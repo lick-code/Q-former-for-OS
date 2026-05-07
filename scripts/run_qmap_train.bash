@@ -5,26 +5,24 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${PROJECT_ROOT}"
 
-# 用法:
+# Usage:
 #   bash scripts/run_qmap_train.bash [GPU_ID] [TRAIN_DATA] [OUTPUT_DIR]
-# 示例:
-#   bash scripts/run_qmap_train.bash 2 train_data.jsonl qmap_checkpoints
-GPU_ID="${1:-2}"
-TRAIN_DATA="${2:-${PROJECT_ROOT}/train_data.jsonl}"
-OUTPUT_DIR="${3:-${PROJECT_ROOT}/qmap_checkpoints}"
+# Example:
+#   bash scripts/run_qmap_train.bash 0 dataset/jsonl/try_train.jsonl outputs/checkpoints/try
+GPU_ID="${1:-0}"
+TRAIN_DATA="${2:-${PROJECT_ROOT}/dataset/jsonl/try_train.jsonl}"
+OUTPUT_DIR="${3:-${PROJECT_ROOT}/outputs/checkpoints/try}"
 LOG_DIR="${PROJECT_ROOT}/logs"
 mkdir -p "${OUTPUT_DIR}" "${LOG_DIR}"
 
 if [[ ! -f "${TRAIN_DATA}" ]]; then
   echo "[error] training data not found: ${TRAIN_DATA}"
-  echo "用法: bash $0 [GPU_ID] [TRAIN_DATA] [OUTPUT_DIR]"
+  echo "Usage: bash $0 [GPU_ID] [TRAIN_DATA] [OUTPUT_DIR]"
   exit 1
 fi
 
 RUN_TS="$(date +%Y%m%d_%H%M%S)"
 LOG_FILE="${LOG_DIR}/qmap_train_${RUN_TS}.log"
-
-# source /home/tingkun/lkc/StageI/venv/bin/activate
 
 echo "[info] gpu=${GPU_ID}"
 echo "[info] train_data=${TRAIN_DATA}"
