@@ -112,7 +112,7 @@ dataset/processed/try_test.csv
 在服务器上运行：
 
 ```bash
-python scripts/run_prototype_experiment.py \
+CUDA_VISIBLE_DEVICES=2 python scripts/run_prototype_experiment.py \
   --run_name try_prototype \
   --train_trace dataset/processed/try_train.csv \
   --test_trace dataset/processed/try_test.csv \
