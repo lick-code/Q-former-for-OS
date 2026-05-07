@@ -60,6 +60,10 @@ def build_arg_parser():
                       help="Existing checkpoint used when --skip_train is set.")
   parser.add_argument("--policies", default="lru,random,lfu,clock,qmap",
                       help="Comma-separated policies to evaluate.")
+  parser.add_argument("--python", default=sys.executable,
+                      help="Python executable used for QMAP subcommands.")
+  parser.add_argument("--toy_records", type=int, default=20000,
+                      help="Records used when auto-creating missing toy trace.")
   return parser
 
 
@@ -83,6 +87,74 @@ def run_command(command, log_path):
 def load_json(path):
   with open(path, "r") as input_file:
     return json.load(input_file)
+
+
+def is_default_try_trace(path, split_name):
+  expected = path_from_root("dataset", "processed",
+                           "try_{}.csv".format(split_name))
+  return os.path.abspath(path) == os.path.abspath(expected)
+
+
+def is_trace_header(row):
+  normalized = {column.strip().lower() for column in row}
+  return bool(normalized & {"pc", "address", "addr", "rw"})
+
+
+def write_trace_split(header, rows, output_path):
+  os.makedirs(os.path.dirname(output_path), exist_ok=True)
+  with open(output_path, "w", newline="") as output_file:
+    writer = csv.writer(output_file)
+    if header:
+      writer.writerow(header)
+    writer.writerows(rows)
+
+
+def split_trace(input_path, train_path, valid_path, test_path):
+  with open(input_path, "r", newline="") as input_file:
+    rows = list(csv.reader(input_file))
+  if not rows:
+    raise ValueError("Trace is empty: {}".format(input_path))
+
+  header = rows[0] if is_trace_header(rows[0]) else None
+  data_rows = rows[1:] if header else rows
+  if len(data_rows) < 10:
+    raise ValueError("Trace is too small to split: {}".format(input_path))
+
+  train_end = int(len(data_rows) * 0.8)
+  valid_end = int(len(data_rows) * 0.9)
+  write_trace_split(header, data_rows[:train_end], train_path)
+  write_trace_split(header, data_rows[train_end:valid_end], valid_path)
+  write_trace_split(header, data_rows[valid_end:], test_path)
+
+
+def ensure_default_try_split(args, log_dir):
+  """Creates the default toy split if dataset/processed/try_*.csv is missing."""
+  train_is_default = is_default_try_trace(args.train_trace, "train")
+  test_is_default = is_default_try_trace(args.test_trace, "test")
+  if not (train_is_default and test_is_default):
+    return
+  if os.path.exists(args.train_trace) and os.path.exists(args.test_trace):
+    return
+
+  raw_trace = path_from_root("dataset", "raw_traces", "try.csv")
+  valid_trace = path_from_root("dataset", "processed", "try_valid.csv")
+  os.makedirs(os.path.dirname(raw_trace), exist_ok=True)
+  os.makedirs(os.path.dirname(args.train_trace), exist_ok=True)
+
+  build_command = [
+      args.python, "qmap/trace_builder.py",
+      "--output", raw_trace,
+      "--page_shift", str(args.page_shift),
+      "--records", str(args.toy_records),
+      "--working_set_pages", "512",
+      "--hot_pages", "64",
+      "--write_ratio", "0.30",
+      "--phase_length", "2000",
+      "--seed", "3136859",
+  ]
+  print("[info] default toy split is missing; creating dataset/processed/try_*.csv")
+  run_command(build_command, os.path.join(log_dir, "build_default_trace.log"))
+  split_trace(raw_trace, args.train_trace, valid_trace, args.test_trace)
 
 
 def write_summary_csv(rows, output_path):
@@ -153,9 +225,19 @@ def main():
     os.makedirs(checkpoint_dir, exist_ok=True)
   os.makedirs(os.path.dirname(train_jsonl), exist_ok=True)
 
+  ensure_default_try_split(args, log_dir)
+  if not os.path.exists(args.train_trace):
+    raise FileNotFoundError(
+        "Training trace not found: {}. Provide --train_trace or put the file "
+        "under dataset/processed/.".format(args.train_trace))
+  if not os.path.exists(args.test_trace):
+    raise FileNotFoundError(
+        "Test trace not found: {}. Provide --test_trace or put the file under "
+        "dataset/processed/.".format(args.test_trace))
+
   if not args.skip_generate:
     generate_command = [
-        sys.executable, "qmap/qmap_generator.py",
+        args.python, "qmap/qmap_generator.py",
         "--input", args.train_trace,
         "--output", train_jsonl,
         "--history_length", str(args.history_length),
@@ -169,7 +251,7 @@ def main():
   checkpoint_path = args.checkpoint
   if not args.skip_train:
     train_command = [
-        sys.executable, "qmap/qmap_train.py",
+        args.python, "qmap/qmap_train.py",
         "--train_data", train_jsonl,
         "--output_dir", checkpoint_dir,
         "--epochs", str(args.epochs),
@@ -187,7 +269,7 @@ def main():
   for policy in policies:
     json_output = os.path.join(result_dir, "{}.json".format(policy))
     eval_command = [
-        sys.executable, "qmap/qmap_eval.py",
+        args.python, "qmap/qmap_eval.py",
         "--trace_path", args.test_trace,
         "--policy", policy,
         "--dram_capacity", str(args.dram_capacity),

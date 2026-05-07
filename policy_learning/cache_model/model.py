@@ -23,8 +23,8 @@ from torch import nn
 from torch.nn import functional as F
 
 try:
-  from cache_replacement.policy_learning.cache_model import embed
-  from cache_replacement.policy_learning.cache_model import loss as L
+  from policy_learning.cache_model import embed
+  from policy_learning.cache_model import loss as L
 except ImportError:
   # 允许直接执行本文件：python policy_learning/cache_model/model.py
   import embed

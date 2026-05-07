@@ -27,7 +27,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
 try:
-  from cache_replacement.policy_learning.cache_model import embed
+  from policy_learning.cache_model import embed
 except ImportError:
   # 允许直接执行本文件：python policy_learning/cache_model/qmap_data.py
   import embed

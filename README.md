@@ -102,7 +102,10 @@ dataset/processed/try_valid.csv
 dataset/processed/try_test.csv
 ```
 
-这组数据适合 smoke test 和第一版原型实验，但还不能支撑最终论文里的强结论。
+如果服务器上没有这几个文件，一键实验脚本会自动用 `qmap/trace_builder.py`
+生成一套默认 toy trace，并切分出 `try_train.csv`、`try_valid.csv` 和
+`try_test.csv`。这组数据适合 smoke test 和第一版原型实验，但还不能支撑最终论文
+里的强结论。
 
 ## 一键运行原型实验
 
@@ -125,6 +128,7 @@ python scripts/run_prototype_experiment.py \
 
 该命令会自动完成：
 
+0. 如果 `dataset/processed/try_*.csv` 不存在，先自动生成默认 toy trace
 1. 从 `try_train.csv` 生成 QMAP JSONL 训练样本
 2. 训练 QMAP 模型
 3. 在 `try_test.csv` 上评估 LRU、Random、LFU、CLOCK 和 QMAP

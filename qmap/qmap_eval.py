@@ -29,9 +29,8 @@ from qmap_generator import read_trace
 
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-PROJECT_PARENT = os.path.dirname(PROJECT_ROOT)
-if PROJECT_PARENT not in sys.path:
-  sys.path.insert(0, PROJECT_PARENT)
+if PROJECT_ROOT not in sys.path:
+  sys.path.insert(0, PROJECT_ROOT)
 
 
 DRAM_READ_COST = 1.0
@@ -174,8 +173,8 @@ class QMAPPolicy(object):
 
     # Lazy imports keep LRU/Random evaluation runnable without importing torch.
     import torch
-    from cache_replacement.policy_learning.cache_model import embed
-    from cache_replacement.policy_learning.cache_model import model
+    from policy_learning.cache_model import embed
+    from policy_learning.cache_model import model
 
     self._torch = torch
     self._device = device

@@ -13,13 +13,12 @@ from torch.utils.data import Dataset
 
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-PROJECT_PARENT = os.path.dirname(PROJECT_ROOT)
-if PROJECT_PARENT not in sys.path:
-  sys.path.insert(0, PROJECT_PARENT)
+if PROJECT_ROOT not in sys.path:
+  sys.path.insert(0, PROJECT_ROOT)
 
-from cache_replacement.policy_learning.cache_model import embed
-from cache_replacement.policy_learning.cache_model import model
-from cache_replacement.policy_learning.cache_model import qmap_loss
+from policy_learning.cache_model import embed
+from policy_learning.cache_model import model
+from policy_learning.cache_model import qmap_loss
 
 
 class QMAPAccessSequenceDataset(Dataset):
