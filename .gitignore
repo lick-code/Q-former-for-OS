@@ -11,11 +11,9 @@ env/
 environment/
 
 # Runtime outputs
-checkpoints/
 qmap_checkpoints/
 
 # Large/local datasets
-dataset/
 *.jsonl
 !test_train_data_with_rw.jsonl
 !train_data.jsonl
