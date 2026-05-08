@@ -12,6 +12,10 @@ stable around the current prototype setting by varying one parameter at a time:
 For each unique configuration it regenerates QMAP samples, retrains QMAP with a
 fixed seed, evaluates QMAP on the test trace, and writes compact CSV/Markdown
 summaries.
+
+Completed runs are reused only when their saved metadata matches the current
+training/evaluation arguments.  This avoids accidentally mixing old 5-epoch
+results into a 10-epoch sweep.
 """
 
 import argparse
@@ -104,6 +108,43 @@ def load_json(path):
     return json.load(input_file)
 
 
+def write_json(data, path):
+  with open(path, "w", encoding="utf-8") as output_file:
+    json.dump(data, output_file, indent=2, sort_keys=True)
+    output_file.write("\n")
+
+
+def normalized_path(path):
+  return os.path.normpath(os.path.abspath(path))
+
+
+def run_metadata(args, config):
+  metadata = {
+      "config": dict(config),
+      "train_trace": normalized_path(args.train_trace),
+      "test_trace": normalized_path(args.test_trace),
+      "page_shift": args.page_shift,
+      "epochs": args.epochs,
+      "batch_size": args.batch_size,
+      "lr": args.lr,
+      "device": args.device,
+      "seed": args.seed,
+  }
+  return metadata
+
+
+def can_reuse_run(args, config, qmap_json, checkpoint_path, metadata_path):
+  if args.force:
+    return False
+  if not (os.path.exists(qmap_json) and os.path.exists(checkpoint_path) and
+          os.path.exists(metadata_path)):
+    return False
+  try:
+    return load_json(metadata_path) == run_metadata(args, config)
+  except (IOError, ValueError):
+    return False
+
+
 def build_rows():
   rows = []
   for parameter, values in PARAMETER_VALUES.items():
@@ -121,10 +162,12 @@ def run_experiment(args, config):
   jsonl_path = os.path.join(args.jsonl_root, "{}.jsonl".format(run_id))
   log_dir = os.path.join(result_dir, "logs")
   qmap_json = os.path.join(result_dir, "qmap.json")
+  metadata_path = os.path.join(result_dir, "run_metadata.json")
   checkpoint_path = os.path.join(
       checkpoint_dir, "qmap_epoch_{}.pth".format(args.epochs))
 
-  if not args.force and os.path.exists(qmap_json):
+  if can_reuse_run(args, config, qmap_json, checkpoint_path, metadata_path):
+    print("[skip] reusable run: {}".format(run_id), flush=True)
     return load_json(qmap_json), result_dir, checkpoint_path
 
   os.makedirs(result_dir, exist_ok=True)
@@ -168,6 +211,7 @@ def run_experiment(args, config):
       "--json_output", qmap_json,
   ]
   run_command(eval_command, os.path.join(log_dir, "qmap.log"))
+  write_json(run_metadata(args, config), metadata_path)
 
   return load_json(qmap_json), result_dir, checkpoint_path
 
