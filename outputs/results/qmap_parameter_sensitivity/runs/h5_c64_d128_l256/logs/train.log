@@ -1,31 +1,59 @@
 QMAP training configuration:
-  train_data path: D:\计算机系统大赛\功能赛道\cache_replacement\dataset\jsonl\qmap_parameter_sensitivity\h5_c64_d128_l256.jsonl
+  train_data path: dataset/jsonl/qmap_parameter_sensitivity/h5_c64_d128_l256.jsonl
   number of training samples: 6064
-  batch_size: 64
-  epochs: 5
+  batch_size: 32
+  epochs: 10
   learning rate: 0.0001
-  device: cpu
-Epoch [1/5] iter=1 loss=-0.737813
-Epoch [1/5] avg_loss=-0.753435
-Saved checkpoint: D:\计算机系统大赛\功能赛道\cache_replacement\outputs\checkpoints\qmap_parameter_sensitivity\h5_c64_d128_l256\qmap_epoch_1.pth
-Epoch [2/5] iter=96 loss=-0.773049
-Epoch [2/5] iter=100 loss=-0.766057
-Epoch [2/5] avg_loss=-0.780791
-Saved checkpoint: D:\计算机系统大赛\功能赛道\cache_replacement\outputs\checkpoints\qmap_parameter_sensitivity\h5_c64_d128_l256\qmap_epoch_2.pth
-Epoch [3/5] iter=191 loss=-0.811604
-Epoch [3/5] iter=200 loss=-0.830042
-Epoch [3/5] avg_loss=-0.870712
-Saved checkpoint: D:\计算机系统大赛\功能赛道\cache_replacement\outputs\checkpoints\qmap_parameter_sensitivity\h5_c64_d128_l256\qmap_epoch_3.pth
-Epoch [4/5] iter=286 loss=-0.892353
-Epoch [4/5] iter=300 loss=-0.897258
-Epoch [4/5] avg_loss=-0.900691
-Saved checkpoint: D:\计算机系统大赛\功能赛道\cache_replacement\outputs\checkpoints\qmap_parameter_sensitivity\h5_c64_d128_l256\qmap_epoch_4.pth
-Epoch [5/5] iter=381 loss=-0.907751
-Epoch [5/5] iter=400 loss=-0.911838
-Epoch [5/5] avg_loss=-0.909635
-Saved checkpoint: D:\计算机系统大赛\功能赛道\cache_replacement\outputs\checkpoints\qmap_parameter_sensitivity\h5_c64_d128_l256\qmap_epoch_5.pth
+  device: cuda
+Epoch [1/10] iter=1 loss=-0.737809
+Epoch [1/10] iter=100 loss=-0.774593
+Epoch [1/10] avg_loss=-0.765611
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_1.pth
+Epoch [2/10] iter=191 loss=-0.799290
+Epoch [2/10] iter=200 loss=-0.802146
+Epoch [2/10] iter=300 loss=-0.890056
+Epoch [2/10] avg_loss=-0.881307
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_2.pth
+Epoch [3/10] iter=381 loss=-0.908497
+Epoch [3/10] iter=400 loss=-0.897818
+Epoch [3/10] iter=500 loss=-0.913705
+Epoch [3/10] avg_loss=-0.910816
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_3.pth
+Epoch [4/10] iter=571 loss=-0.913773
+Epoch [4/10] iter=600 loss=-0.917790
+Epoch [4/10] iter=700 loss=-0.922336
+Epoch [4/10] avg_loss=-0.917383
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_4.pth
+Epoch [5/10] iter=761 loss=-0.920572
+Epoch [5/10] iter=800 loss=-0.921213
+Epoch [5/10] iter=900 loss=-0.924358
+Epoch [5/10] avg_loss=-0.921839
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_5.pth
+Epoch [6/10] iter=951 loss=-0.922850
+Epoch [6/10] iter=1000 loss=-0.925784
+Epoch [6/10] iter=1100 loss=-0.916809
+Epoch [6/10] avg_loss=-0.924622
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_6.pth
+Epoch [7/10] iter=1141 loss=-0.926339
+Epoch [7/10] iter=1200 loss=-0.923384
+Epoch [7/10] iter=1300 loss=-0.924747
+Epoch [7/10] avg_loss=-0.926612
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_7.pth
+Epoch [8/10] iter=1331 loss=-0.928524
+Epoch [8/10] iter=1400 loss=-0.925203
+Epoch [8/10] iter=1500 loss=-0.925830
+Epoch [8/10] avg_loss=-0.927969
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_8.pth
+Epoch [9/10] iter=1521 loss=-0.927367
+Epoch [9/10] iter=1600 loss=-0.930524
+Epoch [9/10] iter=1700 loss=-0.933524
+Epoch [9/10] avg_loss=-0.928863
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_9.pth
+Epoch [10/10] iter=1711 loss=-0.929577
+Epoch [10/10] iter=1800 loss=-0.925395
+Epoch [10/10] iter=1900 loss=-0.928336
+Epoch [10/10] avg_loss=-0.929634
+Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h5_c64_d128_l256/qmap_epoch_10.pth
 Training finished.
-D:\Anaconda\envs\leinao\lib\site-packages\torch\nn\modules\transformer.py:307: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
-  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
-D:\计算机系统大赛\功能赛道\cache_replacement\policy_learning\cache_model\embed.py:183: FutureWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/main/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
-  state_dict = super().state_dict(destination, prefix, keep_vars)
+/home/tingkun/miniconda3/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
