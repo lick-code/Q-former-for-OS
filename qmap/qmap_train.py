@@ -21,6 +21,8 @@ from policy_learning.cache_model import embed
 from policy_learning.cache_model import model
 from policy_learning.cache_model import qmap_loss
 
+ABLATION_CHOICES = ("full", "no_pc", "no_rw", "no_qformer", "no_cost")
+
 
 class QMAPAccessSequenceDataset(Dataset):
   """Loads complete QMAP training samples from a JSONL file.
@@ -162,6 +164,8 @@ def build_arg_parser():
                       help="cpu, cuda, or omitted for auto selection.")
   parser.add_argument("--seed", type=int, default=3136859,
                       help="Random seed for reproducible sensitivity runs.")
+  parser.add_argument("--ablation", choices=ABLATION_CHOICES, default="full",
+                      help="QMAP ablation variant to train.")
   return parser
 
 
@@ -174,6 +178,15 @@ def set_random_seed(seed):
 
 def move_batch_to_device(batch, device):
   return {key: value.to(device) for key, value in batch.items()}
+
+
+def apply_batch_ablation(batch, ablation):
+  """Drops ablated model inputs while keeping checkpoint dimensions stable."""
+  if ablation == "no_pc":
+    batch["pc"] = torch.zeros_like(batch["pc"])
+  elif ablation == "no_rw":
+    batch["rw"] = torch.zeros_like(batch["rw"])
+  return batch
 
 
 def save_checkpoint(path, feature_embedder, extractor, scorer, optimizer, epoch,
@@ -213,6 +226,7 @@ def main():
   print("  epochs:", args.epochs)
   print("  learning rate:", args.lr)
   print("  device:", device, flush=True)
+  print("  ablation:", args.ablation, flush=True)
 
   feature_embedder = embed.QMAPAccessFeatureEmbedder(
       address_embedder=embed.DynamicVocabEmbedder(
@@ -231,7 +245,9 @@ def main():
       hidden_dim=args.hidden_dim,
       num_queries=args.num_queries,
       num_layers=args.num_layers,
-      num_heads=args.num_heads).to(device)
+      num_heads=args.num_heads,
+      use_qformer=(args.ablation != "no_qformer"),
+      pooling_strategy="mean").to(device)
   scorer = model.QMAPCandidateScorer(
       hidden_dim=args.hidden_dim,
       page_state_dim=args.page_state_dim,
@@ -239,7 +255,11 @@ def main():
       page_vocab_size=args.page_vocab_size,
       num_heads=args.num_heads,
       page_dim=args.page_dim).to(device)
-  loss_fn = qmap_loss.QMAPCostAwareRankingLoss().to(device)
+  if args.ablation == "no_cost":
+    loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
+        lambda_3=0.0, lambda_4=0.0).to(device)
+  else:
+    loss_fn = qmap_loss.QMAPCostAwareRankingLoss().to(device)
 
   parameters = (
       list(feature_embedder.parameters()) +
@@ -257,6 +277,7 @@ def main():
     epoch_iterations = 0
     for batch in dataloader:
       batch = move_batch_to_device(batch, device)
+      batch = apply_batch_ablation(batch, args.ablation)
 
       access_features = feature_embedder(
           batch["physical_address"], batch["pc"], batch["rw"])

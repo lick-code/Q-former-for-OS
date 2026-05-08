@@ -18,6 +18,8 @@ import collections
 import csv
 import json
 
+ABLATION_CHOICES = ("full", "no_pc", "no_rw", "no_qformer", "no_cost")
+
 
 def parse_int(value):
   """Parses hex strings such as 0x10 and decimal strings."""
@@ -172,6 +174,15 @@ def padded_history(history, history_length):
   physical_address = [0] * padding + [item["page"] for item in history]
   pc = [0] * padding + [item["pc"] for item in history]
   rw = [0] * padding + [item["rw"] for item in history]
+  return physical_address, pc, rw
+
+
+def apply_history_ablation(physical_address, pc, rw, ablation):
+  """Removes ablated access-sequence signals while preserving tensor shapes."""
+  if ablation == "no_pc":
+    pc = [0] * len(pc)
+  elif ablation == "no_rw":
+    rw = [0] * len(rw)
   return physical_address, pc, rw
 
 
@@ -373,8 +384,9 @@ def generate_qmap_samples(args):
 
       is_hit = access["page"] in dram_cache
       if not is_hit and len(dram_cache) >= args.dram_capacity:
-        physical_address, pc, rw = padded_history(
-            history, args.history_length)
+        physical_address, pc, rw = apply_history_ablation(
+            *padded_history(history, args.history_length),
+            ablation=args.ablation)
         candidates, candidate_mask = get_lru_tail_candidates_and_mask(
             dram_cache, args.candidate_count)
 
@@ -450,6 +462,8 @@ def build_arg_parser():
                       help="Number of pages in the simulated DRAM LRU cache.")
   parser.add_argument("--page_shift", type=int, default=0,
                       help="Right shift raw addresses to page addresses.")
+  parser.add_argument("--ablation", choices=ABLATION_CHOICES, default="full",
+                      help="QMAP ablation variant for generated samples.")
   return parser
 
 

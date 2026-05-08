@@ -123,7 +123,8 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
   """
 
   def __init__(self, hidden_dim=18, num_queries=4, num_layers=1, num_heads=2,
-               feedforward_dim=None, dropout=0.0):
+               feedforward_dim=None, dropout=0.0, use_qformer=True,
+               pooling_strategy="mean"):
     """Constructs the QMAP macroscopic pattern extractor.
 
     Args:
@@ -137,9 +138,13 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
     super(QMAPMacroscopicPatternExtractor, self).__init__()
     if hidden_dim % num_heads != 0:
       raise ValueError("hidden_dim must be divisible by num_heads.")
+    if pooling_strategy not in ("mean", "last"):
+      raise ValueError("pooling_strategy must be 'mean' or 'last'.")
 
     if feedforward_dim is None:
       feedforward_dim = hidden_dim * 4
+    self._use_qformer = use_qformer
+    self._pooling_strategy = pooling_strategy
 
     encoder_layer = nn.TransformerEncoderLayer(
         d_model=hidden_dim,
@@ -149,11 +154,14 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
         activation="gelu")
     self._transformer_encoder = nn.TransformerEncoder(
         encoder_layer, num_layers=num_layers)
-    self._qformer = QFormer(
-        hidden_dim=hidden_dim,
-        num_queries=num_queries,
-        num_heads=num_heads,
-        dropout=dropout)
+    if use_qformer:
+      self._qformer = QFormer(
+          hidden_dim=hidden_dim,
+          num_queries=num_queries,
+          num_heads=num_heads,
+          dropout=dropout)
+    else:
+      self._qformer = None
 
   def forward(self, access_features):
     """Extracts macroscopic access patterns.
@@ -174,7 +182,13 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
     sequence_first = access_features.transpose(0, 1)
     encoded = self._transformer_encoder(sequence_first, mask=causal_mask)
     encoded = encoded.transpose(0, 1)
-    return self._qformer(encoded)
+    if self._use_qformer:
+      return self._qformer(encoded)
+    if self._pooling_strategy == "last":
+      pooled = encoded[:, -1:, :]
+    else:
+      pooled = encoded.mean(dim=1, keepdim=True)
+    return pooled
 
   @staticmethod
   def _causal_mask(sequence_length, device):

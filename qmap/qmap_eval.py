@@ -23,6 +23,7 @@ import sys
 import time
 
 from qmap_generator import build_candidate_state_features
+from qmap_generator import apply_history_ablation
 from qmap_generator import get_lru_tail_candidates_and_mask
 from qmap_generator import padded_history
 from qmap_generator import read_trace
@@ -38,6 +39,7 @@ DRAM_WRITE_COST = 1.0
 NVM_READ_COST = 2.0
 NVM_WRITE_COST = 4.0
 MIGRATION_COST = 10.0
+ABLATION_CHOICES = ("full", "no_pc", "no_rw", "no_qformer", "no_cost")
 
 
 def build_arg_parser():
@@ -58,6 +60,9 @@ def build_arg_parser():
                       help="cpu, cuda, or omitted for auto selection.")
   parser.add_argument("--json_output", default=None,
                       help="Optional path to write machine-readable metrics.")
+  parser.add_argument("--ablation", choices=ABLATION_CHOICES, default=None,
+                      help=("QMAP ablation variant. Defaults to the checkpoint "
+                            "model_args value for --policy qmap."))
   return parser
 
 
@@ -167,7 +172,8 @@ class ClockPolicy(object):
 class QMAPPolicy(object):
   """Loads a trained QMAP checkpoint and scores LRU-tail candidates."""
 
-  def __init__(self, checkpoint_path, device, history_length, candidate_count):
+  def __init__(self, checkpoint_path, device, history_length, candidate_count,
+               ablation=None):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
 
@@ -183,6 +189,7 @@ class QMAPPolicy(object):
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model_args = checkpoint.get("model_args", {})
+    self._ablation = ablation or model_args.get("ablation", "full")
 
     self._feature_embedder = embed.QMAPAccessFeatureEmbedder(
         address_embedder=embed.DynamicVocabEmbedder(
@@ -197,7 +204,9 @@ class QMAPPolicy(object):
         hidden_dim=model_args.get("hidden_dim", 18),
         num_queries=model_args.get("num_queries", 4),
         num_layers=model_args.get("num_layers", 1),
-        num_heads=model_args.get("num_heads", 2)).to(device)
+        num_heads=model_args.get("num_heads", 2),
+        use_qformer=(model_args.get("ablation") != "no_qformer"),
+        pooling_strategy="mean").to(device)
     self._scorer = model.QMAPCandidateScorer(
         hidden_dim=model_args.get("hidden_dim", 18),
         page_state_dim=model_args.get("page_state_dim", 3),
@@ -222,7 +231,9 @@ class QMAPPolicy(object):
                     dram_insert_time, dirty_pages):
     candidates, candidate_mask = get_lru_tail_candidates_and_mask(
         dram_pages, self._candidate_count)
-    physical_address, pc, rw = padded_history(history, self._history_length)
+    physical_address, pc, rw = apply_history_ablation(
+        *padded_history(history, self._history_length),
+        ablation=self._ablation)
     candidate_state_features = []
     for candidate in candidates:
       residency_duration = access_index - dram_insert_time.get(
@@ -277,7 +288,8 @@ def replay(args):
         args.checkpoint,
         torch.device(device),
         args.history_length,
-        args.candidate_count)
+        args.candidate_count,
+        args.ablation)
 
   for access_index, access in enumerate(trace):
     page = access["page"]
