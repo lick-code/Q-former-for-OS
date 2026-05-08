@@ -1,0 +1,89 @@
+QMAP training configuration:
+  train_data path: /home/tingkun/lcs/cache_replacement/dataset/jsonl/streaming_train.jsonl
+  number of training samples: 15872
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  device: cuda
+Epoch [1/10] iter=1 loss=-0.000000
+Epoch [1/10] iter=100 loss=-0.000000
+Epoch [1/10] iter=200 loss=-0.000000
+Epoch [1/10] iter=300 loss=-0.000000
+Epoch [1/10] iter=400 loss=-0.000000
+Epoch [1/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_1.pth
+Epoch [2/10] iter=497 loss=-0.000000
+Epoch [2/10] iter=500 loss=-0.000000
+Epoch [2/10] iter=600 loss=-0.000000
+Epoch [2/10] iter=700 loss=-0.000000
+Epoch [2/10] iter=800 loss=-0.000000
+Epoch [2/10] iter=900 loss=-0.000000
+Epoch [2/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_2.pth
+Epoch [3/10] iter=993 loss=-0.000000
+Epoch [3/10] iter=1000 loss=-0.000000
+Epoch [3/10] iter=1100 loss=-0.000000
+Epoch [3/10] iter=1200 loss=-0.000000
+Epoch [3/10] iter=1300 loss=-0.000000
+Epoch [3/10] iter=1400 loss=-0.000000
+Epoch [3/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_3.pth
+Epoch [4/10] iter=1489 loss=-0.000000
+Epoch [4/10] iter=1500 loss=-0.000000
+Epoch [4/10] iter=1600 loss=-0.000000
+Epoch [4/10] iter=1700 loss=-0.000000
+Epoch [4/10] iter=1800 loss=-0.000000
+Epoch [4/10] iter=1900 loss=-0.000000
+Epoch [4/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_4.pth
+Epoch [5/10] iter=1985 loss=-0.000000
+Epoch [5/10] iter=2000 loss=-0.000000
+Epoch [5/10] iter=2100 loss=-0.000000
+Epoch [5/10] iter=2200 loss=-0.000000
+Epoch [5/10] iter=2300 loss=-0.000000
+Epoch [5/10] iter=2400 loss=-0.000000
+Epoch [5/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_5.pth
+Epoch [6/10] iter=2481 loss=-0.000000
+Epoch [6/10] iter=2500 loss=-0.000000
+Epoch [6/10] iter=2600 loss=-0.000000
+Epoch [6/10] iter=2700 loss=-0.000000
+Epoch [6/10] iter=2800 loss=-0.000000
+Epoch [6/10] iter=2900 loss=-0.000000
+Epoch [6/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_6.pth
+Epoch [7/10] iter=2977 loss=-0.000000
+Epoch [7/10] iter=3000 loss=-0.000000
+Epoch [7/10] iter=3100 loss=-0.000000
+Epoch [7/10] iter=3200 loss=-0.000000
+Epoch [7/10] iter=3300 loss=-0.000000
+Epoch [7/10] iter=3400 loss=-0.000000
+Epoch [7/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_7.pth
+Epoch [8/10] iter=3473 loss=-0.000000
+Epoch [8/10] iter=3500 loss=-0.000000
+Epoch [8/10] iter=3600 loss=-0.000000
+Epoch [8/10] iter=3700 loss=-0.000000
+Epoch [8/10] iter=3800 loss=-0.000000
+Epoch [8/10] iter=3900 loss=-0.000000
+Epoch [8/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_8.pth
+Epoch [9/10] iter=3969 loss=-0.000000
+Epoch [9/10] iter=4000 loss=-0.000000
+Epoch [9/10] iter=4100 loss=-0.000000
+Epoch [9/10] iter=4200 loss=-0.000000
+Epoch [9/10] iter=4300 loss=-0.000000
+Epoch [9/10] iter=4400 loss=-0.000000
+Epoch [9/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_9.pth
+Epoch [10/10] iter=4465 loss=-0.000000
+Epoch [10/10] iter=4500 loss=-0.000000
+Epoch [10/10] iter=4600 loss=-0.000000
+Epoch [10/10] iter=4700 loss=-0.000000
+Epoch [10/10] iter=4800 loss=-0.000000
+Epoch [10/10] iter=4900 loss=-0.000000
+Epoch [10/10] avg_loss=0.000000
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/workload_suite/streaming/qmap_epoch_10.pth
+Training finished.
+/home/tingkun/miniconda3/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
