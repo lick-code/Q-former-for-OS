@@ -4,6 +4,7 @@
 import argparse
 import json
 import os
+import random
 import sys
 
 import torch
@@ -28,11 +29,11 @@ class QMAPAccessSequenceDataset(Dataset):
     physical_address: [sequence_length]
     pc: [sequence_length]
     rw: [sequence_length]，0 表示读，1 表示写
-    candidates_features: [64, page_dim]
-    inactivity: [64]
-    coldness: [64]
-    write_sensitivity: [64]
-    migration_cost: [64]
+    candidates_features: [candidate_count, page_dim]
+    inactivity: [candidate_count]
+    coldness: [candidate_count]
+    write_sensitivity: [candidate_count]
+    migration_cost: [candidate_count]
   """
 
   REQUIRED_FIELDS = (
@@ -71,7 +72,11 @@ class QMAPAccessSequenceDataset(Dataset):
         "pc": torch.tensor(sample["pc"], dtype=torch.long),
         "rw": torch.tensor(sample["rw"], dtype=torch.long),
         "candidate_pages": torch.tensor(
-            sample.get("candidate_pages", [0] * 64), dtype=torch.long),
+            sample.get(
+                "candidate_pages",
+                [0] * len(sample.get("candidate_state_features",
+                                      sample.get("candidates_features")))),
+            dtype=torch.long),
         "candidate_state_features": torch.tensor(
             sample.get("candidate_state_features",
                        sample.get("candidates_features")), dtype=torch.float32),
@@ -102,19 +107,21 @@ class QMAPAccessSequenceDataset(Dataset):
           line_number))
 
     if "candidate_state_features" in sample:
-      if len(sample.get("candidate_pages", [])) != 64:
-        raise ValueError("Line {} must contain exactly 64 candidate pages."
-                         .format(line_number))
-      if len(sample["candidate_state_features"]) != 64:
-        raise ValueError("Line {} must contain exactly 64 candidate states."
-                         .format(line_number))
-      if len(sample.get("candidate_mask", [])) != 64:
-        raise ValueError("Line {} must contain exactly 64 mask values."
-                         .format(line_number))
+      candidate_count = len(sample["candidate_state_features"])
+      if candidate_count == 0:
+        raise ValueError("Line {} has no candidates.".format(line_number))
+      if len(sample.get("candidate_pages", [])) != candidate_count:
+        raise ValueError(
+            "Line {} candidate_pages length must match candidates ({})."
+            .format(line_number, candidate_count))
+      if len(sample.get("candidate_mask", [])) != candidate_count:
+        raise ValueError(
+            "Line {} candidate_mask length must match candidates ({})."
+            .format(line_number, candidate_count))
     elif "candidates_features" in sample:
-      if len(sample["candidates_features"]) != 64:
-        raise ValueError("Line {} must contain exactly 64 candidates.".format(
-            line_number))
+      candidate_count = len(sample["candidates_features"])
+      if candidate_count == 0:
+        raise ValueError("Line {} has no candidates.".format(line_number))
     else:
       raise ValueError(
           "Line {} must contain candidate_state_features or candidates_features."
@@ -122,9 +129,10 @@ class QMAPAccessSequenceDataset(Dataset):
 
     for field in ("inactivity", "coldness", "write_sensitivity",
                   "migration_cost"):
-      if len(sample[field]) != 64:
-        raise ValueError("Line {} field {} must have length 64.".format(
-            line_number, field))
+      if len(sample[field]) != candidate_count:
+        raise ValueError(
+            "Line {} field {} length must match candidates ({}).".format(
+                line_number, field, candidate_count))
 
 
 def build_arg_parser():
@@ -152,7 +160,16 @@ def build_arg_parser():
   parser.add_argument("--num_heads", type=int, default=2)
   parser.add_argument("--device", default=None,
                       help="cpu, cuda, or omitted for auto selection.")
+  parser.add_argument("--seed", type=int, default=3136859,
+                      help="Random seed for reproducible sensitivity runs.")
   return parser
+
+
+def set_random_seed(seed):
+  random.seed(seed)
+  torch.manual_seed(seed)
+  if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(seed)
 
 
 def move_batch_to_device(batch, device):
@@ -174,6 +191,7 @@ def save_checkpoint(path, feature_embedder, extractor, scorer, optimizer, epoch,
 def main():
   args = build_arg_parser().parse_args()
   os.makedirs(args.output_dir, exist_ok=True)
+  set_random_seed(args.seed)
 
   device = args.device
   if device is None:

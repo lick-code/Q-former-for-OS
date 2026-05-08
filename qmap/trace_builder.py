@@ -107,7 +107,7 @@ def convert_trace(input_path, output_path, page_shift, fallback_rw):
   return len(rows)
 
 
-def choose_page(rng, phase, hot_pages, cold_pages, scan_pages):
+def choose_mixed_page(rng, phase, hot_pages, cold_pages, scan_pages):
   selector = rng.random()
   if phase % 4 == 0:
     if selector < 0.72:
@@ -132,6 +132,85 @@ def choose_page(rng, phase, hot_pages, cold_pages, scan_pages):
   if selector < 0.82:
     return rng.choice(hot_pages)
   return rng.choice(cold_pages)
+
+
+def choose_hotset_page(rng, hot_pages, cold_pages, scan_pages):
+  selector = rng.random()
+  if selector < 0.86:
+    return rng.choice(hot_pages)
+  if selector < 0.97:
+    return rng.choice(cold_pages)
+  return rng.choice(scan_pages)
+
+
+def choose_writeheavy_page(rng, hot_pages, cold_pages, scan_pages,
+                           write_hot_pages):
+  selector = rng.random()
+  write_hot_pages = tuple(write_hot_pages)
+  if selector < 0.58:
+    return rng.choice(write_hot_pages)
+  if selector < 0.78:
+    return rng.choice(hot_pages)
+  if selector < 0.94:
+    return rng.choice(cold_pages)
+  return rng.choice(scan_pages)
+
+
+def choose_streaming_page(index, phase, pages):
+  stride = 1 + phase % 3
+  return pages[(index * stride + phase) % len(pages)]
+
+
+def choose_phasechange_page(rng, phase, pages, hot_count):
+  hot_pages = phase_hot_pages(phase, pages, hot_count)
+  cold_pages = [
+      page for page in pages
+      if page not in set(hot_pages)
+  ]
+  selector = rng.random()
+  if selector < 0.76:
+    return rng.choice(hot_pages)
+  if selector < 0.90:
+    return rng.choice(cold_pages)
+  return pages[(phase * 97 + rng.randrange(len(pages))) % len(pages)]
+
+
+def phase_hot_pages(phase, pages, hot_count):
+  phase_count = 4
+  segment_size = max(1, len(pages) // phase_count)
+  segment_start = (phase % phase_count) * segment_size
+  return [
+      pages[(segment_start + offset) % len(pages)]
+      for offset in range(min(hot_count, len(pages)))
+  ]
+
+
+def choose_workload_page(rng, index, phase, workload, pages, hot_pages,
+                         cold_pages, scan_pages, write_hot_pages):
+  if workload == "hotset":
+    return choose_hotset_page(rng, hot_pages, cold_pages, scan_pages)
+  if workload == "writeheavy":
+    return choose_writeheavy_page(rng, hot_pages, cold_pages, scan_pages,
+                                  write_hot_pages)
+  if workload == "streaming":
+    return choose_streaming_page(index, phase, pages)
+  if workload == "phasechange":
+    return choose_phasechange_page(rng, phase, pages, len(hot_pages))
+  return choose_mixed_page(rng, phase, hot_pages, cold_pages, scan_pages)
+
+
+def workload_write_ratio(workload, phase, base_write_ratio):
+  if workload == "writeheavy":
+    return max(base_write_ratio, 0.76)
+  if workload == "streaming":
+    return min(base_write_ratio, 0.12)
+  if workload == "phasechange":
+    if phase % 4 in (1, 2):
+      return max(base_write_ratio, 0.62)
+    return min(max(base_write_ratio, 0.18), 0.35)
+  if workload == "hotset":
+    return min(max(base_write_ratio, 0.20), 0.34)
+  return base_write_ratio
 
 
 def synthetic_rw(rng, page, hot_pages, write_hot_pages, base_write_ratio):
@@ -164,17 +243,27 @@ def synthesize_trace(args):
   phase_length = max(1, args.phase_length)
   for index in range(args.records):
     phase = index // phase_length
-    page = choose_page(rng, phase, hot_pages, cold_pages, scan_pages)
+    page = choose_workload_page(rng, index, phase, args.workload, pages,
+                                hot_pages, cold_pages, scan_pages,
+                                write_hot_pages)
 
-    if phase % 4 == 3 and scan_pages:
+    if args.workload == "mixed" and phase % 4 == 3 and scan_pages:
       page = scan_pages[(index + phase) % len(scan_pages)]
 
     pc_region = phase % max(1, args.pc_regions)
     pc_offset = rng.randrange(args.pc_count) * 4
     pc = args.pc_base + pc_region * 0x1000 + pc_offset
     address = page << args.page_shift
-    rw = synthetic_rw(rng, page, set(hot_pages), write_hot_pages,
-                      args.write_ratio)
+    write_ratio = workload_write_ratio(args.workload, phase, args.write_ratio)
+    active_hot_pages = set(hot_pages)
+    active_write_hot_pages = write_hot_pages
+    if args.workload == "phasechange":
+      active_hot_list = phase_hot_pages(phase, pages, len(hot_pages))
+      active_hot_pages = set(active_hot_list)
+      active_write_hot_pages = set(
+          active_hot_list[:max(1, len(active_hot_list) // 4)])
+    rw = synthetic_rw(rng, page, active_hot_pages, active_write_hot_pages,
+                      write_ratio)
     rows.append((pc, address, rw))
 
   write_trace(rows, args.output)
@@ -194,6 +283,10 @@ def build_arg_parser():
                       help="RW value used when converting a trace without RW.")
 
   parser.add_argument("--records", type=int, default=20000)
+  parser.add_argument("--workload", default="mixed",
+                      choices=("mixed", "hotset", "writeheavy", "streaming",
+                               "phasechange"),
+                      help="Synthetic workload pattern.")
   parser.add_argument("--working_set_pages", type=int, default=512)
   parser.add_argument("--hot_pages", type=int, default=64)
   parser.add_argument("--write_ratio", type=float, default=0.30)

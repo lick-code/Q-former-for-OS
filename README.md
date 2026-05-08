@@ -1,44 +1,29 @@
 # QMAP：面向 DRAM/NVM 混合内存的页面迁移原型
 
-QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。它把页面迁移建模为
-候选页面排序问题：当 DRAM 已满且一次 DRAM miss 触发迁移决策时，QMAP 从 LRU
-尾部取一小组候选页，对每个候选页打分，并选择最应该从 DRAM 降级到 NVM 的页面。
+QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。它把页面迁移建模为候选页面排序问题：当 DRAM 已满且一次 DRAM miss 触发迁移决策时，QMAP 从 LRU 尾部取一组候选页，对每个候选页打分，并选择最应该从 DRAM 降级到 NVM 的页面。
 
-当前仓库的目标是先做出一套可信、可复现的原型实验，不是一次性完成论文级大规模
-评测。第一阶段先稳定比较 QMAP 和几个简单 baseline，再继续扩展真实 trace、
-消融实验和更强的系统 baseline。
+当前仓库目标是先做出一套可信、可复现的原型实验，而不是一次性完成论文级大规模评测。
 
-## 当前实现
+## 当前进度
 
-当前 QMAP 实验链路如下：
+截至当前目录状态，前 4 步完成情况如下：
 
-```text
-PC,Address,RW trace
--> qmap/qmap_generator.py
--> QMAP JSONL 训练样本
--> qmap/qmap_train.py
--> QMAP checkpoint
--> qmap/qmap_eval.py
--> LRU / Random / LFU / CLOCK / QMAP replay 指标
-```
-
-模型路径包括：
-
-- 物理地址、PC、读写类型三路 embedding
-- 轻量 Transformer encoder
-- 使用可学习 query 的 Q-Former，用于提取全局访存模式
-- 基于 LRU 尾部候选页的页面打分器
-- cost-aware ranking loss，标签由离线 replay 统计得到，包括未来不活跃程度、
-  coldness、write sensitivity 和 migration cost
+| 步骤 | 状态 | 说明 |
+|---|---|---|
+| 1. 清理目录并保留有效结果 | 基本完成 | 主结果在 `outputs/results/try_prototype/`，主权重在 `outputs/checkpoints/try_prototype/`。仍有 `outputs/results/diagnostic_baselines/` 这种调试结果，可以删除。 |
+| 2. Checkpoint sweep | 已完成 | 结果在 `outputs/results/checkpoint_sweep/summary.md`。当前 `qmap_epoch_10.pth` 是 weighted cost 最低的 checkpoint。 |
+| 3. 多 workload | 部分完成 | `hotset/writeheavy/streaming/phasechange` 的 raw/processed trace 已生成，见 `dataset/metadata/workload_manifest.json`；但当前没有看到 `outputs/results/workload_suite/summary.md`，说明完整多 workload 训练和评估还没跑完。 |
+| 4. 参数敏感性实验 | 已完成 | 结果在 `outputs/results/qmap_parameter_sensitivity/summary.md`。 |
+| 5. 消融实验 | 未完成 | 还没有 `no-PC/no-RW/no-QFormer/no-cost` 等消融开关和结果。 |
 
 ## 目录结构
 
 ```text
 qmap/
   trace_builder.py              # 构造或转换页粒度 trace
-  qmap_generator.py             # 生成 QMAP JSONL 样本
+  qmap_generator.py             # 从 CSV trace 生成 QMAP JSONL 样本
   qmap_train.py                 # 训练 QMAP checkpoint
-  qmap_eval.py                  # replay 评估所有策略
+  qmap_eval.py                  # replay 评估 LRU / Random / LFU / CLOCK / QMAP
   qmap_integration_test.py      # 模型和 loss 的 smoke test
 
 policy_learning/cache_model/
@@ -46,31 +31,27 @@ policy_learning/cache_model/
   model.py                      # Transformer、Q-Former、候选页打分器
   qmap_loss.py                  # cost-aware ranking loss
 
-dataset/
-  raw_traces/                   # 原始 trace
-  processed/                    # train / valid / test CSV trace
-  jsonl/                        # 生成的 QMAP 训练样本
-  metadata/                     # trace schema 和 split 信息
-
 scripts/
-  run_prototype_experiment.py   # 一键原型实验脚本
-  run_qmap_generate.bash        # 手动生成样本脚本
-  run_qmap_train.bash           # 手动训练脚本
-  run_qmap_eval.bash            # 手动评估 QMAP 脚本
+  run_prototype_experiment.py          # 单 workload 原型实验
+  run_qmap_checkpoint_sweep.py         # checkpoint sweep
+  build_workload_suite.py              # 生成多 workload trace
+  run_workload_suite.py                # 多 workload 训练和评估
+  run_qmap_parameter_sensitivity.py    # 参数敏感性实验
+
+dataset/
+  raw_traces/                   # 原始 synthetic traces
+  processed/                    # train / valid / test CSV traces
+  jsonl/                        # 生成的 QMAP 训练样本
+  metadata/                     # trace schema、split 和 workload manifest
 
 outputs/
   checkpoints/                  # 训练得到的模型 checkpoint
   results/                      # JSON / CSV / Markdown 实验结果
-
-logs/                           # 临时日志
-docs/                           # 更长的说明、路线图和历史文档
 ```
-
-`requirements.txt` 暂时保持原样，因为服务器环境已经能跑。
 
 ## 输入 Trace 格式
 
-原型实验推荐使用如下 CSV 格式：
+推荐 CSV 格式：
 
 ```text
 PC,Address,RW
@@ -94,22 +75,11 @@ L / S
 --page_shift 12
 ```
 
-仓库里已经有一个 toy split：
+## 1. 原型主实验：try_prototype
 
-```text
-dataset/processed/try_train.csv
-dataset/processed/try_valid.csv
-dataset/processed/try_test.csv
-```
+这是当前最基础、最重要的一组结果。它在 `try_train.csv` 上训练，在 `try_test.csv` 上比较 LRU / Random / LFU / CLOCK / QMAP。
 
-如果服务器上没有这几个文件，一键实验脚本会自动用 `qmap/trace_builder.py`
-生成一套默认 toy trace，并切分出 `try_train.csv`、`try_valid.csv` 和
-`try_test.csv`。这组数据适合 smoke test 和第一版原型实验，但还不能支撑最终论文
-里的强结论。
-
-## 一键运行原型实验
-
-在服务器上运行：
+运行命令：
 
 ```bash
 CUDA_VISIBLE_DEVICES=2 python scripts/run_prototype_experiment.py \
@@ -126,79 +96,262 @@ CUDA_VISIBLE_DEVICES=2 python scripts/run_prototype_experiment.py \
   --device cuda
 ```
 
-该命令会自动完成：
+如果 `dataset/processed/try_*.csv` 不存在，脚本会自动生成默认 toy trace 并切分。
 
-0. 如果 `dataset/processed/try_*.csv` 不存在，先自动生成默认 toy trace
-1. 从 `try_train.csv` 生成 QMAP JSONL 训练样本
-2. 训练 QMAP 模型
-3. 在 `try_test.csv` 上评估 LRU、Random、LFU、CLOCK 和 QMAP
-4. 生成 JSON、CSV 和 Markdown 结果表
-
-输出目录如下：
-
-```text
-dataset/jsonl/try_prototype_train.jsonl
-outputs/checkpoints/try_prototype/qmap_epoch_10.pth
-outputs/results/try_prototype/
-  lru.json
-  random.json
-  lfu.json
-  clock.json
-  qmap.json
-  summary.csv
-  summary.md
-  logs/
-```
-
-主结果表在：
+结果位置：
 
 ```text
 outputs/results/try_prototype/summary.md
+outputs/results/try_prototype/summary.csv
+outputs/results/try_prototype/lru.json
+outputs/results/try_prototype/random.json
+outputs/results/try_prototype/lfu.json
+outputs/results/try_prototype/clock.json
+outputs/results/try_prototype/qmap.json
+outputs/results/try_prototype/logs/
 ```
 
-## 手动运行各步骤
+权重位置：
 
-生成训练样本：
+```text
+outputs/checkpoints/try_prototype/qmap_epoch_1.pth
+...
+outputs/checkpoints/try_prototype/qmap_epoch_10.pth
+```
+
+查看结果：
 
 ```bash
-python qmap/qmap_generator.py \
-  --input dataset/processed/try_train.csv \
-  --output dataset/jsonl/try_train.jsonl \
+cat outputs/results/try_prototype/summary.md
+```
+
+## 2. Checkpoint Sweep
+
+目的：不要默认最后一个 epoch 最好，而是逐个评估 `qmap_epoch_1.pth` 到 `qmap_epoch_10.pth`，选择 weighted cost 最低或 NVM writes 最少的 checkpoint。
+
+运行命令：
+
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_checkpoint_sweep.py \
+  --checkpoint_dir outputs/checkpoints/try_prototype \
+  --trace_path dataset/processed/try_test.csv \
+  --result_dir outputs/results/checkpoint_sweep \
+  --epoch_start 1 \
+  --epoch_end 10 \
+  --dram_capacity 128 \
+  --page_shift 12 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --device cuda
+```
+
+结果位置：
+
+```text
+outputs/results/checkpoint_sweep/summary.md
+outputs/results/checkpoint_sweep/summary.csv
+outputs/results/checkpoint_sweep/json/qmap_epoch_*.json
+outputs/results/checkpoint_sweep/logs/qmap_epoch_*.log
+```
+
+查看结果：
+
+```bash
+cat outputs/results/checkpoint_sweep/summary.md
+```
+
+当前结果显示：
+
+```text
+weighted cost 最低：qmap_epoch_10.pth
+NVM writes 最少：qmap_epoch_10.pth
+```
+
+因此当前主实验继续使用：
+
+```text
+outputs/checkpoints/try_prototype/qmap_epoch_10.pth
+```
+
+## 3. 多 Workload 实验
+
+目的：避免只在一个 `try` trace 上证明 QMAP。多 workload 至少覆盖：
+
+```text
+hotset       强局部性热点访问
+writeheavy   写密集访问
+streaming    低复用流式访问
+phasechange  热点随阶段变化
+```
+
+### 3.1 只生成 workload 数据
+
+如果只想生成 raw/processed trace：
+
+```bash
+python scripts/build_workload_suite.py \
+  --records 20000 \
+  --page_shift 12 \
+  --workloads hotset writeheavy streaming phasechange
+```
+
+数据位置：
+
+```text
+dataset/raw_traces/hotset.csv
+dataset/raw_traces/writeheavy.csv
+dataset/raw_traces/streaming.csv
+dataset/raw_traces/phasechange.csv
+
+dataset/processed/hotset_train.csv
+dataset/processed/hotset_valid.csv
+dataset/processed/hotset_test.csv
+...
+dataset/metadata/workload_manifest.json
+```
+
+当前仓库已经完成了这一步。
+
+### 3.2 跑完整多 workload 训练和评估
+
+当前仓库还没有看到 `outputs/results/workload_suite/summary.md`，所以完整多 workload 评估还需要跑：
+
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
+  --workloads hotset,writeheavy,streaming,phasechange \
+  --policies lru,random,lfu,clock,qmap \
+  --records 20000 \
+  --page_shift 12 \
+  --dram_capacity 128 \
   --history_length 10 \
   --candidate_count 64 \
   --lookahead 256 \
-  --dram_capacity 128 \
-  --page_shift 12
-```
-
-训练 QMAP：
-
-```bash
-python qmap/qmap_train.py \
-  --train_data dataset/jsonl/try_train.jsonl \
-  --output_dir outputs/checkpoints/try \
   --epochs 10 \
   --batch_size 32 \
-  --lr 1e-4 \
   --device cuda
 ```
 
-评估 baseline 和 QMAP：
+如果已经生成了 workload trace，想跳过重新生成数据：
 
 ```bash
-python qmap/qmap_eval.py --trace_path dataset/processed/try_test.csv --policy lru --page_shift 12
-python qmap/qmap_eval.py --trace_path dataset/processed/try_test.csv --policy random --page_shift 12
-python qmap/qmap_eval.py --trace_path dataset/processed/try_test.csv --policy lfu --page_shift 12
-python qmap/qmap_eval.py --trace_path dataset/processed/try_test.csv --policy clock --page_shift 12
-python qmap/qmap_eval.py \
-  --trace_path dataset/processed/try_test.csv \
-  --policy qmap \
-  --checkpoint outputs/checkpoints/try/qmap_epoch_10.pth \
+CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
+  --skip_build \
+  --workloads hotset,writeheavy,streaming,phasechange \
+  --policies lru,random,lfu,clock,qmap \
   --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 10 \
+  --batch_size 32 \
   --device cuda
 ```
 
-## 评估指标
+结果位置：
+
+```text
+outputs/results/workload_suite/summary.md
+outputs/results/workload_suite/summary.csv
+outputs/results/workload_suite/hotset/
+outputs/results/workload_suite/writeheavy/
+outputs/results/workload_suite/streaming/
+outputs/results/workload_suite/phasechange/
+outputs/results/workload_suite/logs/
+```
+
+权重位置：
+
+```text
+outputs/checkpoints/workload_suite/hotset/qmap_epoch_10.pth
+outputs/checkpoints/workload_suite/writeheavy/qmap_epoch_10.pth
+outputs/checkpoints/workload_suite/streaming/qmap_epoch_10.pth
+outputs/checkpoints/workload_suite/phasechange/qmap_epoch_10.pth
+```
+
+查看结果：
+
+```bash
+cat outputs/results/workload_suite/summary.md
+```
+
+## 4. 参数敏感性实验
+
+目的：检查 QMAP 对关键参数是否稳定。当前脚本会围绕默认配置 `h10/c64/d128/l256` 做 one-at-a-time 实验。
+
+默认测试范围：
+
+```text
+history_length:   5, 10, 20, 50
+candidate_count:  16, 32, 64
+dram_capacity:    64, 128, 256
+lookahead:        128, 256, 512
+```
+
+运行命令：
+
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_parameter_sensitivity.py \
+  --train_trace dataset/processed/try_train.csv \
+  --test_trace dataset/processed/try_test.csv \
+  --result_dir outputs/results/qmap_parameter_sensitivity \
+  --checkpoint_root outputs/checkpoints/qmap_parameter_sensitivity \
+  --jsonl_root dataset/jsonl/qmap_parameter_sensitivity \
+  --page_shift 12 \
+  --epochs 5 \
+  --batch_size 64 \
+  --device cuda
+```
+
+结果位置：
+
+```text
+outputs/results/qmap_parameter_sensitivity/summary.md
+outputs/results/qmap_parameter_sensitivity/summary.csv
+outputs/results/qmap_parameter_sensitivity/runs/<config>/qmap.json
+outputs/results/qmap_parameter_sensitivity/runs/<config>/logs/
+```
+
+权重位置：
+
+```text
+outputs/checkpoints/qmap_parameter_sensitivity/<config>/qmap_epoch_5.pth
+```
+
+查看结果：
+
+```bash
+cat outputs/results/qmap_parameter_sensitivity/summary.md
+```
+
+当前参数敏感性实验已经完成，结论是：
+
+```text
+history_length 和 lookahead 对 cost 影响较小；
+candidate_count=32 与 64 接近，candidate_count=16 开始变差；
+dram_capacity 影响很大，但它更像 workload pressure/scaling，而不是 QMAP 自身不稳定。
+```
+
+## 5. 后续未完成：消融实验
+
+消融实验还没做。后面建议加入这些版本：
+
+```text
+QMAP-full
+no-PC
+no-RW
+no-QFormer
+no-cost-aware-label
+```
+
+这一步需要继续改代码，给 `qmap_generator.py`、`qmap_train.py`、模型和 loss 增加 ablation 开关。完成后结果建议放在：
+
+```text
+outputs/results/qmap_ablation/
+outputs/checkpoints/qmap_ablation/
+```
+
+## 评估指标说明
 
 `qmap_eval.py` 会输出：
 
@@ -210,7 +363,7 @@ python qmap/qmap_eval.py \
 - `Policy decisions`：触发策略决策的次数
 - `Avg decision time`：平均单次策略决策时间
 
-当前原型使用一个简单的加权代价模型：
+当前 replay 使用的简单代价模型：
 
 ```text
 DRAM read  = 1
@@ -220,30 +373,39 @@ NVM write  = 4
 Migration  = 10
 ```
 
-这些常数定义在 `qmap/qmap_eval.py` 中。如果把结果写进论文或报告，需要明确说明
-这是原型 replay 的 cost model。
-
-## 当前第一阶段实验目标
-
-当前最有价值的第一张表是：
+这些常数定义在：
 
 ```text
-LRU / Random / LFU / CLOCK / QMAP
-对比：
-hit rate、NVM writes、weighted access cost、migrations、avg decision time
+qmap/qmap_eval.py
 ```
 
-这张表跑通并稳定后，再继续做：
+如果把结果写进论文或报告，需要明确说明这是原型 replay 的 cost model。
 
-- 更多 workload，覆盖不同 locality 和写入比例
-- `history_length`、`candidate_count`、`dram_capacity`、`lookahead` 的敏感性实验
-- 去掉 PC、去掉 RW、去掉 Q-Former、去掉 cost-aware label 的消融实验
-- 如果论文仍然要声称超过已有学习型迁移方法，再加入更强 baseline
+## 建议清理
 
-## 当前注意事项
+可以保留：
 
-- `dataset/processed/try_*.csv` 是 toy 数据，只能用于原型验证。
-- 当前 QMAP 是离线训练 + replay 评估，不是完整 OS 内核集成。
-- QMAP 推理只在 migration event 上执行，不在每次访存关键路径上执行。
-- GPU 上计时前后已经做了 CUDA synchronize，`Avg decision time` 更接近真实单次
-  决策开销。
+```text
+outputs/results/try_prototype/
+outputs/results/checkpoint_sweep/
+outputs/results/qmap_parameter_sensitivity/
+outputs/checkpoints/try_prototype/
+outputs/checkpoints/qmap_parameter_sensitivity/
+dataset/processed/
+dataset/raw_traces/
+dataset/metadata/
+```
+
+如果不再需要调试结果，可以删除：
+
+```bash
+rm -rf outputs/results/diagnostic_baselines
+```
+
+不要随便删除：
+
+```text
+outputs/checkpoints/try_prototype/qmap_epoch_10.pth
+```
+
+它是当前主实验和 checkpoint sweep 选出的最好权重。

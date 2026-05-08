@@ -1,0 +1,17 @@
+{
+    "columns":  [
+                    "idx",
+                    "address",
+                    "pc",
+                    "rw"
+                ],
+    "rw_encoding":  {
+                        "R":  0,
+                        "W":  1
+                    },
+    "address_granularity":  "page",
+    "page_shift":  12,
+    "page_size_bytes":  4096,
+    "address_format":  "hexadecimal page-aligned address",
+    "pc_format":  "hexadecimal program counter"
+}

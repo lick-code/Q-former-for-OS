@@ -1,0 +1,142 @@
+{
+  "hotset": {
+    "description": "Strong locality around a small hot page set.",
+    "source_trace": "dataset/raw_traces/hotset.csv",
+    "split_policy": "chronological 80/10/10",
+    "stats": {
+      "total_records": 20000,
+      "unique_pages": 509,
+      "write_ratio": 0.2786,
+      "write_records": 5572
+    },
+    "test": {
+      "file": "dataset/processed/hotset_test.csv",
+      "range": [
+        18000,
+        19999
+      ],
+      "records": 2000
+    },
+    "train": {
+      "file": "dataset/processed/hotset_train.csv",
+      "range": [
+        0,
+        15999
+      ],
+      "records": 16000
+    },
+    "valid": {
+      "file": "dataset/processed/hotset_valid.csv",
+      "range": [
+        16000,
+        17999
+      ],
+      "records": 2000
+    }
+  },
+  "phasechange": {
+    "description": "Hot page set and write behavior shift by phase.",
+    "source_trace": "dataset/raw_traces/phasechange.csv",
+    "split_policy": "chronological 80/10/10",
+    "stats": {
+      "total_records": 20000,
+      "unique_pages": 1020,
+      "write_ratio": 0.3795,
+      "write_records": 7591
+    },
+    "test": {
+      "file": "dataset/processed/phasechange_test.csv",
+      "range": [
+        18000,
+        19999
+      ],
+      "records": 2000
+    },
+    "train": {
+      "file": "dataset/processed/phasechange_train.csv",
+      "range": [
+        0,
+        15999
+      ],
+      "records": 16000
+    },
+    "valid": {
+      "file": "dataset/processed/phasechange_valid.csv",
+      "range": [
+        16000,
+        17999
+      ],
+      "records": 2000
+    }
+  },
+  "streaming": {
+    "description": "Sequential scan with low temporal reuse.",
+    "source_trace": "dataset/raw_traces/streaming.csv",
+    "split_policy": "chronological 80/10/10",
+    "stats": {
+      "total_records": 20000,
+      "unique_pages": 2048,
+      "write_ratio": 0.0537,
+      "write_records": 1074
+    },
+    "test": {
+      "file": "dataset/processed/streaming_test.csv",
+      "range": [
+        18000,
+        19999
+      ],
+      "records": 2000
+    },
+    "train": {
+      "file": "dataset/processed/streaming_train.csv",
+      "range": [
+        0,
+        15999
+      ],
+      "records": 16000
+    },
+    "valid": {
+      "file": "dataset/processed/streaming_valid.csv",
+      "range": [
+        16000,
+        17999
+      ],
+      "records": 2000
+    }
+  },
+  "writeheavy": {
+    "description": "Write-intensive accesses concentrated on hot pages.",
+    "source_trace": "dataset/raw_traces/writeheavy.csv",
+    "split_policy": "chronological 80/10/10",
+    "stats": {
+      "total_records": 20000,
+      "unique_pages": 512,
+      "write_ratio": 0.6545,
+      "write_records": 13090
+    },
+    "test": {
+      "file": "dataset/processed/writeheavy_test.csv",
+      "range": [
+        18000,
+        19999
+      ],
+      "records": 2000
+    },
+    "train": {
+      "file": "dataset/processed/writeheavy_train.csv",
+      "range": [
+        0,
+        15999
+      ],
+      "records": 16000
+    },
+    "valid": {
+      "file": "dataset/processed/writeheavy_valid.csv",
+      "range": [
+        16000,
+        17999
+      ],
+      "records": 2000
+    }
+  }
+}

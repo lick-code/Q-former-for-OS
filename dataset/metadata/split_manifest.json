@@ -1,0 +1,23 @@
+{
+    "programA": {
+      "source_trace": "cache_replacement/dataset/raw_traces/try.csv",
+      "split_policy": "chronological 80/10/10",
+      "total_records": 20000,
+      "train": {
+        "file": "environment/traces/programA_train.csv",
+        "range": [0, 15999],
+        "records": 16000
+      },
+      "valid": {
+        "file": "environment/traces/programA_valid.csv",
+        "range": [16000, 17999],
+        "records": 2000
+      },
+      "test": {
+        "file": "environment/traces/programA_test.csv",
+        "range": [18000, 19999],
+        "records": 2000
+      }
+    }
+  }
+  
