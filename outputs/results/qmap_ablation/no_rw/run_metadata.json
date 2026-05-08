@@ -1,0 +1,15 @@
+{
+  "batch_size": 32,
+  "candidate_count": 64,
+  "device": "cuda",
+  "dram_capacity": 128,
+  "epochs": 10,
+  "history_length": 10,
+  "lookahead": 256,
+  "lr": 0.0001,
+  "page_shift": 12,
+  "seed": 3136859,
+  "test_trace": "/home/tingkun/lcs/cache_replacement/dataset/processed/try_test.csv",
+  "train_trace": "/home/tingkun/lcs/cache_replacement/dataset/processed/try_train.csv",
+  "variant": "no_rw"
+}

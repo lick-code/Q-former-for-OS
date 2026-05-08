@@ -1,0 +1,60 @@
+QMAP training configuration:
+  train_data path: /home/tingkun/lcs/cache_replacement/dataset/jsonl/qmap_ablation/no_pc.jsonl
+  number of training samples: 6064
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  device: cuda
+  ablation: no_pc
+Epoch [1/10] iter=1 loss=-0.737840
+Epoch [1/10] iter=100 loss=-0.774352
+Epoch [1/10] avg_loss=-0.765228
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_1.pth
+Epoch [2/10] iter=191 loss=-0.794497
+Epoch [2/10] iter=200 loss=-0.792515
+Epoch [2/10] iter=300 loss=-0.889839
+Epoch [2/10] avg_loss=-0.878841
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_2.pth
+Epoch [3/10] iter=381 loss=-0.907893
+Epoch [3/10] iter=400 loss=-0.897282
+Epoch [3/10] iter=500 loss=-0.913999
+Epoch [3/10] avg_loss=-0.910724
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_3.pth
+Epoch [4/10] iter=571 loss=-0.914227
+Epoch [4/10] iter=600 loss=-0.917327
+Epoch [4/10] iter=700 loss=-0.921317
+Epoch [4/10] avg_loss=-0.917080
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_4.pth
+Epoch [5/10] iter=761 loss=-0.920618
+Epoch [5/10] iter=800 loss=-0.920960
+Epoch [5/10] iter=900 loss=-0.923364
+Epoch [5/10] avg_loss=-0.921026
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_5.pth
+Epoch [6/10] iter=951 loss=-0.922511
+Epoch [6/10] iter=1000 loss=-0.924515
+Epoch [6/10] iter=1100 loss=-0.916119
+Epoch [6/10] avg_loss=-0.923691
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_6.pth
+Epoch [7/10] iter=1141 loss=-0.925131
+Epoch [7/10] iter=1200 loss=-0.922748
+Epoch [7/10] iter=1300 loss=-0.922297
+Epoch [7/10] avg_loss=-0.925646
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_7.pth
+Epoch [8/10] iter=1331 loss=-0.927715
+Epoch [8/10] iter=1400 loss=-0.924272
+Epoch [8/10] iter=1500 loss=-0.925085
+Epoch [8/10] avg_loss=-0.927204
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_8.pth
+Epoch [9/10] iter=1521 loss=-0.926171
+Epoch [9/10] iter=1600 loss=-0.930765
+Epoch [9/10] iter=1700 loss=-0.932500
+Epoch [9/10] avg_loss=-0.928193
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_9.pth
+Epoch [10/10] iter=1711 loss=-0.929184
+Epoch [10/10] iter=1800 loss=-0.924387
+Epoch [10/10] iter=1900 loss=-0.927695
+Epoch [10/10] avg_loss=-0.929120
+Saved checkpoint: /home/tingkun/lcs/cache_replacement/outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_10.pth
+Training finished.
+/home/tingkun/miniconda3/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
