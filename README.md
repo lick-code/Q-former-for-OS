@@ -529,7 +529,7 @@ phasechange    重点看 no_pc/no_qformer 是否影响阶段变化适应能力
 DRAM read  = 1
 DRAM write = 1
 NVM read   = 2
-NVM write  = 4
+NVM write  = 8
 Migration  = 10
 ```
 

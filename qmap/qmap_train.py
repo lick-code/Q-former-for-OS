@@ -147,6 +147,16 @@ def build_arg_parser():
   parser.add_argument("--batch_size", type=int, default=32)
   parser.add_argument("--num_workers", type=int, default=0)
   parser.add_argument("--lr", type=float, default=1e-4)
+  parser.add_argument("--inactivity_weight", type=float, default=1.0,
+                      help="Cost-aware loss weight for inactivity.")
+  parser.add_argument("--coldness_weight", type=float, default=1.0,
+                      help="Cost-aware loss weight for coldness.")
+  parser.add_argument("--write_sensitivity_weight", type=float, default=4.0,
+                      help=("Cost-aware loss penalty weight for future write "
+                            "sensitivity. no_cost forces this to 0."))
+  parser.add_argument("--migration_cost_weight", type=float, default=2.0,
+                      help=("Cost-aware loss penalty weight for migration "
+                            "cost. no_cost forces this to 0."))
   parser.add_argument("--hidden_dim", type=int, default=18)
   parser.add_argument("--address_embed_dim", type=int, default=8)
   parser.add_argument("--pc_embed_dim", type=int, default=8)
@@ -227,6 +237,13 @@ def main():
   print("  learning rate:", args.lr)
   print("  device:", device, flush=True)
   print("  ablation:", args.ablation, flush=True)
+  print("  loss weights: inactivity={} coldness={} write_sensitivity={} "
+        "migration_cost={}".format(
+            args.inactivity_weight,
+            args.coldness_weight,
+            args.write_sensitivity_weight,
+            args.migration_cost_weight),
+        flush=True)
 
   feature_embedder = embed.QMAPAccessFeatureEmbedder(
       address_embedder=embed.DynamicVocabEmbedder(
@@ -257,9 +274,16 @@ def main():
       page_dim=args.page_dim).to(device)
   if args.ablation == "no_cost":
     loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
-        lambda_3=0.0, lambda_4=0.0).to(device)
+        lambda_1=args.inactivity_weight,
+        lambda_2=args.coldness_weight,
+        lambda_3=0.0,
+        lambda_4=0.0).to(device)
   else:
-    loss_fn = qmap_loss.QMAPCostAwareRankingLoss().to(device)
+    loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
+        lambda_1=args.inactivity_weight,
+        lambda_2=args.coldness_weight,
+        lambda_3=args.write_sensitivity_weight,
+        lambda_4=args.migration_cost_weight).to(device)
 
   parameters = (
       list(feature_embedder.parameters()) +

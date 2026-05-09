@@ -31,7 +31,7 @@ class QMAPCostAwareRankingLoss(nn.Module):
   whole candidate list, not just the top-1 page, contributes to training.
   """
 
-  def __init__(self, lambda_1=1.0, lambda_2=1.0, lambda_3=1.0, lambda_4=1.0,
+  def __init__(self, lambda_1=1.0, lambda_2=1.0, lambda_3=4.0, lambda_4=2.0,
                alpha=10.0):
     super(QMAPCostAwareRankingLoss, self).__init__()
     self._lambda_1 = lambda_1

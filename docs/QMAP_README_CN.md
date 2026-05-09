@@ -406,7 +406,7 @@ migration_cost: [B, 64]
 DRAM read = 1
 DRAM write = 1
 NVM read = 2
-NVM write = 4
+NVM write = 8
 migration cost = 10
 ```
 

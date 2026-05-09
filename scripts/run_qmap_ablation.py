@@ -61,6 +61,10 @@ def build_arg_parser():
   parser.add_argument("--epochs", type=int, default=10)
   parser.add_argument("--batch_size", type=int, default=32)
   parser.add_argument("--lr", type=float, default=1e-4)
+  parser.add_argument("--write_sensitivity_weight", type=float, default=4.0)
+  parser.add_argument("--migration_cost_weight", type=float, default=2.0)
+  parser.add_argument("--nvm_write_cost", type=float, default=8.0,
+                      help="NVM write cost used by qmap_eval weighted cost.")
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--seed", type=int, default=3136859)
   parser.add_argument("--python", default=sys.executable)
@@ -129,6 +133,9 @@ def run_metadata(args, variant):
       "epochs": args.epochs,
       "batch_size": args.batch_size,
       "lr": args.lr,
+      "write_sensitivity_weight": args.write_sensitivity_weight,
+      "migration_cost_weight": args.migration_cost_weight,
+      "nvm_write_cost": args.nvm_write_cost,
       "device": args.device,
       "seed": args.seed,
   }
@@ -184,6 +191,8 @@ def run_variant(args, variant):
       "--epochs", str(args.epochs),
       "--batch_size", str(args.batch_size),
       "--lr", str(args.lr),
+      "--write_sensitivity_weight", str(args.write_sensitivity_weight),
+      "--migration_cost_weight", str(args.migration_cost_weight),
       "--device", args.device,
       "--seed", str(args.seed),
       "--ablation", variant,
@@ -200,6 +209,7 @@ def run_variant(args, variant):
       "--page_shift", str(args.page_shift),
       "--history_length", str(args.history_length),
       "--candidate_count", str(args.candidate_count),
+      "--nvm_write_cost", str(args.nvm_write_cost),
       "--ablation", variant,
       "--json_output", qmap_json,
   ]
@@ -221,6 +231,10 @@ def add_relative_metrics(row, baseline):
     row["nvm_writes_delta_percent"] = 0.0
   row["hit_rate_delta_pp"] = (
       row["hit_rate_percent"] - baseline["hit_rate_percent"])
+  row["nvm_writes_saved_vs_full"] = row["nvm_writes"] - baseline["nvm_writes"]
+  row["nvm_writes_reduction_vs_variant_percent"] = (
+      (row["nvm_writes"] - base_writes) * 100.0 / row["nvm_writes"]
+      if row["nvm_writes"] else 0.0)
 
 
 def write_summary_csv(rows, output_path):
@@ -232,7 +246,9 @@ def write_summary_csv(rows, output_path):
       "weighted_access_cost",
       "cost_delta_percent",
       "nvm_writes",
+      "nvm_writes_saved_vs_full",
       "nvm_writes_delta_percent",
+      "nvm_writes_reduction_vs_variant_percent",
       "nvm_reads",
       "migrations",
       "avg_decision_time_ms",
@@ -263,6 +279,11 @@ def write_summary_markdown(rows, output_path, args):
         args.lookahead))
     output_file.write("- epochs: `{}`\n".format(args.epochs))
     output_file.write("- batch size: `{}`\n".format(args.batch_size))
+    output_file.write("- loss weights: `write_sensitivity={}, "
+                      "migration_cost={}`\n".format(
+                          args.write_sensitivity_weight,
+                          args.migration_cost_weight))
+    output_file.write("- NVM write cost: `{}`\n".format(args.nvm_write_cost))
     output_file.write("- device: `{}`\n".format(args.device))
     output_file.write("- seed: `{}`\n\n".format(args.seed))
 
@@ -278,14 +299,17 @@ def write_summary_markdown(rows, output_path, args):
     output_file.write("## Results\n\n")
     output_file.write(
         "| Variant | Purpose | Hit rate (%) | Hit delta (pp) | Cost | "
-        "Cost delta (%) | NVM writes | Writes delta (%) | Decision ms |\n")
-    output_file.write("|---|---|---:|---:|---:|---:|---:|---:|---:|\n")
+        "Cost delta (%) | NVM writes | Writes saved vs full | "
+        "Writes delta (%) | Full writes reduction (%) | Decision ms |\n")
+    output_file.write("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
     for row in rows:
       output_file.write(
           "| {variant} | {purpose} | {hit_rate_percent:.2f} | "
           "{hit_rate_delta_pp:+.2f} | {weighted_access_cost:.2f} | "
           "{cost_delta_percent:+.2f} | {nvm_writes} | "
+          "{nvm_writes_saved_vs_full:+.0f} | "
           "{nvm_writes_delta_percent:+.2f} | "
+          "{nvm_writes_reduction_vs_variant_percent:+.2f} | "
           "{avg_decision_time_ms:.6f} |\n".format(**row))
 
 

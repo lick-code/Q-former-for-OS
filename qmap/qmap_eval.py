@@ -37,7 +37,7 @@ if PROJECT_ROOT not in sys.path:
 DRAM_READ_COST = 1.0
 DRAM_WRITE_COST = 1.0
 NVM_READ_COST = 2.0
-NVM_WRITE_COST = 4.0
+NVM_WRITE_COST = 8.0
 MIGRATION_COST = 10.0
 ABLATION_CHOICES = ("full", "no_pc", "no_rw", "no_qformer", "no_cost")
 
@@ -58,6 +58,13 @@ def build_arg_parser():
   parser.add_argument("--random_seed", type=int, default=0)
   parser.add_argument("--device", default=None,
                       help="cpu, cuda, or omitted for auto selection.")
+  parser.add_argument("--dram_read_cost", type=float, default=DRAM_READ_COST)
+  parser.add_argument("--dram_write_cost", type=float, default=DRAM_WRITE_COST)
+  parser.add_argument("--nvm_read_cost", type=float, default=NVM_READ_COST)
+  parser.add_argument("--nvm_write_cost", type=float, default=NVM_WRITE_COST,
+                      help=("Weighted access cost for a write served from "
+                            "NVM. Default is 8 for write-pressure testing."))
+  parser.add_argument("--migration_cost", type=float, default=MIGRATION_COST)
   parser.add_argument("--json_output", default=None,
                       help="Optional path to write machine-readable metrics.")
   parser.add_argument("--ablation", choices=ABLATION_CHOICES, default=None,
@@ -112,12 +119,12 @@ class ReplayStats(object):
     }
 
 
-def dram_access_cost(rw):
-  return DRAM_WRITE_COST if rw else DRAM_READ_COST
+def dram_access_cost(rw, args):
+  return args.dram_write_cost if rw else args.dram_read_cost
 
 
-def nvm_access_cost(rw):
-  return NVM_WRITE_COST if rw else NVM_READ_COST
+def nvm_access_cost(rw, args):
+  return args.nvm_write_cost if rw else args.nvm_read_cost
 
 
 def update_mru(dram_pages, page):
@@ -300,7 +307,7 @@ def replay(args):
 
     if page in dram_pages:
       stats.hit_count += 1
-      stats.weighted_access_cost += dram_access_cost(rw)
+      stats.weighted_access_cost += dram_access_cost(rw, args)
       if args.policy != "clock":
         update_mru(dram_pages, page)
       else:
@@ -309,7 +316,7 @@ def replay(args):
         dirty_pages.add(page)
     else:
       stats.miss_count += 1
-      stats.weighted_access_cost += nvm_access_cost(rw)
+      stats.weighted_access_cost += nvm_access_cost(rw, args)
       if rw:
         stats.nvm_write_count += 1
       else:
@@ -342,7 +349,7 @@ def replay(args):
         dram_insert_time.pop(victim, None)
         dirty_pages.discard(victim)
         stats.migration_count += 1
-        stats.weighted_access_cost += MIGRATION_COST
+        stats.weighted_access_cost += args.migration_cost
 
       if page in nvm_pages:
         nvm_pages.remove(page)
@@ -382,9 +389,17 @@ def main():
     output_dir = os.path.dirname(os.path.abspath(args.json_output))
     if output_dir:
       os.makedirs(output_dir, exist_ok=True)
+    metrics = stats.to_dict(args.policy, args.trace_path, args.dram_capacity)
+    metrics["cost_model"] = {
+        "dram_read_cost": args.dram_read_cost,
+        "dram_write_cost": args.dram_write_cost,
+        "nvm_read_cost": args.nvm_read_cost,
+        "nvm_write_cost": args.nvm_write_cost,
+        "migration_cost": args.migration_cost,
+    }
     with open(args.json_output, "w") as output_file:
       json.dump(
-          stats.to_dict(args.policy, args.trace_path, args.dram_capacity),
+          metrics,
           output_file,
           indent=2,
           sort_keys=True)
