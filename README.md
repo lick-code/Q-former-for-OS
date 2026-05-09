@@ -10,7 +10,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 |---|---|---|
 | 1. 原型主实验：QMAP vs LRU / Random / LFU / CLOCK | 已完成 | `outputs/results/try_prototype/summary.md` |
 | 2. Checkpoint sweep：选择最佳 epoch | 已完成 | `outputs/results/checkpoint_sweep/summary.md` |
-| 3. 多 workload：hotset / writeheavy / streaming / phasechange | 已完成 | `outputs/results/workload_suite/summary.md` |
+| 3. 多 workload：hotset / writeheavy / streaming / phasechange / pcrwstress | 已完成 | `outputs/results/workload_suite/summary.md` |
 | 4. 参数敏感性：history / candidate / DRAM capacity / lookahead | 已完成 | `outputs/results/qmap_parameter_sensitivity/summary.md` |
 | 5. 消融实验：no-PC / no-RW / no-QFormer / no-cost-aware | 已完成 | `outputs/results/qmap_ablation/summary.md` |
 
@@ -208,13 +208,14 @@ outputs/checkpoints/try_prototype/qmap_epoch_10.pth
 
 ## 3. 多 Workload 实验
 
-目的：避免只在一个 `try` trace 上证明 QMAP。当前仓库已经完成四类 workload：
+目的：避免只在一个 `try` trace 上证明 QMAP。当前仓库已经完成五类 workload：
 
 ```text
 hotset       强局部性热点访问
 writeheavy   写密集访问
 streaming    低复用流式访问
 phasechange  热点随阶段变化
+pcrwstress   强化 PC/RW 信号：PC 绑定复用距离，读/写热点分离，phase 间读写角色切换
 ```
 
 ### 3.1 只生成 workload 数据
@@ -225,7 +226,7 @@ phasechange  热点随阶段变化
 python scripts/build_workload_suite.py \
   --records 20000 \
   --page_shift 12 \
-  --workloads hotset writeheavy streaming phasechange
+  --workloads hotset writeheavy streaming phasechange pcrwstress
 ```
 
 数据位置：
@@ -235,6 +236,7 @@ dataset/raw_traces/hotset.csv
 dataset/raw_traces/writeheavy.csv
 dataset/raw_traces/streaming.csv
 dataset/raw_traces/phasechange.csv
+dataset/raw_traces/pcrwstress.csv
 
 dataset/processed/hotset_train.csv
 dataset/processed/hotset_valid.csv
@@ -249,7 +251,7 @@ dataset/metadata/workload_manifest.json
 
 ```bash
 CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
-  --workloads hotset,writeheavy,streaming,phasechange \
+  --workloads hotset,writeheavy,streaming,phasechange,pcrwstress \
   --policies lru,random,lfu,clock,qmap \
   --records 20000 \
   --page_shift 12 \
@@ -267,7 +269,7 @@ CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
 ```bash
 CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
   --skip_build \
-  --workloads hotset,writeheavy,streaming,phasechange \
+  --workloads hotset,writeheavy,streaming,phasechange,pcrwstress \
   --policies lru,random,lfu,clock,qmap \
   --page_shift 12 \
   --dram_capacity 128 \
@@ -288,6 +290,7 @@ outputs/results/workload_suite/hotset/
 outputs/results/workload_suite/writeheavy/
 outputs/results/workload_suite/streaming/
 outputs/results/workload_suite/phasechange/
+outputs/results/workload_suite/pcrwstress/
 outputs/results/workload_suite/logs/
 ```
 
@@ -298,6 +301,7 @@ outputs/checkpoints/workload_suite/hotset/qmap_epoch_10.pth
 outputs/checkpoints/workload_suite/writeheavy/qmap_epoch_10.pth
 outputs/checkpoints/workload_suite/streaming/qmap_epoch_10.pth
 outputs/checkpoints/workload_suite/phasechange/qmap_epoch_10.pth
+outputs/checkpoints/workload_suite/pcrwstress/qmap_epoch_10.pth
 ```
 
 查看结果：
@@ -313,6 +317,7 @@ writeheavy：QMAP 表现最好，说明写敏感场景下 QMAP 有价值。
 streaming：所有策略都比较差，QMAP 只有轻微优势，这是低复用 workload 的合理现象。
 hotset：LFU 最好，QMAP 接近 LRU/LFU，但没有超过 LFU。
 phasechange：LFU 最好，QMAP 优于 LRU/Random/CLOCK，但弱于 LFU。
+pcrwstress：用于重新检验 no_pc/no_rw/no_cost；它刻意放大 PC 复用距离、读写类型和写热点迁移代价。
 ```
 
 写论文或报告时，这组结果可以支撑一个更诚实的结论：QMAP 在写密集和部分非平稳访问下有收益，但不是在所有 workload 上都压过 LFU。
@@ -493,13 +498,23 @@ phasechange    重点看 no_pc/no_qformer 是否影响阶段变化适应能力
 把 mean pooling 作为正式 baseline，而不是只作为消融项。
 ```
 
-第四，构造更能体现 PC/RW 的 trace。当前 `no_pc/no_rw` 不差，说明 trace 里 PC/RW 信号可能太弱。可以补一个更清晰的 synthetic workload：
+第四，构造更能体现 PC/RW 的 trace。当前 `no_pc/no_rw` 不差，说明 trace 里 PC/RW 信号可能太弱。仓库已补充 `pcrwstress` synthetic workload：
 
 ```text
 不同 PC 对应不同页面复用距离；
 写热点和读热点分离；
 同一页面在不同 phase 中读写行为变化；
 让错误迁移写热点页面时付出更高 cost。
+```
+
+对应数据：
+
+```text
+dataset/raw_traces/pcrwstress.csv
+dataset/processed/pcrwstress_train.csv
+dataset/processed/pcrwstress_valid.csv
+dataset/processed/pcrwstress_test.csv
+dataset/jsonl/pcrwstress_train.jsonl
 ```
 
 推荐实验顺序：
@@ -600,3 +615,35 @@ outputs/checkpoints/qmap_ablation/*/qmap_epoch_10.pth
 ```
 
 它们是当前主实验和多 workload 实验的关键权重。
+
+## Q-Former comparison rerun
+
+Mean pooling is now available as the formal `mean_pool` baseline instead of
+only the legacy `no_qformer` ablation alias. Use this runner to compare the
+original Q-Former, mean pooling, and lighter Q-Former profiles under the same
+replay setup:
+
+```bash
+python scripts/run_qmap_qformer_comparison.py \
+  --profiles full,mean_pool,qformer_light \
+  --epochs 20 \
+  --device cuda
+```
+
+Default profiles:
+
+```text
+full            original Q-Former, 4 queries, 1 layer, no regularization
+mean_pool       formal baseline, Transformer encoder + mean pooling
+qformer_light  2-query Q-Former, 1 layer, dropout=0.1, weight_decay=1e-4
+qformer_tiny   1-query Q-Former, 1 layer, dropout=0.1, weight_decay=1e-4
+```
+
+Outputs:
+
+```text
+outputs/results/qmap_qformer_comparison/summary.md
+outputs/results/qmap_qformer_comparison/summary.csv
+outputs/checkpoints/qmap_qformer_comparison/*/qmap_epoch_20.pth
+dataset/jsonl/qmap_qformer_comparison/*.jsonl
+```

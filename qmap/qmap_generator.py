@@ -18,7 +18,8 @@ import collections
 import csv
 import json
 
-ABLATION_CHOICES = ("full", "no_pc", "no_rw", "no_qformer", "no_cost")
+ABLATION_CHOICES = (
+    "full", "no_pc", "no_rw", "mean_pool", "no_qformer", "no_cost")
 
 
 def parse_int(value):

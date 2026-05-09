@@ -34,6 +34,41 @@
       "records": 2000
     }
   },
+  "pcrwstress": {
+    "description": "PC-correlated reuse distance with separated read/write hot sets and phase-dependent page write behavior.",
+    "source_trace": "dataset/raw_traces/pcrwstress.csv",
+    "split_policy": "chronological 80/10/10",
+    "stats": {
+      "total_records": 20000,
+      "unique_pages": 1048,
+      "write_ratio": 0.2293,
+      "write_records": 4586
+    },
+    "test": {
+      "file": "dataset/processed/pcrwstress_test.csv",
+      "range": [
+        18000,
+        19999
+      ],
+      "records": 2000
+    },
+    "train": {
+      "file": "dataset/processed/pcrwstress_train.csv",
+      "range": [
+        0,
+        15999
+      ],
+      "records": 16000
+    },
+    "valid": {
+      "file": "dataset/processed/pcrwstress_valid.csv",
+      "range": [
+        16000,
+        17999
+      ],
+      "records": 2000
+    }
+  },
   "phasechange": {
     "description": "Hot page set and write behavior shift by phase.",
     "source_trace": "dataset/raw_traces/phasechange.csv",

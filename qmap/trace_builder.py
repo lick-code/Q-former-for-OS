@@ -185,6 +185,62 @@ def phase_hot_pages(phase, pages, hot_count):
   ]
 
 
+def pcrwstress_groups(pages, hot_count):
+  hot_count = max(8, min(hot_count, len(pages) // 4))
+  write_hot = pages[:hot_count]
+  read_hot = pages[hot_count:hot_count * 2]
+  medium_reuse = pages[hot_count * 2:hot_count * 3]
+  long_reuse = pages[hot_count * 3:hot_count * 4]
+  scan_pages = pages[hot_count * 4:]
+  if not scan_pages:
+    scan_pages = pages
+  return write_hot, read_hot, medium_reuse, long_reuse, scan_pages
+
+
+def choose_pcrwstress_access(index, phase, pages, hot_count, page_shift,
+                             pc_base):
+  """Builds a trace where PC and RW carry explicit replacement signal.
+
+  Four PC regions encode distinct reuse distances.  The hot read/write sets
+  swap roles across phases, so the same page can be write-sensitive in one
+  phase and mostly read-only in another.
+  """
+  write_hot, read_hot, medium_reuse, long_reuse, scan_pages = (
+      pcrwstress_groups(pages, hot_count))
+  phase_slot = phase % 4
+  if phase_slot in (1, 2):
+    write_hot, read_hot = read_hot, write_hot
+
+  cycle_index = index % 24
+  if cycle_index in (0, 1, 2, 3, 4, 5):
+    page = write_hot[(index // 2 + phase) % len(write_hot)]
+    pc = pc_base + 0x0100 + (cycle_index % 3) * 4
+    rw = "W" if cycle_index != 5 else "R"
+  elif cycle_index in (6, 7, 8, 9, 10, 11):
+    page = read_hot[(index + phase * 3) % len(read_hot)]
+    pc = pc_base + 0x1100 + (cycle_index % 3) * 4
+    rw = "R"
+  elif cycle_index in (12, 13, 14, 15):
+    page = medium_reuse[(index // 4 + phase * 5) % len(medium_reuse)]
+    pc = pc_base + 0x2100 + (cycle_index % 2) * 4
+    rw = "W" if phase_slot == 2 and cycle_index == 15 else "R"
+  elif cycle_index in (16, 17, 18, 19):
+    page = scan_pages[(index + phase * 97) % len(scan_pages)]
+    pc = pc_base + 0x3100 + (cycle_index % 2) * 4
+    rw = "R"
+  else:
+    page = long_reuse[(index // 24 + phase * 7) % len(long_reuse)]
+    pc = pc_base + 0x4100 + (cycle_index % 4) * 4
+    rw = "W" if phase_slot == 3 and cycle_index == 23 else "R"
+
+  if phase_slot == 3 and cycle_index in (16, 17, 18, 19):
+    # Extra scan pressure in the last phase makes evicting the write-hot set
+    # expensive: subsequent short-distance writes will be served from NVM.
+    page = scan_pages[(index * 5 + phase * 131) % len(scan_pages)]
+
+  return pc, page << page_shift, rw
+
+
 def choose_workload_page(rng, index, phase, workload, pages, hot_pages,
                          cold_pages, scan_pages, write_hot_pages):
   if workload == "hotset":
@@ -243,6 +299,11 @@ def synthesize_trace(args):
   phase_length = max(1, args.phase_length)
   for index in range(args.records):
     phase = index // phase_length
+    if args.workload == "pcrwstress":
+      rows.append(choose_pcrwstress_access(
+          index, phase, pages, hot_count, args.page_shift, args.pc_base))
+      continue
+
     page = choose_workload_page(rng, index, phase, args.workload, pages,
                                 hot_pages, cold_pages, scan_pages,
                                 write_hot_pages)
@@ -285,7 +346,7 @@ def build_arg_parser():
   parser.add_argument("--records", type=int, default=20000)
   parser.add_argument("--workload", default="mixed",
                       choices=("mixed", "hotset", "writeheavy", "streaming",
-                               "phasechange"),
+                               "phasechange", "pcrwstress"),
                       help="Synthetic workload pattern.")
   parser.add_argument("--working_set_pages", type=int, default=512)
   parser.add_argument("--hot_pages", type=int, default=64)

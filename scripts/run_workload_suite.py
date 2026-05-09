@@ -3,7 +3,7 @@
 
 Pipeline:
 
-  1. build hotset/writeheavy/streaming/phasechange raw traces
+  1. build hotset/writeheavy/streaming/phasechange/pcrwstress raw traces
   2. split each trace into train/valid/test CSV files
   3. generate QMAP JSONL training samples
   4. train one QMAP checkpoint per workload
@@ -21,7 +21,8 @@ from datetime import datetime
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-DEFAULT_WORKLOADS = ("hotset", "writeheavy", "streaming", "phasechange")
+DEFAULT_WORKLOADS = ("hotset", "writeheavy", "streaming", "phasechange",
+                     "pcrwstress")
 DEFAULT_POLICIES = ("lru", "random", "lfu", "clock", "qmap")
 
 

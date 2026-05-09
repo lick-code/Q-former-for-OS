@@ -21,7 +21,8 @@ from policy_learning.cache_model import embed
 from policy_learning.cache_model import model
 from policy_learning.cache_model import qmap_loss
 
-ABLATION_CHOICES = ("full", "no_pc", "no_rw", "no_qformer", "no_cost")
+ABLATION_CHOICES = (
+    "full", "no_pc", "no_rw", "mean_pool", "no_qformer", "no_cost")
 
 
 class QMAPAccessSequenceDataset(Dataset):
@@ -147,6 +148,8 @@ def build_arg_parser():
   parser.add_argument("--batch_size", type=int, default=32)
   parser.add_argument("--num_workers", type=int, default=0)
   parser.add_argument("--lr", type=float, default=1e-4)
+  parser.add_argument("--weight_decay", type=float, default=0.0,
+                      help="AdamW weight decay for regularized Q-Former runs.")
   parser.add_argument("--inactivity_weight", type=float, default=1.0,
                       help="Cost-aware loss weight for inactivity.")
   parser.add_argument("--coldness_weight", type=float, default=1.0,
@@ -170,6 +173,10 @@ def build_arg_parser():
   parser.add_argument("--num_queries", type=int, default=4)
   parser.add_argument("--num_layers", type=int, default=1)
   parser.add_argument("--num_heads", type=int, default=2)
+  parser.add_argument("--feedforward_dim", type=int, default=None,
+                      help="Transformer FFN dimension. Defaults to 4x hidden.")
+  parser.add_argument("--dropout", type=float, default=0.0,
+                      help="Dropout used by Transformer, Q-Former and scorer.")
   parser.add_argument("--device", default=None,
                       help="cpu, cuda, or omitted for auto selection.")
   parser.add_argument("--seed", type=int, default=3136859,
@@ -197,6 +204,10 @@ def apply_batch_ablation(batch, ablation):
   elif ablation == "no_rw":
     batch["rw"] = torch.zeros_like(batch["rw"])
   return batch
+
+
+def uses_qformer(ablation):
+  return ablation not in ("mean_pool", "no_qformer")
 
 
 def save_checkpoint(path, feature_embedder, extractor, scorer, optimizer, epoch,
@@ -235,8 +246,16 @@ def main():
   print("  batch_size:", args.batch_size)
   print("  epochs:", args.epochs)
   print("  learning rate:", args.lr)
+  print("  weight decay:", args.weight_decay)
   print("  device:", device, flush=True)
   print("  ablation:", args.ablation, flush=True)
+  print("  qformer: use={} queries={} layers={} heads={} dropout={}".format(
+      uses_qformer(args.ablation),
+      args.num_queries,
+      args.num_layers,
+      args.num_heads,
+      args.dropout),
+        flush=True)
   print("  loss weights: inactivity={} coldness={} write_sensitivity={} "
         "migration_cost={}".format(
             args.inactivity_weight,
@@ -263,7 +282,9 @@ def main():
       num_queries=args.num_queries,
       num_layers=args.num_layers,
       num_heads=args.num_heads,
-      use_qformer=(args.ablation != "no_qformer"),
+      feedforward_dim=args.feedforward_dim,
+      dropout=args.dropout,
+      use_qformer=uses_qformer(args.ablation),
       pooling_strategy="mean").to(device)
   scorer = model.QMAPCandidateScorer(
       hidden_dim=args.hidden_dim,
@@ -271,6 +292,7 @@ def main():
       page_embed_dim=args.page_embed_dim,
       page_vocab_size=args.page_vocab_size,
       num_heads=args.num_heads,
+      dropout=args.dropout,
       page_dim=args.page_dim).to(device)
   if args.ablation == "no_cost":
     loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
@@ -289,7 +311,8 @@ def main():
       list(feature_embedder.parameters()) +
       list(extractor.parameters()) +
       list(scorer.parameters()))
-  optimizer = optim.Adam(parameters, lr=args.lr)
+  optimizer = optim.AdamW(
+      parameters, lr=args.lr, weight_decay=args.weight_decay)
 
   global_iteration = 0
   for epoch in range(1, args.epochs + 1):

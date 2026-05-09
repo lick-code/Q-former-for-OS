@@ -8,6 +8,7 @@ for workloads with different locality and write behavior:
   writeheavy   write-intensive hot pages
   streaming    sequential scan with little reuse
   phasechange  shifting hot sets across phases
+  pcrwstress   PC/RW-discriminative reuse and write-hot pressure
 """
 
 import argparse
@@ -49,9 +50,17 @@ WORKLOAD_CONFIGS = {
         "write_ratio": 0.32,
         "phase_length": 2500,
     },
+    "pcrwstress": {
+        "seed": 5505,
+        "working_set_pages": 1536,
+        "hot_pages": 96,
+        "write_ratio": 0.50,
+        "phase_length": 2500,
+    },
 }
 
-DEFAULT_WORKLOADS = ("hotset", "writeheavy", "streaming", "phasechange")
+DEFAULT_WORKLOADS = ("hotset", "writeheavy", "streaming", "phasechange",
+                     "pcrwstress")
 
 
 def path_from_root(*parts):
@@ -149,6 +158,9 @@ def build_workload(args, workload):
           "writeheavy": "Write-intensive accesses concentrated on hot pages.",
           "streaming": "Sequential scan with low temporal reuse.",
           "phasechange": "Hot page set and write behavior shift by phase.",
+          "pcrwstress": (
+              "PC-correlated reuse distance with separated read/write hot "
+              "sets and phase-dependent page write behavior."),
       }[workload],
       "source_trace": rel_path(raw_path),
       "split_policy": "chronological 80/10/10",

@@ -1,12 +1,9 @@
 # coding=utf-8
-"""Run QMAP ablation experiments.
+"""Compare formal mean-pooling baseline against lighter Q-Former variants.
 
-Each variant is run as an independent generate -> train -> evaluate pipeline and
-is summarized against the full QMAP baseline.  The default output layout is:
-
-  outputs/results/qmap_ablation/<variant>/qmap.json
-  outputs/checkpoints/qmap_ablation/<variant>/qmap_epoch_<N>.pth
-  dataset/jsonl/qmap_ablation/<variant>.jsonl
+This runner is intentionally separate from the feature ablation script: mean
+pooling is treated as a baseline policy, while Q-Former variants differ only in
+aggregation capacity and training regularization.
 """
 
 import argparse
@@ -19,16 +16,46 @@ import sys
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-VARIANT_PURPOSES = {
-    "full": "complete QMAP baseline",
-    "no_pc": "remove program-counter context from the access sequence",
-    "no_rw": "remove read/write type from the access sequence",
-    "mean_pool": "formal mean-pooling baseline without Q-Former queries",
-    "no_qformer": "legacy alias for mean_pool",
-    "no_cost": "disable write-sensitivity and migration-cost loss terms",
+PROFILES = {
+    "full": {
+        "purpose": "original Q-Former capacity",
+        "train_ablation": "full",
+        "eval_ablation": "full",
+        "num_queries": 4,
+        "num_layers": 1,
+        "dropout": 0.0,
+        "weight_decay": 0.0,
+    },
+    "mean_pool": {
+        "purpose": "formal mean-pooling baseline",
+        "train_ablation": "mean_pool",
+        "eval_ablation": "mean_pool",
+        "num_queries": 4,
+        "num_layers": 1,
+        "dropout": 0.0,
+        "weight_decay": 0.0,
+    },
+    "qformer_light": {
+        "purpose": "lighter Q-Former with fewer queries and regularization",
+        "train_ablation": "full",
+        "eval_ablation": "full",
+        "num_queries": 2,
+        "num_layers": 1,
+        "dropout": 0.1,
+        "weight_decay": 1e-4,
+    },
+    "qformer_tiny": {
+        "purpose": "minimal one-query Q-Former with regularization",
+        "train_ablation": "full",
+        "eval_ablation": "full",
+        "num_queries": 1,
+        "num_layers": 1,
+        "dropout": 0.1,
+        "weight_decay": 1e-4,
+    },
 }
 
-DEFAULT_VARIANTS = ("full", "no_pc", "no_rw", "mean_pool", "no_cost")
+DEFAULT_PROFILES = ("full", "mean_pool", "qformer_light")
 
 
 def path_from_root(*parts):
@@ -36,53 +63,55 @@ def path_from_root(*parts):
 
 
 def build_arg_parser():
-  parser = argparse.ArgumentParser(description="Run QMAP ablation variants.")
+  parser = argparse.ArgumentParser(
+      description="Run mean-pooling vs lighter Q-Former comparison.")
   parser.add_argument("--train_trace",
                       default=path_from_root("dataset", "processed",
                                              "try_train.csv"))
   parser.add_argument("--test_trace",
                       default=path_from_root("dataset", "processed",
                                              "try_test.csv"))
-  parser.add_argument("--variants", default=",".join(DEFAULT_VARIANTS),
-                      help="Comma-separated variants to run.")
+  parser.add_argument("--profiles", default=",".join(DEFAULT_PROFILES),
+                      help="Comma-separated profiles: {}.".format(
+                          ",".join(sorted(PROFILES))))
   parser.add_argument("--result_dir",
                       default=path_from_root("outputs", "results",
-                                             "qmap_ablation"))
+                                             "qmap_qformer_comparison"))
   parser.add_argument("--checkpoint_root",
                       default=path_from_root("outputs", "checkpoints",
-                                             "qmap_ablation"))
+                                             "qmap_qformer_comparison"))
   parser.add_argument("--jsonl_root",
                       default=path_from_root("dataset", "jsonl",
-                                             "qmap_ablation"))
+                                             "qmap_qformer_comparison"))
   parser.add_argument("--page_shift", type=int, default=12)
   parser.add_argument("--dram_capacity", type=int, default=128)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
   parser.add_argument("--lookahead", type=int, default=256)
-  parser.add_argument("--epochs", type=int, default=10)
+  parser.add_argument("--epochs", type=int, default=20,
+                      help="Longer default training for Q-Former comparison.")
   parser.add_argument("--batch_size", type=int, default=32)
   parser.add_argument("--lr", type=float, default=1e-4)
   parser.add_argument("--write_sensitivity_weight", type=float, default=4.0)
   parser.add_argument("--migration_cost_weight", type=float, default=2.0)
-  parser.add_argument("--nvm_write_cost", type=float, default=8.0,
-                      help="NVM write cost used by qmap_eval weighted cost.")
+  parser.add_argument("--nvm_write_cost", type=float, default=8.0)
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--seed", type=int, default=3136859)
   parser.add_argument("--python", default=sys.executable)
   parser.add_argument("--force", action="store_true",
-                      help="Rerun variants even if matching results exist.")
+                      help="Rerun profiles even if matching results exist.")
   return parser
 
 
-def parse_variants(text):
-  variants = [item.strip() for item in text.split(",") if item.strip()]
-  unknown = [item for item in variants if item not in VARIANT_PURPOSES]
+def parse_profiles(text):
+  profiles = [item.strip() for item in text.split(",") if item.strip()]
+  unknown = [item for item in profiles if item not in PROFILES]
   if unknown:
-    raise ValueError("Unknown ablation variant(s): {}".format(
+    raise ValueError("Unknown Q-Former profile(s): {}".format(
         ", ".join(unknown)))
-  if not variants:
-    raise ValueError("At least one variant is required.")
-  return variants
+  if "mean_pool" not in profiles:
+    raise ValueError("Include `mean_pool`; it is the formal baseline.")
+  return profiles
 
 
 def command_to_text(command):
@@ -121,9 +150,11 @@ def normalized_path(path):
   return os.path.normpath(os.path.abspath(path))
 
 
-def run_metadata(args, variant):
+def run_metadata(args, profile_name):
+  profile = PROFILES[profile_name]
   return {
-      "variant": variant,
+      "profile": profile_name,
+      "profile_config": dict(profile),
       "train_trace": normalized_path(args.train_trace),
       "test_trace": normalized_path(args.test_trace),
       "page_shift": args.page_shift,
@@ -142,30 +173,33 @@ def run_metadata(args, variant):
   }
 
 
-def can_reuse_run(args, variant, qmap_json, checkpoint_path, metadata_path):
+def can_reuse_run(args, profile_name, qmap_json, checkpoint_path,
+                  metadata_path):
   if args.force:
     return False
   if not (os.path.exists(qmap_json) and os.path.exists(checkpoint_path) and
           os.path.exists(metadata_path)):
     return False
   try:
-    return load_json(metadata_path) == run_metadata(args, variant)
+    return load_json(metadata_path) == run_metadata(args, profile_name)
   except (IOError, ValueError):
     return False
 
 
-def run_variant(args, variant):
-  result_dir = os.path.join(args.result_dir, variant)
-  checkpoint_dir = os.path.join(args.checkpoint_root, variant)
-  jsonl_path = os.path.join(args.jsonl_root, "{}.jsonl".format(variant))
+def run_profile(args, profile_name):
+  profile = PROFILES[profile_name]
+  result_dir = os.path.join(args.result_dir, profile_name)
+  checkpoint_dir = os.path.join(args.checkpoint_root, profile_name)
+  jsonl_path = os.path.join(args.jsonl_root, "{}.jsonl".format(profile_name))
   log_dir = os.path.join(result_dir, "logs")
   qmap_json = os.path.join(result_dir, "qmap.json")
   metadata_path = os.path.join(result_dir, "run_metadata.json")
   checkpoint_path = os.path.join(
       checkpoint_dir, "qmap_epoch_{}.pth".format(args.epochs))
 
-  if can_reuse_run(args, variant, qmap_json, checkpoint_path, metadata_path):
-    print("[skip] reusable variant: {}".format(variant), flush=True)
+  if can_reuse_run(
+      args, profile_name, qmap_json, checkpoint_path, metadata_path):
+    print("[skip] reusable profile: {}".format(profile_name), flush=True)
     return load_json(qmap_json), result_dir, checkpoint_path
 
   os.makedirs(result_dir, exist_ok=True)
@@ -181,7 +215,7 @@ def run_variant(args, variant):
       "--lookahead", str(args.lookahead),
       "--dram_capacity", str(args.dram_capacity),
       "--page_shift", str(args.page_shift),
-      "--ablation", variant,
+      "--ablation", profile["train_ablation"],
   ]
   run_command(generate_command, os.path.join(log_dir, "generate.log"))
 
@@ -192,11 +226,15 @@ def run_variant(args, variant):
       "--epochs", str(args.epochs),
       "--batch_size", str(args.batch_size),
       "--lr", str(args.lr),
+      "--weight_decay", str(profile["weight_decay"]),
       "--write_sensitivity_weight", str(args.write_sensitivity_weight),
       "--migration_cost_weight", str(args.migration_cost_weight),
+      "--num_queries", str(profile["num_queries"]),
+      "--num_layers", str(profile["num_layers"]),
+      "--dropout", str(profile["dropout"]),
       "--device", args.device,
       "--seed", str(args.seed),
-      "--ablation", variant,
+      "--ablation", profile["train_ablation"],
   ]
   run_command(train_command, os.path.join(log_dir, "train.log"))
 
@@ -211,45 +249,42 @@ def run_variant(args, variant):
       "--history_length", str(args.history_length),
       "--candidate_count", str(args.candidate_count),
       "--nvm_write_cost", str(args.nvm_write_cost),
-      "--ablation", variant,
+      "--ablation", profile["eval_ablation"],
       "--json_output", qmap_json,
   ]
   run_command(eval_command, os.path.join(log_dir, "qmap.log"))
-  write_json(run_metadata(args, variant), metadata_path)
-
+  write_json(run_metadata(args, profile_name), metadata_path)
   return load_json(qmap_json), result_dir, checkpoint_path
 
 
 def add_relative_metrics(row, baseline):
   base_cost = float(baseline["weighted_access_cost"])
   base_writes = float(baseline["nvm_writes"])
-  row["cost_delta_percent"] = (
+  row["cost_delta_vs_mean_pool_percent"] = (
       (row["weighted_access_cost"] - base_cost) * 100.0 / base_cost)
+  row["hit_rate_delta_vs_mean_pool_pp"] = (
+      row["hit_rate_percent"] - baseline["hit_rate_percent"])
   if base_writes:
-    row["nvm_writes_delta_percent"] = (
+    row["nvm_writes_delta_vs_mean_pool_percent"] = (
         (row["nvm_writes"] - base_writes) * 100.0 / base_writes)
   else:
-    row["nvm_writes_delta_percent"] = 0.0
-  row["hit_rate_delta_pp"] = (
-      row["hit_rate_percent"] - baseline["hit_rate_percent"])
-  row["nvm_writes_saved_vs_full"] = row["nvm_writes"] - baseline["nvm_writes"]
-  row["nvm_writes_reduction_vs_variant_percent"] = (
-      (row["nvm_writes"] - base_writes) * 100.0 / row["nvm_writes"]
-      if row["nvm_writes"] else 0.0)
+    row["nvm_writes_delta_vs_mean_pool_percent"] = 0.0
 
 
 def write_summary_csv(rows, output_path):
   fields = [
-      "variant",
+      "profile",
       "purpose",
+      "num_queries",
+      "num_layers",
+      "dropout",
+      "weight_decay",
       "hit_rate_percent",
-      "hit_rate_delta_pp",
+      "hit_rate_delta_vs_mean_pool_pp",
       "weighted_access_cost",
-      "cost_delta_percent",
+      "cost_delta_vs_mean_pool_percent",
       "nvm_writes",
-      "nvm_writes_saved_vs_full",
-      "nvm_writes_delta_percent",
-      "nvm_writes_reduction_vs_variant_percent",
+      "nvm_writes_delta_vs_mean_pool_percent",
       "nvm_reads",
       "migrations",
       "avg_decision_time_ms",
@@ -265,63 +300,49 @@ def write_summary_csv(rows, output_path):
 
 
 def write_summary_markdown(rows, output_path, args):
-  baseline = next((row for row in rows if row["variant"] == "full"), None)
   with open(output_path, "w", encoding="utf-8") as output_file:
-    output_file.write("# QMAP Ablation\n\n")
+    output_file.write("# QMAP Q-Former Comparison\n\n")
     output_file.write("## Setup\n\n")
     output_file.write("- train trace: `{}`\n".format(
         os.path.relpath(args.train_trace, PROJECT_ROOT)))
     output_file.write("- test trace: `{}`\n".format(
         os.path.relpath(args.test_trace, PROJECT_ROOT)))
-    output_file.write("- variants: `{}`\n".format(
-        ",".join(row["variant"] for row in rows)))
+    output_file.write("- baseline: `mean_pool`\n")
+    output_file.write("- profiles: `{}`\n".format(
+        ",".join(row["profile"] for row in rows)))
     output_file.write("- h/c/d/l: `{}/{}/{}/{}`\n".format(
         args.history_length, args.candidate_count, args.dram_capacity,
         args.lookahead))
     output_file.write("- epochs: `{}`\n".format(args.epochs))
     output_file.write("- batch size: `{}`\n".format(args.batch_size))
-    output_file.write("- loss weights: `write_sensitivity={}, "
-                      "migration_cost={}`\n".format(
-                          args.write_sensitivity_weight,
-                          args.migration_cost_weight))
-    output_file.write("- NVM write cost: `{}`\n".format(args.nvm_write_cost))
+    output_file.write("- lr: `{}`\n".format(args.lr))
     output_file.write("- device: `{}`\n".format(args.device))
     output_file.write("- seed: `{}`\n\n".format(args.seed))
 
-    if baseline is not None:
-      output_file.write("## Full Baseline\n\n")
-      output_file.write(
-          "| Hit rate (%) | Weighted cost | NVM writes | Migrations |\n")
-      output_file.write("|---:|---:|---:|---:|\n")
-      output_file.write("| {hit_rate_percent:.2f} | "
-                        "{weighted_access_cost:.2f} | {nvm_writes} | "
-                        "{migrations} |\n\n".format(**baseline))
-
     output_file.write("## Results\n\n")
     output_file.write(
-        "| Variant | Purpose | Hit rate (%) | Hit delta (pp) | Cost | "
-        "Cost delta (%) | NVM writes | Writes saved vs full | "
-        "Writes delta (%) | Full writes reduction (%) | Decision ms |\n")
-    output_file.write("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
+        "| Profile | Purpose | Q | Layers | Dropout | Weight decay | "
+        "Hit rate (%) | Hit delta vs mean_pool (pp) | Cost | "
+        "Cost delta vs mean_pool (%) | NVM writes | "
+        "Writes delta vs mean_pool (%) | Decision ms |\n")
+    output_file.write(
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
     for row in rows:
       output_file.write(
-          "| {variant} | {purpose} | {hit_rate_percent:.2f} | "
-          "{hit_rate_delta_pp:+.2f} | {weighted_access_cost:.2f} | "
-          "{cost_delta_percent:+.2f} | {nvm_writes} | "
-          "{nvm_writes_saved_vs_full:+.0f} | "
-          "{nvm_writes_delta_percent:+.2f} | "
-          "{nvm_writes_reduction_vs_variant_percent:+.2f} | "
+          "| {profile} | {purpose} | {num_queries} | {num_layers} | "
+          "{dropout:.3g} | {weight_decay:.3g} | {hit_rate_percent:.2f} | "
+          "{hit_rate_delta_vs_mean_pool_pp:+.2f} | "
+          "{weighted_access_cost:.2f} | "
+          "{cost_delta_vs_mean_pool_percent:+.2f} | {nvm_writes} | "
+          "{nvm_writes_delta_vs_mean_pool_percent:+.2f} | "
           "{avg_decision_time_ms:.6f} |\n".format(**row))
 
 
 def main():
   args = build_arg_parser().parse_args()
-  variants = parse_variants(args.variants)
+  profiles = parse_profiles(args.profiles)
   os.makedirs(args.result_dir, exist_ok=True)
 
-  if "full" not in variants:
-    raise ValueError("The ablation summary needs the `full` baseline. "
-                     "Include full in --variants.")
   if not os.path.exists(args.train_trace):
     raise FileNotFoundError("Training trace not found: {}".format(
         args.train_trace))
@@ -329,18 +350,23 @@ def main():
     raise FileNotFoundError("Test trace not found: {}".format(
         args.test_trace))
 
-  variant_results = {}
-  for variant in variants:
-    metrics, result_dir, checkpoint_path = run_variant(args, variant)
-    variant_results[variant] = (metrics, result_dir, checkpoint_path)
+  profile_results = {}
+  for profile_name in profiles:
+    metrics, result_dir, checkpoint_path = run_profile(args, profile_name)
+    profile_results[profile_name] = (metrics, result_dir, checkpoint_path)
 
-  baseline_metrics = variant_results["full"][0]
+  baseline_metrics = profile_results["mean_pool"][0]
   rows = []
-  for variant in variants:
-    metrics, result_dir, checkpoint_path = variant_results[variant]
+  for profile_name in profiles:
+    profile = PROFILES[profile_name]
+    metrics, result_dir, checkpoint_path = profile_results[profile_name]
     row = dict(metrics)
-    row["variant"] = variant
-    row["purpose"] = VARIANT_PURPOSES[variant]
+    row["profile"] = profile_name
+    row["purpose"] = profile["purpose"]
+    row["num_queries"] = profile["num_queries"]
+    row["num_layers"] = profile["num_layers"]
+    row["dropout"] = profile["dropout"]
+    row["weight_decay"] = profile["weight_decay"]
     row["result_dir"] = os.path.relpath(result_dir, PROJECT_ROOT)
     row["checkpoint"] = os.path.relpath(checkpoint_path, PROJECT_ROOT)
     add_relative_metrics(row, baseline_metrics)

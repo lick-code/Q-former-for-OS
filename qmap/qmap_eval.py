@@ -39,7 +39,8 @@ DRAM_WRITE_COST = 1.0
 NVM_READ_COST = 2.0
 NVM_WRITE_COST = 8.0
 MIGRATION_COST = 10.0
-ABLATION_CHOICES = ("full", "no_pc", "no_rw", "no_qformer", "no_cost")
+ABLATION_CHOICES = (
+    "full", "no_pc", "no_rw", "mean_pool", "no_qformer", "no_cost")
 
 
 def build_arg_parser():
@@ -127,6 +128,10 @@ def nvm_access_cost(rw, args):
   return args.nvm_write_cost if rw else args.nvm_read_cost
 
 
+def uses_qformer(ablation):
+  return ablation not in ("mean_pool", "no_qformer")
+
+
 def update_mru(dram_pages, page):
   """Moves an existing DRAM page to MRU position."""
   dram_pages.remove(page)
@@ -212,7 +217,9 @@ class QMAPPolicy(object):
         num_queries=model_args.get("num_queries", 4),
         num_layers=model_args.get("num_layers", 1),
         num_heads=model_args.get("num_heads", 2),
-        use_qformer=(model_args.get("ablation") != "no_qformer"),
+        feedforward_dim=model_args.get("feedforward_dim"),
+        dropout=model_args.get("dropout", 0.0),
+        use_qformer=uses_qformer(model_args.get("ablation", "full")),
         pooling_strategy="mean").to(device)
     self._scorer = model.QMAPCandidateScorer(
         hidden_dim=model_args.get("hidden_dim", 18),
@@ -220,6 +227,7 @@ class QMAPPolicy(object):
         page_embed_dim=model_args.get("page_embed_dim", 8),
         page_vocab_size=model_args.get("page_vocab_size", 100000),
         num_heads=model_args.get("num_heads", 2),
+        dropout=model_args.get("dropout", 0.0),
         page_dim=model_args.get("page_dim", 21)).to(device)
 
     self._feature_embedder.load_state_dict(checkpoint["feature_embedder"])
