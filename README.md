@@ -2,7 +2,7 @@
 
 QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。它把页面迁移建模为候选页面排序问题：当 DRAM 已满并且一次 DRAM miss 触发迁移决策时，QMAP 从一组候选页面中选择最适合从 DRAM 降级到 NVM 的页面。
 
-当前仓库的目标是先做出一套可信、可复现的原型实验，而不是一次性完成论文级大规模评测。现在主实验、checkpoint sweep、多 workload 实验、参数敏感性实验和消融实验这 5 个模块都已经具备。
+当前仓库的目标是先做出一套可信、可复现的原型实验，而不是一次性完成论文级大规模评测。现在主实验、checkpoint sweep、多 workload 实验、参数敏感性实验和消融实验这 5 个基础模块都已经具备。后续增强实验的代码也在推进中，但其中一部分还没有在服务器上跑出正式结果。
 
 ## 当前进度
 
@@ -10,9 +10,28 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 |---|---|---|
 | 1. 原型主实验：QMAP vs LRU / Random / LFU / CLOCK | 已完成 | `outputs/results/try_prototype/summary.md` |
 | 2. Checkpoint sweep：选择最佳 epoch | 已完成 | `outputs/results/checkpoint_sweep/summary.md` |
-| 3. 多 workload：hotset / writeheavy / streaming / phasechange / pcrwstress | 已完成 | `outputs/results/workload_suite/summary.md` |
+| 3. 多 workload：hotset / writeheavy / streaming / phasechange | 已完成 | `outputs/results/workload_suite/summary.md` |
 | 4. 参数敏感性：history / candidate / DRAM capacity / lookahead | 已完成 | `outputs/results/qmap_parameter_sensitivity/summary.md` |
 | 5. 消融实验：no-PC / no-RW / no-QFormer / no-cost-aware | 已完成 | `outputs/results/qmap_ablation/summary.md` |
+
+## 后续增强任务状态
+
+前面 5 个基础模块已经齐全；下面 4 个是为了让论文结果更有说服力而补的增强实验。
+
+| 任务 | 代码状态 | 服务器结果状态 | 说明 |
+|---|---|---|---|
+| 1. workload 上的消融 | 基本可跑 | 未跑 | `scripts/run_qmap_ablation.py` 支持指定任意 train/test trace，但还没有 `writeheavy/phasechange/pcrwstress` 的消融 summary。 |
+| 2. 强化 cost-aware loss | 代码已写 | 未跑 | `qmap_train.py` 和 runner 已支持 `--write_sensitivity_weight`、`--migration_cost_weight`，`qmap_eval.py` 已支持 `--nvm_write_cost`。 |
+| 3. Q-Former / mean pooling / lighter Q-Former 对照 | 代码已写 | 未跑 | 新增 `scripts/run_qmap_qformer_comparison.py`，当前还没有 `outputs/results/qmap_qformer_comparison/summary.md`。 |
+| 4. PC/RW stress trace | 数据和代码已写 | 部分未跑 | `pcrwstress_train/valid/test.csv` 和 `pcrwstress_train.jsonl` 已生成，但还没有 `pcrwstress` 的 workload suite checkpoint 和 summary。 |
+
+我在本地做过语法检查：
+
+```bash
+python -m py_compile qmap/qmap_generator.py qmap/qmap_train.py qmap/qmap_eval.py qmap/trace_builder.py scripts/build_workload_suite.py scripts/run_workload_suite.py scripts/run_qmap_ablation.py scripts/run_qmap_qformer_comparison.py
+```
+
+语法检查通过。下一步主要是在服务器上跑实验，而不是继续堆代码。
 
 ## 当前结果判断
 
@@ -208,7 +227,7 @@ outputs/checkpoints/try_prototype/qmap_epoch_10.pth
 
 ## 3. 多 Workload 实验
 
-目的：避免只在一个 `try` trace 上证明 QMAP。当前仓库已经完成五类 workload：
+目的：避免只在一个 `try` trace 上证明 QMAP。当前代码支持五类 workload：
 
 ```text
 hotset       强局部性热点访问
@@ -217,6 +236,8 @@ streaming    低复用流式访问
 phasechange  热点随阶段变化
 pcrwstress   强化 PC/RW 信号：PC 绑定复用距离，读/写热点分离，phase 间读写角色切换
 ```
+
+注意：当前 `outputs/results/workload_suite/summary.md` 里的正式结果仍然是 `hotset/writeheavy/streaming/phasechange` 四类 workload。`pcrwstress` 的 trace 和 JSONL 已生成，但它的 workload suite 训练和评估还没有在服务器上跑完。
 
 ### 3.1 只生成 workload 数据
 
@@ -317,7 +338,7 @@ writeheavy：QMAP 表现最好，说明写敏感场景下 QMAP 有价值。
 streaming：所有策略都比较差，QMAP 只有轻微优势，这是低复用 workload 的合理现象。
 hotset：LFU 最好，QMAP 接近 LRU/LFU，但没有超过 LFU。
 phasechange：LFU 最好，QMAP 优于 LRU/Random/CLOCK，但弱于 LFU。
-pcrwstress：用于重新检验 no_pc/no_rw/no_cost；它刻意放大 PC 复用距离、读写类型和写热点迁移代价。
+pcrwstress：用于重新检验 no_pc/no_rw/no_cost；当前数据已生成，但正式结果待跑。
 ```
 
 写论文或报告时，这组结果可以支撑一个更诚实的结论：QMAP 在写密集和部分非平稳访问下有收益，但不是在所有 workload 上都压过 LFU。
@@ -470,60 +491,180 @@ no_cost 的 writes 略高但 cost 接近：cost-aware loss 有一点写敏感信
 
 ## 下一步实验建议
 
-如果只想让结果更像一篇完整论文，建议优先做下面 4 件事。
+如果只想让结果更像一篇完整论文，接下来优先不是继续改 README，而是在服务器上把下面几组增强实验跑出来。
 
-第一，做 workload 上的消融，而不是只在 `try` trace 上做消融。当前消融只说明 toy trace 上 full 不占优，不能说明所有 workload 都这样。优先补：
+### 6.1 先跑 pcrwstress 的完整 workload suite
+
+`pcrwstress` 是为了放大 PC/RW 信号设计的 workload。现在数据已经生成，缺的是 QMAP checkpoint 和 replay 结果。
+
+建议先单独跑它，避免覆盖原来的 `workload_suite` summary：
+
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
+  --skip_build \
+  --skip_generate \
+  --workloads pcrwstress \
+  --policies lru,random,lfu,clock,qmap \
+  --result_dir outputs/results/workload_suite_pcrwstress \
+  --checkpoint_dir outputs/checkpoints/workload_suite_pcrwstress \
+  --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 10 \
+  --batch_size 32 \
+  --device cuda
+```
+
+结果看这里：
+
+```bash
+cat outputs/results/workload_suite_pcrwstress/summary.md
+```
+
+如果 `pcrwstress` 上 QMAP 明显优于 LFU 或显著减少 NVM writes，这个 workload 就值得写进论文主表。
+
+### 6.2 再跑 workload 上的消融
+
+当前消融只在 `try_train.csv/try_test.csv` 上做过，它只能说明 toy trace 上的情况。下一步要在更关键的 workload 上补消融：
 
 ```text
 writeheavy     重点看 no_rw/no_cost 是否导致 NVM writes 上升
-phasechange    重点看 no_pc/no_qformer 是否影响阶段变化适应能力
+pcrwstress     重点看 no_pc/no_rw 是否变差
+phasechange    可选，重点看 no_pc/mean_pool 是否影响阶段变化适应能力
 ```
 
-第二，强化 cost-aware loss。当前 `no_cost` 只让 NVM writes 从 115 增到 116，差异太小。可以尝试：
+推荐先跑 `writeheavy`：
 
-```text
-提高 write_sensitivity 权重；
-提高 migration_cost 权重；
-把 weighted access cost 里的 NVM write cost 从 4 调到 8 或 10 做压力测试；
-单独报告 writes reduction，而不是只报告 hit rate。
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
+  --train_trace dataset/processed/writeheavy_train.csv \
+  --test_trace dataset/processed/writeheavy_test.csv \
+  --result_dir outputs/results/qmap_ablation_writeheavy \
+  --checkpoint_root outputs/checkpoints/qmap_ablation_writeheavy \
+  --jsonl_root dataset/jsonl/qmap_ablation_writeheavy \
+  --variants full,no_pc,no_rw,mean_pool,no_cost \
+  --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 10 \
+  --batch_size 32 \
+  --write_sensitivity_weight 4 \
+  --migration_cost_weight 2 \
+  --nvm_write_cost 8 \
+  --device cuda
 ```
 
-第三，重做 Q-Former 对照。当前 `no_qformer` 最好，说明 full 的 Q-Former 设计可能过重或训练不足。可以尝试：
+再跑 `pcrwstress`：
 
-```text
-减少 query 数量；
-减少 Transformer 层数；
-加入 dropout / weight decay；
-延长训练 epoch；
-把 mean pooling 作为正式 baseline，而不是只作为消融项。
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
+  --train_trace dataset/processed/pcrwstress_train.csv \
+  --test_trace dataset/processed/pcrwstress_test.csv \
+  --result_dir outputs/results/qmap_ablation_pcrwstress \
+  --checkpoint_root outputs/checkpoints/qmap_ablation_pcrwstress \
+  --jsonl_root dataset/jsonl/qmap_ablation_pcrwstress \
+  --variants full,no_pc,no_rw,mean_pool,no_cost \
+  --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 10 \
+  --batch_size 32 \
+  --write_sensitivity_weight 4 \
+  --migration_cost_weight 2 \
+  --nvm_write_cost 8 \
+  --device cuda
 ```
 
-第四，构造更能体现 PC/RW 的 trace。当前 `no_pc/no_rw` 不差，说明 trace 里 PC/RW 信号可能太弱。仓库已补充 `pcrwstress` synthetic workload：
+### 6.3 然后跑 cost-aware loss 权重实验
+
+当前 `no_cost` 只让 NVM writes 从 115 增到 116，差异太小。现在代码已经支持调权重，可以先在 `writeheavy` 或 `pcrwstress` 上做小网格：
 
 ```text
-不同 PC 对应不同页面复用距离；
-写热点和读热点分离；
-同一页面在不同 phase 中读写行为变化；
-让错误迁移写热点页面时付出更高 cost。
+write_sensitivity_weight / migration_cost_weight:
+  2 / 1
+  4 / 2
+  8 / 4
+  12 / 6
 ```
 
-对应数据：
+例子：
 
-```text
-dataset/raw_traces/pcrwstress.csv
-dataset/processed/pcrwstress_train.csv
-dataset/processed/pcrwstress_valid.csv
-dataset/processed/pcrwstress_test.csv
-dataset/jsonl/pcrwstress_train.jsonl
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
+  --train_trace dataset/processed/writeheavy_train.csv \
+  --test_trace dataset/processed/writeheavy_test.csv \
+  --result_dir outputs/results/qmap_cost_w8_m4_writeheavy \
+  --checkpoint_root outputs/checkpoints/qmap_cost_w8_m4_writeheavy \
+  --jsonl_root dataset/jsonl/qmap_cost_w8_m4_writeheavy \
+  --variants full,no_cost \
+  --write_sensitivity_weight 8 \
+  --migration_cost_weight 4 \
+  --nvm_write_cost 8 \
+  --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 10 \
+  --batch_size 32 \
+  --device cuda
 ```
 
-推荐实验顺序：
+重点看：
 
 ```text
-1. 先在 writeheavy 上补消融；
-2. 再调 cost-aware loss 权重；
-3. 然后比较 full / mean pooling / lighter Q-Former；
-4. 最后再补更真实或更有区分度的 trace。
+NVM writes 是否下降；
+weighted cost 是否下降；
+hit rate 是否明显牺牲。
+```
+
+### 6.4 最后跑 Q-Former 对照
+
+当前 `mean_pool/no_qformer` 在 try trace 上反而比 full 好，所以要把 mean pooling 当成正式 baseline，而不是只当消融项。
+
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_qformer_comparison.py \
+  --train_trace dataset/processed/writeheavy_train.csv \
+  --test_trace dataset/processed/writeheavy_test.csv \
+  --profiles full,mean_pool,qformer_light,qformer_tiny \
+  --result_dir outputs/results/qmap_qformer_comparison_writeheavy \
+  --checkpoint_root outputs/checkpoints/qmap_qformer_comparison_writeheavy \
+  --jsonl_root dataset/jsonl/qmap_qformer_comparison_writeheavy \
+  --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 20 \
+  --batch_size 32 \
+  --write_sensitivity_weight 4 \
+  --migration_cost_weight 2 \
+  --nvm_write_cost 8 \
+  --device cuda
+```
+
+结果看这里：
+
+```bash
+cat outputs/results/qmap_qformer_comparison_writeheavy/summary.md
+```
+
+如果 `qformer_light` 或 `qformer_tiny` 能超过 `mean_pool`，才比较适合继续保留 Q-Former 作为论文结构创新点。
+
+### 6.5 推荐服务器运行顺序
+
+```text
+1. workload_suite_pcrwstress
+2. qmap_ablation_writeheavy
+3. qmap_ablation_pcrwstress
+4. qmap_cost_w8_m4_writeheavy
+5. qmap_qformer_comparison_writeheavy
 ```
 
 ## 评估指标说明
@@ -593,13 +734,21 @@ CUDA_VISIBLE_DEVICES=2 python ...
 outputs/results/try_prototype/
 outputs/results/checkpoint_sweep/
 outputs/results/workload_suite/
+outputs/results/workload_suite_pcrwstress/          # 跑完 pcrwstress 后保留
 outputs/results/qmap_parameter_sensitivity/
 outputs/results/qmap_ablation/
+outputs/results/qmap_ablation_writeheavy/           # 跑完增强消融后保留
+outputs/results/qmap_ablation_pcrwstress/           # 跑完增强消融后保留
+outputs/results/qmap_qformer_comparison_writeheavy/ # 跑完 Q-Former 对照后保留
 
 outputs/checkpoints/try_prototype/
 outputs/checkpoints/workload_suite/
+outputs/checkpoints/workload_suite_pcrwstress/
 outputs/checkpoints/qmap_parameter_sensitivity/
 outputs/checkpoints/qmap_ablation/
+outputs/checkpoints/qmap_ablation_writeheavy/
+outputs/checkpoints/qmap_ablation_pcrwstress/
+outputs/checkpoints/qmap_qformer_comparison_writeheavy/
 
 dataset/processed/
 dataset/raw_traces/
@@ -616,30 +765,27 @@ outputs/checkpoints/qmap_ablation/*/qmap_epoch_10.pth
 
 它们是当前主实验和多 workload 实验的关键权重。
 
-## Q-Former comparison rerun
+## Q-Former 对照实验
 
-Mean pooling is now available as the formal `mean_pool` baseline instead of
-only the legacy `no_qformer` ablation alias. Use this runner to compare the
-original Q-Former, mean pooling, and lighter Q-Former profiles under the same
-replay setup:
+`mean_pool` 现在是正式 baseline，不只是旧的 `no_qformer` 消融别名。这个 runner 用来在同一套 replay 设置下比较原始 Q-Former、mean pooling 和更轻量的 Q-Former。
 
 ```bash
-python scripts/run_qmap_qformer_comparison.py \
-  --profiles full,mean_pool,qformer_light \
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_qformer_comparison.py \
+  --profiles full,mean_pool,qformer_light,qformer_tiny \
   --epochs 20 \
   --device cuda
 ```
 
-Default profiles:
+默认 profile：
 
 ```text
-full            original Q-Former, 4 queries, 1 layer, no regularization
-mean_pool       formal baseline, Transformer encoder + mean pooling
-qformer_light  2-query Q-Former, 1 layer, dropout=0.1, weight_decay=1e-4
-qformer_tiny   1-query Q-Former, 1 layer, dropout=0.1, weight_decay=1e-4
+full            原始 Q-Former，4 个 query，1 层，无正则
+mean_pool       Transformer encoder + mean pooling
+qformer_light  2 个 query，1 层，dropout=0.1，weight_decay=1e-4
+qformer_tiny   1 个 query，1 层，dropout=0.1，weight_decay=1e-4
 ```
 
-Outputs:
+默认输出：
 
 ```text
 outputs/results/qmap_qformer_comparison/summary.md
@@ -647,3 +793,12 @@ outputs/results/qmap_qformer_comparison/summary.csv
 outputs/checkpoints/qmap_qformer_comparison/*/qmap_epoch_20.pth
 dataset/jsonl/qmap_qformer_comparison/*.jsonl
 ```
+
+当前仓库还没有正式跑出：
+
+```text
+outputs/results/qmap_qformer_comparison/summary.md
+outputs/results/qmap_qformer_comparison_writeheavy/summary.md
+```
+
+所以这个实验属于“代码已写，服务器结果待跑”。
