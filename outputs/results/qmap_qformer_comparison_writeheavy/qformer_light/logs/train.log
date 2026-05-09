@@ -1,0 +1,99 @@
+QMAP training configuration:
+  train_data path: dataset/jsonl/qmap_qformer_comparison_writeheavy/qformer_light.jsonl
+  number of training samples: 4079
+  batch_size: 32
+  epochs: 20
+  learning rate: 0.0001
+  weight decay: 0.0001
+  device: cuda
+  ablation: full
+  qformer: use=True queries=2 layers=1 heads=2 dropout=0.1
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/20] iter=1 loss=-0.785865
+Epoch [1/20] iter=100 loss=-0.820154
+Epoch [1/20] avg_loss=-0.803007
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_1.pth
+Epoch [2/20] iter=129 loss=-0.844684
+Epoch [2/20] iter=200 loss=-0.875969
+Epoch [2/20] avg_loss=-0.872239
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_2.pth
+Epoch [3/20] iter=257 loss=-0.905184
+Epoch [3/20] iter=300 loss=-0.921044
+Epoch [3/20] avg_loss=-0.920066
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_3.pth
+Epoch [4/20] iter=385 loss=-0.930721
+Epoch [4/20] iter=400 loss=-0.900990
+Epoch [4/20] iter=500 loss=-0.908902
+Epoch [4/20] avg_loss=-0.932271
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_4.pth
+Epoch [5/20] iter=513 loss=-0.935259
+Epoch [5/20] iter=600 loss=-0.937820
+Epoch [5/20] avg_loss=-0.937431
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_5.pth
+Epoch [6/20] iter=641 loss=-0.938847
+Epoch [6/20] iter=700 loss=-0.942014
+Epoch [6/20] avg_loss=-0.940856
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_6.pth
+Epoch [7/20] iter=769 loss=-0.943863
+Epoch [7/20] iter=800 loss=-0.943483
+Epoch [7/20] avg_loss=-0.943477
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_7.pth
+Epoch [8/20] iter=897 loss=-0.946130
+Epoch [8/20] iter=900 loss=-0.946145
+Epoch [8/20] iter=1000 loss=-0.947516
+Epoch [8/20] avg_loss=-0.945217
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_8.pth
+Epoch [9/20] iter=1025 loss=-0.950521
+Epoch [9/20] iter=1100 loss=-0.948586
+Epoch [9/20] avg_loss=-0.946394
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_9.pth
+Epoch [10/20] iter=1153 loss=-0.947672
+Epoch [10/20] iter=1200 loss=-0.948247
+Epoch [10/20] avg_loss=-0.947331
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_10.pth
+Epoch [11/20] iter=1281 loss=-0.949643
+Epoch [11/20] iter=1300 loss=-0.950170
+Epoch [11/20] iter=1400 loss=-0.950734
+Epoch [11/20] avg_loss=-0.948188
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_11.pth
+Epoch [12/20] iter=1409 loss=-0.950359
+Epoch [12/20] iter=1500 loss=-0.950839
+Epoch [12/20] avg_loss=-0.948727
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_12.pth
+Epoch [13/20] iter=1537 loss=-0.951619
+Epoch [13/20] iter=1600 loss=-0.950725
+Epoch [13/20] avg_loss=-0.949204
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_13.pth
+Epoch [14/20] iter=1665 loss=-0.950683
+Epoch [14/20] iter=1700 loss=-0.920797
+Epoch [14/20] avg_loss=-0.949621
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_14.pth
+Epoch [15/20] iter=1793 loss=-0.950693
+Epoch [15/20] iter=1800 loss=-0.921600
+Epoch [15/20] iter=1900 loss=-0.951460
+Epoch [15/20] avg_loss=-0.949885
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_15.pth
+Epoch [16/20] iter=1921 loss=-0.950574
+Epoch [16/20] iter=2000 loss=-0.951951
+Epoch [16/20] avg_loss=-0.950253
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_16.pth
+Epoch [17/20] iter=2049 loss=-0.952373
+Epoch [17/20] iter=2100 loss=-0.950701
+Epoch [17/20] avg_loss=-0.950430
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_17.pth
+Epoch [18/20] iter=2177 loss=-0.952206
+Epoch [18/20] iter=2200 loss=-0.951468
+Epoch [18/20] iter=2300 loss=-0.951781
+Epoch [18/20] avg_loss=-0.950621
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_18.pth
+Epoch [19/20] iter=2305 loss=-0.953997
+Epoch [19/20] iter=2400 loss=-0.953819
+Epoch [19/20] avg_loss=-0.950806
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_19.pth
+Epoch [20/20] iter=2433 loss=-0.953027
+Epoch [20/20] iter=2500 loss=-0.951381
+Epoch [20/20] avg_loss=-0.950941
+Saved checkpoint: outputs/checkpoints/qmap_qformer_comparison_writeheavy/qformer_light/qmap_epoch_20.pth
+Training finished.
+/home/tingkun/miniconda3/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "

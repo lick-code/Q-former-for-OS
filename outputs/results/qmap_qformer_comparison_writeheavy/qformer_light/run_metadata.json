@@ -1,0 +1,27 @@
+{
+  "batch_size": 32,
+  "candidate_count": 64,
+  "device": "cuda",
+  "dram_capacity": 128,
+  "epochs": 20,
+  "history_length": 10,
+  "lookahead": 256,
+  "lr": 0.0001,
+  "migration_cost_weight": 2.0,
+  "nvm_write_cost": 8.0,
+  "page_shift": 12,
+  "profile": "qformer_light",
+  "profile_config": {
+    "dropout": 0.1,
+    "eval_ablation": "full",
+    "num_layers": 1,
+    "num_queries": 2,
+    "purpose": "lighter Q-Former with fewer queries and regularization",
+    "train_ablation": "full",
+    "weight_decay": 0.0001
+  },
+  "seed": 3136859,
+  "test_trace": "/home/tingkun/lcs/cache_replacement/dataset/processed/writeheavy_test.csv",
+  "train_trace": "/home/tingkun/lcs/cache_replacement/dataset/processed/writeheavy_train.csv",
+  "write_sensitivity_weight": 4.0
+}

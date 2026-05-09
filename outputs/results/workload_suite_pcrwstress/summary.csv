@@ -1,0 +1,6 @@
+workload,policy,hit_rate,hit_rate_percent,nvm_writes,cost,migrations,decision_ms,decision_count,total_accesses,misses,nvm_reads,train_trace,test_trace,checkpoint
+pcrwstress,lru,0.727,72.7,24,6870.0,418,0.00026665347222791334,418,2000,546,522,dataset/processed/pcrwstress_train.csv,dataset/processed/pcrwstress_test.csv,
+pcrwstress,random,0.6535,65.35,100,8943.0,565,0.0009077930806484898,565,2000,693,593,dataset/processed/pcrwstress_train.csv,dataset/processed/pcrwstress_test.csv,
+pcrwstress,lfu,0.7605,76.05,24,6133.0,351,0.02326810748403908,351,2000,479,455,dataset/processed/pcrwstress_train.csv,dataset/processed/pcrwstress_test.csv,
+pcrwstress,clock,0.683,68.30000000000001,96,8270.0,506,0.0010913802980787668,506,2000,634,538,dataset/processed/pcrwstress_train.csv,dataset/processed/pcrwstress_test.csv,
+pcrwstress,qmap,0.7465,74.65,24,6441.0,379,3.142115962875904,379,2000,507,483,dataset/processed/pcrwstress_train.csv,dataset/processed/pcrwstress_test.csv,outputs/checkpoints/workload_suite_pcrwstress/pcrwstress/qmap_epoch_10.pth

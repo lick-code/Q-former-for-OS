@@ -1,0 +1,24 @@
+{
+  "avg_decision_time_ms": 2.9827771717217924,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 421,
+  "decision_time_seconds": 1.2557491892948747,
+  "dram_capacity": 128,
+  "hit_rate": 0.7255,
+  "hit_rate_percent": 72.55,
+  "hits": 1451,
+  "migrations": 421,
+  "misses": 549,
+  "nvm_reads": 332,
+  "nvm_writes": 217,
+  "policy": "qmap",
+  "total_accesses": 2000,
+  "trace_path": "dataset/processed/writeheavy_test.csv",
+  "weighted_access_cost": 8061.0
+}

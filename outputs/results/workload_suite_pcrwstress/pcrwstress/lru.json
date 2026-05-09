@@ -1,0 +1,24 @@
+{
+  "avg_decision_time_ms": 0.00026665347222791334,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 418,
+  "decision_time_seconds": 0.00011146115139126778,
+  "dram_capacity": 128,
+  "hit_rate": 0.727,
+  "hit_rate_percent": 72.7,
+  "hits": 1454,
+  "migrations": 418,
+  "misses": 546,
+  "nvm_reads": 522,
+  "nvm_writes": 24,
+  "policy": "lru",
+  "total_accesses": 2000,
+  "trace_path": "/home/tingkun/lcs/cache_replacement/dataset/processed/pcrwstress_test.csv",
+  "weighted_access_cost": 6870.0
+}

@@ -1,0 +1,56 @@
+QMAP training configuration:
+  train_data path: dataset/jsonl/qmap_ablation_pcrwstress/no_rw.jsonl
+  number of training samples: 4082
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: no_rw
+  qformer: use=True queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.772531
+Epoch [1/10] iter=100 loss=-0.807271
+Epoch [1/10] avg_loss=-0.786040
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_1.pth
+Epoch [2/10] iter=129 loss=-0.811874
+Epoch [2/10] iter=200 loss=-0.805451
+Epoch [2/10] avg_loss=-0.837500
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_2.pth
+Epoch [3/10] iter=257 loss=-0.880088
+Epoch [3/10] iter=300 loss=-0.918634
+Epoch [3/10] avg_loss=-0.915335
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_3.pth
+Epoch [4/10] iter=385 loss=-0.938926
+Epoch [4/10] iter=400 loss=-0.940684
+Epoch [4/10] iter=500 loss=-0.947147
+Epoch [4/10] avg_loss=-0.934950
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_4.pth
+Epoch [5/10] iter=513 loss=-0.946976
+Epoch [5/10] iter=600 loss=-0.949711
+Epoch [5/10] avg_loss=-0.940073
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_5.pth
+Epoch [6/10] iter=641 loss=-0.950716
+Epoch [6/10] iter=700 loss=-0.920913
+Epoch [6/10] avg_loss=-0.943072
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_6.pth
+Epoch [7/10] iter=769 loss=-0.953339
+Epoch [7/10] iter=800 loss=-0.954871
+Epoch [7/10] avg_loss=-0.946009
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_7.pth
+Epoch [8/10] iter=897 loss=-0.955613
+Epoch [8/10] iter=900 loss=-0.925448
+Epoch [8/10] iter=1000 loss=-0.956075
+Epoch [8/10] avg_loss=-0.947324
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_8.pth
+Epoch [9/10] iter=1025 loss=-0.956089
+Epoch [9/10] iter=1100 loss=-0.927913
+Epoch [9/10] avg_loss=-0.948802
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_9.pth
+Epoch [10/10] iter=1153 loss=-0.958385
+Epoch [10/10] iter=1200 loss=-0.958912
+Epoch [10/10] avg_loss=-0.949906
+Saved checkpoint: outputs/checkpoints/qmap_ablation_pcrwstress/no_rw/qmap_epoch_10.pth
+Training finished.
+/home/tingkun/miniconda3/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "

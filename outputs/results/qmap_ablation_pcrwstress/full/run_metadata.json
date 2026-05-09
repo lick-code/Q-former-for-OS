@@ -1,0 +1,18 @@
+{
+  "batch_size": 32,
+  "candidate_count": 64,
+  "device": "cuda",
+  "dram_capacity": 128,
+  "epochs": 10,
+  "history_length": 10,
+  "lookahead": 256,
+  "lr": 0.0001,
+  "migration_cost_weight": 2.0,
+  "nvm_write_cost": 8.0,
+  "page_shift": 12,
+  "seed": 3136859,
+  "test_trace": "/home/tingkun/lcs/cache_replacement/dataset/processed/pcrwstress_test.csv",
+  "train_trace": "/home/tingkun/lcs/cache_replacement/dataset/processed/pcrwstress_train.csv",
+  "variant": "full",
+  "write_sensitivity_weight": 4.0
+}
