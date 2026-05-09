@@ -2,7 +2,7 @@
 
 QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。它把页面迁移建模为候选页面排序问题：当 DRAM 已满并且一次 DRAM miss 触发迁移决策时，QMAP 从一组候选页面中选择最适合从 DRAM 降级到 NVM 的页面。
 
-当前仓库的目标是先做出一套可信、可复现的原型实验，而不是一次性完成论文级大规模评测。现在主实验、checkpoint sweep、多 workload 实验和参数敏感性实验都已经具备；剩下主要是消融实验。
+当前仓库的目标是先做出一套可信、可复现的原型实验，而不是一次性完成论文级大规模评测。现在主实验、checkpoint sweep、多 workload 实验、参数敏感性实验和消融实验这 5 个模块都已经具备。
 
 ## 当前进度
 
@@ -12,7 +12,38 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 | 2. Checkpoint sweep：选择最佳 epoch | 已完成 | `outputs/results/checkpoint_sweep/summary.md` |
 | 3. 多 workload：hotset / writeheavy / streaming / phasechange | 已完成 | `outputs/results/workload_suite/summary.md` |
 | 4. 参数敏感性：history / candidate / DRAM capacity / lookahead | 已完成 | `outputs/results/qmap_parameter_sensitivity/summary.md` |
-| 5. 消融实验：no-PC / no-RW / no-QFormer / no-cost-aware | 未完成 | 建议输出到 `outputs/results/qmap_ablation/` |
+| 5. 消融实验：no-PC / no-RW / no-QFormer / no-cost-aware | 已完成 | `outputs/results/qmap_ablation/summary.md` |
+
+## 当前结果判断
+
+这套结果是“原型实验已经齐全，但算法效果还需要继续打磨”的状态。
+
+可以比较放心写进论文或中期材料的点：
+
+```text
+1. QMAP 能完整跑通训练、replay 评估和多策略对比。
+2. 在 writeheavy workload 上，QMAP 同时取得最高 hit rate、最低 NVM writes 和最低 weighted cost。
+3. 在 streaming workload 上，所有策略都很差，QMAP 只有轻微优势，这符合低复用流式访问的直觉。
+4. 参数敏感性结果比较稳定：history_length 和 lookahead 影响小，candidate_count=32/64 接近。
+5. checkpoint sweep 显示训练到 epoch 10 的效果持续改善，不是随便挑了一个权重。
+```
+
+需要谨慎写、不能夸大的点：
+
+```text
+1. hotset 和 phasechange 上 LFU 仍然比 QMAP 更强。
+2. try_prototype 上 QMAP 接近 LFU，但 weighted cost 略高于 LFU。
+3. 消融实验里 no_qformer 反而优于 full，说明当前 Q-Former 结构没有被证明有效。
+4. no_pc/no_rw 也没有变差，说明当前 trace 或模型还没有充分利用 PC/RW 特征。
+5. no_cost 只让 NVM writes 略变差，cost 几乎不变，cost-aware loss 的贡献还不够强。
+```
+
+因此，当前最诚实的结论是：
+
+```text
+QMAP 原型已经完成，并且在写密集 workload 上显示出优势；
+但当前模型结构贡献还不够稳定，特别是 Q-Former、PC/RW 特征和 cost-aware loss 需要进一步验证和增强。
+```
 
 ## 目录结构
 
@@ -36,6 +67,7 @@ scripts/
   build_workload_suite.py              # 生成多 workload trace
   run_workload_suite.py                # 多 workload 训练和评估
   run_qmap_parameter_sensitivity.py    # 参数敏感性实验
+  run_qmap_ablation.py                 # 消融实验
 
 dataset/
   raw_traces/                   # 原始 synthetic traces
@@ -342,152 +374,25 @@ candidate_count=32 与 64 接近，candidate_count=16 开始变差；
 dram_capacity 影响很大，但它更像 workload pressure/scaling，而不是 QMAP 自身不稳定。
 ```
 
-## 5. 消融实验该怎么做
+## 5. 消融实验
 
-消融实验的目标不是再和 LRU / LFU 比一次，而是回答：QMAP 里面每个设计到底有没有贡献。建议至少做 5 个版本：
-
-| 版本 | 含义 | 要证明的问题 |
-|---|---|---|
-| `full` | 当前完整 QMAP | 作为消融基线 |
-| `no_pc` | 不使用 PC 信息 | PC 上下文是否真的帮助预测页面复用 |
-| `no_rw` | 不使用读写类型信息 | 读写类型是否帮助减少 NVM writes |
-| `no_qformer` | 去掉 Q-Former 查询聚合 | Q-Former 结构是否比简单 pooling 更有用 |
-| `no_cost` | 去掉 cost-aware label / loss 里的写敏感和迁移代价项 | cost-aware 设计是否真的降低 writes 和 weighted cost |
-
-### 5.1 推荐实现方式
-
-第一步，在 `qmap/qmap_train.py` 和 `qmap/qmap_eval.py` 增加参数：
-
-```text
---ablation full|no_pc|no_rw|no_qformer|no_cost
-```
-
-训练时把这个参数写入 checkpoint，例如写到 `model_args` 或 `ablation` 字段里。评估时如果没有显式传入 `--ablation`，优先从 checkpoint 读取。
-
-第二步，实现 `no_pc`：
-
-```text
-位置：qmap/qmap_train.py、qmap/qmap_eval.py 或 policy_learning/cache_model/qmap_data.py
-做法：进入模型前，把 batch 里的 PC 特征统一置零或置为同一个 unknown id。
-目的：模型仍然能跑，但不能区分不同 PC。
-```
-
-看结果时重点关注：
-
-```text
-hit rate 是否下降；
-weighted access cost 是否上升。
-```
-
-如果 `no_pc` 明显变差，可以说明 PC 上下文有用。
-
-第三步，实现 `no_rw`：
-
-```text
-位置：qmap/qmap_train.py、qmap/qmap_eval.py 或 policy_learning/cache_model/qmap_data.py
-做法：进入模型前，把 batch 里的 RW 特征统一置为 read，或者统一置零。
-目的：模型无法知道访问是读还是写。
-```
-
-看结果时重点关注：
-
-```text
-NVM writes 是否增加；
-weighted access cost 是否上升。
-```
-
-如果 `no_rw` 的 NVM writes 明显更多，可以说明读写类型对写敏感迁移有贡献。
-
-第四步，实现 `no_qformer`：
-
-```text
-位置：policy_learning/cache_model/model.py
-做法：增加一个模型开关，例如 use_qformer=True/False。
-full：继续使用 Q-Former 查询向量聚合历史访问表示。
-no_qformer：改成简单 mean pooling 或 last-token pooling，再送入同一个候选页 scorer。
-```
-
-这里要注意保持 scorer 输入形状尽量一致，避免比较不公平。可以把 mean pooling 得到的 `[B, H]` 扩展成 `[B, 1, H]`，然后复用原来的打分逻辑。
-
-看结果时重点关注：
-
-```text
-hit rate；
-weighted access cost；
-avg decision time。
-```
-
-如果 `no_qformer` 性能下降，说明 Q-Former 聚合有用；如果性能接近但 overhead 明显下降，也可以作为论文里的 trade-off 分析。
-
-第五步，实现 `no_cost`：
-
-```text
-位置：policy_learning/cache_model/qmap_loss.py 或 qmap/qmap_generator.py
-做法一：训练时把 cost-aware loss 里的 write_sensitivity 和 migration_cost 权重置零。
-做法二：生成 label 时把与写敏感、迁移代价相关的项置零。
-```
-
-推荐优先做法一，因为改动更小、更容易复现：
-
-```text
-full：使用原始 QMAPCostAwareRankingLoss。
-no_cost：lambda_3=0，lambda_4=0，只保留 reuse/inactivity 类信号。
-```
-
-看结果时重点关注：
-
-```text
-NVM writes；
-migration count；
-weighted access cost。
-```
-
-如果 `no_cost` 的 hit rate 接近但 NVM writes / weighted cost 变差，就能说明 cost-aware objective 的价值。
-
-### 5.2 建议新增脚本
-
-建议新增：
+消融实验已经完成，脚本是：
 
 ```text
 scripts/run_qmap_ablation.py
 ```
 
-它负责循环运行多个 ablation 版本：
+它包含 5 个版本：
 
-```text
-full
-no_pc
-no_rw
-no_qformer
-no_cost
-```
+| 版本 | 含义 | 结果解释 |
+|---|---|---|
+| `full` | 当前完整 QMAP | 消融基线 |
+| `no_pc` | 去掉 PC 信息 | 检查 PC 上下文是否有贡献 |
+| `no_rw` | 去掉读写类型 | 检查读写类型是否有助于减少 NVM writes |
+| `no_qformer` | 用 mean pooling 替代 Q-Former | 检查 Q-Former 是否优于简单聚合 |
+| `no_cost` | 关闭 write-sensitivity 和 migration-cost loss 项 | 检查 cost-aware objective 是否有效 |
 
-每个版本单独生成 JSONL、训练 checkpoint、评估 QMAP，并最终汇总成 Markdown 和 CSV。
-
-推荐输出结构：
-
-```text
-outputs/results/qmap_ablation/
-  summary.md
-  summary.csv
-  full/qmap.json
-  no_pc/qmap.json
-  no_rw/qmap.json
-  no_qformer/qmap.json
-  no_cost/qmap.json
-  logs/
-
-outputs/checkpoints/qmap_ablation/
-  full/qmap_epoch_10.pth
-  no_pc/qmap_epoch_10.pth
-  no_rw/qmap_epoch_10.pth
-  no_qformer/qmap_epoch_10.pth
-  no_cost/qmap_epoch_10.pth
-```
-
-### 5.3 建议运行命令
-
-消融实验先在 `try_train.csv` / `try_test.csv` 上跑通：
+运行命令：
 
 ```bash
 CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
@@ -504,42 +409,106 @@ CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
   --device cuda
 ```
 
-如果时间允许，再在最有代表性的两个 workload 上补跑：
+结果位置：
 
 ```text
-writeheavy     因为它最能体现 NVM writes 和 cost-aware 的价值
-phasechange    因为它能体现非平稳访问下的泛化能力
+outputs/results/qmap_ablation/summary.md
+outputs/results/qmap_ablation/summary.csv
+outputs/results/qmap_ablation/full/qmap.json
+outputs/results/qmap_ablation/no_pc/qmap.json
+outputs/results/qmap_ablation/no_rw/qmap.json
+outputs/results/qmap_ablation/no_qformer/qmap.json
+outputs/results/qmap_ablation/no_cost/qmap.json
 ```
 
-### 5.4 消融结果应该怎么看
-
-建议最终表格至少包含：
+权重位置：
 
 ```text
-variant
-hit_rate_percent
-nvm_reads
-nvm_writes
-migrations
-weighted_access_cost
-avg_decision_time_ms
+outputs/checkpoints/qmap_ablation/full/qmap_epoch_10.pth
+outputs/checkpoints/qmap_ablation/no_pc/qmap_epoch_10.pth
+outputs/checkpoints/qmap_ablation/no_rw/qmap_epoch_10.pth
+outputs/checkpoints/qmap_ablation/no_qformer/qmap_epoch_10.pth
+outputs/checkpoints/qmap_ablation/no_cost/qmap_epoch_10.pth
 ```
 
-论文里更建议报告相对变化：
+查看结果：
 
-```text
-cost_delta_vs_full = (variant_cost - full_cost) / full_cost
-writes_delta_vs_full = (variant_writes - full_writes) / full_writes
+```bash
+cat outputs/results/qmap_ablation/summary.md
 ```
 
-判断标准：
+当前消融结果：
+
+| Variant | Hit rate (%) | Cost | Cost delta | NVM writes | Writes delta |
+|---|---:|---:|---:|---:|---:|
+| `full` | 59.30 | 9904 | +0.00% | 115 | +0.00% |
+| `no_pc` | 59.65 | 9821 | -0.84% | 112 | -2.61% |
+| `no_rw` | 59.85 | 9781 | -1.24% | 114 | -0.87% |
+| `no_qformer` | 60.00 | 9738 | -1.68% | 109 | -5.22% |
+| `no_cost` | 59.40 | 9884 | -0.20% | 116 | +0.87% |
+
+这个结果要谨慎解释。它没有证明 Q-Former、PC/RW 特征和 cost-aware loss 都有明显正贡献，反而暴露了当前模型还需要继续打磨：
 
 ```text
-no_pc 变差：说明 PC 上下文对复用预测有贡献。
-no_rw 的 NVM writes 增加：说明读写类型对写敏感迁移有贡献。
-no_qformer 变差：说明 Q-Former 聚合比简单 pooling 有贡献。
-no_qformer 接近 full 但更快：说明 Q-Former 的收益需要结合 overhead 讨论。
-no_cost 的 hit rate 接近但 writes/cost 变差：说明 cost-aware objective 的贡献主要体现在降低写放大和总访问代价。
+no_qformer 比 full 更好：当前 Q-Former 结构没有被证明有效，mean pooling 反而更稳。
+no_pc/no_rw 比 full 略好：当前 synthetic trace 可能没有让 PC/RW 特征发挥出来，或者模型没有学会利用它们。
+no_cost 的 writes 略高但 cost 接近：cost-aware loss 有一点写敏感信号，但强度还不够。
+```
+
+因此，当前消融实验在论文里更适合写成“诊断性消融”：
+
+```text
+它说明当前 QMAP 框架可运行、可评估；
+但完整模型还不是最终最优结构；
+下一步应该围绕 Q-Former 结构、PC/RW 特征设计和 cost-aware loss 权重继续优化。
+```
+
+## 下一步实验建议
+
+如果只想让结果更像一篇完整论文，建议优先做下面 4 件事。
+
+第一，做 workload 上的消融，而不是只在 `try` trace 上做消融。当前消融只说明 toy trace 上 full 不占优，不能说明所有 workload 都这样。优先补：
+
+```text
+writeheavy     重点看 no_rw/no_cost 是否导致 NVM writes 上升
+phasechange    重点看 no_pc/no_qformer 是否影响阶段变化适应能力
+```
+
+第二，强化 cost-aware loss。当前 `no_cost` 只让 NVM writes 从 115 增到 116，差异太小。可以尝试：
+
+```text
+提高 write_sensitivity 权重；
+提高 migration_cost 权重；
+把 weighted access cost 里的 NVM write cost 从 4 调到 8 或 10 做压力测试；
+单独报告 writes reduction，而不是只报告 hit rate。
+```
+
+第三，重做 Q-Former 对照。当前 `no_qformer` 最好，说明 full 的 Q-Former 设计可能过重或训练不足。可以尝试：
+
+```text
+减少 query 数量；
+减少 Transformer 层数；
+加入 dropout / weight decay；
+延长训练 epoch；
+把 mean pooling 作为正式 baseline，而不是只作为消融项。
+```
+
+第四，构造更能体现 PC/RW 的 trace。当前 `no_pc/no_rw` 不差，说明 trace 里 PC/RW 信号可能太弱。可以补一个更清晰的 synthetic workload：
+
+```text
+不同 PC 对应不同页面复用距离；
+写热点和读热点分离；
+同一页面在不同 phase 中读写行为变化；
+让错误迁移写热点页面时付出更高 cost。
+```
+
+推荐实验顺序：
+
+```text
+1. 先在 writeheavy 上补消融；
+2. 再调 cost-aware loss 权重；
+3. 然后比较 full / mean pooling / lighter Q-Former；
+4. 最后再补更真实或更有区分度的 trace。
 ```
 
 ## 评估指标说明
@@ -610,10 +579,12 @@ outputs/results/try_prototype/
 outputs/results/checkpoint_sweep/
 outputs/results/workload_suite/
 outputs/results/qmap_parameter_sensitivity/
+outputs/results/qmap_ablation/
 
 outputs/checkpoints/try_prototype/
 outputs/checkpoints/workload_suite/
 outputs/checkpoints/qmap_parameter_sensitivity/
+outputs/checkpoints/qmap_ablation/
 
 dataset/processed/
 dataset/raw_traces/
@@ -625,6 +596,7 @@ dataset/metadata/
 ```text
 outputs/checkpoints/try_prototype/qmap_epoch_10.pth
 outputs/checkpoints/workload_suite/*/qmap_epoch_10.pth
+outputs/checkpoints/qmap_ablation/*/qmap_epoch_10.pth
 ```
 
 它们是当前主实验和多 workload 实验的关键权重。
