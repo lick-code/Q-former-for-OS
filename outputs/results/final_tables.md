@@ -37,6 +37,8 @@ All results use 2,000 test accesses per workload. Hit rate is reported in percen
 | Average | CLOCK | 55.52 | 10,883 | 150.20 | 761.60 | 0.001 |
 | Average | QMAP | 59.30 | 9,910 | 108.40 | 686.00 | 3.291 |
 
+**总结：** QMAP 在 writeheavy 和 streaming 场景中表现较突出，其中 writeheavy 下相较 LRU 将命中率从 71.30% 提升到 73.45%，同时将 NVM 写入从 238 次降至 209 次，weighted access cost 从 7,510 降至 6,979；streaming 下各传统策略命中率均为 0，QMAP 仍取得 0.70% 的小幅命中并降低总成本。pcrwstress 中 QMAP 的写入次数与 LRU/LFU 同为 24 次，成本低于 LRU 和 Random/CLOCK，但 LFU 在该 workload 上仍取得最高命中率和最低成本。整体平均看，QMAP 的平均 cost 为 9,910，低于 LRU、Random 和 CLOCK，NVM 写入平均值也低于 LRU、Random 和 CLOCK；但 LFU 在平均命中率和平均 cost 上仍较强，说明 QMAP 的优势主要体现在写敏感、迁移敏感和部分非平稳 workload 上，而非所有场景的纯命中率最优。
+
 ## Table 2: Checkpoint sweep
 
 | Epoch | Hit rate (%) | Cost | NVM writes | NVM reads | Migrations | Avg. decision (ms) |
@@ -51,6 +53,8 @@ All results use 2,000 test accesses per workload. Hit rate is reported in percen
 | 8 | 59.55 | 9,849 | 115 | 694 | 681 | 2.088 |
 | 9 | 59.50 | 9,860 | 115 | 695 | 682 | 2.041 |
 | 10 | 59.60 | 9,838 | 115 | 693 | 680 | 2.152 |
+
+**总结：** 随着训练 epoch 增加，QMAP 的性能总体呈稳定改善趋势。第 1 轮 checkpoint 的命中率为 54.35%，cost 为 11,043；到第 10 轮时命中率提升至 59.60%，cost 降至 9,838，同时 NVM writes 从 140 次降至 115 次，migrations 从 785 次降至 680 次。第 8 至第 10 轮之间指标波动很小，说明模型在后期基本收敛。综合命中率、写入次数和 cost，第 10 轮 checkpoint 是该组实验中最优且最稳定的选择。
 
 ## Table 3: Parameter sensitivity
 
@@ -71,6 +75,8 @@ Baseline configuration is history length = 10, candidate count = 64, DRAM capaci
 | lookahead | 128 | 59.60 | +0.30 | 9,832 | -0.73 | 112 | -2.61 | 680 | 3.392 |
 | lookahead | 256 | 59.30 | +0.00 | 9,904 | +0.00 | 115 | +0.00 | 686 | 4.101 |
 | lookahead | 512 | 59.90 | +0.60 | 9,774 | -1.31 | 116 | +0.87 | 674 | 5.093 |
+
+**总结：** 参数敏感性实验显示，QMAP 对候选数量和 DRAM 容量较敏感，对 history length 和 lookahead 的变化相对稳健。candidate count 从 64 降到 16 时，命中率下降 2.20 个百分点，cost 上升 5.13%，说明候选集合过小会限制模型选择空间。DRAM capacity 是影响最大的因素：容量从 128 降到 64 时，命中率下降 8.90 个百分点、cost 上升 26.51%；容量增加到 256 时，命中率提升 12.30 个百分点、cost 降低 40.93%。history length 从 10 增至 50、lookahead 从 256 增至 512 都只带来小幅收益，表明默认配置已经接近稳定区间，进一步增大上下文窗口或前瞻距离的收益有限。
 
 ## Table 4: Ablation and QMAP-Full vs. QMAP-Pool
 
@@ -102,6 +108,8 @@ QMAP-Pool corresponds to replacing Q-Former query aggregation with mean pooling.
 | writeheavy, epoch 20 | QMAP-Pool | 73.35 | +0.00 | 7,837 | +0.00 | 209 | +0.00 | 405 | 2.768 |
 | writeheavy, epoch 20 | QFormer-light | 72.55 | -0.80 | 8,061 | +2.86 | 217 | +3.83 | 421 | 2.983 |
 | writeheavy, epoch 20 | QFormer-tiny | 73.15 | -0.20 | 7,905 | +0.87 | 213 | +1.91 | 409 | 2.995 |
+
+**总结：** 消融实验表明，各输入特征和损失项对不同 workload 的贡献并不完全一致。在 writeheavy 上，QMAP-Full 优于 no PC、no R/W、QMAP-Pool 和 no cost loss，说明程序上下文、读写类型以及代价感知训练对写密集负载都有正向作用。pcrwstress 中去除 PC 或 R/W 会带来 cost 上升，而 no cost loss 与 QMAP-Full 接近，说明该场景下写入次数已被压到较低水平，主要差异来自读访问和迁移行为。值得注意的是，QMAP-Pool 在 default、phasechange 和 pcrwstress 设置下反而优于 QMAP-Full，尤其 phasechange 中 cost 降低 8.85%，说明当前 Q-Former 聚合并非在所有负载上都稳定优于简单池化；论文中可将其表述为“QMAP-Full 在写密集场景更稳健，而 QMAP-Pool 在部分非平稳负载上具有更低开销和更好泛化”，从而引出后续对聚合结构的优化空间。
 
 ## Source files
 
