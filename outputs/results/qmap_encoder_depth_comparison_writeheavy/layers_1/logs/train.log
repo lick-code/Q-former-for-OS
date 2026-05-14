@@ -1,0 +1,99 @@
+QMAP training configuration:
+  train_data path: dataset/jsonl/qmap_encoder_depth_comparison_writeheavy/layers_1.jsonl
+  number of training samples: 4079
+  batch_size: 32
+  epochs: 20
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: mean_pool
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/20] iter=1 loss=-0.786407
+Epoch [1/20] iter=100 loss=-0.829265
+Epoch [1/20] avg_loss=-0.806287
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_1.pth
+Epoch [2/20] iter=129 loss=-0.829872
+Epoch [2/20] iter=200 loss=-0.839997
+Epoch [2/20] avg_loss=-0.846118
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_2.pth
+Epoch [3/20] iter=257 loss=-0.891472
+Epoch [3/20] iter=300 loss=-0.911990
+Epoch [3/20] avg_loss=-0.914415
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_3.pth
+Epoch [4/20] iter=385 loss=-0.901749
+Epoch [4/20] iter=400 loss=-0.902007
+Epoch [4/20] iter=500 loss=-0.936168
+Epoch [4/20] avg_loss=-0.932388
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_4.pth
+Epoch [5/20] iter=513 loss=-0.933875
+Epoch [5/20] iter=600 loss=-0.942800
+Epoch [5/20] avg_loss=-0.939111
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_5.pth
+Epoch [6/20] iter=641 loss=-0.942950
+Epoch [6/20] iter=700 loss=-0.944260
+Epoch [6/20] avg_loss=-0.943694
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_6.pth
+Epoch [7/20] iter=769 loss=-0.946516
+Epoch [7/20] iter=800 loss=-0.948694
+Epoch [7/20] avg_loss=-0.946437
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_7.pth
+Epoch [8/20] iter=897 loss=-0.950538
+Epoch [8/20] iter=900 loss=-0.947688
+Epoch [8/20] iter=1000 loss=-0.947700
+Epoch [8/20] avg_loss=-0.948067
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_8.pth
+Epoch [9/20] iter=1025 loss=-0.949311
+Epoch [9/20] iter=1100 loss=-0.950809
+Epoch [9/20] avg_loss=-0.949166
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_9.pth
+Epoch [10/20] iter=1153 loss=-0.952244
+Epoch [10/20] iter=1200 loss=-0.950831
+Epoch [10/20] avg_loss=-0.949926
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_10.pth
+Epoch [11/20] iter=1281 loss=-0.950306
+Epoch [11/20] iter=1300 loss=-0.952551
+Epoch [11/20] iter=1400 loss=-0.953490
+Epoch [11/20] avg_loss=-0.950556
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_11.pth
+Epoch [12/20] iter=1409 loss=-0.953371
+Epoch [12/20] iter=1500 loss=-0.951270
+Epoch [12/20] avg_loss=-0.951048
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_12.pth
+Epoch [13/20] iter=1537 loss=-0.952267
+Epoch [13/20] iter=1600 loss=-0.953425
+Epoch [13/20] avg_loss=-0.951451
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_13.pth
+Epoch [14/20] iter=1665 loss=-0.953863
+Epoch [14/20] iter=1700 loss=-0.955249
+Epoch [14/20] avg_loss=-0.951771
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_14.pth
+Epoch [15/20] iter=1793 loss=-0.954168
+Epoch [15/20] iter=1800 loss=-0.954591
+Epoch [15/20] iter=1900 loss=-0.954630
+Epoch [15/20] avg_loss=-0.952002
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_15.pth
+Epoch [16/20] iter=1921 loss=-0.953997
+Epoch [16/20] iter=2000 loss=-0.954617
+Epoch [16/20] avg_loss=-0.952207
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_16.pth
+Epoch [17/20] iter=2049 loss=-0.953152
+Epoch [17/20] iter=2100 loss=-0.954224
+Epoch [17/20] avg_loss=-0.952380
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_17.pth
+Epoch [18/20] iter=2177 loss=-0.953430
+Epoch [18/20] iter=2200 loss=-0.952230
+Epoch [18/20] iter=2300 loss=-0.955014
+Epoch [18/20] avg_loss=-0.952529
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_18.pth
+Epoch [19/20] iter=2305 loss=-0.954625
+Epoch [19/20] iter=2400 loss=-0.955580
+Epoch [19/20] avg_loss=-0.952672
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_19.pth
+Epoch [20/20] iter=2433 loss=-0.954868
+Epoch [20/20] iter=2500 loss=-0.953614
+Epoch [20/20] avg_loss=-0.952826
+Saved checkpoint: outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_1/qmap_epoch_20.pth
+Training finished.
+/home/tingkun/miniconda3/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
