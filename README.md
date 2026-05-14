@@ -14,6 +14,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 3. 参数敏感性整体稳定：history_length 和 lookahead 影响小，candidate_count=32 与 64 接近。
 4. writeheavy 消融显示 full QMAP 的 PC/RW/Q-Former/cost-aware 组件都有小幅正贡献。
 5. mean pooling 在 phasechange、pcrwstress 和 Q-Former 对照中更稳，说明当前 Q-Former 结构不是最终最优。
+6. 在 mean pooling 固定后，1/2/3 层 Transformer Encoder 差距很小；writeheavy 上单层 encoder 的 weighted cost 最低且推理最快。
 ```
 
 需要谨慎表述的结论：
@@ -48,7 +49,7 @@ QMAP 在写密集场景下能降低 NVM writes 和 weighted access cost；
 | pcrwstress 消融 | 已完成 | `outputs/results/qmap_ablation_pcrwstress/summary.md` |
 | cost-aware 权重实验 | 已完成 | `outputs/results/qmap_cost_w8_m4_writeheavy/summary.md` |
 | Q-Former 对照 | 已完成 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
-| Encoder 层数对照 | 待运行 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
+| Encoder 层数对照 | 已完成 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 
 ## 目录结构
 
@@ -214,13 +215,19 @@ Q-Former 可以保留为探索性模块，但不建议作为当前论文最强�
 
 ### Encoder 层数对照
 
-当前计划把聚合方式固定为：
+查看：
+
+```bash
+cat outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md
+```
+
+该实验把聚合方式固定为：
 
 ```text
 TransformerEncoder -> mean pooling
 ```
 
-然后只比较 Transformer Encoder 的层数：
+只比较 Transformer Encoder 的层数：
 
 ```text
 1 layer：当前 mean_pool baseline
@@ -228,10 +235,20 @@ TransformerEncoder -> mean pooling
 3 layers：进一步加深 encoder
 ```
 
-运行后查看：
+结果：
 
-```bash
-cat outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md
+| Profile | Hit rate | Cost | NVM writes | Decision ms | 解读 |
+|---|---:|---:|---:|---:|---|
+| layers_1 | 73.35 | 7837 | 209 | 3.073 | 最低 cost，推理最快 |
+| layers_2 | 73.30 | 7848 | 209 | 3.939 | cost 略升，writes 不变 |
+| layers_3 | 73.30 | 7842 | 208 | 4.105 | 少 1 次 write，但 reads/migrations 增加，cost 仍高于单层 |
+
+结论：
+
+```text
+加深 Transformer Encoder 对 writeheavy 指标影响很小，没有带来稳定收益。
+如果以 weighted access cost 为主指标，当前应继续保留 1-layer mean_pool。
+3-layer 只少 1 次 NVM write，但 cost 更高、推理更慢，不足以作为默认配置。
 ```
 
 ## 运行命令
