@@ -2,7 +2,7 @@
 
 QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。它把页面迁移建模为候选页面排序问题：当 DRAM 已满并且一次 DRAM miss 触发迁移决策时，QMAP 从候选页面中选择最适合从 DRAM 降级到 NVM 的页面。
 
-当前仓库已经完成了一套可复现的原型实验：主实验、checkpoint sweep、多 workload、参数敏感性、消融实验、PC/RW stress workload、cost-aware 权重实验和 Q-Former 对照实验都已有输出。
+当前仓库已经完成了一套可复现的原型实验：主实验、checkpoint sweep、多 workload、参数敏感性、消融实验、PC/RW stress workload、cost-aware 权重实验、Q-Former 对照实验和 Q-Former K sweep 都已有输出。
 
 ## 当前结论
 
@@ -15,6 +15,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 4. writeheavy 消融显示 full QMAP 的 PC/RW/Q-Former/cost-aware 组件都有小幅正贡献。
 5. mean pooling 在 phasechange、pcrwstress 和 Q-Former 对照中更稳，说明当前 Q-Former 结构不是最终最优。
 6. 在 mean pooling 固定后，1/2/3 层 Transformer Encoder 差距很小；writeheavy 上单层 encoder 的 weighted cost 最低且推理最快。
+7. Q-Former 的 query 数 K 对 writeheavy 指标影响较小；单 seed 下 K=2 的 weighted cost 最低，K=5 的 NVM writes 最少，但整体差距不大。
 ```
 
 需要谨慎表述的结论：
@@ -24,6 +25,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 2. cost-aware loss 的收益目前偏弱：writeheavy 上强化权重只比 no_cost 少 1 次 NVM write。
 3. PC/RW 特征在 pcrwstress 中没有明显拉开 NVM writes，说明当前 trace 或特征利用还不够强。
 4. Q-Former 不应直接作为强贡献点；目前更适合把 mean_pool 作为正式 baseline 或候选最终版本。
+5. K sweep 目前仍是单 seed 结果，且 K=1/2/4/5 之间差异很小；不要把 K=2 或 K=5 写成稳定最优。
 ```
 
 最诚实的论文叙事是：
@@ -32,6 +34,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 QMAP 在写密集场景下能降低 NVM writes 和 weighted access cost；
 但在稳定热点或 LFU 友好的 workload 上优势有限；
 当前实验进一步表明，简单 mean pooling 比原始 Q-Former 更稳，后续应把 QMAP-Pool 作为主要实现继续打磨。
+如果继续保留 Q-Former，K 可以作为轻量超参数调优项；现有 writeheavy 结果只支持“弱敏感”，不支持强结论。
 ```
 
 ## 结果总览
@@ -49,6 +52,7 @@ QMAP 在写密集场景下能降低 NVM writes 和 weighted access cost；
 | pcrwstress 消融 | 已完成 | `outputs/results/qmap_ablation_pcrwstress/summary.md` |
 | cost-aware 权重实验 | 已完成 | `outputs/results/qmap_cost_w8_m4_writeheavy/summary.md` |
 | Q-Former 对照 | 已完成 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
+| Q-Former K sweep | 已完成 | `outputs/results/qmap_qformer_k_sweep_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 
 ## 目录结构
@@ -75,6 +79,7 @@ scripts/
   run_qmap_parameter_sensitivity.py    # 参数敏感性实验
   run_qmap_ablation.py                 # 消融实验
   run_qmap_qformer_comparison.py       # Q-Former / mean_pool 对照实验
+  run_qmap_qformer_k_sweep.py          # Q-Former query 数 K 的纯超参数 sweep
   run_qmap_encoder_depth_comparison.py # mean_pool 下 1/2/3 层 Transformer Encoder 对照实验
 
 dataset/
@@ -211,6 +216,41 @@ cat outputs/results/qmap_qformer_comparison_writeheavy/summary.md
 ```text
 mean_pool 是当前最稳的聚合方式。
 Q-Former 可以保留为探索性模块，但不建议作为当前论文最强贡献点。
+```
+
+### Q-Former K sweep
+
+查看：
+
+```bash
+cat outputs/results/qmap_qformer_k_sweep_writeheavy/summary.md
+```
+
+该实验固定训练样本、Transformer 层数、head 数、dropout、weight decay、loss 权重和评估配置，只改变 Q-Former 的 query 数 K：
+
+```text
+K = 1, 2, 3, 4, 5, 6, 8
+baseline K = 4
+```
+
+结果：
+
+| K | Hit rate | Cost | NVM writes | 解读 |
+|---:|---:|---:|---:|---|
+| 1 | 73.45 | 7821 | 210 | 比 K=4 略低 cost，writes 更少 |
+| 2 | 73.50 | 7810 | 210 | hit 最高、weighted cost 最低 |
+| 3 | 73.25 | 7901 | 216 | 当前 sweep 中最差 |
+| 4 | 73.40 | 7856 | 214 | 原始默认配置，不是本轮最优 |
+| 5 | 73.45 | 7815 | 209 | NVM writes 最少，cost 接近 K=2 |
+| 6 | 73.20 | 7876 | 210 | hit 偏低，cost 略高 |
+| 8 | 73.35 | 7855 | 212 | 接近 K=4 |
+
+结论：
+
+```text
+Q-Former 的 K 不是强敏感超参数。K=2 在单 seed 下 weighted cost 最低，K=5 的 NVM writes 最少；
+但 K=1/2/4/5 的差距很小，最大 cost 差距不到 0.6%。如果继续使用 Q-Former，可以优先复跑 K=2 和 K=5 的多 seed；
+如果要写论文，当前更适合表述为“K 对指标影响较弱，较小 K 不劣于默认 K=4”，不要直接宣称 K=2 或 K=5 稳定最优。
 ```
 
 ### Encoder 层数对照
@@ -415,6 +455,43 @@ CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_qformer_comparison.py \
   --device cuda
 ```
 
+### Q-Former K sweep
+
+固定其它配置，只改变 `--num_queries K`：
+
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_qformer_k_sweep.py \
+  --train_trace dataset/processed/writeheavy_train.csv \
+  --test_trace dataset/processed/writeheavy_test.csv \
+  --queries 1,2,3,4,5,6,8 \
+  --baseline_k 4 \
+  --result_dir outputs/results/qmap_qformer_k_sweep_writeheavy \
+  --checkpoint_root outputs/checkpoints/qmap_qformer_k_sweep_writeheavy \
+  --jsonl_path dataset/jsonl/qmap_qformer_k_sweep_writeheavy/train.jsonl \
+  --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 20 \
+  --batch_size 32 \
+  --write_sensitivity_weight 4 \
+  --migration_cost_weight 2 \
+  --nvm_write_cost 8 \
+  --device cuda
+```
+
+输出位置：
+
+```text
+outputs/results/qmap_qformer_k_sweep_writeheavy/summary.md
+outputs/results/qmap_qformer_k_sweep_writeheavy/summary.csv
+outputs/results/qmap_qformer_k_sweep_writeheavy/k*/qmap.json
+outputs/results/qmap_qformer_k_sweep_writeheavy/k*/logs/*.log
+outputs/checkpoints/qmap_qformer_k_sweep_writeheavy/k*/qmap_epoch_20.pth
+dataset/jsonl/qmap_qformer_k_sweep_writeheavy/train.jsonl
+```
+
 ### Encoder 层数对照
 
 默认比较 1、2、3 层 Transformer Encoder，并且固定使用 mean pooling：
@@ -477,6 +554,7 @@ qmap_ablation/writeheavy
 qmap_ablation/phasechange
 qmap_ablation_pcrwstress
 qmap_qformer_comparison_writeheavy
+qmap_qformer_k_sweep_writeheavy
 ```
 
 建议 seed：
@@ -497,7 +575,7 @@ qmap_qformer_comparison_writeheavy
 Table 1: QMAP vs LRU/Random/LFU/CLOCK across workloads
 Table 2: checkpoint sweep
 Table 3: parameter sensitivity
-Table 4: ablation and QMAP-Full vs QMAP-Pool
+Table 4: ablation, QMAP-Full vs QMAP-Pool, and Q-Former K sensitivity
 ```
 
 其中最重要的是 Table 1 和 Table 4。
@@ -588,4 +666,5 @@ outputs/checkpoints/workload_suite/*/qmap_epoch_10.pth
 outputs/checkpoints/workload_suite_pcrwstress/*/qmap_epoch_10.pth
 outputs/checkpoints/qmap_ablation/**/qmap_epoch_10.pth
 outputs/checkpoints/qmap_qformer_comparison_writeheavy/**/qmap_epoch_20.pth
+outputs/checkpoints/qmap_qformer_k_sweep_writeheavy/k*/qmap_epoch_20.pth
 ```
