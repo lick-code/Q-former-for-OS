@@ -48,6 +48,7 @@ QMAP 在写密集场景下能降低 NVM writes 和 weighted access cost；
 | pcrwstress 消融 | 已完成 | `outputs/results/qmap_ablation_pcrwstress/summary.md` |
 | cost-aware 权重实验 | 已完成 | `outputs/results/qmap_cost_w8_m4_writeheavy/summary.md` |
 | Q-Former 对照 | 已完成 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
+| Encoder 层数对照 | 待运行 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 
 ## 目录结构
 
@@ -73,6 +74,7 @@ scripts/
   run_qmap_parameter_sensitivity.py    # 参数敏感性实验
   run_qmap_ablation.py                 # 消融实验
   run_qmap_qformer_comparison.py       # Q-Former / mean_pool 对照实验
+  run_qmap_encoder_depth_comparison.py # mean_pool 下 1/2/3 层 Transformer Encoder 对照实验
 
 dataset/
   raw_traces/                   # 原始 synthetic traces
@@ -208,6 +210,28 @@ cat outputs/results/qmap_qformer_comparison_writeheavy/summary.md
 ```text
 mean_pool 是当前最稳的聚合方式。
 Q-Former 可以保留为探索性模块，但不建议作为当前论文最强贡献点。
+```
+
+### Encoder 层数对照
+
+当前计划把聚合方式固定为：
+
+```text
+TransformerEncoder -> mean pooling
+```
+
+然后只比较 Transformer Encoder 的层数：
+
+```text
+1 layer：当前 mean_pool baseline
+2 layers：更深一点的 encoder
+3 layers：进一步加深 encoder
+```
+
+运行后查看：
+
+```bash
+cat outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md
 ```
 
 ## 运行命令
@@ -372,6 +396,42 @@ CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_qformer_comparison.py \
   --migration_cost_weight 2 \
   --nvm_write_cost 8 \
   --device cuda
+```
+
+### Encoder 层数对照
+
+默认比较 1、2、3 层 Transformer Encoder，并且固定使用 mean pooling：
+
+```bash
+CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_encoder_depth_comparison.py \
+  --train_trace dataset/processed/writeheavy_train.csv \
+  --test_trace dataset/processed/writeheavy_test.csv \
+  --layers 1,2,3 \
+  --result_dir outputs/results/qmap_encoder_depth_comparison_writeheavy \
+  --checkpoint_root outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy \
+  --jsonl_root dataset/jsonl/qmap_encoder_depth_comparison_writeheavy \
+  --page_shift 12 \
+  --dram_capacity 128 \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --epochs 20 \
+  --batch_size 32 \
+  --write_sensitivity_weight 4 \
+  --migration_cost_weight 2 \
+  --nvm_write_cost 8 \
+  --device cuda
+```
+
+输出位置：
+
+```text
+outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md
+outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.csv
+outputs/results/qmap_encoder_depth_comparison_writeheavy/layers_*/qmap.json
+outputs/results/qmap_encoder_depth_comparison_writeheavy/layers_*/logs/*.log
+outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_*/qmap_epoch_20.pth
+dataset/jsonl/qmap_encoder_depth_comparison_writeheavy/layers_*.jsonl
 ```
 
 ## 下一步计划
