@@ -1,104 +1,104 @@
 {
-  "updated_at": "2026-05-19T19:48:58",
+  "updated_at": "2026-05-19T20:43:29",
   "workloads": {
-    "local_python_loop_pilot": {
+    "parsec_blackscholes": {
       "limit": 100000,
       "page_shift": 12,
-      "raw_trace": "dataset/raw_traces/local_python_loop_pilot.csv",
+      "raw_trace": "dataset/raw_traces/parsec_blackscholes.csv",
       "skip": 0,
-      "source_trace": "dataset/raw_traces/local_python_loop_100k.csv",
+      "source_trace": "dataset/raw_traces/parsec_blackscholes_100k.csv",
       "split_policy": "chronological 80/10/10",
       "splits": {
         "test": {
-          "file": "dataset/processed/local_python_loop_pilot_test.csv",
-          "records": 10000,
-          "stats": {
-            "records": 10000,
-            "unique_pages": 71,
-            "write_ratio": 0.3645
-          }
-        },
-        "train": {
-          "file": "dataset/processed/local_python_loop_pilot_train.csv",
-          "records": 80000,
-          "stats": {
-            "records": 80000,
-            "unique_pages": 115,
-            "write_ratio": 0.3485875
-          }
-        },
-        "valid": {
-          "file": "dataset/processed/local_python_loop_pilot_valid.csv",
+          "file": "dataset/processed/parsec_blackscholes_test.csv",
           "records": 10000,
           "stats": {
             "records": 10000,
             "unique_pages": 50,
-            "write_ratio": 0.3605
+            "write_ratio": 0.3103
+          }
+        },
+        "train": {
+          "file": "dataset/processed/parsec_blackscholes_train.csv",
+          "records": 80000,
+          "stats": {
+            "records": 80000,
+            "unique_pages": 97,
+            "write_ratio": 0.3218125
+          }
+        },
+        "valid": {
+          "file": "dataset/processed/parsec_blackscholes_valid.csv",
+          "records": 10000,
+          "stats": {
+            "records": 10000,
+            "unique_pages": 20,
+            "write_ratio": 0.3465
           }
         }
       },
       "stats": {
-        "mean_reuse_distance": 75.01786053962056,
-        "page_reuse_ratio": 0.99885,
-        "read_accesses": 64863,
-        "reuse_events": 99885,
+        "mean_reuse_distance": 41.88457996316169,
+        "page_reuse_ratio": 0.99896,
+        "read_accesses": 67687,
+        "reuse_events": 99896,
         "top_pages": [
           {
-            "accesses": 47165,
-            "page_address": "0x6a823ef000",
-            "share": 0.47165
+            "accesses": 57297,
+            "page_address": "0x7ffd191a7000",
+            "share": 0.57297
           },
           {
-            "accesses": 6911,
-            "page_address": "0x23a8083f000",
-            "share": 0.06911
+            "accesses": 7678,
+            "page_address": "0x75eb75401000",
+            "share": 0.07678
           },
           {
-            "accesses": 2629,
-            "page_address": "0x23a80864000",
-            "share": 0.02629
+            "accesses": 4927,
+            "page_address": "0x75eb79743000",
+            "share": 0.04927
           },
           {
-            "accesses": 2572,
-            "page_address": "0x23a807f9000",
-            "share": 0.02572
+            "accesses": 1860,
+            "page_address": "0x75eb79740000",
+            "share": 0.0186
           },
           {
-            "accesses": 1831,
-            "page_address": "0x7ffa4950f000",
-            "share": 0.01831
+            "accesses": 1798,
+            "page_address": "0x75eb78c1b000",
+            "share": 0.01798
           },
           {
-            "accesses": 1536,
-            "page_address": "0x7ffa49501000",
-            "share": 0.01536
+            "accesses": 1690,
+            "page_address": "0x75eb7964c000",
+            "share": 0.0169
           },
           {
-            "accesses": 1534,
-            "page_address": "0x7ffa49438000",
-            "share": 0.01534
+            "accesses": 1302,
+            "page_address": "0x75eb789fe000",
+            "share": 0.01302
           },
           {
-            "accesses": 1382,
-            "page_address": "0x6a8209e000",
-            "share": 0.01382
+            "accesses": 1284,
+            "page_address": "0x75eb753fc000",
+            "share": 0.01284
           },
           {
-            "accesses": 1365,
-            "page_address": "0x23a80865000",
-            "share": 0.01365
+            "accesses": 1109,
+            "page_address": "0x75eb78bda000",
+            "share": 0.01109
           },
           {
-            "accesses": 1364,
-            "page_address": "0x7ffa494cb000",
-            "share": 0.01364
+            "accesses": 1073,
+            "page_address": "0x75eb78c19000",
+            "share": 0.01073
           }
         ],
         "total_accesses": 100000,
-        "unique_pages": 115,
-        "unique_pcs": 2147,
-        "write_accesses": 35137,
-        "write_ratio": 0.35137
+        "unique_pages": 104,
+        "unique_pcs": 4471,
+        "write_accesses": 32313,
+        "write_ratio": 0.32313
       }
     }
   }
