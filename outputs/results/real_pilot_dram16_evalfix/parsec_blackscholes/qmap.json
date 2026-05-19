@@ -1,0 +1,24 @@
+{
+  "avg_decision_time_ms": 3.2652160202999,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 742,
+  "decision_time_seconds": 2.4227902870625257,
+  "dram_capacity": 16,
+  "hit_rate": 0.9242,
+  "hit_rate_percent": 92.42,
+  "hits": 9242,
+  "migrations": 742,
+  "misses": 758,
+  "nvm_reads": 720,
+  "nvm_writes": 38,
+  "policy": "qmap",
+  "total_accesses": 10000,
+  "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/parsec_blackscholes_test.csv",
+  "weighted_access_cost": 18406.0
+}
