@@ -1,65 +1,61 @@
-# Real 100k Pilot
+# Real 100k PARSEC Pilot
 
 ## Setup
 
-- run id: `real_pilot_100k_dram64`
-- workloads: `parsec_blackscholes`, `parsec_canneal`, `parsec_streamcluster`, `parsec_dedup`
-- policies: `LRU`, `Random`, `LFU`, `CLOCK`, `QMAP-Pool`
-- input trace size: `100000` records per workload
-- split policy: chronological `80000/10000/10000`
-- DRAM capacity: `64` pages
-- history length: `10`
-- candidate count: `64`
-- lookahead: `256`
+- run id: `real_pilot_100k_dram32`
+- workloads: `parsec_blackscholes, parsec_canneal, parsec_streamcluster, parsec_dedup`
+- policies: `LRU, RANDOM, LFU, CLOCK, QMAP-Pool`
+- records per workload: `100000`
+- split policy: `chronological 80/10/10`
+- DRAM capacity: `32` pages
+- h/c/d/l: `10/64/32/256`
 - QMAP model: `QMAP-Pool` (`ablation=mean_pool`)
+- page shift: `12`
 - epochs: `10`
 - batch size: `32`
-- device: `cpu`
+- seed: `3136859`
+- random seed: `0`
+- device: `cuda`
 
-Note: this Codex run wrote large generated JSONL/checkpoint artifacts to
-`C:\Users\LKC_LE~1\AppData\Local\Temp\qmap_real_pilot_100k_dram64` because the
-shell process could read the workspace but could not create new binary/runtime
-files inside it. The Markdown/CSV summaries were copied back into this results
-directory.
+## Trace Stats
 
-## Training Samples
+| Workload | Records | Unique pages | Unique PCs | Write ratio | Reuse ratio |
+|---|---:|---:|---:|---:|---:|
+| parsec_blackscholes | 100000 | 104 | 4471 | 0.3231 | 0.9990 |
+| parsec_canneal | 100000 | 157 | 1946 | 0.2736 | 0.9984 |
+| parsec_streamcluster | 100000 | 156 | 1941 | 0.2744 | 0.9984 |
+| parsec_dedup | 100000 | 121 | 2678 | 0.3963 | 0.9988 |
 
-| Workload | Train records | Generated QMAP samples |
-|---|---:|---:|
-| parsec_blackscholes | 80000 | 47 |
-| parsec_canneal | 80000 | 111 |
-| parsec_streamcluster | 80000 | 110 |
-| parsec_dedup | 80000 | 60 |
+## Results
 
-## Replay Results
+| Workload | Policy | Hit rate (%) | NVM writes | Cost | Migrations | Decision ms |
+|---|---|---:|---:|---:|---:|---:|
+| parsec_blackscholes | LRU | 99.45 | 5 | 10315.00 | 23 | 0.000333 |
+| parsec_blackscholes | RANDOM | 99.33 | 5 | 10447.00 | 35 | 0.001463 |
+| parsec_blackscholes | LFU | 99.37 | 6 | 10409.00 | 31 | 0.015043 |
+| parsec_blackscholes | CLOCK | 99.29 | 6 | 10497.00 | 39 | 0.001418 |
+| parsec_blackscholes | QMAP-Pool | 99.46 | 4 | 10298.00 | 22 | 28.863295 |
+| parsec_canneal | LRU | 99.69 | 2 | 10043.00 | 0 | 0.000000 |
+| parsec_canneal | RANDOM | 99.69 | 2 | 10043.00 | 0 | 0.000000 |
+| parsec_canneal | LFU | 99.69 | 2 | 10043.00 | 0 | 0.000000 |
+| parsec_canneal | CLOCK | 99.69 | 2 | 10043.00 | 0 | 0.000000 |
+| parsec_canneal | QMAP-Pool | 99.69 | 2 | 10043.00 | 0 | 0.000000 |
+| parsec_streamcluster | LRU | 99.69 | 1 | 10037.00 | 0 | 0.000000 |
+| parsec_streamcluster | RANDOM | 99.69 | 1 | 10037.00 | 0 | 0.000000 |
+| parsec_streamcluster | LFU | 99.69 | 1 | 10037.00 | 0 | 0.000000 |
+| parsec_streamcluster | CLOCK | 99.69 | 1 | 10037.00 | 0 | 0.000000 |
+| parsec_streamcluster | QMAP-Pool | 99.69 | 1 | 10037.00 | 0 | 0.000000 |
+| parsec_dedup | LRU | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
+| parsec_dedup | RANDOM | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
+| parsec_dedup | LFU | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
+| parsec_dedup | CLOCK | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
+| parsec_dedup | QMAP-Pool | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
 
-| Workload | Policy | Hit rate (%) | NVM writes | Cost | Migrations | Decisions | Decision ms |
-|---|---|---:|---:|---:|---:|---:|---:|
-| parsec_blackscholes | LRU | 99.50 | 4 | 10074.00 | 0 | 0 | 0.000000 |
-| parsec_blackscholes | Random | 99.50 | 4 | 10074.00 | 0 | 0 | 0.000000 |
-| parsec_blackscholes | LFU | 99.50 | 4 | 10074.00 | 0 | 0 | 0.000000 |
-| parsec_blackscholes | CLOCK | 99.50 | 4 | 10074.00 | 0 | 0 | 0.000000 |
-| parsec_blackscholes | QMAP-Pool | 99.50 | 4 | 10074.00 | 0 | 0 | 0.000000 |
-| parsec_canneal | LRU | 99.69 | 2 | 10043.00 | 0 | 0 | 0.000000 |
-| parsec_canneal | Random | 99.69 | 2 | 10043.00 | 0 | 0 | 0.000000 |
-| parsec_canneal | LFU | 99.69 | 2 | 10043.00 | 0 | 0 | 0.000000 |
-| parsec_canneal | CLOCK | 99.69 | 2 | 10043.00 | 0 | 0 | 0.000000 |
-| parsec_canneal | QMAP-Pool | 99.69 | 2 | 10043.00 | 0 | 0 | 0.000000 |
-| parsec_streamcluster | LRU | 99.69 | 1 | 10037.00 | 0 | 0 | 0.000000 |
-| parsec_streamcluster | Random | 99.69 | 1 | 10037.00 | 0 | 0 | 0.000000 |
-| parsec_streamcluster | LFU | 99.69 | 1 | 10037.00 | 0 | 0 | 0.000000 |
-| parsec_streamcluster | CLOCK | 99.69 | 1 | 10037.00 | 0 | 0 | 0.000000 |
-| parsec_streamcluster | QMAP-Pool | 99.69 | 1 | 10037.00 | 0 | 0 | 0.000000 |
-| parsec_dedup | LRU | 99.90 | 7 | 10052.00 | 0 | 0 | 0.000000 |
-| parsec_dedup | Random | 99.90 | 7 | 10052.00 | 0 | 0 | 0.000000 |
-| parsec_dedup | LFU | 99.90 | 7 | 10052.00 | 0 | 0 | 0.000000 |
-| parsec_dedup | CLOCK | 99.90 | 7 | 10052.00 | 0 | 0 | 0.000000 |
-| parsec_dedup | QMAP-Pool | 99.90 | 7 | 10052.00 | 0 | 0 | 0.000000 |
+## QMAP-Pool vs Best Baseline By Cost
 
-## Interpretation
-
-The real-trace pipeline is runnable end to end: processed CSV -> QMAP JSONL -> QMAP-Pool training -> LRU/Random/LFU/CLOCK/QMAP replay.
-
-However, `dram_capacity=64` is still too large for this 100k pilot test split. All workloads have `migrations=0` and `decision_count=0`, so the replay never reaches a policy-dependent eviction decision. The pilot therefore validates the plumbing, but not replacement quality.
-
-Next pressure run should use `dram_capacity=32` first, and `dram_capacity=16` if decisions are still near zero. If 100k remains too easy, move to 1M traces or choose a split/window with more than 64 active pages in the test segment.
+| Workload | Best baseline and QMAP-Pool cost delta |
+|---|---:|
+| parsec_blackscholes | LRU -0.16% |
+| parsec_canneal | LRU +0.00% |
+| parsec_streamcluster | LRU +0.00% |
+| parsec_dedup | LRU +0.00% |

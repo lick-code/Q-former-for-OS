@@ -1,0 +1,44 @@
+QMAP training configuration:
+  train_data path: /home/likc/Q-former-for-OS/dataset/jsonl/real_pilot/parsec_blackscholes_train.jsonl
+  number of training samples: 195
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: mean_pool
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.753735
+Epoch [1/10] avg_loss=-0.755242
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_1.pth
+Epoch [2/10] iter=8 loss=-0.753966
+Epoch [2/10] avg_loss=-0.756262
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_2.pth
+Epoch [3/10] iter=15 loss=-0.758452
+Epoch [3/10] avg_loss=-0.757632
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_3.pth
+Epoch [4/10] iter=22 loss=-0.759114
+Epoch [4/10] avg_loss=-0.759328
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_4.pth
+Epoch [5/10] iter=29 loss=-0.756966
+Epoch [5/10] avg_loss=-0.760565
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_5.pth
+Epoch [6/10] iter=36 loss=-0.761350
+Epoch [6/10] avg_loss=-0.763413
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_6.pth
+Epoch [7/10] iter=43 loss=-0.761931
+Epoch [7/10] avg_loss=-0.765369
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_7.pth
+Epoch [8/10] iter=50 loss=-0.765344
+Epoch [8/10] avg_loss=-0.768015
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_8.pth
+Epoch [9/10] iter=57 loss=-0.771583
+Epoch [9/10] avg_loss=-0.769095
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_9.pth
+Epoch [10/10] iter=64 loss=-0.768999
+Epoch [10/10] avg_loss=-0.773776
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_pilot/parsec_blackscholes/qmap_epoch_10.pth
+Training finished.
+/home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
