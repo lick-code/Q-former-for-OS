@@ -23,6 +23,23 @@ def path_from_root(*parts):
   return os.path.join(PROJECT_ROOT, *parts)
 
 
+def tool_path(path):
+  """Prefer project-relative paths for DynamoRIO tools on Windows.
+
+  Some bundled DynamoRIO tools print/use argv paths through the local code page.
+  Keeping project paths relative avoids failures when PROJECT_ROOT contains
+  non-ASCII characters.
+  """
+  absolute_path = os.path.abspath(path)
+  try:
+    common = os.path.commonpath([PROJECT_ROOT, absolute_path])
+  except ValueError:
+    return path
+  if common == PROJECT_ROOT:
+    return os.path.relpath(absolute_path, PROJECT_ROOT)
+  return path
+
+
 def find_drrun(explicit_path):
   if explicit_path:
     return explicit_path
@@ -42,6 +59,21 @@ def find_drrun(explicit_path):
 
   raise FileNotFoundError(
       "Cannot find drrun. Set --drrun or DYNAMORIO_HOME.")
+
+
+def find_drraw2trace(drrun):
+  dynamorio_home = os.path.dirname(os.path.dirname(os.path.abspath(drrun)))
+  executable = "drraw2trace.exe" if os.name == "nt" else "drraw2trace"
+  candidate = os.path.join(dynamorio_home, "tools", "bin64", executable)
+  if os.path.exists(candidate):
+    return candidate
+
+  candidate = shutil.which(executable)
+  if candidate:
+    return candidate
+
+  raise FileNotFoundError(
+      "Cannot find drraw2trace next to drrun or on PATH.")
 
 
 def split_target_command(target):
@@ -65,6 +97,35 @@ def find_trace_dirs(work_dir):
   return sorted(trace_dirs)
 
 
+def trace_dir_has_trace_files(trace_dir):
+  trace_subdir = os.path.join(trace_dir, "trace")
+  if not os.path.isdir(trace_subdir):
+    return False
+  for _, _, files in os.walk(trace_subdir):
+    for filename in files:
+      if filename.endswith(".trace") or ".trace" in filename:
+        return True
+  return False
+
+
+def convert_raw_trace(trace_dir, drrun, dry_run):
+  if trace_dir_has_trace_files(trace_dir):
+    return
+
+  raw_dir = os.path.join(trace_dir, "raw")
+  output_dir = os.path.join(trace_dir, "trace")
+  if not os.path.isdir(raw_dir):
+    raise FileNotFoundError("Missing drmemtrace raw dir: {}".format(raw_dir))
+  os.makedirs(output_dir, exist_ok=True)
+
+  command = [
+      find_drraw2trace(drrun),
+      "-indir", tool_path(raw_dir),
+      "-out", tool_path(output_dir),
+  ]
+  run_command(command, PROJECT_ROOT, dry_run)
+
+
 def run_command(command, cwd, dry_run):
   print("[run] {}".format(" ".join(command)), flush=True)
   if dry_run:
@@ -84,7 +145,7 @@ def collect_trace(args, drrun, target_command):
       drrun,
       "-t", "drmemtrace",
       "-offline",
-      "-outdir", args.work_dir,
+      "-outdir", tool_path(args.work_dir),
   ]
   if args.trace_after_instrs:
     command.extend(["-trace_after_instrs", str(args.trace_after_instrs)])
@@ -108,11 +169,12 @@ def render_and_convert(args, drrun):
         "No drmemtrace .dir output found under {}.".format(args.work_dir))
   if len(trace_dirs) > 1:
     print("[info] found multiple trace dirs; using {}".format(trace_dirs[0]))
+  convert_raw_trace(trace_dirs[0], drrun, args.dry_run)
 
   view_command = [
       drrun,
       "-t", "drmemtrace",
-      "-indir", trace_dirs[0],
+      "-indir", tool_path(trace_dirs[0]),
       "-tool", "view",
       "-view_syntax", "intel",
   ]

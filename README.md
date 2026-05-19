@@ -46,7 +46,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | 阶段 0：实验口径冻结 | 已完成 | 新实验默认 `mean_pool`，表格统一 `QMAP-Pool` |
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
-| 真实/标准 workload | 阶段 2 采集链路已实现，待跑真实 benchmark pilot | `scripts/collect_trace_drmemtrace.py`、`scripts/prepare_real_trace.py` |
+| 真实/标准 workload | 阶段 2 采集链路与本机 100k pilot 已完成 | `outputs/results/real_trace_stats/summary.md` |
 
 ## 目录结构
 
@@ -253,10 +253,12 @@ dataset/raw_traces/parsec_dedup.csv
 ```text
 scripts/collect_trace_drmemtrace.py
   使用 DynamoRIO 自带 drmemtrace 采集离线访存 trace；
+  自动执行 drraw2trace raw -> trace 转换；
   再调用 view 工具解析 read/write data reference；
   输出 QMAP 需要的 PC,Address,RW CSV；
   支持 --max-records、--skip-records、--trace-after-instrs；
   默认把 Address 对齐到 4KB 页边界，和 QMAP page trace 口径一致。
+  在中文路径工作区下对 drraw2trace/view 使用项目相对路径，避免工具内部路径编码问题。
 
 scripts/convert_drmemtrace_view.py
   把 drmemtrace view 文本流转换为 PC,Address,RW。
@@ -270,6 +272,64 @@ scripts/prepare_real_trace.py
 tools/trace_collectors/dynamorio/README.md
   记录 DynamoRIO 采集命令模板。
 ```
+
+本机 100k instrumentation pilot 已完成：
+
+```text
+DynamoRIO: 11.91.20581
+drrun: tools/extern/DynamoRIO-Windows-11.91.20581/bin64/drrun.exe
+target: D:/Anaconda/python.exe
+target workload: 64MB bytearray page-stride write/read loop
+trace window: --trace-after-instrs 5000000, --max-records 100000, --skip-records 10000
+collector result: seen data refs = 110000, wrote records = 100000
+```
+
+本机 pilot 输出：
+
+```text
+dataset/raw_traces/local_python_loop_100k.csv
+dataset/raw_traces/local_python_loop_pilot.csv
+dataset/processed/local_python_loop_pilot_train.csv
+dataset/processed/local_python_loop_pilot_valid.csv
+dataset/processed/local_python_loop_pilot_test.csv
+dataset/metadata/real_workload_manifest.json
+outputs/results/real_trace_stats/summary.md
+```
+
+质量统计：
+
+```text
+records = 100000
+unique pages = 115
+unique PCs = 2147
+write ratio = 0.3514
+reuse ratio = 0.9989
+split = 80000 / 10000 / 10000
+```
+
+QMAP 数据管线验证：
+
+```bash
+python qmap/qmap_generator.py \
+  --input dataset/processed/local_python_loop_pilot_train.csv \
+  --output dataset/jsonl/local_python_loop_pilot_train_h64.jsonl \
+  --history_length 10 \
+  --candidate_count 64 \
+  --lookahead 256 \
+  --dram_capacity 64 \
+  --page_shift 12 \
+  --ablation mean_pool
+```
+
+生成结果：
+
+```text
+RW source = real trace RW column
+train records = 80000
+generated samples = 173
+```
+
+说明：本机 pilot 的目标是验证 instrumentation、CSV schema、切分和 JSONL 入口链路，不作为论文主表 workload。正式 PARSEC/YCSB 仍按下面模板采集，规模从 100k pilot 扩到 1M/5M。
 
 100k pilot 采集命令模板：
 
@@ -328,14 +388,11 @@ python scripts/collect_trace_drmemtrace.py \
 本机环境检查结果：
 
 ```text
-drrun / pin / valgrind 当前不在 PATH；
-cmake / MSVC cl 当前不在 PATH；
-WSL 未安装 Linux distribution；
-因此这台机器上暂时不能直接跑真实二进制的 instrumentation pilot。
-
-已完成脚本级验证：
-1. drmemtrace view -> PC,Address,RW 转换器 smoke test 通过；
-2. prepare_real_trace.py 已用现有 writeheavy raw trace 验证规范化、80/10/10 切分和统计输出。
+DynamoRIO 已下载并解压到 tools/extern/，该目录被 .gitignore 忽略。
+drrun -version 通过：11.91.20581。
+drmemtrace view -> PC,Address,RW 转换器 smoke test 通过。
+prepare_real_trace.py 规范化、80/10/10 切分和统计输出通过。
+本机 100k instrumentation pilot 已通过。
 ```
 
 严格依赖关系：
