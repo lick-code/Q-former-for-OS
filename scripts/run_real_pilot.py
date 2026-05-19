@@ -271,6 +271,7 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
       "--page_shift", str(args.page_shift),
       "--history_length", str(args.history_length),
       "--candidate_count", str(args.candidate_count),
+      "--lookahead", str(args.lookahead),
       "--random_seed", str(args.random_seed),
       "--nvm_write_cost", str(args.nvm_write_cost),
       "--json_output", json_output,

@@ -167,7 +167,7 @@ def build_arg_parser():
   parser.add_argument("--address_vocab_size", type=int, default=100000)
   parser.add_argument("--pc_vocab_size", type=int, default=50000)
   parser.add_argument("--page_dim", type=int, default=21)
-  parser.add_argument("--page_state_dim", type=int, default=3)
+  parser.add_argument("--page_state_dim", type=int, default=4)
   parser.add_argument("--page_embed_dim", type=int, default=8)
   parser.add_argument("--page_vocab_size", type=int, default=100000)
   parser.add_argument("--num_queries", type=int, default=4)

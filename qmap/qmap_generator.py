@@ -222,7 +222,8 @@ def future_stats(trace, start_index, candidate, lookahead):
 
 
 def build_candidate_state_features(candidate, history, residency_duration,
-                                   is_dirty, lookahead):
+                                   is_dirty, residency_scale, rank=None,
+                                   candidate_count=None):
   """Builds the page-state features described by QMAP.
 
   The page identifier itself is embedded by the model. This helper only
@@ -230,16 +231,21 @@ def build_candidate_state_features(candidate, history, residency_duration,
     0. recent access frequency in the current history window
     1. dirty/write-touched state
     2. normalized residency duration in DRAM
+    3. optional normalized LRU-tail rank, where 0 is the oldest candidate
   """
   recent_frequency = sum(1 for item in history if item["page"] == candidate)
   recent_frequency = recent_frequency / max(1, len(history))
   normalized_residency = min(
-      residency_duration / float(max(1, lookahead)), 1.0)
-  return [
+      residency_duration / float(max(1, residency_scale)), 1.0)
+  features = [
       recent_frequency,
       1.0 if is_dirty else 0.0,
       normalized_residency,
   ]
+  if rank is not None:
+    denominator = max(1, (candidate_count or 1) - 1)
+    features.append(rank / float(denominator))
+  return features
 
 
 def build_candidate_features(candidate, rank, history, max_page):
@@ -403,7 +409,8 @@ def generate_qmap_samples(args):
           is_dirty = candidate in dirty_pages
           candidate_state_features.append(build_candidate_state_features(
               candidate, history, residency_duration, is_dirty,
-              args.history_length))
+              args.lookahead, rank=rank,
+              candidate_count=args.candidate_count))
           candidates_features.append(build_candidate_features(
               candidate, rank, history, max_page))
           labels = build_labels(trace, index, candidate, args.lookahead)

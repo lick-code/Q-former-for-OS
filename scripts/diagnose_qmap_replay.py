@@ -56,6 +56,7 @@ def build_arg_parser():
   parser.add_argument("--dram_capacity", type=int, default=16)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
+  parser.add_argument("--lookahead", type=int, default=256)
   parser.add_argument("--page_shift", type=int, default=12)
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--dedup_raw_trace", default=path_from_root(
@@ -150,6 +151,7 @@ def qmap_choice_diagnostics(workload, args):
       torch.device(args.device),
       args.history_length,
       args.candidate_count,
+      args.lookahead,
       "mean_pool")
 
   dram = []

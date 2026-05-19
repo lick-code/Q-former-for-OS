@@ -56,6 +56,9 @@ def build_arg_parser():
   parser.add_argument("--page_shift", type=int, default=0)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
+  parser.add_argument("--lookahead", type=int, default=256,
+                      help=("Scale used for DRAM residency features. Match "
+                            "the generator lookahead used for training."))
   parser.add_argument("--random_seed", type=int, default=0)
   parser.add_argument("--device", default=None,
                       help="cpu, cuda, or omitted for auto selection.")
@@ -193,7 +196,7 @@ class QMAPPolicy(object):
   """Loads a trained QMAP checkpoint and scores LRU-tail candidates."""
 
   def __init__(self, checkpoint_path, device, history_length, candidate_count,
-               ablation=None):
+               lookahead=256, ablation=None):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
 
@@ -206,6 +209,7 @@ class QMAPPolicy(object):
     self._device = device
     self._history_length = history_length
     self._candidate_count = candidate_count
+    self._lookahead = lookahead
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model_args = checkpoint.get("model_args", {})
@@ -230,9 +234,10 @@ class QMAPPolicy(object):
         dropout=model_args.get("dropout", 0.0),
         use_qformer=checkpoint_uses_qformer(model_args, extractor_state),
         pooling_strategy="mean").to(device)
+    self._page_state_dim = model_args.get("page_state_dim", 3)
     self._scorer = model.QMAPCandidateScorer(
         hidden_dim=model_args.get("hidden_dim", 18),
-        page_state_dim=model_args.get("page_state_dim", 3),
+        page_state_dim=self._page_state_dim,
         page_embed_dim=model_args.get("page_embed_dim", 8),
         page_vocab_size=model_args.get("page_vocab_size", 100000),
         num_heads=model_args.get("num_heads", 2),
@@ -259,12 +264,18 @@ class QMAPPolicy(object):
         *padded_history(history, self._history_length),
         ablation=self._ablation)
     candidate_state_features = []
-    for candidate in candidates:
+    for rank, candidate in enumerate(candidates):
       residency_duration = access_index - dram_insert_time.get(
           candidate, access_index)
-      candidate_state_features.append(build_candidate_state_features(
-          candidate, history, residency_duration, candidate in dirty_pages,
-          self._history_length))
+      if self._page_state_dim >= 4:
+        features = build_candidate_state_features(
+            candidate, history, residency_duration, candidate in dirty_pages,
+            self._lookahead, rank=rank, candidate_count=self._candidate_count)
+      else:
+        features = build_candidate_state_features(
+            candidate, history, residency_duration, candidate in dirty_pages,
+            self._history_length)
+      candidate_state_features.append(features)
 
     torch = self._torch
     with torch.no_grad():
@@ -313,6 +324,7 @@ def replay(args):
         torch.device(device),
         args.history_length,
         args.candidate_count,
+        args.lookahead,
         args.ablation)
 
   for access_index, access in enumerate(trace):
