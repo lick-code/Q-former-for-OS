@@ -1,13 +1,13 @@
 {
   "limit": 50000,
   "page_shift": 12,
-  "raw_trace": "dataset/raw_traces/real_pilot_dedup_pressure/parsec_dedup.csv",
+  "raw_trace": "dataset/raw_traces/real_pilot_dedup_pressure_rankfix/parsec_dedup.csv",
   "skip": 0,
   "source_trace": "dataset/raw_traces/parsec_dedup_100k.csv",
   "split_policy": "chronological 80/10/10",
   "splits": {
     "test": {
-      "file": "dataset/processed/real_pilot_dedup_pressure/parsec_dedup_test.csv",
+      "file": "dataset/processed/real_pilot_dedup_pressure_rankfix/parsec_dedup_test.csv",
       "records": 5000,
       "stats": {
         "records": 5000,
@@ -16,7 +16,7 @@
       }
     },
     "train": {
-      "file": "dataset/processed/real_pilot_dedup_pressure/parsec_dedup_train.csv",
+      "file": "dataset/processed/real_pilot_dedup_pressure_rankfix/parsec_dedup_train.csv",
       "records": 40000,
       "stats": {
         "records": 40000,
@@ -25,7 +25,7 @@
       }
     },
     "valid": {
-      "file": "dataset/processed/real_pilot_dedup_pressure/parsec_dedup_valid.csv",
+      "file": "dataset/processed/real_pilot_dedup_pressure_rankfix/parsec_dedup_valid.csv",
       "records": 5000,
       "stats": {
         "records": 5000,
