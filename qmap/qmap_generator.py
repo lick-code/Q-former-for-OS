@@ -463,7 +463,8 @@ def build_arg_parser():
                       help="Number of pages in the simulated DRAM LRU cache.")
   parser.add_argument("--page_shift", type=int, default=0,
                       help="Right shift raw addresses to page addresses.")
-  parser.add_argument("--ablation", choices=ABLATION_CHOICES, default="full",
+  parser.add_argument("--ablation", choices=ABLATION_CHOICES,
+                      default="mean_pool",
                       help="QMAP ablation variant for generated samples.")
   return parser
 

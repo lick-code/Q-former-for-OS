@@ -16,6 +16,8 @@ import sys
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 CHECKPOINT_RE = re.compile(r"qmap_epoch_(\d+)\.pth$")
+QMAP_MODEL_NAME = "QMAP-Pool"
+QMAP_ABLATION = "mean_pool"
 
 
 def path_from_root(*parts):
@@ -47,6 +49,10 @@ def build_arg_parser():
       "--device",
       default="cpu",
       help="Evaluation device passed to qmap_eval.py. Use cuda for GPU.")
+  parser.add_argument("--ablation", default=QMAP_ABLATION,
+                      choices=("full", "no_pc", "no_rw", "mean_pool",
+                               "no_qformer", "no_cost"),
+                      help="Evaluation ablation. New experiments use mean_pool.")
   parser.add_argument("--python", default=sys.executable)
   return parser
 
@@ -74,6 +80,7 @@ def run_eval(args, epoch, checkpoint_path, json_output, log_output):
       "--page_shift", str(args.page_shift),
       "--history_length", str(args.history_length),
       "--candidate_count", str(args.candidate_count),
+      "--ablation", args.ablation,
       "--json_output", json_output,
   ]
   print("[run] epoch={} checkpoint={}".format(epoch, checkpoint_path),
@@ -139,6 +146,8 @@ def write_summary_markdown(rows, output_path, args):
     output_file.write("- history length: `{}`\n".format(args.history_length))
     output_file.write("- candidate count: `{}`\n".format(
         args.candidate_count))
+    output_file.write("- QMAP model: `{}` (`ablation={}`)\n".format(
+        QMAP_MODEL_NAME, args.ablation))
     output_file.write("- page shift: `{}`\n".format(args.page_shift))
     output_file.write("- device: `{}`\n\n".format(args.device))
     output_file.write("## Selection\n\n")

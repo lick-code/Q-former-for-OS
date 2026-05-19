@@ -2,7 +2,7 @@
 """Run QMAP ablation experiments.
 
 Each variant is run as an independent generate -> train -> evaluate pipeline and
-is summarized against the full QMAP baseline.  The default output layout is:
+is summarized against the frozen QMAP-Pool baseline. The default output layout is:
 
   outputs/results/qmap_ablation/<variant>/qmap.json
   outputs/checkpoints/qmap_ablation/<variant>/qmap_epoch_<N>.pth
@@ -18,17 +18,19 @@ import sys
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+QMAP_MODEL_NAME = "QMAP-Pool"
+BASELINE_VARIANT = "mean_pool"
 
 VARIANT_PURPOSES = {
-    "full": "complete QMAP baseline",
+    "full": "historical Q-Former baseline",
     "no_pc": "remove program-counter context from the access sequence",
     "no_rw": "remove read/write type from the access sequence",
-    "mean_pool": "formal mean-pooling baseline without Q-Former queries",
+    "mean_pool": "QMAP-Pool baseline without Q-Former queries",
     "no_qformer": "legacy alias for mean_pool",
     "no_cost": "disable write-sensitivity and migration-cost loss terms",
 }
 
-DEFAULT_VARIANTS = ("full", "no_pc", "no_rw", "mean_pool", "no_cost")
+DEFAULT_VARIANTS = ("mean_pool", "no_pc", "no_rw", "no_cost")
 
 
 def path_from_root(*parts):
@@ -69,17 +71,24 @@ def build_arg_parser():
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--seed", type=int, default=3136859)
   parser.add_argument("--python", default=sys.executable)
+  parser.add_argument("--allow_historical_qformer", action="store_true",
+                      help="Allow the historical `full` Q-Former variant.")
   parser.add_argument("--force", action="store_true",
                       help="Rerun variants even if matching results exist.")
   return parser
 
 
-def parse_variants(text):
+def parse_variants(text, allow_historical_qformer=False):
   variants = [item.strip() for item in text.split(",") if item.strip()]
   unknown = [item for item in variants if item not in VARIANT_PURPOSES]
   if unknown:
     raise ValueError("Unknown ablation variant(s): {}".format(
         ", ".join(unknown)))
+  if "full" in variants and not allow_historical_qformer:
+    raise ValueError(
+        "`full` is the historical Q-Former variant. New experiments are "
+        "frozen to QMAP-Pool/mean_pool; pass --allow_historical_qformer only "
+        "when intentionally reproducing old exploratory results.")
   if not variants:
     raise ValueError("At least one variant is required.")
   return variants
@@ -124,6 +133,8 @@ def normalized_path(path):
 def run_metadata(args, variant):
   return {
       "variant": variant,
+      "qmap_model": QMAP_MODEL_NAME,
+      "baseline_variant": BASELINE_VARIANT,
       "train_trace": normalized_path(args.train_trace),
       "test_trace": normalized_path(args.test_trace),
       "page_shift": args.page_shift,
@@ -232,7 +243,8 @@ def add_relative_metrics(row, baseline):
     row["nvm_writes_delta_percent"] = 0.0
   row["hit_rate_delta_pp"] = (
       row["hit_rate_percent"] - baseline["hit_rate_percent"])
-  row["nvm_writes_saved_vs_full"] = row["nvm_writes"] - baseline["nvm_writes"]
+  row["nvm_writes_saved_vs_qmap_pool"] = (
+      row["nvm_writes"] - baseline["nvm_writes"])
   row["nvm_writes_reduction_vs_variant_percent"] = (
       (row["nvm_writes"] - base_writes) * 100.0 / row["nvm_writes"]
       if row["nvm_writes"] else 0.0)
@@ -247,7 +259,7 @@ def write_summary_csv(rows, output_path):
       "weighted_access_cost",
       "cost_delta_percent",
       "nvm_writes",
-      "nvm_writes_saved_vs_full",
+      "nvm_writes_saved_vs_qmap_pool",
       "nvm_writes_delta_percent",
       "nvm_writes_reduction_vs_variant_percent",
       "nvm_reads",
@@ -265,7 +277,8 @@ def write_summary_csv(rows, output_path):
 
 
 def write_summary_markdown(rows, output_path, args):
-  baseline = next((row for row in rows if row["variant"] == "full"), None)
+  baseline = next((row for row in rows
+                   if row["variant"] == BASELINE_VARIANT), None)
   with open(output_path, "w", encoding="utf-8") as output_file:
     output_file.write("# QMAP Ablation\n\n")
     output_file.write("## Setup\n\n")
@@ -275,6 +288,8 @@ def write_summary_markdown(rows, output_path, args):
         os.path.relpath(args.test_trace, PROJECT_ROOT)))
     output_file.write("- variants: `{}`\n".format(
         ",".join(row["variant"] for row in rows)))
+    output_file.write("- baseline model: `{}` (`ablation={}`)\n".format(
+        QMAP_MODEL_NAME, BASELINE_VARIANT))
     output_file.write("- h/c/d/l: `{}/{}/{}/{}`\n".format(
         args.history_length, args.candidate_count, args.dram_capacity,
         args.lookahead))
@@ -289,26 +304,26 @@ def write_summary_markdown(rows, output_path, args):
     output_file.write("- seed: `{}`\n\n".format(args.seed))
 
     if baseline is not None:
-      output_file.write("## Full Baseline\n\n")
+      output_file.write("## QMAP-Pool Baseline\n\n")
       output_file.write(
-          "| Hit rate (%) | Weighted cost | NVM writes | Migrations |\n")
+        "| Hit rate (%) | Weighted cost | NVM writes | Migrations |\n")
       output_file.write("|---:|---:|---:|---:|\n")
       output_file.write("| {hit_rate_percent:.2f} | "
                         "{weighted_access_cost:.2f} | {nvm_writes} | "
-                        "{migrations} |\n\n".format(**baseline))
+        "{migrations} |\n\n".format(**baseline))
 
     output_file.write("## Results\n\n")
     output_file.write(
         "| Variant | Purpose | Hit rate (%) | Hit delta (pp) | Cost | "
-        "Cost delta (%) | NVM writes | Writes saved vs full | "
-        "Writes delta (%) | Full writes reduction (%) | Decision ms |\n")
+        "Cost delta (%) | NVM writes | Writes delta vs QMAP-Pool | "
+        "Writes delta (%) | QMAP-Pool writes delta (%) | Decision ms |\n")
     output_file.write("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
     for row in rows:
       output_file.write(
           "| {variant} | {purpose} | {hit_rate_percent:.2f} | "
           "{hit_rate_delta_pp:+.2f} | {weighted_access_cost:.2f} | "
           "{cost_delta_percent:+.2f} | {nvm_writes} | "
-          "{nvm_writes_saved_vs_full:+.0f} | "
+          "{nvm_writes_saved_vs_qmap_pool:+.0f} | "
           "{nvm_writes_delta_percent:+.2f} | "
           "{nvm_writes_reduction_vs_variant_percent:+.2f} | "
           "{avg_decision_time_ms:.6f} |\n".format(**row))
@@ -316,12 +331,13 @@ def write_summary_markdown(rows, output_path, args):
 
 def main():
   args = build_arg_parser().parse_args()
-  variants = parse_variants(args.variants)
+  variants = parse_variants(args.variants, args.allow_historical_qformer)
   os.makedirs(args.result_dir, exist_ok=True)
 
-  if "full" not in variants:
-    raise ValueError("The ablation summary needs the `full` baseline. "
-                     "Include full in --variants.")
+  if BASELINE_VARIANT not in variants:
+    raise ValueError("The ablation summary needs the `{}` baseline. "
+                     "Include {} in --variants.".format(
+                         BASELINE_VARIANT, BASELINE_VARIANT))
   if not os.path.exists(args.train_trace):
     raise FileNotFoundError("Training trace not found: {}".format(
         args.train_trace))
@@ -334,7 +350,7 @@ def main():
     metrics, result_dir, checkpoint_path = run_variant(args, variant)
     variant_results[variant] = (metrics, result_dir, checkpoint_path)
 
-  baseline_metrics = variant_results["full"][0]
+  baseline_metrics = variant_results[BASELINE_VARIANT][0]
   rows = []
   for variant in variants:
     metrics, result_dir, checkpoint_path = variant_results[variant]

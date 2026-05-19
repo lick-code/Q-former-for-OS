@@ -41,6 +41,8 @@ PARAMETER_VALUES = {
     "dram_capacity": [64, 128, 256],
     "lookahead": [128, 256, 512],
 }
+QMAP_MODEL_NAME = "QMAP-Pool"
+QMAP_ABLATION = "mean_pool"
 
 
 def path_from_root(*parts):
@@ -127,6 +129,8 @@ def run_metadata(args, config):
       "epochs": args.epochs,
       "batch_size": args.batch_size,
       "lr": args.lr,
+      "qmap_model": QMAP_MODEL_NAME,
+      "ablation": QMAP_ABLATION,
       "device": args.device,
       "seed": args.seed,
   }
@@ -183,6 +187,7 @@ def run_experiment(args, config):
       "--lookahead", str(config["lookahead"]),
       "--dram_capacity", str(config["dram_capacity"]),
       "--page_shift", str(args.page_shift),
+      "--ablation", QMAP_ABLATION,
   ]
   run_command(generate_command, os.path.join(log_dir, "generate.log"))
 
@@ -195,6 +200,7 @@ def run_experiment(args, config):
       "--lr", str(args.lr),
       "--device", args.device,
       "--seed", str(args.seed),
+      "--ablation", QMAP_ABLATION,
   ]
   run_command(train_command, os.path.join(log_dir, "train.log"))
 
@@ -208,6 +214,7 @@ def run_experiment(args, config):
       "--page_shift", str(args.page_shift),
       "--history_length", str(config["history_length"]),
       "--candidate_count", str(config["candidate_count"]),
+      "--ablation", QMAP_ABLATION,
       "--json_output", qmap_json,
   ]
   run_command(eval_command, os.path.join(log_dir, "qmap.log"))
@@ -318,6 +325,8 @@ def write_summary_markdown(rows, output_path, args):
 
     output_file.write("## Setup\n\n")
     output_file.write("- design: one parameter at a time around `h10/c64/d128/l256`\n")
+    output_file.write("- QMAP model: `{}` (`ablation={}`)\n".format(
+        QMAP_MODEL_NAME, QMAP_ABLATION))
     output_file.write("- train trace: `{}`\n".format(
         os.path.relpath(args.train_trace, PROJECT_ROOT)))
     output_file.write("- test trace: `{}`\n".format(

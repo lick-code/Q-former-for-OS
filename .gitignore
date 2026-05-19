@@ -12,6 +12,14 @@ environment/
 
 # Runtime outputs
 qmap_checkpoints/
+build/
+tmp/
+tools/extern/
+tools/trace_collectors/**/build/
+*.dll
+*.dylib
+*.so
+*.exe
 
 # Large/local datasets
 *.jsonl

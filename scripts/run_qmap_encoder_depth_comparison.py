@@ -5,8 +5,8 @@ This runner keeps the current best aggregation choice fixed:
 
   TransformerEncoder(num_layers=N) -> mean pooling -> candidate scorer
 
-It then sweeps N over 1, 2 and 3 by default. Each depth is trained and
-evaluated as an independent generate -> train -> replay pipeline.
+Historical runs swept N over 1, 2 and 3. New experiments are frozen to the
+one-layer QMAP-Pool setting unless --allow_historical_depth_sweep is passed.
 """
 
 import argparse
@@ -18,7 +18,7 @@ import sys
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-DEFAULT_LAYERS = (1, 2, 3)
+DEFAULT_LAYERS = (1,)
 TRAIN_ABLATION = "mean_pool"
 EVAL_ABLATION = "mean_pool"
 
@@ -68,6 +68,8 @@ def build_arg_parser():
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--seed", type=int, default=3136859)
   parser.add_argument("--python", default=sys.executable)
+  parser.add_argument("--allow_historical_depth_sweep", action="store_true",
+                      help="Allow encoder depths above the frozen 1-layer setup.")
   parser.add_argument("--force", action="store_true",
                       help="Rerun layers even if matching results exist.")
   return parser
@@ -359,6 +361,13 @@ def main():
 
   if 1 not in layers:
     raise ValueError("Include layer `1`; it is needed as the baseline.")
+  if any(num_layers > 1 for num_layers in layers
+         ) and not args.allow_historical_depth_sweep:
+    raise RuntimeError(
+        "Encoder 2/3-layer sweeps are frozen as historical exploration. New "
+        "experiments should use the one-layer QMAP-Pool setting. Pass "
+        "--allow_historical_depth_sweep only when intentionally reproducing "
+        "old results.")
   if not os.path.exists(args.train_trace):
     raise FileNotFoundError("Training trace not found: {}".format(
         args.train_trace))

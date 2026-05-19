@@ -36,4 +36,5 @@ CUDA_VISIBLE_DEVICES="${GPU_ID}" python qmap/qmap_train.py \
   --batch_size 32 \
   --lr 1e-4 \
   --device cuda \
+  --ablation mean_pool \
   2>&1 | tee "${LOG_FILE}"

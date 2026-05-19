@@ -24,6 +24,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DEFAULT_WORKLOADS = ("hotset", "writeheavy", "streaming", "phasechange",
                      "pcrwstress")
 DEFAULT_POLICIES = ("lru", "random", "lfu", "clock", "qmap")
+QMAP_MODEL_NAME = "QMAP-Pool"
+QMAP_ABLATION = "mean_pool"
 
 
 def path_from_root(*parts):
@@ -37,6 +39,10 @@ def rel_path(path):
 def load_json(path):
   with open(path, "r") as input_file:
     return json.load(input_file)
+
+
+def display_policy(policy):
+  return QMAP_MODEL_NAME if policy == "qmap" else policy.upper()
 
 
 def run_command(command, log_path):
@@ -177,6 +183,7 @@ def generate_jsonl(args, workload, paths, log_dir):
       "--lookahead", str(args.lookahead),
       "--dram_capacity", str(args.dram_capacity),
       "--page_shift", str(args.page_shift),
+      "--ablation", QMAP_ABLATION,
   ]
   run_command(command, os.path.join(log_dir, "{}_generate.log".format(
       workload)))
@@ -199,6 +206,7 @@ def train_qmap(args, workload, paths, log_dir):
       "--epochs", str(args.epochs),
       "--batch_size", str(args.batch_size),
       "--lr", str(args.lr),
+      "--ablation", QMAP_ABLATION,
   ]
   maybe_extend_device(command, args.device)
   run_command(command, os.path.join(log_dir, "{}_train.log".format(workload)))
@@ -222,7 +230,10 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
       "--json_output", json_output,
   ]
   if policy == "qmap":
-    command.extend(["--checkpoint", checkpoint_path])
+    command.extend([
+        "--checkpoint", checkpoint_path,
+        "--ablation", QMAP_ABLATION,
+    ])
     maybe_extend_device(command, args.device)
   run_command(command, os.path.join(log_dir, "{}_{}.log".format(
       workload, policy)))
@@ -295,6 +306,8 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
     output_file.write("- candidate count: `{}`\n".format(
         args.candidate_count))
     output_file.write("- lookahead: `{}`\n".format(args.lookahead))
+    output_file.write("- QMAP model: `{}` (`ablation={}`)\n".format(
+        QMAP_MODEL_NAME, QMAP_ABLATION))
     output_file.write("- page shift: `{}`\n".format(args.page_shift))
     output_file.write("- epochs: `{}`\n".format(args.epochs))
     output_file.write("- batch size: `{}`\n".format(args.batch_size))
@@ -309,7 +322,7 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
           "| {workload} | {policy} | {hit_rate:.2f} | {writes} | "
           "{cost:.2f} | {migrations} | {decision_ms:.6f} |\n".format(
               workload=row["workload"],
-              policy=row["policy"],
+              policy=display_policy(row["policy"]),
               hit_rate=row["hit_rate_percent"],
               writes=row["nvm_writes"],
               cost=row["cost"],

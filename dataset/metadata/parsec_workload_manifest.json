@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "phase": "stage1_real_workload_selection",
+  "created_at": "2026-05-19",
+  "dataset": {
+    "name": "PARSEC",
+    "version_target": "3.0",
+    "selection_status": "selected_for_stage2_trace_collection",
+    "rationale": [
+      "PARSEC is a classic benchmark suite for chip-multiprocessor and shared-memory studies.",
+      "The suite spans working set size, locality, sharing, synchronization, and off-chip traffic diversity.",
+      "It is a better first real-workload target than Redis/RocksDB/YCSB or SPEC CPU for the current QMAP trace-driven pipeline."
+    ],
+    "reference_urls": [
+      "https://www.cs.princeton.edu/research/techreps/504",
+      "https://collaborate.princeton.edu/en/publications/the-parsec-benchmark-suite-characterization-and-architectural-imp/"
+    ],
+    "download_candidates": [
+      {
+        "kind": "original_project_site",
+        "url": "http://parsec.cs.princeton.edu/",
+        "note": "Verify availability from the Linux trace-collection host before Stage 2."
+      },
+      {
+        "kind": "community_mirror",
+        "url": "https://github.com/connorimes/parsec-3.0",
+        "note": "Fallback only if the original project site is unavailable."
+      },
+      {
+        "kind": "community_mirror_with_modern_patches",
+        "url": "https://github.com/cirosantilli/parsec-benchmark",
+        "note": "Fallback for modern Linux builds; record any patch delta if used."
+      }
+    ]
+  },
+  "trace_schema": {
+    "required_columns": [
+      "PC",
+      "Address",
+      "RW"
+    ],
+    "rw_encoding": {
+      "R": "read/load",
+      "W": "write/store"
+    },
+    "page_shift": 12,
+    "target_directory": "dataset/raw_traces"
+  },
+  "common_stage2_capture_plan": {
+    "thread_counts": [
+      1,
+      4
+    ],
+    "pilot_records_per_workload": 100000,
+    "formal_records_per_workload": 1000000,
+    "warmup_accesses_to_skip": 10000,
+    "preferred_inputs": [
+      "simsmall",
+      "simmedium"
+    ],
+    "formal_input_candidates": [
+      "simlarge",
+      "native"
+    ],
+    "trace_tools": [
+      "Pin",
+      "DynamoRIO",
+      "Valgrind Lackey fallback"
+    ],
+    "notes": [
+      "Use Linux, WSL2, or a server for PARSEC build and tracing.",
+      "Keep raw PARSEC source, input archives, and full traces out of git unless a tiny sample is explicitly needed.",
+      "After capture, run chronological 80/10/10 split before JSONL generation."
+    ]
+  },
+  "selected_workloads": [
+    {
+      "name": "blackscholes",
+      "suite_key": "parsec.blackscholes",
+      "selected": true,
+      "priority": 1,
+      "role": "compute-stable anchor",
+      "why_selected": "Provides a comparatively stable, compute-heavy baseline so QMAP can be checked against a workload where memory behavior should be less pathological.",
+      "expected_signal": "Moderate locality and comparatively limited write pressure; useful as a sanity baseline.",
+      "raw_trace_target": "dataset/raw_traces/parsec_blackscholes.csv",
+      "processed_prefix": "parsec_blackscholes",
+      "qmap_result_prefix": "parsec_blackscholes"
+    },
+    {
+      "name": "canneal",
+      "suite_key": "parsec.canneal",
+      "selected": true,
+      "priority": 2,
+      "role": "irregular memory workload",
+      "why_selected": "Often used in memory-system studies and expected to stress locality and reuse behavior more than blackscholes.",
+      "expected_signal": "Irregular page reuse and nontrivial working-set pressure; useful for testing whether QMAP beats simple recency.",
+      "raw_trace_target": "dataset/raw_traces/parsec_canneal.csv",
+      "processed_prefix": "parsec_canneal",
+      "qmap_result_prefix": "parsec_canneal"
+    },
+    {
+      "name": "streamcluster",
+      "suite_key": "parsec.streamcluster",
+      "selected": true,
+      "priority": 3,
+      "role": "streaming-like locality stress",
+      "why_selected": "Covers streaming/cluster-style behavior where reuse distance and working set shape may differ from synthetic hotset traces.",
+      "expected_signal": "Potentially weaker temporal reuse and larger working set; useful for defining QMAP's boundary conditions.",
+      "raw_trace_target": "dataset/raw_traces/parsec_streamcluster.csv",
+      "processed_prefix": "parsec_streamcluster",
+      "qmap_result_prefix": "parsec_streamcluster"
+    },
+    {
+      "name": "dedup",
+      "suite_key": "parsec.dedup",
+      "selected": true,
+      "priority": 4,
+      "role": "data-processing and write-pressure workload",
+      "why_selected": "Data deduplication pipeline can expose memory traffic from chunking, hashing, compression, and output handling.",
+      "expected_signal": "More useful than a purely compute-heavy workload for observing NVM writes and migration cost interactions.",
+      "raw_trace_target": "dataset/raw_traces/parsec_dedup.csv",
+      "processed_prefix": "parsec_dedup",
+      "qmap_result_prefix": "parsec_dedup"
+    }
+  ],
+  "fallback_workloads": [
+    {
+      "name": "ferret",
+      "suite_key": "parsec.ferret",
+      "selected": false,
+      "fallback_for": "dedup",
+      "why_fallback": "Use if dedup build, dependencies, or trace capture are unstable. Ferret adds recognition/search-style behavior and is still useful for locality and sharing diversity.",
+      "raw_trace_target": "dataset/raw_traces/parsec_ferret.csv"
+    }
+  ],
+  "stage1_decision": {
+    "primary_batch": [
+      "blackscholes",
+      "canneal",
+      "streamcluster",
+      "dedup"
+    ],
+    "fallback": "ferret",
+    "next_phase": "Stage 2 should build PARSEC on Linux/WSL/server, capture PC/Address/RW traces, and write raw CSV files to dataset/raw_traces."
+  }
+}

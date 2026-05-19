@@ -43,9 +43,10 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | 参数敏感性 | 已完成 | `outputs/results/qmap_parameter_sensitivity/summary.md` |
 | 消融实验 | 已完成 | `outputs/results/qmap_ablation/` |
 | cost-aware 权重实验 | 已完成 | `outputs/results/qmap_cost_w8_m4_writeheavy/summary.md` |
+| 阶段 0：实验口径冻结 | 已完成 | 新实验默认 `mean_pool`，表格统一 `QMAP-Pool` |
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
-| Encoder 层数对照 | 已完成 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
-| 真实/标准 workload | 未完成 | 下一步重点 |
+| Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
+| 真实/标准 workload | 阶段 2 采集链路已实现，待跑真实 benchmark pilot | `scripts/collect_trace_drmemtrace.py`、`scripts/prepare_real_trace.py` |
 
 ## 目录结构
 
@@ -99,6 +100,7 @@ QMAP-Pool
 ```text
 Q-Former query 数 K sweep
 Q-Former light/tiny 变体
+Encoder 2/3 层 sweep
 把 Q-Former 作为论文主贡献点
 ```
 
@@ -116,15 +118,18 @@ Q-Former light/tiny 变体
 
 ### 阶段 0：冻结实验口径
 
+状态：已完成。
+
 目标：把后续所有实验统一到 QMAP-Pool。
 
-必须先做：
+已落实：
 
 ```text
-1. 所有后续训练和评估统一使用 ablation=mean_pool。
-2. 后续 summary 和论文表格统一叫 QMAP-Pool。
-3. Q-Former 结果只放在附录或历史探索，不再作为主线。
-4. replay cost model 暂时不再改，继续使用当前 qmap_eval.py 的配置。
+1. qmap_generator.py / qmap_train.py 默认 ablation=mean_pool。
+2. run_prototype_experiment.py、run_workload_suite.py、run_qmap_parameter_sensitivity.py 等新实验入口显式传入 mean_pool。
+3. 后续 summary 和论文表格统一叫 QMAP-Pool。
+4. Q-Former comparison、Q-Former K sweep、Encoder 2/3 层 sweep 加保护开关，仅用于复现历史探索。
+5. replay cost model 暂时不再改，继续使用当前 qmap_eval.py 的配置。
 ```
 
 建议新增或确认一个主运行配置：
@@ -136,7 +141,8 @@ lookahead = 256
 dram_capacity = 128
 epochs = 10 或 20
 batch_size = 32
-model = mean_pool
+model = QMAP-Pool
+ablation = mean_pool
 ```
 
 严格依赖关系：
@@ -169,14 +175,25 @@ model = mean_pool
   原因：权威性强，但通常涉及授权和运行规范，成本最高。
 ```
 
-建议当前先选 PARSEC。第一批不要太多，先选 4 个：
+阶段 1 已选定 PARSEC 作为第一批真实/标准 benchmark。第一批先跑 4 个：
 
 ```text
 blackscholes    计算密集，作为相对平稳 workload
 canneal         内存访问更复杂，常用于内存系统研究
 streamcluster   流式/聚类访问，有机会验证 streaming-like 行为
-dedup 或 ferret 写入/数据处理特征更明显，可观察 NVM writes
+dedup           数据处理/写入压力更明显，可观察 NVM writes
 ```
+
+`ferret` 作为 fallback：如果 `dedup` 的依赖、构建或 trace 采集不稳定，就用 `ferret` 替换。
+
+本阶段输出：
+
+```text
+outputs/results/parsec_stage1_selection/summary.md
+dataset/metadata/parsec_workload_manifest.json
+```
+
+阶段 1 只冻结 benchmark 选择和后续采集契约，不把 PARSEC 源码、输入集或大规模 raw trace 放进仓库。阶段 2 在 Linux/WSL/服务器上搭建 PARSEC 环境，并采集 `PC,Address,RW` CSV trace。
 
 严格依赖关系：
 
@@ -229,6 +246,96 @@ dataset/raw_traces/parsec_blackscholes.csv
 dataset/raw_traces/parsec_canneal.csv
 dataset/raw_traces/parsec_streamcluster.csv
 dataset/raw_traces/parsec_dedup.csv
+```
+
+当前已实现的采集链路：
+
+```text
+scripts/collect_trace_drmemtrace.py
+  使用 DynamoRIO 自带 drmemtrace 采集离线访存 trace；
+  再调用 view 工具解析 read/write data reference；
+  输出 QMAP 需要的 PC,Address,RW CSV；
+  支持 --max-records、--skip-records、--trace-after-instrs；
+  默认把 Address 对齐到 4KB 页边界，和 QMAP page trace 口径一致。
+
+scripts/convert_drmemtrace_view.py
+  把 drmemtrace view 文本流转换为 PC,Address,RW。
+
+scripts/prepare_real_trace.py
+  规范化 raw trace；
+  截取 100k/1M/5M；
+  按时间顺序切成 80% train / 10% valid / 10% test；
+  输出 trace 质量统计和 real_workload_manifest.json。
+
+tools/trace_collectors/dynamorio/README.md
+  记录 DynamoRIO 采集命令模板。
+```
+
+100k pilot 采集命令模板：
+
+```bash
+python scripts/collect_trace_drmemtrace.py \
+  --output dataset/raw_traces/parsec_blackscholes_100k.csv \
+  --max-records 100000 \
+  --skip-records 10000 \
+  --trace-ref-multiplier 12 \
+  -- \
+  /path/to/blackscholes args...
+```
+
+pilot 通过后做规范化、切分和质量检查：
+
+```bash
+python scripts/prepare_real_trace.py \
+  --input dataset/raw_traces/parsec_blackscholes_100k.csv \
+  --workload parsec_blackscholes \
+  --limit 100000
+```
+
+输出：
+
+```text
+dataset/raw_traces/parsec_blackscholes.csv
+dataset/processed/parsec_blackscholes_train.csv
+dataset/processed/parsec_blackscholes_valid.csv
+dataset/processed/parsec_blackscholes_test.csv
+dataset/metadata/real_workload_manifest.json
+outputs/results/real_trace_stats/summary.md
+```
+
+扩到 1M 或 5M 时只改记录数：
+
+```bash
+# 1M
+python scripts/collect_trace_drmemtrace.py \
+  --output dataset/raw_traces/parsec_blackscholes_1m.csv \
+  --max-records 1000000 \
+  --skip-records 100000 \
+  --trace-ref-multiplier 12 \
+  -- \
+  /path/to/blackscholes args...
+
+# 5M
+python scripts/collect_trace_drmemtrace.py \
+  --output dataset/raw_traces/parsec_blackscholes_5m.csv \
+  --max-records 5000000 \
+  --skip-records 100000 \
+  --trace-ref-multiplier 12 \
+  -- \
+  /path/to/blackscholes args...
+```
+
+本机环境检查结果：
+
+```text
+drrun / pin / valgrind 当前不在 PATH；
+cmake / MSVC cl 当前不在 PATH；
+WSL 未安装 Linux distribution；
+因此这台机器上暂时不能直接跑真实二进制的 instrumentation pilot。
+
+已完成脚本级验证：
+1. drmemtrace view -> PC,Address,RW 转换器 smoke test 通过；
+2. prepare_real_trace.py 已用现有 writeheavy raw trace 验证规范化、80/10/10 切分和统计输出。
 ```
 
 严格依赖关系：
@@ -486,9 +593,9 @@ outputs/results/seed_stability/summary.md
 最实际的顺序：
 
 ```text
-Step 1. 冻结 QMAP-Pool 为最终模型，所有新实验统一 mean_pool。
-Step 2. 搭建 PARSEC 或其它真实 workload 环境。
-Step 3. 写/确认 trace 采集工具，输出 PC,Address,RW。
+Step 1. 已完成：冻结 QMAP-Pool 为最终模型，所有新实验统一 mean_pool。
+Step 2. 搭建 PARSEC 环境，第一批固定为 blackscholes/canneal/streamcluster/dedup。
+Step 3. 写/确认 trace 采集工具，输出 PC,Address,RW；dedup 不稳定时用 ferret 替换。
 Step 4. 先采 1 个 workload 的 100k trace，跑通 raw -> split -> JSONL -> train -> eval。
 Step 5. 扩展到 4 个 PARSEC workload 的 100k pilot。
 Step 6. 选择 3-4 个有代表性的 workload，扩到 1M 或 5M 正式实验。

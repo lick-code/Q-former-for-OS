@@ -181,7 +181,8 @@ def build_arg_parser():
                       help="cpu, cuda, or omitted for auto selection.")
   parser.add_argument("--seed", type=int, default=3136859,
                       help="Random seed for reproducible sensitivity runs.")
-  parser.add_argument("--ablation", choices=ABLATION_CHOICES, default="full",
+  parser.add_argument("--ablation", choices=ABLATION_CHOICES,
+                      default="mean_pool",
                       help="QMAP ablation variant to train.")
   return parser
 
@@ -207,7 +208,7 @@ def apply_batch_ablation(batch, ablation):
 
 
 def uses_qformer(ablation):
-  return ablation not in ("mean_pool", "no_qformer")
+  return ablation == "full"
 
 
 def save_checkpoint(path, feature_embedder, extractor, scorer, optimizer, epoch,

@@ -22,6 +22,8 @@ from datetime import datetime
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+QMAP_MODEL_NAME = "QMAP-Pool"
+QMAP_ABLATION = "mean_pool"
 
 
 def path_from_root(*parts):
@@ -87,6 +89,10 @@ def run_command(command, log_path):
 def load_json(path):
   with open(path, "r") as input_file:
     return json.load(input_file)
+
+
+def display_policy(policy):
+  return QMAP_MODEL_NAME if policy == "qmap" else policy.upper()
 
 
 def is_default_try_trace(path, split_name):
@@ -189,6 +195,8 @@ def write_summary_markdown(rows, output_path, args):
     output_file.write("- candidate count: `{}`\n".format(
         args.candidate_count))
     output_file.write("- lookahead: `{}`\n".format(args.lookahead))
+    output_file.write("- QMAP model: `{}` (`ablation={}`)\n".format(
+        QMAP_MODEL_NAME, QMAP_ABLATION))
     output_file.write("- page shift: `{}`\n".format(args.page_shift))
     output_file.write("- epochs: `{}`\n".format(args.epochs))
     output_file.write("- batch size: `{}`\n\n".format(args.batch_size))
@@ -202,7 +210,7 @@ def write_summary_markdown(rows, output_path, args):
       output_file.write(
           "| {policy} | {hit_rate:.2f} | {writes} | {cost:.2f} | "
           "{migrations} | {decision_ms:.6f} |\n".format(
-              policy=row["policy"],
+              policy=display_policy(row["policy"]),
               hit_rate=row["hit_rate_percent"],
               writes=row["nvm_writes"],
               cost=row["weighted_access_cost"],
@@ -245,6 +253,7 @@ def main():
         "--lookahead", str(args.lookahead),
         "--dram_capacity", str(args.dram_capacity),
         "--page_shift", str(args.page_shift),
+        "--ablation", QMAP_ABLATION,
     ]
     run_command(generate_command, os.path.join(log_dir, "generate.log"))
 
@@ -258,6 +267,7 @@ def main():
         "--batch_size", str(args.batch_size),
         "--lr", str(args.lr),
         "--device", args.device,
+        "--ablation", QMAP_ABLATION,
     ]
     run_command(train_command, os.path.join(log_dir, "train.log"))
     checkpoint_path = os.path.join(
@@ -284,6 +294,7 @@ def main():
       eval_command.extend([
           "--checkpoint", checkpoint_path,
           "--device", args.device,
+          "--ablation", QMAP_ABLATION,
       ])
     run_command(eval_command, os.path.join(log_dir, "{}.log".format(policy)))
     rows.append(load_json(json_output))

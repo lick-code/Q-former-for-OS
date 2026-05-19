@@ -129,7 +129,15 @@ def nvm_access_cost(rw, args):
 
 
 def uses_qformer(ablation):
-  return ablation not in ("mean_pool", "no_qformer")
+  return ablation == "full"
+
+
+def checkpoint_uses_qformer(model_args, extractor_state):
+  """Keeps old Q-Former checkpoints loadable while new runs default to Pool."""
+  ablation = model_args.get("ablation", "mean_pool")
+  if uses_qformer(ablation):
+    return True
+  return any(key.startswith("_qformer.") for key in extractor_state)
 
 
 def update_mru(dram_pages, page):
@@ -201,7 +209,8 @@ class QMAPPolicy(object):
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model_args = checkpoint.get("model_args", {})
-    self._ablation = ablation or model_args.get("ablation", "full")
+    self._ablation = ablation or model_args.get("ablation", "mean_pool")
+    extractor_state = checkpoint["extractor"]
 
     self._feature_embedder = embed.QMAPAccessFeatureEmbedder(
         address_embedder=embed.DynamicVocabEmbedder(
@@ -219,7 +228,7 @@ class QMAPPolicy(object):
         num_heads=model_args.get("num_heads", 2),
         feedforward_dim=model_args.get("feedforward_dim"),
         dropout=model_args.get("dropout", 0.0),
-        use_qformer=uses_qformer(model_args.get("ablation", "full")),
+        use_qformer=checkpoint_uses_qformer(model_args, extractor_state),
         pooling_strategy="mean").to(device)
     self._scorer = model.QMAPCandidateScorer(
         hidden_dim=model_args.get("hidden_dim", 18),
@@ -231,7 +240,7 @@ class QMAPPolicy(object):
         page_dim=model_args.get("page_dim", 21)).to(device)
 
     self._feature_embedder.load_state_dict(checkpoint["feature_embedder"])
-    self._extractor.load_state_dict(checkpoint["extractor"])
+    self._extractor.load_state_dict(extractor_state)
     self._scorer.load_state_dict(checkpoint["scorer"])
 
     self._feature_embedder.eval()

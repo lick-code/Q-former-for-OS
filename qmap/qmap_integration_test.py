@@ -75,7 +75,9 @@ def main():
       hidden_dim=18,
       num_queries=4,
       num_layers=1,
-      num_heads=2)
+      num_heads=2,
+      use_qformer=False,
+      pooling_strategy="mean")
   z = pattern_extractor(access_features)
 
   # 3. 64 页面候选池打分。

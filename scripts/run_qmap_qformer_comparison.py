@@ -98,6 +98,8 @@ def build_arg_parser():
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--seed", type=int, default=3136859)
   parser.add_argument("--python", default=sys.executable)
+  parser.add_argument("--allow_historical_qformer", action="store_true",
+                      help="Required to run historical Q-Former comparison.")
   parser.add_argument("--force", action="store_true",
                       help="Rerun profiles even if matching results exist.")
   return parser
@@ -340,6 +342,12 @@ def write_summary_markdown(rows, output_path, args):
 
 def main():
   args = build_arg_parser().parse_args()
+  if not args.allow_historical_qformer:
+    raise RuntimeError(
+        "Q-Former comparison is frozen as historical exploration. New "
+        "experiments should use QMAP-Pool (`ablation=mean_pool`). Pass "
+        "--allow_historical_qformer only when intentionally reproducing old "
+        "results.")
   profiles = parse_profiles(args.profiles)
   os.makedirs(args.result_dir, exist_ok=True)
 

@@ -42,5 +42,6 @@ CUDA_VISIBLE_DEVICES="${GPU_ID}" python qmap/qmap_eval.py \
   --checkpoint "${CHECKPOINT}" \
   --device cuda \
   --page_shift 12 \
+  --ablation mean_pool \
   --json_output "${RESULT_DIR}/qmap_${RUN_TS}.json" \
   2>&1 | tee "${LOG_FILE}"

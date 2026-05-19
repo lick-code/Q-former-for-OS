@@ -37,4 +37,5 @@ CUDA_VISIBLE_DEVICES="${GPU_ID}" python qmap/qmap_generator.py \
   --lookahead 256 \
   --dram_capacity 128 \
   --page_shift 12 \
+  --ablation mean_pool \
   2>&1 | tee "${LOG_FILE}"
