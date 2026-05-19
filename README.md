@@ -8,7 +8,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer
 ```
 
-Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前已补上第一个真实/标准 workload trace：PARSEC blackscholes 100k，下一步进入 100k pilot 训练评估。
+Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前已补上第一批 4 个 PARSEC 100k 真实 trace，下一步进入 100k pilot 训练评估。
 
 ## 当前状态
 
@@ -29,7 +29,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 2. QMAP 不是所有 workload 都优于 LFU，尤其在 hotset、phasechange、pcrwstress 上 LFU 仍然很强。
 3. mean pooling 比 Q-Former 更稳，且结构更简单、推理开销更低。
 4. 后续论文主线应改为 QMAP-Pool，而不是 QMAP-Full/Q-Former。
-5. 最大短板已从“没有真实 trace”转为“需要在真实 trace 上完成 100k pilot 训练评估，并扩展到更多 PARSEC workload”。
+5. 最大短板已从“没有真实 trace”转为“需要在 4 个 PARSEC 100k trace 上完成 pilot 训练评估，并扩到 1M/5M 正式规模”。
 ```
 
 ## 结果总览
@@ -46,7 +46,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | 阶段 0：实验口径冻结 | 已完成 | 新实验默认 `mean_pool`，表格统一 `QMAP-Pool` |
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
-| 真实/标准 workload | PARSEC blackscholes 100k 真实 trace 已完成 | `outputs/results/real_trace_stats/summary.md` |
+| 真实/标准 workload | 4 个 PARSEC 100k 真实 trace 已完成 | `outputs/results/real_trace_stats/summary.md` |
 
 ## 目录结构
 
@@ -331,19 +331,23 @@ generated samples = 173
 
 说明：本机 Python pilot 的目标是验证 instrumentation、CSV schema、切分和 JSONL 入口链路，不作为论文主表 workload。
 
-PARSEC blackscholes 100k 真实 trace pilot 已完成：
+PARSEC 100k 真实 trace pilot 已完成：
 
 ```text
 WSL source: D:/WSL/Ubuntu-22.04/Ubuntu-22.04.tar and ext4.vhdx
 WSL distro used: QMAP-Ubuntu-22.04, Ubuntu 22.04.5 LTS, root
 PARSEC source: connorimes/parsec-3.0 sparse checkout
-PARSEC package: parsec.blackscholes, gcc-pthreads
+PARSEC packages:
+  parsec.blackscholes, gcc-pthreads
+  parsec.canneal, gcc-serial
+  parsec.streamcluster, gcc-pthreads
+  parsec.dedup, gcc-pthreads with -fcommon for modern GCC
 DynamoRIO: Linux 11.91.20581
 drmemtrace window: --max-records 100000, --skip-records 10000, --trace-ref-multiplier 20
-collector result: seen data refs = 110000, wrote records = 100000
+collector result: each workload saw 110000 data refs and wrote 100000 records
 ```
 
-采集命令：
+采集命令示例：
 
 ```bash
 python3 scripts/collect_trace_drmemtrace.py \
@@ -360,16 +364,16 @@ python3 scripts/collect_trace_drmemtrace.py \
   /root/qmap-work/parsec-runs/blackscholes/prices_trace.txt
 ```
 
-规范化和质量检查命令：
+规范化和质量检查命令模板：
 
 ```bash
 python3 scripts/prepare_real_trace.py \
-  --input dataset/raw_traces/parsec_blackscholes_100k.csv \
-  --workload parsec_blackscholes \
+  --input dataset/raw_traces/<workload>_100k.csv \
+  --workload <workload> \
   --limit 100000
 ```
 
-PARSEC blackscholes 输出：
+PARSEC 100k 输出：
 
 ```text
 dataset/raw_traces/parsec_blackscholes_100k.csv
@@ -377,19 +381,34 @@ dataset/raw_traces/parsec_blackscholes.csv
 dataset/processed/parsec_blackscholes_train.csv
 dataset/processed/parsec_blackscholes_valid.csv
 dataset/processed/parsec_blackscholes_test.csv
+dataset/raw_traces/parsec_canneal_100k.csv
+dataset/raw_traces/parsec_canneal.csv
+dataset/processed/parsec_canneal_train.csv
+dataset/processed/parsec_canneal_valid.csv
+dataset/processed/parsec_canneal_test.csv
+dataset/raw_traces/parsec_streamcluster_100k.csv
+dataset/raw_traces/parsec_streamcluster.csv
+dataset/processed/parsec_streamcluster_train.csv
+dataset/processed/parsec_streamcluster_valid.csv
+dataset/processed/parsec_streamcluster_test.csv
+dataset/raw_traces/parsec_dedup_100k.csv
+dataset/raw_traces/parsec_dedup.csv
+dataset/processed/parsec_dedup_train.csv
+dataset/processed/parsec_dedup_valid.csv
+dataset/processed/parsec_dedup_test.csv
 dataset/metadata/real_workload_manifest.json
 outputs/results/real_trace_stats/summary.md
 ```
 
-PARSEC blackscholes 质量统计：
+PARSEC 100k 质量统计：
 
 ```text
-records = 100000
-unique pages = 104
-unique PCs = 4471
-write ratio = 0.3231
-reuse ratio = 0.9990
-split = 80000 / 10000 / 10000
+parsec_blackscholes:  records=100000, unique_pages=104, unique_PCs=4471, write_ratio=0.3231, reuse_ratio=0.9990
+parsec_canneal:       records=100000, unique_pages=157, unique_PCs=1946, write_ratio=0.2736, reuse_ratio=0.9984
+parsec_streamcluster: records=100000, unique_pages=156, unique_PCs=1941, write_ratio=0.2744, reuse_ratio=0.9984
+parsec_dedup:         records=100000, unique_pages=121, unique_PCs=2678, write_ratio=0.3963, reuse_ratio=0.9988
+all splits = 80000 / 10000 / 10000
+schema check = 100000 rows per raw 100k CSV, bad rows = 0
 ```
 
 该质量检查已通过，可以进入阶段 4 的 100k pilot 训练评估。后续正式 PARSEC/YCSB 规模从 100k pilot 扩到 1M/5M。
@@ -456,7 +475,7 @@ drrun -version 通过：11.91.20581。
 drmemtrace view -> PC,Address,RW 转换器 smoke test 通过。
 prepare_real_trace.py 规范化、80/10/10 切分和统计输出通过。
 本机 100k instrumentation pilot 已通过。
-本机 WSL 里的 PARSEC blackscholes 100k 真实 trace pilot 已通过。
+本机 WSL 里的 PARSEC blackscholes/canneal/streamcluster/dedup 100k 真实 trace pilot 已通过。
 ```
 
 严格依赖关系：
@@ -717,8 +736,8 @@ outputs/results/seed_stability/summary.md
 Step 1. 已完成：冻结 QMAP-Pool 为最终模型，所有新实验统一 mean_pool。
 Step 2. 已完成：在 WSL 搭建 PARSEC 环境，第一批固定为 blackscholes/canneal/streamcluster/dedup。
 Step 3. 已完成：写/确认 trace 采集工具，输出 PC,Address,RW；dedup 不稳定时用 ferret 替换。
-Step 4. 已完成前半：parsec_blackscholes 100k raw -> split -> 质量检查已通过；下一步进入 JSONL -> train -> eval。
-Step 5. 扩展到 4 个 PARSEC workload 的 100k pilot。
+Step 4. 已完成前半：4 个 PARSEC 100k raw -> split -> 质量检查已通过；下一步进入 JSONL -> train -> eval。
+Step 5. 已完成 trace 部分：4 个 PARSEC workload 的 100k pilot trace 已齐；下一步跑 100k pilot 训练评估。
 Step 6. 选择 3-4 个有代表性的 workload，扩到 1M 或 5M 正式实验。
 Step 7. 跑 LRU/Random/LFU/CLOCK/QMAP-Pool 主表。
 Step 8. 选 1-2 个真实 workload 做 no_rw/no_cost 消融。
