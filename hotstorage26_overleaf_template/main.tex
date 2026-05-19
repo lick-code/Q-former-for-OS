@@ -1,4 +1,11 @@
+% !TeX program = xelatex
 \documentclass[sigconf,10pt,anonymous,review]{acmart}
+\usepackage{iftex}
+\ifXeTeX
+  \usepackage{xeCJK}
+  \setCJKmainfont{Noto Serif CJK SC}
+  \setCJKsansfont{Noto Sans CJK SC}
+\fi
 \usepackage{booktabs}
 \usepackage{tikz}
 
@@ -112,33 +119,7 @@ byte overhead if the method will be compared to production policies.
 Explain the admission and eviction decision path. Be explicit about what happens
 on hits, misses, object resizing, and writeback.
 
-\section{Evaluation}
-\label{sec:evaluation}
-% Target length: 1.1--1.3 pages.
-% For HotStorage, preliminary but credible evidence is enough if the question is sharp.
-
-Answer three questions:
-\begin{enumerate}
-  \item Does the idea improve the metric that matters for the target storage
-  system?
-  \item When does it fail or become equivalent to simpler policies?
-  \item What is the overhead in metadata, CPU, or write amplification?
-\end{enumerate}
-
-\begin{table}[t]
-  \centering
-  \caption{Replace with your trace summary. Keep tables dense and factual.}
-  \label{tab:traces}
-  \begin{tabular}{lrrr}
-    \toprule
-    Trace & Requests & Objects & Read ratio \\
-    \midrule
-    A & 10M & 1.2M & 0.91 \\
-    B & 25M & 3.7M & 0.76 \\
-    C & 8M & 0.9M & 0.64 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\input{sections/evaluation_cn}
 
 \section{Discussion and Limitations}
 \label{sec:discussion}

@@ -2,39 +2,34 @@
 
 QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。它把页面迁移建模为候选页面排序问题：当 DRAM 已满并且一次 DRAM miss 触发迁移决策时，QMAP 从候选页面中选择最适合从 DRAM 降级到 NVM 的页面。
 
-当前仓库已经完成了一套可复现的原型实验：主实验、checkpoint sweep、多 workload、参数敏感性、消融实验、PC/RW stress workload、cost-aware 权重实验、Q-Former 对照实验和 Q-Former K sweep 都已有输出。
-
-## 当前结论
-
-可以写进论文或报告的结论：
+和老师讨论后，后续主线不再使用 Q-Former。最终模型收敛为：
 
 ```text
-1. QMAP 原型已经跑通完整 pipeline：trace -> JSONL -> training -> replay evaluation -> summary。
-2. 在 writeheavy workload 上，QMAP 是最强策略：hit rate 最高、NVM writes 最少、weighted cost 最低。
-3. 参数敏感性整体稳定：history_length 和 lookahead 影响小，candidate_count=32 与 64 接近。
-4. writeheavy 消融显示 full QMAP 的 PC/RW/Q-Former/cost-aware 组件都有小幅正贡献。
-5. mean pooling 在 phasechange、pcrwstress 和 Q-Former 对照中更稳，说明当前 Q-Former 结构不是最终最优。
-6. 在 mean pooling 固定后，1/2/3 层 Transformer Encoder 差距很小；writeheavy 上单层 encoder 的 weighted cost 最低且推理最快。
-7. Q-Former 的 query 数 K 对 writeheavy 指标影响较小；单 seed 下 K=2 的 weighted cost 最低，K=5 的 NVM writes 最少，但整体差距不大。
+QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer
 ```
 
-需要谨慎表述的结论：
+Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。现在最重要的下一步是补正式/真实 workload trace，让实验不只依赖 synthetic trace。
+
+## 当前状态
+
+已经完成：
 
 ```text
-1. QMAP 不是所有 workload 都优于 LFU。hotset、phasechange、pcrwstress 上 LFU 仍然很强。
-2. cost-aware loss 的收益目前偏弱：writeheavy 上强化权重只比 no_cost 少 1 次 NVM write。
-3. PC/RW 特征在 pcrwstress 中没有明显拉开 NVM writes，说明当前 trace 或特征利用还不够强。
-4. Q-Former 不应直接作为强贡献点；目前更适合把 mean_pool 作为正式 baseline 或候选最终版本。
-5. K sweep 目前仍是单 seed 结果，且 K=1/2/4/5 之间差异很小；不要把 K=2 或 K=5 写成稳定最优。
+1. synthetic trace 上的 QMAP 原型 pipeline：trace -> JSONL -> train -> replay -> summary。
+2. LRU / Random / LFU / CLOCK / QMAP 的基础对比。
+3. checkpoint sweep、参数敏感性、消融实验。
+4. Q-Former 与 mean pooling 的对照。
+5. Encoder 层数对照，结果显示 1-layer mean_pool 已经足够稳。
 ```
 
-最诚实的论文叙事是：
+当前结论：
 
 ```text
-QMAP 在写密集场景下能降低 NVM writes 和 weighted access cost；
-但在稳定热点或 LFU 友好的 workload 上优势有限；
-当前实验进一步表明，简单 mean pooling 比原始 Q-Former 更稳，后续应把 QMAP-Pool 作为主要实现继续打磨。
-如果继续保留 Q-Former，K 可以作为轻量超参数调优项；现有 writeheavy 结果只支持“弱敏感”，不支持强结论。
+1. QMAP 在 writeheavy synthetic workload 上表现最好，能降低 NVM writes 和 weighted access cost。
+2. QMAP 不是所有 workload 都优于 LFU，尤其在 hotset、phasechange、pcrwstress 上 LFU 仍然很强。
+3. mean pooling 比 Q-Former 更稳，且结构更简单、推理开销更低。
+4. 后续论文主线应改为 QMAP-Pool，而不是 QMAP-Full/Q-Former。
+5. 目前最大短板是缺少真实或标准 benchmark trace。
 ```
 
 ## 结果总览
@@ -46,14 +41,11 @@ QMAP 在写密集场景下能降低 NVM writes 和 weighted access cost；
 | 多 workload | 已完成 | `outputs/results/workload_suite/summary.md` |
 | pcrwstress workload | 已完成 | `outputs/results/workload_suite_pcrwstress/summary.md` |
 | 参数敏感性 | 已完成 | `outputs/results/qmap_parameter_sensitivity/summary.md` |
-| try trace 消融 | 已完成 | `outputs/results/qmap_ablation/summary.md` |
-| writeheavy 消融 | 已完成 | `outputs/results/qmap_ablation/writeheavy/summary.md` |
-| phasechange 消融 | 已完成 | `outputs/results/qmap_ablation/phasechange/summary.md` |
-| pcrwstress 消融 | 已完成 | `outputs/results/qmap_ablation_pcrwstress/summary.md` |
+| 消融实验 | 已完成 | `outputs/results/qmap_ablation/` |
 | cost-aware 权重实验 | 已完成 | `outputs/results/qmap_cost_w8_m4_writeheavy/summary.md` |
-| Q-Former 对照 | 已完成 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
-| Q-Former K sweep | 已完成 | `outputs/results/qmap_qformer_k_sweep_writeheavy/summary.md` |
+| Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
+| 真实/标准 workload | 未完成 | 下一步重点 |
 
 ## 目录结构
 
@@ -67,23 +59,21 @@ qmap/
 
 policy_learning/cache_model/
   embed.py                      # QMAP embedding
-  model.py                      # Transformer、Q-Former、mean pooling、候选页 scorer
+  model.py                      # Transformer、mean pooling、候选页 scorer；Q-Former 代码保留为历史探索
   qmap_loss.py                  # cost-aware ranking loss
   qmap_data.py                  # JSONL dataset 和 collate 逻辑
 
 scripts/
   run_prototype_experiment.py          # 单 workload 原型实验
   run_qmap_checkpoint_sweep.py         # checkpoint sweep
-  build_workload_suite.py              # 生成多 workload trace
+  build_workload_suite.py              # 生成 synthetic workload trace
   run_workload_suite.py                # 多 workload 训练和评估
   run_qmap_parameter_sensitivity.py    # 参数敏感性实验
   run_qmap_ablation.py                 # 消融实验
-  run_qmap_qformer_comparison.py       # Q-Former / mean_pool 对照实验
-  run_qmap_qformer_k_sweep.py          # Q-Former query 数 K 的纯超参数 sweep
-  run_qmap_encoder_depth_comparison.py # mean_pool 下 1/2/3 层 Transformer Encoder 对照实验
+  run_qmap_encoder_depth_comparison.py # mean_pool 下 encoder 层数对照
 
 dataset/
-  raw_traces/                   # 原始 synthetic traces
+  raw_traces/                   # 原始 traces，后续真实 trace 也放这里
   processed/                    # train / valid / test CSV traces
   jsonl/                        # QMAP 训练样本
   metadata/                     # trace schema、split 和 workload manifest
@@ -93,468 +83,375 @@ outputs/
   results/                      # JSON / CSV / Markdown 实验结果
 ```
 
-## 主要实验结果
+## 最终模型设定
 
-### 多 Workload
-
-查看：
-
-```bash
-cat outputs/results/workload_suite/summary.md
-cat outputs/results/workload_suite_pcrwstress/summary.md
-```
-
-关键结果：
-
-| Workload | 最好策略 | QMAP 表现 |
-|---|---|---|
-| hotset | LFU | QMAP 接近 LFU，cost 3777 vs LFU 3746，NVM writes 与 LRU 同为 38 |
-| writeheavy | QMAP | QMAP 最好，hit 73.45%，writes 209，cost 6979 |
-| streaming | QMAP 略好 | 所有策略都很差，QMAP 只有轻微优势 |
-| phasechange | LFU | QMAP 弱于 LFU，cost 9589 vs LFU 7170 |
-| pcrwstress | LFU | QMAP 优于 LRU，但弱于 LFU，cost 6441 vs LFU 6133 |
-
-writeheavy 是当前最有价值的主结果：
+后续默认模型：
 
 ```text
-QMAP vs LFU:
-hit rate: 73.45% vs 71.95%
-NVM writes: 209 vs 224
-weighted cost: 6979 vs 7339
+QMAP-Pool
+  access sequence encoder: Transformer Encoder
+  sequence aggregation: mean pooling
+  eviction decision: candidate scorer
 ```
 
-这可以支撑“QMAP 在写密集场景下有效”的结论。
-
-### 消融实验
-
-查看：
-
-```bash
-cat outputs/results/qmap_ablation/summary.md
-cat outputs/results/qmap_ablation/writeheavy/summary.md
-cat outputs/results/qmap_ablation/phasechange/summary.md
-cat outputs/results/qmap_ablation_pcrwstress/summary.md
-```
-
-writeheavy 消融：
-
-| Variant | Hit rate | Cost | NVM writes | 解读 |
-|---|---:|---:|---:|---|
-| full | 73.45 | 6979 | 209 | 最好 |
-| no_pc | 73.25 | 7027 | 211 | PC 有小幅贡献 |
-| no_rw | 73.30 | 7016 | 211 | RW 有小幅贡献 |
-| no_qformer / mean_pool | 73.15 | 7051 | 212 | Q-Former 在 writeheavy 上略有帮助 |
-| no_cost | 73.30 | 7016 | 211 | cost-aware 有小幅贡献 |
-
-phasechange 消融：
+不再继续做：
 
 ```text
-mean_pool/no_qformer 明显优于 full：
-hit rate: 64.90% vs 61.25%
-cost: 8740 vs 9589
-NVM writes: 149 vs 172
+Q-Former query 数 K sweep
+Q-Former light/tiny 变体
+把 Q-Former 作为论文主贡献点
 ```
 
-pcrwstress 消融：
+保留原因：
 
 ```text
-mean_pool 仍然优于 full：
-hit rate: 75.75% vs 74.65%
-cost: 6199 vs 6441
-NVM writes 都是 24
+1. mean_pool 在 phasechange、pcrwstress 和 Q-Former 对照中更稳。
+2. Encoder 层数对照显示 1-layer mean_pool 的 weighted cost 最低且推理最快。
+3. 去掉 Q-Former 后论文主线更清晰，复杂度更低。
 ```
 
-消融结论：
+## 下一步实验规划
+
+下面是推荐的执行顺序。重点是先收敛代码和模型命名，再采集真实数据，再跑正式实验。不要一开始就大规模跑，否则出错成本很高。
+
+### 阶段 0：冻结实验口径
+
+目标：把后续所有实验统一到 QMAP-Pool。
+
+必须先做：
 
 ```text
-writeheavy 上 full QMAP 组件都有小幅正贡献；
-phasechange/pcrwstress 上 mean_pool 更稳；
-因此当前不应把 Q-Former 写成稳定贡献点，更适合把 mean_pool 作为正式对照或最终候选实现。
+1. 所有后续训练和评估统一使用 ablation=mean_pool。
+2. 后续 summary 和论文表格统一叫 QMAP-Pool。
+3. Q-Former 结果只放在附录或历史探索，不再作为主线。
+4. replay cost model 暂时不再改，继续使用当前 qmap_eval.py 的配置。
 ```
 
-### Cost-Aware 权重实验
-
-查看：
-
-```bash
-cat outputs/results/qmap_cost_w8_m4_writeheavy/summary.md
-```
-
-结果：
+建议新增或确认一个主运行配置：
 
 ```text
-full:    hit 73.30%, cost 7854, NVM writes 210
-no_cost: hit 73.30%, cost 7860, NVM writes 211
+history_length = 10
+candidate_count = 64
+lookahead = 256
+dram_capacity = 128
+epochs = 10 或 20
+batch_size = 32
+model = mean_pool
 ```
 
-结论：
+严格依赖关系：
 
 ```text
-强化 write_sensitivity=8、migration_cost=4 后，full 比 no_cost 少 1 次 NVM write，cost 低 6。
-方向是对的，但收益很小。论文里可以说 cost-aware objective 有轻微信号，不能夸大。
+阶段 0 必须在所有真实数据正式实验之前完成。
+否则后面结果会混入 Q-Former / mean_pool 两套口径，论文会很难写。
 ```
 
-### Q-Former 对照
-
-查看：
-
-```bash
-cat outputs/results/qmap_qformer_comparison_writeheavy/summary.md
-```
-
-结果：
-
-| Profile | Hit rate | Cost | NVM writes | 解读 |
-|---|---:|---:|---:|---|
-| full | 73.40 | 7856 | 214 | hit 略高，但 cost/writes 更差 |
-| mean_pool | 73.35 | 7837 | 209 | 最低 cost 和 writes |
-| qformer_light | 72.55 | 8061 | 217 | 明显变差 |
-| qformer_tiny | 73.15 | 7905 | 213 | 仍弱于 mean_pool |
-
-结论：
+可以并行：
 
 ```text
-mean_pool 是当前最稳的聚合方式。
-Q-Former 可以保留为探索性模块，但不建议作为当前论文最强贡献点。
+阶段 0 的 README/脚本命名整理 可以和 真实 benchmark 环境准备 并行。
 ```
 
-### Q-Former K sweep
+### 阶段 1：选择真实/标准数据集
 
-查看：
+目标：补一组正式 workload，解决“只有 synthetic trace”的问题。
 
-```bash
-cat outputs/results/qmap_qformer_k_sweep_writeheavy/summary.md
-```
-
-该实验固定训练样本、Transformer 层数、head 数、dropout、weight decay、loss 权重和评估配置，只改变 Q-Former 的 query 数 K：
+推荐优先级：
 
 ```text
-K = 1, 2, 3, 4, 5, 6, 8
-baseline K = 4
+优先级 1：PARSEC
+  原因：学术论文中常见，适合多核/内存行为研究，获取和运行成本相对可控。
+
+优先级 2：真实系统 workload，例如 Redis / RocksDB + YCSB
+  原因：系统味更强，但采集链路更麻烦，容易拖慢进度。
+
+优先级 3：SPEC CPU
+  原因：权威性强，但通常涉及授权和运行规范，成本最高。
 ```
 
-结果：
-
-| K | Hit rate | Cost | NVM writes | 解读 |
-|---:|---:|---:|---:|---|
-| 1 | 73.45 | 7821 | 210 | 比 K=4 略低 cost，writes 更少 |
-| 2 | 73.50 | 7810 | 210 | hit 最高、weighted cost 最低 |
-| 3 | 73.25 | 7901 | 216 | 当前 sweep 中最差 |
-| 4 | 73.40 | 7856 | 214 | 原始默认配置，不是本轮最优 |
-| 5 | 73.45 | 7815 | 209 | NVM writes 最少，cost 接近 K=2 |
-| 6 | 73.20 | 7876 | 210 | hit 偏低，cost 略高 |
-| 8 | 73.35 | 7855 | 212 | 接近 K=4 |
-
-结论：
+建议当前先选 PARSEC。第一批不要太多，先选 4 个：
 
 ```text
-Q-Former 的 K 不是强敏感超参数。K=2 在单 seed 下 weighted cost 最低，K=5 的 NVM writes 最少；
-但 K=1/2/4/5 的差距很小，最大 cost 差距不到 0.6%。如果继续使用 Q-Former，可以优先复跑 K=2 和 K=5 的多 seed；
-如果要写论文，当前更适合表述为“K 对指标影响较弱，较小 K 不劣于默认 K=4”，不要直接宣称 K=2 或 K=5 稳定最优。
+blackscholes    计算密集，作为相对平稳 workload
+canneal         内存访问更复杂，常用于内存系统研究
+streamcluster   流式/聚类访问，有机会验证 streaming-like 行为
+dedup 或 ferret 写入/数据处理特征更明显，可观察 NVM writes
 ```
 
-### Encoder 层数对照
-
-查看：
-
-```bash
-cat outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md
-```
-
-该实验把聚合方式固定为：
+严格依赖关系：
 
 ```text
-TransformerEncoder -> mean pooling
+先确定 benchmark 列表，再写采集脚本；
+不要一边改列表一边跑完整训练。
 ```
 
-只比较 Transformer Encoder 的层数：
+可以并行：
 
 ```text
-1 layer：当前 mean_pool baseline
-2 layers：更深一点的 encoder
-3 layers：进一步加深 encoder
+PARSEC 环境搭建
+trace 采集工具准备
+QMAP-Pool synthetic 复跑脚本整理
 ```
 
-结果：
+### 阶段 2：实现真实 trace 采集和转换
 
-| Profile | Hit rate | Cost | NVM writes | Decision ms | 解读 |
-|---|---:|---:|---:|---:|---|
-| layers_1 | 73.35 | 7837 | 209 | 3.073 | 最低 cost，推理最快 |
-| layers_2 | 73.30 | 7848 | 209 | 3.939 | cost 略升，writes 不变 |
-| layers_3 | 73.30 | 7842 | 208 | 4.105 | 少 1 次 write，但 reads/migrations 增加，cost 仍高于单层 |
+目标：把真实程序访存记录转成 QMAP 已支持的 CSV 格式。
 
-结论：
+最终格式必须是：
 
 ```text
-加深 Transformer Encoder 对 writeheavy 指标影响很小，没有带来稳定收益。
-如果以 weighted access cost 为主指标，当前应继续保留 1-layer mean_pool。
-3-layer 只少 1 次 NVM write，但 cost 更高、推理更慢，不足以作为默认配置。
+PC,Address,RW
+0x400100,0x7f12345000,R
+0x400108,0x7f12346000,W
 ```
 
-## 运行命令
-
-### 主实验
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_prototype_experiment.py \
-  --run_name try_prototype \
-  --train_trace dataset/processed/try_train.csv \
-  --test_trace dataset/processed/try_test.csv \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 10 \
-  --batch_size 32 \
-  --device cuda
-```
-
-### 多 Workload
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
-  --workloads hotset,writeheavy,streaming,phasechange \
-  --policies lru,random,lfu,clock,qmap \
-  --records 20000 \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 10 \
-  --batch_size 32 \
-  --device cuda
-```
-
-### pcrwstress Workload
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_workload_suite.py \
-  --skip_build \
-  --skip_generate \
-  --workloads pcrwstress \
-  --policies lru,random,lfu,clock,qmap \
-  --result_dir outputs/results/workload_suite_pcrwstress \
-  --checkpoint_dir outputs/checkpoints/workload_suite_pcrwstress \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 10 \
-  --batch_size 32 \
-  --device cuda
-```
-
-### 消融实验
-
-try trace：
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
-  --train_trace dataset/processed/try_train.csv \
-  --test_trace dataset/processed/try_test.csv \
-  --variants full,no_pc,no_rw,mean_pool,no_cost \
-  --result_dir outputs/results/qmap_ablation \
-  --checkpoint_root outputs/checkpoints/qmap_ablation \
-  --jsonl_root dataset/jsonl/qmap_ablation \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 10 \
-  --batch_size 32 \
-  --device cuda
-```
-
-writeheavy：
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
-  --train_trace dataset/processed/writeheavy_train.csv \
-  --test_trace dataset/processed/writeheavy_test.csv \
-  --variants full,no_pc,no_rw,mean_pool,no_cost \
-  --result_dir outputs/results/qmap_ablation/writeheavy \
-  --checkpoint_root outputs/checkpoints/qmap_ablation/writeheavy \
-  --jsonl_root dataset/jsonl/qmap_ablation/writeheavy \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 10 \
-  --batch_size 32 \
-  --device cuda
-```
-
-phasechange：
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
-  --train_trace dataset/processed/phasechange_train.csv \
-  --test_trace dataset/processed/phasechange_test.csv \
-  --variants full,no_pc,no_rw,mean_pool,no_cost \
-  --result_dir outputs/results/qmap_ablation/phasechange \
-  --checkpoint_root outputs/checkpoints/qmap_ablation/phasechange \
-  --jsonl_root dataset/jsonl/qmap_ablation/phasechange \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 10 \
-  --batch_size 32 \
-  --device cuda
-```
-
-pcrwstress：
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_ablation.py \
-  --train_trace dataset/processed/pcrwstress_train.csv \
-  --test_trace dataset/processed/pcrwstress_test.csv \
-  --variants full,no_pc,no_rw,mean_pool,no_cost \
-  --result_dir outputs/results/qmap_ablation_pcrwstress \
-  --checkpoint_root outputs/checkpoints/qmap_ablation_pcrwstress \
-  --jsonl_root dataset/jsonl/qmap_ablation_pcrwstress \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 10 \
-  --batch_size 32 \
-  --write_sensitivity_weight 4 \
-  --migration_cost_weight 2 \
-  --nvm_write_cost 8 \
-  --device cuda
-```
-
-### Q-Former 对照
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_qformer_comparison.py \
-  --train_trace dataset/processed/writeheavy_train.csv \
-  --test_trace dataset/processed/writeheavy_test.csv \
-  --profiles full,mean_pool,qformer_light,qformer_tiny \
-  --result_dir outputs/results/qmap_qformer_comparison_writeheavy \
-  --checkpoint_root outputs/checkpoints/qmap_qformer_comparison_writeheavy \
-  --jsonl_root dataset/jsonl/qmap_qformer_comparison_writeheavy \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 20 \
-  --batch_size 32 \
-  --write_sensitivity_weight 4 \
-  --migration_cost_weight 2 \
-  --nvm_write_cost 8 \
-  --device cuda
-```
-
-### Q-Former K sweep
-
-固定其它配置，只改变 `--num_queries K`：
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_qformer_k_sweep.py \
-  --train_trace dataset/processed/writeheavy_train.csv \
-  --test_trace dataset/processed/writeheavy_test.csv \
-  --queries 1,2,3,4,5,6,8 \
-  --baseline_k 4 \
-  --result_dir outputs/results/qmap_qformer_k_sweep_writeheavy \
-  --checkpoint_root outputs/checkpoints/qmap_qformer_k_sweep_writeheavy \
-  --jsonl_path dataset/jsonl/qmap_qformer_k_sweep_writeheavy/train.jsonl \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 20 \
-  --batch_size 32 \
-  --write_sensitivity_weight 4 \
-  --migration_cost_weight 2 \
-  --nvm_write_cost 8 \
-  --device cuda
-```
-
-输出位置：
+采集方式建议：
 
 ```text
-outputs/results/qmap_qformer_k_sweep_writeheavy/summary.md
-outputs/results/qmap_qformer_k_sweep_writeheavy/summary.csv
-outputs/results/qmap_qformer_k_sweep_writeheavy/k*/qmap.json
-outputs/results/qmap_qformer_k_sweep_writeheavy/k*/logs/*.log
-outputs/checkpoints/qmap_qformer_k_sweep_writeheavy/k*/qmap_epoch_20.pth
-dataset/jsonl/qmap_qformer_k_sweep_writeheavy/train.jsonl
+Pin / DynamoRIO / Valgrind 任选一个。
+优先建议 Pin 或 DynamoRIO，因为可以直接拿到 PC、访存地址、读写类型。
 ```
 
-### Encoder 层数对照
-
-默认比较 1、2、3 层 Transformer Encoder，并且固定使用 mean pooling：
-
-```bash
-CUDA_VISIBLE_DEVICES=2 python scripts/run_qmap_encoder_depth_comparison.py \
-  --train_trace dataset/processed/writeheavy_train.csv \
-  --test_trace dataset/processed/writeheavy_test.csv \
-  --layers 1,2,3 \
-  --result_dir outputs/results/qmap_encoder_depth_comparison_writeheavy \
-  --checkpoint_root outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy \
-  --jsonl_root dataset/jsonl/qmap_encoder_depth_comparison_writeheavy \
-  --page_shift 12 \
-  --dram_capacity 128 \
-  --history_length 10 \
-  --candidate_count 64 \
-  --lookahead 256 \
-  --epochs 20 \
-  --batch_size 32 \
-  --write_sensitivity_weight 4 \
-  --migration_cost_weight 2 \
-  --nvm_write_cost 8 \
-  --device cuda
-```
-
-输出位置：
+第一版采集要求：
 
 ```text
-outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md
-outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.csv
-outputs/results/qmap_encoder_depth_comparison_writeheavy/layers_*/qmap.json
-outputs/results/qmap_encoder_depth_comparison_writeheavy/layers_*/logs/*.log
-outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/layers_*/qmap_epoch_20.pth
-dataset/jsonl/qmap_encoder_depth_comparison_writeheavy/layers_*.jsonl
+1. 只采用户态内存访问。
+2. 每条记录包含 PC、Address、RW。
+3. 支持限制最大记录数，例如 100k / 1M / 5M。
+4. 支持跳过 warmup，例如跳过前 10k 或 100k 条访问。
+5. 输出 CSV 到 dataset/raw_traces/。
 ```
 
-## 下一步计划
-
-现在不建议继续盲目加新模块。更现实的下一步是“收敛版本 + 增强可信度”。
-
-### 1. 确定最终策略命名
-
-建议把当前策略分成两个名字：
+建议文件命名：
 
 ```text
-QMAP-Full：原始 Q-Former 版本
-QMAP-Pool：Transformer encoder + mean pooling 版本
+dataset/raw_traces/parsec_blackscholes.csv
+dataset/raw_traces/parsec_canneal.csv
+dataset/raw_traces/parsec_streamcluster.csv
+dataset/raw_traces/parsec_dedup.csv
 ```
 
-论文主结果可以先报告 QMAP-Full，因为 writeheavy 上 full 最好；但在讨论和消融中明确指出 QMAP-Pool 在 phasechange/pcrwstress 上更稳。
-
-如果后续只能保留一个最终实现，更推荐选择 QMAP-Pool。
-
-### 2. 做 3 个 seed 的重复实验
-
-writeheavy 上很多消融差距只有 0.5% 到 1%，需要多 seed 支撑。建议至少对下面实验跑 3 个 seed：
+严格依赖关系：
 
 ```text
-qmap_ablation/writeheavy
-qmap_ablation/phasechange
-qmap_ablation_pcrwstress
-qmap_qformer_comparison_writeheavy
-qmap_qformer_k_sweep_writeheavy
+必须先有 raw trace，才能 split；
+必须 split 成 train/test，才能 generate JSONL；
+必须 generate JSONL，才能 train QMAP-Pool；
+必须有 checkpoint，才能评估 QMAP-Pool。
+```
+
+可以并行：
+
+```text
+不同 benchmark 的 trace 采集可以并行；
+同一个 benchmark 的 raw -> split -> jsonl -> train -> eval 必须串行。
+```
+
+### 阶段 3：真实 trace 质量检查
+
+目标：不要把坏 trace 直接拿去训练。
+
+每个真实 trace 至少统计：
+
+```text
+total accesses
+unique pages
+read/write ratio
+unique PCs
+page reuse 情况
+前 10 个 hot pages 占比
+train/test 是否分布差异过大
+```
+
+判断标准：
+
+```text
+如果 write ratio 太低，不能指望 QMAP 明显减少 NVM writes。
+如果 unique pages 太少，LFU/LRU 可能已经足够好。
+如果 streaming 太强，所有策略 hit rate 都可能很低。
+如果 train/test 分布完全不同，QMAP 可能泛化差。
+```
+
+建议输出：
+
+```text
+dataset/metadata/real_workload_manifest.json
+outputs/results/real_trace_stats/summary.md
+```
+
+严格依赖关系：
+
+```text
+质量检查必须在正式训练前完成。
+```
+
+可以并行：
+
+```text
+多个 workload 的统计可以并行。
+```
+
+### 阶段 4：小规模 pilot 实验
+
+目标：先确认真实数据 pipeline 能跑通，不追求最终大规模。
+
+建议每个 workload 先截取：
+
+```text
+100k accesses
+chronological split: 80% train / 10% valid / 10% test
+```
+
+先跑这几个策略：
+
+```text
+LRU
+LFU
+CLOCK
+QMAP-Pool
+```
+
+Random 可以先不跑，等正式实验再补。
+
+pilot 输出建议：
+
+```text
+outputs/results/real_pilot/summary.md
+outputs/checkpoints/real_pilot/<workload>/qmap_epoch_10.pth
+```
+
+严格依赖关系：
+
+```text
+pilot 通过后再跑 full-scale。
+```
+
+可以并行：
+
+```text
+不同 workload 的 pilot 可以并行；
+同一 workload 内 QMAP-Pool 训练和 QMAP-Pool 评估串行；
+baselines 的 replay 可以和 QMAP 训练并行，因为 baselines 不依赖 checkpoint。
+```
+
+### 阶段 5：正式真实数据实验
+
+目标：把论文主表补完整。
+
+正式实验策略：
+
+```text
+LRU
+Random
+LFU
+CLOCK
+QMAP-Pool
+```
+
+如果时间允许，再加：
+
+```text
+QMAP-Full 仅作为历史对照，可选，不作为主线。
+```
+
+正式 trace 规模建议：
+
+```text
+每个 workload 1M 到 5M accesses。
+如果服务器时间紧，先用 1M。
+如果 1M 结果稳定，再扩到 5M。
+```
+
+输出建议：
+
+```text
+outputs/results/real_workload_suite/summary.md
+outputs/results/real_workload_suite/<workload>/*.json
+outputs/checkpoints/real_workload_suite/<workload>/qmap_epoch_10.pth
+```
+
+主表要报告：
+
+```text
+hit rate
+NVM writes
+weighted access cost
+migration count
+avg decision time
+```
+
+严格依赖关系：
+
+```text
+真实 trace pilot 成功 -> 正式规模 trace -> 正式训练和评估 -> 汇总表格。
+```
+
+可以并行：
+
+```text
+多个 workload 的正式实验可以并行；
+多个 baseline policy 可以并行；
+多 seed 可以并行；
+同一 QMAP-Pool workload 的 generate/train/eval 必须串行。
+```
+
+### 阶段 6：只做必要消融
+
+目标：不要在真实数据上重复所有 synthetic 消融，只做最能支撑论文的部分。
+
+真实数据上建议只做：
+
+```text
+QMAP-Pool
+no_rw
+no_cost
+```
+
+可选：
+
+```text
+no_pc
+```
+
+不再做：
+
+```text
+Q-Former K sweep
+qformer_light / qformer_tiny
+Encoder 2/3 层 sweep
+大规模 cost weight grid
+```
+
+原因：
+
+```text
+老师已经决定不走 Q-Former；
+真实数据实验的主要任务是证明 QMAP-Pool 在标准 workload 上仍然有效；
+消融只需要说明 RW/cost-aware 是否有贡献。
+```
+
+严格依赖关系：
+
+```text
+先看正式真实 workload 主结果，再挑 1-2 个最有代表性的 workload 做消融。
+```
+
+可以并行：
+
+```text
+选定 workload 后，各 variant 可以并行训练和评估。
+```
+
+### 阶段 7：多 seed 验证
+
+目标：增强可信度。
+
+不需要所有实验都多 seed。建议只对最关键结果做：
+
+```text
+1. synthetic writeheavy: QMAP-Pool vs LFU/CLOCK
+2. 真实数据中 QMAP-Pool 表现最好的 workload
+3. 真实数据中 QMAP-Pool 表现最差或最接近 LFU 的 workload
 ```
 
 建议 seed：
@@ -565,30 +462,80 @@ qmap_qformer_k_sweep_writeheavy
 2026
 ```
 
-如果多 seed 后趋势仍然一致，再写进论文；如果趋势不稳定，就把这些结果写成“诊断性实验”。
-
-### 3. 汇总最终表格
-
-建议最终论文保留 4 张表：
+输出建议：
 
 ```text
-Table 1: QMAP vs LRU/Random/LFU/CLOCK across workloads
-Table 2: checkpoint sweep
-Table 3: parameter sensitivity
-Table 4: ablation, QMAP-Full vs QMAP-Pool, and Q-Former K sensitivity
+outputs/results/seed_stability/summary.md
 ```
 
-其中最重要的是 Table 1 和 Table 4。
-
-### 4. 暂时不要继续强化 cost-aware
-
-当前 cost-aware 权重实验收益太小：
+严格依赖关系：
 
 ```text
-full 比 no_cost 少 1 次 NVM write，cost 低 6。
+先知道哪些 workload 最关键，再做多 seed。
 ```
 
-除非你愿意重新设计 label 或 trace，否则不建议再花太多时间调权重。
+可以并行：
+
+```text
+不同 seed 可以并行；
+不同 workload 可以并行。
+```
+
+## 推荐总执行顺序
+
+最实际的顺序：
+
+```text
+Step 1. 冻结 QMAP-Pool 为最终模型，所有新实验统一 mean_pool。
+Step 2. 搭建 PARSEC 或其它真实 workload 环境。
+Step 3. 写/确认 trace 采集工具，输出 PC,Address,RW。
+Step 4. 先采 1 个 workload 的 100k trace，跑通 raw -> split -> JSONL -> train -> eval。
+Step 5. 扩展到 4 个 PARSEC workload 的 100k pilot。
+Step 6. 选择 3-4 个有代表性的 workload，扩到 1M 或 5M 正式实验。
+Step 7. 跑 LRU/Random/LFU/CLOCK/QMAP-Pool 主表。
+Step 8. 选 1-2 个真实 workload 做 no_rw/no_cost 消融。
+Step 9. 对关键结果做 3 seed 验证。
+Step 10. 汇总论文表格和图。
+```
+
+## 并行执行建议
+
+可以并行：
+
+```text
+1. 真实 benchmark 环境搭建 和 QMAP-Pool 脚本整理。
+2. 多个 workload 的 trace 采集。
+3. 多个 baseline replay。
+4. 多个 workload 的 QMAP-Pool 训练。
+5. 多 seed 实验。
+```
+
+不能并行、必须串行：
+
+```text
+1. raw trace -> split -> JSONL -> train -> QMAP eval。
+2. pilot 实验 -> 正式规模实验。
+3. 主结果分析 -> 选择真实数据消融 workload。
+4. 确定最终模型口径 -> 写论文主表。
+```
+
+## 建议论文最终表格
+
+```text
+Table 1: Synthetic workloads 上 QMAP-Pool vs LRU/Random/LFU/CLOCK
+Table 2: Real/PARSEC workloads 上 QMAP-Pool vs LRU/Random/LFU/CLOCK
+Table 3: Parameter sensitivity
+Table 4: Ablation on representative workloads
+Table 5: Inference overhead
+```
+
+如果篇幅有限，保留：
+
+```text
+Table 1: Real workload main results
+Table 2: Synthetic workload main results
+Table 3: Ablation + overhead
+```
 
 ## 指标说明
 
@@ -665,6 +612,5 @@ outputs/checkpoints/try_prototype/qmap_epoch_10.pth
 outputs/checkpoints/workload_suite/*/qmap_epoch_10.pth
 outputs/checkpoints/workload_suite_pcrwstress/*/qmap_epoch_10.pth
 outputs/checkpoints/qmap_ablation/**/qmap_epoch_10.pth
-outputs/checkpoints/qmap_qformer_comparison_writeheavy/**/qmap_epoch_20.pth
-outputs/checkpoints/qmap_qformer_k_sweep_writeheavy/k*/qmap_epoch_20.pth
+outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/**/qmap_epoch_20.pth
 ```

@@ -1,0 +1,104 @@
+\section{实验评估}
+\label{sec:evaluation}
+
+本节评估 QMAP 在 DRAM/NVM 混合内存页面迁移场景下的有效性。按照最终设计，后文中的 QMAP 均指由访问历史经过 Transformer Encoder 编码后，再对时间维做均值池化，并对候选迁移页进行打分的版本。我们不再使用额外的查询式聚合模块，以避免在当前数据规模下引入不稳定的结构复杂度。
+
+实验围绕三个问题展开。第一，QMAP 是否能够在写密集和迁移敏感的负载中降低系统代价，而不仅仅提升命中率。第二，QMAP 在不同访问局部性和读写结构下相对于经典替换策略的收益边界在哪里。第三，增加 Transformer Encoder 深度是否能带来足够收益，足以抵消额外推理开销。
+
+\subsection{实验设置}
+
+我们使用 trace-driven replay 评估页面迁移策略。系统包含一个容量受限的 DRAM 层和一个容量更大的 NVM 层。当一次访问在 DRAM 中未命中且 DRAM 已满时，策略需要从候选页面集合中选择一个页面迁移到 NVM。QMAP 在每次决策时读取最近的访存历史、页面候选特征和读写类型信息，输出候选页面的迁移优先级。所有负载均使用 2,000 次测试访问进行 replay。
+
+比较策略包括 LRU、Random、LFU、CLOCK 和 QMAP。LRU、LFU 和 CLOCK 代表常见的启发式替换策略；Random 用于给出无状态策略下界。我们报告四类指标：DRAM 命中率、NVM 写入次数、页面迁移次数和加权访问代价。加权访问代价用于刻画 DRAM/NVM 非对称访问开销，当前 replay 模型中 DRAM 读写代价均为 1，NVM 读代价为 2，NVM 写代价为 8，页面迁移代价为 10。决策延迟来自 Python replay 原型，主要用于比较不同策略和模型结构的相对在线开销，并不代表优化后系统实现的绝对延迟。除特别说明外，数值越低表示系统代价越小，命中率越高表示缓存利用越好。
+
+表~\ref{tab:workloads} 给出本文使用的三个代表性负载。我们选择这些负载，是因为它们分别覆盖了写密集、阶段变化和读写压力混合三类对混合内存系统更有区分度的场景。
+
+\begin{table*}[t]
+  \centering
+  \caption{实验负载。}
+  \label{tab:workloads}
+  \small
+  \begin{tabular}{lrp{0.65\textwidth}}
+    \toprule
+    负载 & 测试访问数 & 负载特征 \\
+    \midrule
+    writeheavy & 2,000 & 写访问占比较高，NVM 写入代价主导总成本 \\
+    phasechange & 2,000 & 访问热点随时间阶段性切换 \\
+    pcrwstress & 2,000 & 程序上下文和读写模式共同变化 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\subsection{端到端性能}
+
+表~\ref{tab:end-to-end} 展示 QMAP 与四个经典策略在三类负载上的端到端 replay 结果。整体上，QMAP 的平均加权代价为 7,330，低于 LRU 的 7,927、Random 的 9,660 和 CLOCK 的 9,230；平均 NVM 写入次数为 128.3，也低于 LRU、Random 和 CLOCK。LFU 在平均代价上仍然最强，说明 QMAP 的优势不是无条件替代频率策略，而是在写密集和迁移敏感场景下减少高代价访问。
+
+\begin{table*}[t]
+  \centering
+  \caption{端到端 replay 性能。命中率越高越好；加权代价、NVM 写入、迁移次数和决策延迟越低越好。}
+  \label{tab:end-to-end}
+  \scriptsize
+  \begin{tabular}{llrrrrr}
+    \toprule
+    负载 & 策略 & 命中率(\%) & 加权代价 & NVM 写入 & 迁移次数 & 决策延迟(ms) \\
+    \midrule
+    writeheavy & LRU & 71.30 & 7,510 & 238 & 446 & 0.000 \\
+    writeheavy & Random & 66.45 & 8,721 & 310 & 543 & 0.001 \\
+    writeheavy & LFU & 71.95 & 7,339 & 224 & 433 & 0.023 \\
+    writeheavy & CLOCK & 68.05 & 8,313 & 282 & 511 & 0.001 \\
+    writeheavy & QMAP & \textbf{73.15} & \textbf{7,051} & \textbf{212} & \textbf{409} & 2.970 \\
+    \midrule
+    phasechange & LRU & 62.25 & 9,401 & 188 & 627 & 0.000 \\
+    phasechange & Random & 53.85 & 11,317 & 222 & 795 & 0.001 \\
+    phasechange & LFU & \textbf{71.70} & \textbf{7,170} & \textbf{112} & \textbf{438} & 0.022 \\
+    phasechange & CLOCK & 54.90 & 11,108 & 233 & 774 & 0.001 \\
+    phasechange & QMAP & 64.90 & 8,740 & 149 & 574 & 2.406 \\
+    \midrule
+    pcrwstress & LRU & 72.70 & 6,870 & \textbf{24} & 418 & 0.000 \\
+    pcrwstress & Random & 65.35 & 8,943 & 100 & 565 & 0.001 \\
+    pcrwstress & LFU & \textbf{76.05} & \textbf{6,133} & \textbf{24} & \textbf{351} & 0.023 \\
+    pcrwstress & CLOCK & 68.30 & 8,270 & 96 & 506 & 0.001 \\
+    pcrwstress & QMAP & 75.75 & 6,199 & \textbf{24} & 357 & 2.938 \\
+    \midrule
+    Average & LRU & 68.75 & 7,927 & 150.0 & 497.0 & 0.000 \\
+    Average & Random & 61.88 & 9,660 & 210.7 & 634.3 & 0.001 \\
+    Average & LFU & \textbf{73.23} & \textbf{6,881} & \textbf{120.0} & \textbf{407.3} & 0.023 \\
+    Average & CLOCK & 63.75 & 9,230 & 203.7 & 597.0 & 0.001 \\
+    Average & QMAP & 71.27 & 7,330 & 128.3 & 446.7 & 2.771 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+在 writeheavy 上，QMAP 取得最高命中率和最低系统代价。相较 LRU，QMAP 将命中率从 71.30\% 提升到 73.15\%，将 NVM 写入从 238 次降至 212 次，降幅为 10.9\%，同时将加权代价从 7,510 降至 7,051，降幅为 6.1\%。相较更强的 LFU，QMAP 仍将加权代价降低 3.9\%，将 NVM 写入降低 5.4\%。这表明在写代价显著高于读代价的混合内存系统中，仅优化命中率并不充分，迁移策略需要显式避开未来可能产生高写入代价的页面。
+
+在 phasechange 上，LFU 取得最低代价。QMAP 相较 LRU 仍降低了 7.0\% 的加权代价，并将 NVM 写入从 188 次降至 149 次，但它没有追上 LFU。这说明当负载存在较强频率结构时，简单频率统计仍然是很强的基线。对系统论文而言，这一结果同样重要：QMAP 的价值不在于宣称所有场景都优于 LFU，而在于给出一种能感知写入代价和迁移代价的策略框架，并明确其适用边界。
+
+在 pcrwstress 上，QMAP 与 LFU 的差距很小。QMAP 的命中率为 75.75\%，接近 LFU 的 76.05\%；加权代价为 6,199，仅比 LFU 高 1.1\%，同时保持与 LRU/LFU 相同的 24 次 NVM 写入。相较 LRU，QMAP 将加权代价降低 9.8\%，迁移次数从 418 次降至 357 次。该结果说明，在读写模式和程序上下文共同变化的场景下，QMAP 能够学到比 LRU 更稳定的迁移顺序，并接近 LFU 的总体代价。
+
+\subsection{编码器深度和推理开销}
+
+QMAP 的在线部署成本主要来自每次 DRAM miss 后的候选页打分。为了判断是否需要更深的序列编码器，我们固定使用均值池化聚合方式，只改变 Transformer Encoder 的层数。表~\ref{tab:encoder-depth} 显示，在 writeheavy 负载上，增加编码器深度并没有带来稳定收益。
+
+\begin{table}[t]
+  \centering
+  \caption{Transformer Encoder 层数对 writeheavy 的影响。}
+  \label{tab:encoder-depth}
+  \scriptsize
+  \begin{tabular}{rrrrrr}
+    \toprule
+    层数 & 命中率(\%) & 加权代价 & NVM 写入 & 迁移次数 & 延迟(ms) \\
+    \midrule
+    1 & \textbf{73.35} & \textbf{7,837} & 209 & \textbf{405} & \textbf{3.073} \\
+    2 & 73.30 & 7,848 & 209 & 406 & 3.939 \\
+    3 & 73.30 & 7,842 & \textbf{208} & 406 & 4.105 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+单层编码器取得最低加权代价和最低推理延迟。两层编码器的代价略高，决策延迟增加 28.2\%；三层编码器虽然少 1 次 NVM 写入，但 NVM 读取和迁移次数增加，加权代价仍高于单层，同时延迟增加 33.6\%。因此，本文采用单层 Transformer Encoder 加均值池化作为默认结构。这一选择符合系统设计中的常见取舍：在收益有限时，在线路径应优先保留较低延迟和更少参数的实现。
+
+\subsection{结果总结}
+
+实验结果给出三个结论。第一，QMAP 在 writeheavy 中同时提升命中率、减少 NVM 写入并降低加权代价，说明面向混合内存的页面迁移策略需要显式考虑写入非对称性，而不能只追求 DRAM 命中率。第二，QMAP 在 pcrwstress 中接近 LFU，并显著优于 LRU/CLOCK，说明访问历史、程序上下文和读写类型能够为迁移决策提供有用信号。第三，QMAP 并不在所有负载上优于 LFU；phasechange 结果表明，当访问频率本身足够稳定且可被 LFU 捕获时，经典策略仍然具有很强竞争力。
+
+从系统角度看，这组结果支持一个更克制但更可靠的结论：QMAP 是一种适用于写敏感混合内存场景的学习型页面迁移策略。它在写密集负载上能减少高代价 NVM 写入，在复杂读写压力下接近强启发式策略；但在频率局部性特别明显的负载上，仍需要与 LFU 类策略结合或引入更强的在线自适应机制。后续工作可以沿两个方向推进：其一，将 QMAP 作为写敏感迁移器，与传统命中率导向策略做混合选择；其二，在更大规模和真实系统 trace 上验证当前 replay 结论的稳定性。
