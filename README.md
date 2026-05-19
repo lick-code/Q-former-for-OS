@@ -8,7 +8,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer
 ```
 
-Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前已补上第一批 4 个 PARSEC 100k 真实 trace，下一步进入 100k pilot 训练评估。
+Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前已补上第一批 4 个 PARSEC 100k 真实 trace，并完成 `dram_capacity=64` 的 100k pilot 训练评估。pilot 已验证真实 trace pipeline 能跑通，但 test 段仍然没有触发 eviction，下一轮需要继续降低 DRAM 容量或扩大 trace。
 
 ## 当前状态
 
@@ -29,7 +29,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 2. QMAP 不是所有 workload 都优于 LFU，尤其在 hotset、phasechange、pcrwstress 上 LFU 仍然很强。
 3. mean pooling 比 Q-Former 更稳，且结构更简单、推理开销更低。
 4. 后续论文主线应改为 QMAP-Pool，而不是 QMAP-Full/Q-Former。
-5. 最大短板已从“没有真实 trace”转为“需要在 4 个 PARSEC 100k trace 上完成 pilot 训练评估，并扩到 1M/5M 正式规模”。
+5. 4 个 PARSEC 100k trace 的 `dram_capacity=64` pilot 已跑通，但 test replay 的 `migrations=0`、`decision_count=0`，说明 100k/64 页仍然偏容易；下一步应先试 `dram_capacity=32/16`，再扩到 1M/5M 正式规模。
 ```
 
 ## 结果总览
@@ -47,6 +47,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 | 真实/标准 workload | 4 个 PARSEC 100k 真实 trace 已完成 | `outputs/results/real_trace_stats/summary.md` |
+| 真实 trace 100k pilot | `dram_capacity=64` 已跑通；无 eviction 压力 | `outputs/results/real_pilot/summary.md` |
 
 ## 目录结构
 
@@ -560,6 +561,27 @@ QMAP-Pool
 
 Random 可以先不跑，等正式实验再补。
 
+当前 100k pilot 已完成一次：
+
+```text
+run id: real_pilot_100k_dram64
+workloads: parsec_blackscholes / parsec_canneal / parsec_streamcluster / parsec_dedup
+policies: LRU / Random / LFU / CLOCK / QMAP-Pool
+dram_capacity: 64
+QMAP: mean_pool, epochs=10, batch_size=32
+```
+
+结果摘要：
+
+| Workload | QMAP samples | Test hit rate | NVM writes | Cost | Migrations | Decisions |
+|---|---:|---:|---:|---:|---:|---:|
+| parsec_blackscholes | 47 | 99.50 | 4 | 10074.00 | 0 | 0 |
+| parsec_canneal | 111 | 99.69 | 2 | 10043.00 | 0 | 0 |
+| parsec_streamcluster | 110 | 99.69 | 1 | 10037.00 | 0 | 0 |
+| parsec_dedup | 60 | 99.90 | 7 | 10052.00 | 0 | 0 |
+
+结论：真实 trace pipeline 已经从 processed CSV 跑通到 JSONL、QMAP-Pool 训练和 replay 评估；但 100k test 段在 `dram_capacity=64` 下没有触发策略决策，所有 baseline 与 QMAP-Pool 完全相同。下一轮先试 `dram_capacity=32`，如果 `decision_count` 仍然接近 0，再降到 `16` 或切换到 1M trace。
+
 pilot 输出建议：
 
 ```text
@@ -737,7 +759,7 @@ Step 1. 已完成：冻结 QMAP-Pool 为最终模型，所有新实验统一 mea
 Step 2. 已完成：在 WSL 搭建 PARSEC 环境，第一批固定为 blackscholes/canneal/streamcluster/dedup。
 Step 3. 已完成：写/确认 trace 采集工具，输出 PC,Address,RW；dedup 不稳定时用 ferret 替换。
 Step 4. 已完成前半：4 个 PARSEC 100k raw -> split -> 质量检查已通过；下一步进入 JSONL -> train -> eval。
-Step 5. 已完成 trace 部分：4 个 PARSEC workload 的 100k pilot trace 已齐；下一步跑 100k pilot 训练评估。
+Step 5. 已完成 4 个 PARSEC workload 的 100k pilot trace，并跑通 `dram_capacity=64` 的 100k pilot 训练评估；结果显示 test 段没有 eviction 压力，下一步补 `dram_capacity=32/16` 压力版本。
 Step 6. 选择 3-4 个有代表性的 workload，扩到 1M 或 5M 正式实验。
 Step 7. 跑 LRU/Random/LFU/CLOCK/QMAP-Pool 主表。
 Step 8. 选 1-2 个真实 workload 做 no_rw/no_cost 消融。

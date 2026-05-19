@@ -1,14 +1,13 @@
 # coding=utf-8
-"""Run the QMAP workload suite end to end.
+"""Run the 100k real/PARSEC QMAP pilot end to end.
 
 Pipeline:
 
-  1. build hotset/writeheavy/streaming/phasechange/pcrwstress raw traces
-  2. split each trace into train/valid/test CSV files
-  3. generate QMAP JSONL training samples
-  4. train one QMAP checkpoint per workload
-  5. evaluate LRU / Random / LFU / CLOCK / QMAP on each workload test trace
-  6. write suite-level CSV and Markdown summaries
+  1. normalize and split each raw CSV trace into 80/10/10 train/valid/test
+  2. generate QMAP JSONL training samples from the train split
+  3. train one QMAP-Pool checkpoint per workload
+  4. evaluate LRU / Random / LFU / CLOCK / QMAP-Pool on each test split
+  5. write pilot-level CSV and Markdown summaries
 """
 
 import argparse
@@ -21,8 +20,12 @@ from datetime import datetime
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-DEFAULT_WORKLOADS = ("hotset", "writeheavy", "streaming", "phasechange",
-                     "pcrwstress")
+DEFAULT_WORKLOADS = (
+    "parsec_blackscholes",
+    "parsec_canneal",
+    "parsec_streamcluster",
+    "parsec_dedup",
+)
 DEFAULT_POLICIES = ("lru", "random", "lfu", "clock", "qmap")
 QMAP_MODEL_NAME = "QMAP-Pool"
 QMAP_ABLATION = "mean_pool"
@@ -33,11 +36,16 @@ def path_from_root(*parts):
 
 
 def rel_path(path):
-  return os.path.relpath(path, PROJECT_ROOT).replace(os.sep, "/")
+  return os.path.relpath(os.path.abspath(path), PROJECT_ROOT).replace(
+      os.sep, "/")
+
+
+def split_csv(value):
+  return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def load_json(path):
-  with open(path, "r") as input_file:
+  with open(path, "r", encoding="utf-8") as input_file:
     return json.load(input_file)
 
 
@@ -45,16 +53,20 @@ def display_policy(policy):
   return QMAP_MODEL_NAME if policy == "qmap" else policy.upper()
 
 
+def command_to_text(command):
+  return " ".join(command)
+
+
 def run_command(command, log_path):
   os.makedirs(os.path.dirname(log_path), exist_ok=True)
-  print("[run] {}".format(" ".join(command)), flush=True)
+  print("[run] {}".format(command_to_text(command)), flush=True)
   process = subprocess.run(
       command,
       cwd=PROJECT_ROOT,
       stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT,
       universal_newlines=True)
-  with open(log_path, "w") as log_file:
+  with open(log_path, "w", encoding="utf-8") as log_file:
     log_file.write(process.stdout)
   if process.returncode != 0:
     print(process.stdout)
@@ -62,18 +74,15 @@ def run_command(command, log_path):
   return process.stdout
 
 
-def split_csv(value):
-  return [item.strip() for item in value.split(",") if item.strip()]
-
-
 def build_arg_parser():
   parser = argparse.ArgumentParser(
-      description="Run QMAP across multiple synthetic workloads.")
+      description="Run the 100k real/PARSEC QMAP pilot.")
   parser.add_argument("--workloads", default=",".join(DEFAULT_WORKLOADS),
                       help="Comma-separated workload names.")
   parser.add_argument("--policies", default=",".join(DEFAULT_POLICIES),
                       help="Comma-separated policies to evaluate.")
-  parser.add_argument("--records", type=int, default=20000)
+  parser.add_argument("--limit", type=int, default=100000,
+                      help="Records kept from each raw trace. 0 means all.")
   parser.add_argument("--page_shift", type=int, default=12)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
@@ -82,26 +91,37 @@ def build_arg_parser():
   parser.add_argument("--epochs", type=int, default=10)
   parser.add_argument("--batch_size", type=int, default=32)
   parser.add_argument("--lr", type=float, default=1e-4)
+  parser.add_argument("--write_sensitivity_weight", type=float, default=4.0)
+  parser.add_argument("--migration_cost_weight", type=float, default=2.0)
+  parser.add_argument("--nvm_write_cost", type=float, default=8.0)
+  parser.add_argument("--seed", type=int, default=3136859)
+  parser.add_argument("--random_seed", type=int, default=0)
   parser.add_argument("--device", default=None,
-                      help="cpu, cuda, or omit for qmap_train/qmap_eval auto.")
+                      help="cpu, cuda, or omitted for qmap_train/qmap_eval auto.")
   parser.add_argument("--python", default=sys.executable)
   parser.add_argument("--raw_dir", default=os.path.join("dataset",
                                                         "raw_traces"))
+  parser.add_argument("--raw_pattern", default="{workload}_100k.csv",
+                      help=("Input file pattern under --raw_dir. The token "
+                            "{workload} is replaced by the workload name."))
   parser.add_argument("--processed_dir", default=os.path.join("dataset",
                                                               "processed"))
-  parser.add_argument("--jsonl_dir", default=os.path.join("dataset", "jsonl"))
+  parser.add_argument("--jsonl_dir", default=os.path.join("dataset", "jsonl",
+                                                         "real_pilot"))
   parser.add_argument("--result_dir", default=path_from_root(
-      "outputs", "results", "workload_suite"))
+      "outputs", "results", "real_pilot"))
   parser.add_argument("--checkpoint_dir", default=path_from_root(
-      "outputs", "checkpoints", "workload_suite"))
-  parser.add_argument("--metadata", default=os.path.join(
-      "dataset", "metadata", "workload_manifest.json"))
-  parser.add_argument("--skip_build", action="store_true",
-                      help="Use existing raw/processed workload CSV files.")
+      "outputs", "checkpoints", "real_pilot"))
+  parser.add_argument("--manifest", default=path_from_root(
+      "dataset", "metadata", "real_workload_manifest.json"))
+  parser.add_argument("--stats_dir", default=path_from_root(
+      "outputs", "results", "real_trace_stats"))
+  parser.add_argument("--skip_prepare", action="store_true",
+                      help="Use existing processed train/valid/test CSV files.")
   parser.add_argument("--skip_generate", action="store_true",
-                      help="Use existing workload JSONL files.")
+                      help="Use existing real-pilot JSONL files.")
   parser.add_argument("--skip_train", action="store_true",
-                      help="Use existing checkpoints for QMAP evaluation.")
+                      help="Use existing QMAP-Pool checkpoints.")
   parser.add_argument("--run_id", default=None,
                       help="Optional run id recorded in summary metadata.")
   return parser
@@ -112,43 +132,35 @@ def maybe_extend_device(command, device):
     command.extend(["--device", device])
 
 
-def build_workloads(args, workloads, log_dir):
-  if args.skip_build:
-    return
-  command = [
-      args.python, "scripts/build_workload_suite.py",
-      "--records", str(args.records),
-      "--page_shift", str(args.page_shift),
-      "--raw_dir", args.raw_dir,
-      "--processed_dir", args.processed_dir,
-      "--metadata", args.metadata,
-      "--python", args.python,
-      "--workloads",
-  ] + workloads
-  run_command(command, os.path.join(log_dir, "build_workloads.log"))
-
-
 def check_qmap_dependency(args, log_dir):
   command = [args.python, "-c", "import torch; print(torch.__version__)"]
   log_path = os.path.join(log_dir, "torch_check.log")
-  os.makedirs(os.path.dirname(log_path), exist_ok=True)
   process = subprocess.run(
       command,
       cwd=PROJECT_ROOT,
       stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT,
       universal_newlines=True)
-  with open(log_path, "w") as log_file:
+  os.makedirs(os.path.dirname(log_path), exist_ok=True)
+  with open(log_path, "w", encoding="utf-8") as log_file:
     log_file.write(process.stdout)
   if process.returncode != 0:
     raise RuntimeError(
         "QMAP training/evaluation requires torch, but `{}` cannot import it. "
-        "Install the project requirements or pass --python to an environment "
-        "with torch. See {} for details.".format(args.python, log_path))
+        "Install requirements or pass --python to an environment with torch. "
+        "See {} for details.".format(args.python, log_path))
 
 
 def workload_paths(args, workload):
+  raw_input = path_from_root(
+      args.raw_dir, args.raw_pattern.format(workload=workload))
+  fallback_input = path_from_root(args.raw_dir, "{}.csv".format(workload))
+  if not os.path.exists(raw_input) and os.path.exists(fallback_input):
+    raw_input = fallback_input
   return {
+      "raw_input": raw_input,
+      "normalized_raw": path_from_root(args.raw_dir,
+                                       "{}.csv".format(workload)),
       "train_trace": path_from_root(
           args.processed_dir, "{}_train.csv".format(workload)),
       "valid_trace": path_from_root(
@@ -166,6 +178,29 @@ def check_required_trace_paths(paths):
   for key in ("train_trace", "valid_trace", "test_trace"):
     if not os.path.exists(paths[key]):
       raise FileNotFoundError("{} not found: {}".format(key, paths[key]))
+
+
+def prepare_workload(args, workload, paths, log_dir):
+  if args.skip_prepare:
+    check_required_trace_paths(paths)
+    return
+  if not os.path.exists(paths["raw_input"]):
+    raise FileNotFoundError("Raw input not found: {}".format(
+        paths["raw_input"]))
+  command = [
+      args.python, "scripts/prepare_real_trace.py",
+      "--input", paths["raw_input"],
+      "--workload", workload,
+      "--raw-output", paths["normalized_raw"],
+      "--processed-dir", path_from_root(args.processed_dir),
+      "--manifest", args.manifest,
+      "--stats-dir", args.stats_dir,
+      "--page-shift", str(args.page_shift),
+      "--limit", str(args.limit),
+  ]
+  run_command(command, os.path.join(log_dir, "{}_prepare.log".format(
+      workload)))
+  check_required_trace_paths(paths)
 
 
 def generate_jsonl(args, workload, paths, log_dir):
@@ -206,6 +241,9 @@ def train_qmap(args, workload, paths, log_dir):
       "--epochs", str(args.epochs),
       "--batch_size", str(args.batch_size),
       "--lr", str(args.lr),
+      "--write_sensitivity_weight", str(args.write_sensitivity_weight),
+      "--migration_cost_weight", str(args.migration_cost_weight),
+      "--seed", str(args.seed),
       "--ablation", QMAP_ABLATION,
   ]
   maybe_extend_device(command, args.device)
@@ -227,6 +265,8 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
       "--page_shift", str(args.page_shift),
       "--history_length", str(args.history_length),
       "--candidate_count", str(args.candidate_count),
+      "--random_seed", str(args.random_seed),
+      "--nvm_write_cost", str(args.nvm_write_cost),
       "--json_output", json_output,
   ]
   if policy == "qmap":
@@ -241,7 +281,9 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
   row["workload"] = workload
   row["checkpoint"] = checkpoint_path if policy == "qmap" else ""
   row["train_trace"] = rel_path(paths["train_trace"])
+  row["valid_trace"] = rel_path(paths["valid_trace"])
   row["test_trace"] = rel_path(paths["test_trace"])
+  row["jsonl"] = rel_path(paths["jsonl"]) if policy == "qmap" else ""
   return row
 
 
@@ -252,15 +294,17 @@ def summary_row(row):
       "hit_rate": row["hit_rate"],
       "hit_rate_percent": row["hit_rate_percent"],
       "nvm_writes": row["nvm_writes"],
-      "cost": row["weighted_access_cost"],
+      "weighted_access_cost": row["weighted_access_cost"],
       "migrations": row["migrations"],
-      "decision_ms": row["avg_decision_time_ms"],
+      "avg_decision_time_ms": row["avg_decision_time_ms"],
       "decision_count": row["decision_count"],
       "total_accesses": row["total_accesses"],
       "misses": row["misses"],
       "nvm_reads": row["nvm_reads"],
       "train_trace": row["train_trace"],
+      "valid_trace": row["valid_trace"],
       "test_trace": row["test_trace"],
+      "jsonl": row["jsonl"],
       "checkpoint": row["checkpoint"],
   }
 
@@ -272,47 +316,102 @@ def write_summary_csv(rows, output_path):
       "hit_rate",
       "hit_rate_percent",
       "nvm_writes",
-      "cost",
+      "weighted_access_cost",
       "migrations",
-      "decision_ms",
+      "avg_decision_time_ms",
       "decision_count",
       "total_accesses",
       "misses",
       "nvm_reads",
       "train_trace",
+      "valid_trace",
       "test_trace",
+      "jsonl",
       "checkpoint",
   ]
-  with open(output_path, "w", newline="") as output_file:
+  with open(output_path, "w", newline="", encoding="utf-8") as output_file:
     writer = csv.DictWriter(output_file, fieldnames=fields)
     writer.writeheader()
     for row in rows:
       writer.writerow({field: row.get(field, "") for field in fields})
 
 
+def manifest_stats(manifest_path, workload):
+  if not os.path.exists(manifest_path):
+    return None
+  manifest = load_json(manifest_path)
+  entry = manifest.get("workloads", {}).get(workload)
+  if not entry:
+    return None
+  return entry.get("stats")
+
+
+def best_qmap_comparison(rows, workload):
+  workload_rows = [row for row in rows if row["workload"] == workload]
+  qmap_row = next((row for row in workload_rows if row["policy"] == "qmap"),
+                  None)
+  baseline_rows = [row for row in workload_rows if row["policy"] != "qmap"]
+  if qmap_row is None or not baseline_rows:
+    return ""
+  best_baseline = min(
+      baseline_rows,
+      key=lambda row: (row["weighted_access_cost"], row["nvm_writes"],
+                       -row["hit_rate_percent"]))
+  base_cost = float(best_baseline["weighted_access_cost"])
+  if base_cost == 0.0:
+    delta = 0.0
+  else:
+    delta = (
+        (qmap_row["weighted_access_cost"] - base_cost) * 100.0 / base_cost)
+  return "{} {:+.2f}%".format(display_policy(best_baseline["policy"]), delta)
+
+
 def write_summary_markdown(rows, output_path, args, workloads, policies):
   run_id = args.run_id or datetime.now().strftime("%Y%m%d_%H%M%S")
-  with open(output_path, "w") as output_file:
-    output_file.write("# QMAP Workload Suite\n\n")
+  with open(output_path, "w", encoding="utf-8") as output_file:
+    output_file.write("# Real 100k PARSEC Pilot\n\n")
     output_file.write("## Setup\n\n")
     output_file.write("- run id: `{}`\n".format(run_id))
     output_file.write("- workloads: `{}`\n".format(", ".join(workloads)))
-    output_file.write("- policies: `{}`\n".format(", ".join(policies)))
-    output_file.write("- records per workload: `{}`\n".format(args.records))
+    output_file.write("- policies: `{}`\n".format(", ".join(
+        display_policy(policy) for policy in policies)))
+    output_file.write("- records per workload: `{}`\n".format(args.limit))
     output_file.write("- split policy: `chronological 80/10/10`\n")
     output_file.write("- DRAM capacity: `{}` pages\n".format(
         args.dram_capacity))
-    output_file.write("- history length: `{}`\n".format(args.history_length))
-    output_file.write("- candidate count: `{}`\n".format(
-        args.candidate_count))
-    output_file.write("- lookahead: `{}`\n".format(args.lookahead))
+    output_file.write("- h/c/d/l: `{}/{}/{}/{}`\n".format(
+        args.history_length, args.candidate_count, args.dram_capacity,
+        args.lookahead))
     output_file.write("- QMAP model: `{}` (`ablation={}`)\n".format(
         QMAP_MODEL_NAME, QMAP_ABLATION))
     output_file.write("- page shift: `{}`\n".format(args.page_shift))
     output_file.write("- epochs: `{}`\n".format(args.epochs))
     output_file.write("- batch size: `{}`\n".format(args.batch_size))
+    output_file.write("- seed: `{}`\n".format(args.seed))
+    output_file.write("- random seed: `{}`\n".format(args.random_seed))
     output_file.write("- device: `{}`\n\n".format(args.device or "auto"))
-    output_file.write("## Results\n\n")
+
+    output_file.write("## Trace Stats\n\n")
+    output_file.write(
+        "| Workload | Records | Unique pages | Unique PCs | Write ratio | "
+        "Reuse ratio |\n")
+    output_file.write("|---|---:|---:|---:|---:|---:|\n")
+    for workload in workloads:
+      stats = manifest_stats(args.manifest, workload)
+      if not stats:
+        output_file.write("| {} |  |  |  |  |  |\n".format(workload))
+        continue
+      output_file.write(
+          "| {workload} | {records} | {pages} | {pcs} | {write:.4f} | "
+          "{reuse:.4f} |\n".format(
+              workload=workload,
+              records=stats["total_accesses"],
+              pages=stats["unique_pages"],
+              pcs=stats["unique_pcs"],
+              write=stats["write_ratio"],
+              reuse=stats["page_reuse_ratio"]))
+
+    output_file.write("\n## Results\n\n")
     output_file.write(
         "| Workload | Policy | Hit rate (%) | NVM writes | Cost | "
         "Migrations | Decision ms |\n")
@@ -325,9 +424,16 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
               policy=display_policy(row["policy"]),
               hit_rate=row["hit_rate_percent"],
               writes=row["nvm_writes"],
-              cost=row["cost"],
+              cost=row["weighted_access_cost"],
               migrations=row["migrations"],
-              decision_ms=row["decision_ms"]))
+              decision_ms=row["avg_decision_time_ms"]))
+
+    output_file.write("\n## QMAP-Pool vs Best Baseline By Cost\n\n")
+    output_file.write("| Workload | Best baseline and QMAP-Pool cost delta |\n")
+    output_file.write("|---|---:|\n")
+    for workload in workloads:
+      output_file.write("| {} | {} |\n".format(
+          workload, best_qmap_comparison(rows, workload)))
 
 
 def main():
@@ -337,9 +443,8 @@ def main():
   unknown_policies = sorted(set(policies) - set(DEFAULT_POLICIES))
   if unknown_policies:
     raise ValueError("Unsupported policies: {}".format(unknown_policies))
-  if "qmap" in policies and args.skip_train:
-    print("[info] --skip_train set; QMAP will use existing checkpoints.",
-          flush=True)
+  if not workloads:
+    raise ValueError("At least one workload is required.")
 
   log_dir = os.path.join(args.result_dir, "logs")
   os.makedirs(args.result_dir, exist_ok=True)
@@ -348,16 +453,14 @@ def main():
   if "qmap" in policies:
     check_qmap_dependency(args, log_dir)
 
-  build_workloads(args, workloads, log_dir)
-
   rows = []
   for workload in workloads:
     print("[workload] {}".format(workload), flush=True)
     paths = workload_paths(args, workload)
-    check_required_trace_paths(paths)
-    generate_jsonl(args, workload, paths, log_dir)
+    prepare_workload(args, workload, paths, log_dir)
     checkpoint_path = None
     if "qmap" in policies:
+      generate_jsonl(args, workload, paths, log_dir)
       checkpoint_path = train_qmap(args, workload, paths, log_dir)
     for policy in policies:
       row = evaluate_policy(

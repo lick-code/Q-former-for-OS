@@ -330,7 +330,7 @@ def main():
       access_features = feature_embedder(
           batch["physical_address"], batch["pc"], batch["rw"])
       z = extractor(access_features)
-      if torch.any(batch["legacy_candidates"]):
+      if (batch["legacy_candidates"] != 0).any():
         eviction_scores = scorer(
             z, batch["candidate_state_features"],
             candidate_mask=batch["candidate_mask"])
