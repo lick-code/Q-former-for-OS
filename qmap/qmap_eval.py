@@ -353,9 +353,13 @@ def replay(args):
         elif args.policy == "clock":
           victim = clock_policy.choose_victim(dram_pages)
         else:
+          # qmap_generator.py includes the current miss in the fixed-length
+          # access history before constructing a training sample. Keep replay
+          # inference aligned with that feature contract.
+          decision_history = (history + [access])[-args.history_length:]
           victim = qmap_policy.choose_victim(
-              dram_pages, history, max_page, access_index, dram_insert_time,
-              dirty_pages)
+              dram_pages, decision_history, max_page, access_index,
+              dram_insert_time, dirty_pages)
           qmap_policy.synchronize()
         stats.decision_time_seconds += time.perf_counter() - decision_start
         stats.decision_count += 1

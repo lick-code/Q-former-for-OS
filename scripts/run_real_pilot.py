@@ -101,6 +101,11 @@ def build_arg_parser():
   parser.add_argument("--python", default=sys.executable)
   parser.add_argument("--raw_dir", default=os.path.join("dataset",
                                                         "raw_traces"))
+  parser.add_argument("--normalized_raw_dir", default=None,
+                      help=("Directory for normalized raw CSV outputs. "
+                            "Defaults to --raw_dir. Use a separate directory "
+                            "for pressure-window reruns to avoid overwriting "
+                            "canonical normalized traces."))
   parser.add_argument("--raw_pattern", default="{workload}_100k.csv",
                       help=("Input file pattern under --raw_dir. The token "
                             "{workload} is replaced by the workload name."))
@@ -157,9 +162,10 @@ def workload_paths(args, workload):
   fallback_input = path_from_root(args.raw_dir, "{}.csv".format(workload))
   if not os.path.exists(raw_input) and os.path.exists(fallback_input):
     raw_input = fallback_input
+  normalized_raw_dir = args.normalized_raw_dir or args.raw_dir
   return {
       "raw_input": raw_input,
-      "normalized_raw": path_from_root(args.raw_dir,
+      "normalized_raw": path_from_root(normalized_raw_dir,
                                        "{}.csv".format(workload)),
       "train_trace": path_from_root(
           args.processed_dir, "{}_train.csv".format(workload)),
