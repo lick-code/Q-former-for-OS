@@ -59,6 +59,9 @@ def build_arg_parser():
   parser.add_argument("--dram_capacity", type=int, default=16)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
+  parser.add_argument("--rank_guard", type=int, default=0,
+                      help=("For QMAP diagnostics, restrict inference to the "
+                            "first N LRU-tail candidates. 0 disables guard."))
   parser.add_argument("--lookahead", type=int, default=256)
   parser.add_argument("--page_shift", type=int, default=12)
   parser.add_argument("--device", default="cpu")
@@ -155,7 +158,8 @@ def qmap_choice_diagnostics(workload, args):
       args.history_length,
       args.candidate_count,
       args.lookahead,
-      "mean_pool")
+      "mean_pool",
+      args.rank_guard)
 
   dram = []
   history = []
@@ -178,7 +182,10 @@ def qmap_choice_diagnostics(workload, args):
         dirty_pages.add(page)
     else:
       if len(dram) >= args.dram_capacity:
-        candidates = list(reversed(dram[-args.candidate_count:]))
+        effective_candidate_count = (
+            min(args.candidate_count, args.rank_guard)
+            if args.rank_guard else args.candidate_count)
+        candidates = list(reversed(dram[-effective_candidate_count:]))
         decision_history = (history + [access])[-args.history_length:]
         victim = policy.choose_victim(
             dram, decision_history, 0, access_index, dram_insert_time,

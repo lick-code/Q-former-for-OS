@@ -53,6 +53,12 @@ def display_policy(policy):
   return QMAP_MODEL_NAME if policy == "qmap" else policy.upper()
 
 
+def display_qmap_model(args):
+  if args.rank_guard:
+    return "{}-Guard".format(QMAP_MODEL_NAME)
+  return QMAP_MODEL_NAME
+
+
 def command_to_text(command):
   return " ".join(command)
 
@@ -92,6 +98,9 @@ def build_arg_parser():
   parser.add_argument("--page_shift", type=int, default=12)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
+  parser.add_argument("--rank_guard", type=int, default=0,
+                      help=("For QMAP eval, restrict inference to the first N "
+                            "LRU-tail candidates. 0 disables the guard."))
   parser.add_argument("--lookahead", type=int, default=256)
   parser.add_argument("--dram_capacity", type=int, default=128)
   parser.add_argument("--epochs", type=int, default=10)
@@ -307,6 +316,8 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
         "--checkpoint", checkpoint_path,
         "--ablation", QMAP_ABLATION,
     ])
+    if args.rank_guard:
+      command.extend(["--rank_guard", str(args.rank_guard)])
     maybe_extend_device(command, args.device)
   run_command(command, os.path.join(log_dir, "{}_{}.log".format(
       workload, policy)))
@@ -317,6 +328,8 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
   row["valid_trace"] = rel_path(paths["valid_trace"])
   row["test_trace"] = rel_path(paths["test_trace"])
   row["jsonl"] = rel_path(paths["jsonl"]) if policy == "qmap" else ""
+  row["candidate_count"] = row.get("candidate_count", "")
+  row["rank_guard"] = row.get("rank_guard", "")
   return row
 
 
@@ -338,6 +351,8 @@ def summary_row(row):
       "valid_trace": row["valid_trace"],
       "test_trace": row["test_trace"],
       "jsonl": row["jsonl"],
+      "candidate_count": row.get("candidate_count", ""),
+      "rank_guard": row.get("rank_guard", ""),
       "checkpoint": row["checkpoint"],
   }
 
@@ -360,6 +375,8 @@ def write_summary_csv(rows, output_path):
       "valid_trace",
       "test_trace",
       "jsonl",
+      "candidate_count",
+      "rank_guard",
       "checkpoint",
   ]
   with open(output_path, "w", newline="", encoding="utf-8") as output_file:
@@ -430,7 +447,9 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
         args.history_length, args.candidate_count, args.dram_capacity,
         args.lookahead))
     output_file.write("- QMAP model: `{}` (`ablation={}`)\n".format(
-        QMAP_MODEL_NAME, QMAP_ABLATION))
+        display_qmap_model(args), QMAP_ABLATION))
+    output_file.write("- QMAP rank guard: `{}`\n".format(
+        args.rank_guard or "disabled"))
     output_file.write("- page shift: `{}`\n".format(args.page_shift))
     output_file.write("- epochs: `{}`\n".format(args.epochs))
     output_file.write("- batch size: `{}`\n".format(args.batch_size))
@@ -489,6 +508,10 @@ def main():
     raise ValueError("--limit must be non-negative.")
   if args.skip < 0:
     raise ValueError("--skip must be non-negative.")
+  if args.rank_guard < 0:
+    raise ValueError("--rank_guard must be non-negative.")
+  if args.rank_guard and args.rank_guard > args.candidate_count:
+    raise ValueError("--rank_guard cannot exceed --candidate_count.")
   workloads = split_csv(args.workloads)
   policies = split_csv(args.policies)
   workload_skips = parse_workload_skips(args.workload_skips)

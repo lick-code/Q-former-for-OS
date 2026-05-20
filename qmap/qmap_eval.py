@@ -56,6 +56,9 @@ def build_arg_parser():
   parser.add_argument("--page_shift", type=int, default=0)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
+  parser.add_argument("--rank_guard", type=int, default=0,
+                      help=("For QMAP, restrict inference to the first N "
+                            "LRU-tail candidates. 0 disables the guard."))
   parser.add_argument("--lookahead", type=int, default=256,
                       help=("Scale used for DRAM residency features. Match "
                             "the generator lookahead used for training."))
@@ -196,9 +199,13 @@ class QMAPPolicy(object):
   """Loads a trained QMAP checkpoint and scores LRU-tail candidates."""
 
   def __init__(self, checkpoint_path, device, history_length, candidate_count,
-               lookahead=256, ablation=None):
+               lookahead=256, ablation=None, rank_guard=0):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
+    if candidate_count <= 0:
+      raise ValueError("candidate_count must be positive.")
+    if rank_guard < 0:
+      raise ValueError("rank_guard must be non-negative.")
 
     # Lazy imports keep LRU/Random evaluation runnable without importing torch.
     import torch
@@ -209,6 +216,8 @@ class QMAPPolicy(object):
     self._device = device
     self._history_length = history_length
     self._candidate_count = candidate_count
+    self._effective_candidate_count = (
+        min(candidate_count, rank_guard) if rank_guard else candidate_count)
     self._lookahead = lookahead
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
@@ -259,7 +268,7 @@ class QMAPPolicy(object):
   def choose_victim(self, dram_pages, history, max_page, access_index,
                     dram_insert_time, dirty_pages):
     candidates, candidate_mask = get_lru_tail_candidates_and_mask(
-        dram_pages, self._candidate_count)
+        dram_pages, self._effective_candidate_count)
     physical_address, pc, rw = apply_history_ablation(
         *padded_history(history, self._history_length),
         ablation=self._ablation)
@@ -270,7 +279,8 @@ class QMAPPolicy(object):
       if self._page_state_dim >= 4:
         features = build_candidate_state_features(
             candidate, history, residency_duration, candidate in dirty_pages,
-            self._lookahead, rank=rank, candidate_count=self._candidate_count)
+            self._lookahead, rank=rank,
+            candidate_count=self._effective_candidate_count)
       else:
         features = build_candidate_state_features(
             candidate, history, residency_duration, candidate in dirty_pages,
@@ -325,7 +335,8 @@ def replay(args):
         args.history_length,
         args.candidate_count,
         args.lookahead,
-        args.ablation)
+        args.ablation,
+        args.rank_guard)
 
   for access_index, access in enumerate(trace):
     page = access["page"]
@@ -423,6 +434,8 @@ def main():
     if output_dir:
       os.makedirs(output_dir, exist_ok=True)
     metrics = stats.to_dict(args.policy, args.trace_path, args.dram_capacity)
+    metrics["candidate_count"] = args.candidate_count
+    metrics["rank_guard"] = args.rank_guard
     metrics["cost_model"] = {
         "dram_read_cost": args.dram_read_cost,
         "dram_write_cost": args.dram_write_cost,
