@@ -1075,3 +1075,53 @@ Artifacts:
 - `outputs/checkpoints/real_ablation/*/*/qmap_epoch_10.pth`
 - `dataset/jsonl/real_ablation/*/*/*.jsonl`
 - Runner: `scripts/run_real_ablation.py`
+
+## Stage 7: Seed stability conclusion
+
+Stage 7 answers: is the QMAP-Pool result just an accidental training-seed outcome?
+
+Scope:
+
+- `streamcluster_pressure`: strongest positive real workload case.
+- `blackscholes`: standard 1M split positive case.
+- `canneal`: negative / robustness-boundary case.
+- Seeds: `3136859`, `42`, `2026`.
+- Baselines are reused from the existing deterministic or fixed-random-seed runs. Only QMAP-Pool is retrained for each seed.
+
+Per-seed results:
+
+| workload | seed | QMAP cost | best baseline cost | delta | migrations | writes |
+|---|---:|---:|---:|---:|---:|---:|
+| streamcluster_pressure | 3136859 | 264501.00 | 301767.00 | -12.35% | 5541 | 589 |
+| streamcluster_pressure | 42 | 270304.00 | 301767.00 | -10.43% | 6068 | 590 |
+| streamcluster_pressure | 2026 | 265585.00 | 301767.00 | -11.99% | 5639 | 590 |
+| blackscholes | 3136859 | 105983.00 | 106952.00 | -0.91% | 525 | 32 |
+| blackscholes | 42 | 104707.00 | 106952.00 | -2.10% | 409 | 32 |
+| blackscholes | 2026 | 105002.00 | 106952.00 | -1.82% | 438 | 28 |
+| canneal | 3136859 | 150559.00 | 126178.00 | +19.32% | 4567 | 51 |
+| canneal | 42 | 152154.00 | 126178.00 | +20.59% | 4718 | 40 |
+| canneal | 2026 | 147212.00 | 126178.00 | +16.67% | 4260 | 56 |
+
+Stability summary:
+
+| workload | mean delta | std delta | min/max delta | conclusion |
+|---|---:|---:|---:|---|
+| streamcluster_pressure | -11.59% | 0.83% | -12.35% / -10.43% | Stable positive. All seeds beat the best baseline. |
+| blackscholes | -1.61% | 0.51% | -2.10% / -0.91% | Stable positive. All seeds beat the best baseline. |
+| canneal | +18.86% | 1.63% | +16.67% / +20.59% | Stable negative boundary. All seeds are worse than the best baseline. |
+
+Interpretation:
+
+- The strong `streamcluster_pressure` result is not a seed accident. All three retrainings remain clearly better than the best baseline, with a narrow delta range.
+- The smaller `blackscholes` gain is also not a seed accident. The improvement is modest, but every seed still beats LFU.
+- The `canneal` failure is robust rather than noise. QMAP-Pool consistently over-migrates and loses to LRU across all seeds.
+- No further seed-stability runs are needed for the current story. The result supports a balanced claim: QMAP-Pool has stable wins on the selected positive workloads, and the known canneal boundary is also stable.
+
+Artifacts:
+
+- `outputs/results/seed_stability/summary.md`
+- `outputs/results/seed_stability/summary.csv`
+- `outputs/results/seed_stability/seed_results.csv`
+- `outputs/results/seed_stability/*/seed_*/qmap.json`
+- `outputs/checkpoints/seed_stability/*/seed_*/qmap_epoch_10.pth`
+- Runner: `scripts/run_seed_stability.py`
