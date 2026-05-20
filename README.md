@@ -648,6 +648,21 @@ ablation = mean_pool
 policies = LRU / Random / LFU / CLOCK / QMAP-Pool
 ```
 
+当前阶段 5 口径决策：
+
+```text
+正式主表仍使用 QMAP-Pool c8，也就是 rank_guard disabled。
+QMAP-Pool-Guard / rank_guard=2 只作为诊断和附表，不作为统一主口径。
+```
+
+原因：
+
+```text
+rank_guard=2 能缓解 canneal 的 MRU-ish 误驱逐，但会明显伤害 blackscholes 和 streamcluster pressure window。
+统一改成 Guard 后，blackscholes 从 -0.91% 变成 +3.41%，streamcluster pressure 从 -12.35% 降到 -2.36%。
+因此 Guard 不是当前阶段 5 的正式策略，只用于解释 canneal 的失败原因和候选 rank 敏感性。
+```
+
 正式 trace 规模建议：
 
 ```text
@@ -669,6 +684,52 @@ dedup 注意：
   默认 chronological split 在 100k 下 test 段没有 eviction；
   1M/5M 时也必须先检查 test 段 decision_count；
   如果 decision_count 仍然太低，就用 pressure-aware window，避免把无压力结果写进主表。
+```
+
+当前 1M 主结果状态：
+
+```text
+结果目录：
+  outputs/results/real_workload_suite/1m/
+  outputs/results/real_workload_suite_pressure/selected/
+  outputs/results/real_workload_suite_guard/
+
+可进主表：
+  parsec_blackscholes 1M standard, QMAP-Pool c8:
+    QMAP vs best baseline = -0.91%
+    结论：有效正结果。
+
+  parsec_streamcluster pressure window, QMAP-Pool c8:
+    QMAP vs best baseline = -12.35%
+    结论：最强真实 workload 正结果。
+
+需要诊断或降级：
+  parsec_canneal 1M standard, QMAP-Pool c8:
+    QMAP vs LRU = +19.32%
+    迁移次数 4567 vs LRU 2350。
+    结论：负结果/诊断案例，不强行改统一口径。
+
+  parsec_dedup pressure window:
+    QMAP 与 LRU 持平，decision_count 只有 87。
+    结论：弱压力 trace，只能说明不差，不能证明优势。
+
+不能用作策略比较：
+  parsec_streamcluster standard split:
+    test 段 decision_count=0。
+    已用 pressure window 结果替代。
+
+  outputs/results/real_workload_suite/5m/:
+    当前仍是旧的 100k 回退结果，不是正式 5M。
+```
+
+canneal 诊断结论：
+
+```text
+outputs/results/real_workload_suite/1m/canneal_epoch_candidate_sweep/
+
+c8 全 epoch 都差，说明不是 epoch 10 单点过拟合。
+eval candidate_count=2 可以把 canneal 从 +19.32% 改善到约 -0.85%，说明问题来自 c8 下 QMAP 过度选择靠近 MRU 的 rank。
+但 c2 / rank_guard=2 会伤害 blackscholes 和 streamcluster pressure，所以不作为统一主口径。
 ```
 
 1M 主实验命令模板：
@@ -852,12 +913,13 @@ Step 2. 已完成：在 WSL 搭建 PARSEC 环境，第一批固定为 blackschol
 Step 3. 已完成：写/确认 trace 采集工具，输出 PC,Address,RW；dedup 不稳定时用 ferret 替换。
 Step 4. 已完成：4 个 PARSEC 100k raw -> split -> 质量检查已通过。
 Step 5. 已完成：阶段 4 100k pilot 已收敛到 `dram_capacity=16, candidate_count=8, lookahead=256`；canneal/streamcluster 上 QMAP-Pool 优于最佳 baseline，blackscholes 略差，dedup 需要 pressure window。
-Step 6. 下一步：按 c8/rankfix 口径采集并运行 1M 正式实验。
-Step 7. 1M 稳定后扩到 5M 正式实验。
-Step 8. 跑 LRU/Random/LFU/CLOCK/QMAP-Pool 主表。
-Step 9. 选 1-2 个真实 workload 做 no_rw/no_cost 消融。
-Step 10. 对关键结果做 3 seed 验证。
-Step 11. 汇总论文表格和图。
+Step 6. 已完成：真实 1M trace 已采集，1M standard split 主实验已跑完。
+Step 7. 已完成：streamcluster pressure window 已补，QMAP-Pool c8 有 -12.35% cost 改善。
+Step 8. 已完成：canneal epoch/candidate sweep 已补，确认 c8 负结果来自 rank 偏置；rank_guard=2 不作为统一主口径。
+Step 9. 下一步：把 1M 主表按 current status 固化，blackscholes 和 streamcluster pressure 作为正结果，canneal 作为负例诊断，dedup 标注 low-pressure tie。
+Step 10. 下一步：只选关键 workload 做必要消融，优先 streamcluster pressure 和 blackscholes；canneal 只做诊断附表。
+Step 11. 下一步：做多 seed 验证，优先 streamcluster pressure、blackscholes，以及 canneal 负例。
+Step 12. 暂缓：正式 5M。只有在 1M 主表、消融和多 seed 写法稳定后，再重新采真实 5M 并运行；当前 5M 目录不是有效 5M。
 ```
 
 ## 并行执行建议
