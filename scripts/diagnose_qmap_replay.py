@@ -52,6 +52,9 @@ def build_arg_parser():
       "outputs", "results", "real_pilot_dram16"))
   parser.add_argument("--checkpoint_dir", default=path_from_root(
       "outputs", "checkpoints", "real_pilot_dram16"))
+  parser.add_argument("--processed_dir", default=path_from_root(
+      "dataset", "processed"),
+                      help="Directory containing <workload>_test.csv files.")
   parser.add_argument("--workloads", default=",".join(DEFAULT_WORKLOADS))
   parser.add_argument("--dram_capacity", type=int, default=16)
   parser.add_argument("--history_length", type=int, default=10)
@@ -136,8 +139,8 @@ def qmap_choice_diagnostics(workload, args):
   except ImportError as error:
     return {"error": "torch/QMAP import unavailable: {}".format(error)}
 
-  trace_path = path_from_root(
-      "dataset", "processed", "{}_test.csv".format(workload))
+  trace_path = os.path.join(
+      args.processed_dir, "{}_test.csv".format(workload))
   checkpoint_path = os.path.join(
       args.checkpoint_dir, workload, "qmap_epoch_10.pth")
   if not os.path.exists(trace_path):
