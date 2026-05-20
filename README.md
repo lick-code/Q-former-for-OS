@@ -8,7 +8,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer
 ```
 
-Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前已补上第一批 4 个 PARSEC 100k 真实 trace，并完成 `dram_capacity=64` 的 100k pilot 训练评估。pilot 已验证真实 trace pipeline 能跑通，但 test 段仍然没有触发 eviction，下一轮需要继续降低 DRAM 容量或扩大 trace。
+Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前已完成第一批 4 个 PARSEC 100k 真实 trace 的阶段 4 pilot：`dram_capacity=16`、`candidate_count=8`、`lookahead=256`、QMAP-Pool mean_pool。该配置已经能触发真实 eviction，并且修正了早期 `candidate_count=64` 下 QMAP 过度选择 MRU 页导致迁移次数过多的问题。下一阶段应进入 1M/5M 规模的正式真实 workload 实验。
 
 ## 当前状态
 
@@ -29,7 +29,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 2. QMAP 不是所有 workload 都优于 LFU，尤其在 hotset、phasechange、pcrwstress 上 LFU 仍然很强。
 3. mean pooling 比 Q-Former 更稳，且结构更简单、推理开销更低。
 4. 后续论文主线应改为 QMAP-Pool，而不是 QMAP-Full/Q-Former。
-5. 4 个 PARSEC 100k trace 的 `dram_capacity=64` pilot 已跑通，但 test replay 的 `migrations=0`、`decision_count=0`，说明 100k/64 页仍然偏容易；下一步应先试 `dram_capacity=32/16`，再扩到 1M/5M 正式规模。
+5. 4 个 PARSEC 100k trace 的阶段 4 pilot 已完成；最终采用 `dram_capacity=16`、`candidate_count=8`、`lookahead=256`。blackscholes 略差于 LRU，canneal 和 streamcluster 优于最佳 baseline，dedup 需要压力窗口才有可比性。
 ```
 
 ## 结果总览
@@ -47,7 +47,8 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 | 真实/标准 workload | 4 个 PARSEC 100k 真实 trace 已完成 | `outputs/results/real_trace_stats/summary.md` |
-| 真实 trace 100k pilot | `dram_capacity=64` 已跑通；无 eviction 压力 | `outputs/results/real_pilot/summary.md` |
+| 真实 trace 100k pilot | 阶段 4 已完成；最终口径为 `dram_capacity=16`、`candidate_count=8`、QMAP-Pool mean_pool | `outputs/results/real_pilot_dram16_c8_rankfix/summary.md` |
+| dedup pressure pilot | 默认 dedup split 无 eviction，已补 50k pressure window | `outputs/results/real_pilot_dedup_pressure_c8_rankfix/summary.md` |
 
 ## 目录结构
 
@@ -73,6 +74,8 @@ scripts/
   run_qmap_parameter_sensitivity.py    # 参数敏感性实验
   run_qmap_ablation.py                 # 消融实验
   run_qmap_encoder_depth_comparison.py # mean_pool 下 encoder 层数对照
+  run_real_pilot.py                    # 真实/PARSEC trace 的 split -> JSONL -> train -> eval -> summary 统一入口
+  diagnose_qmap_replay.py              # 真实 trace replay 诊断和 dedup pressure window 扫描
 
 dataset/
   raw_traces/                   # 原始 traces，后续真实 trace 也放这里
@@ -137,10 +140,10 @@ Encoder 2/3 层 sweep
 
 ```text
 history_length = 10
-candidate_count = 64
+candidate_count = 8
 lookahead = 256
-dram_capacity = 128
-epochs = 10 或 20
+dram_capacity = 16
+epochs = 10
 batch_size = 32
 model = QMAP-Pool
 ablation = mean_pool
@@ -541,102 +544,190 @@ outputs/results/real_trace_stats/summary.md
 
 ### 阶段 4：小规模 pilot 实验
 
-目标：先确认真实数据 pipeline 能跑通，不追求最终大规模。
+状态：已完成，可以进入阶段 5。
 
-建议每个 workload 先截取：
+目标：确认真实数据 pipeline 能跑通，并找到能产生有效 eviction 压力的真实 trace 配置。
+
+最终采用的 pilot 口径：
 
 ```text
-100k accesses
-chronological split: 80% train / 10% valid / 10% test
+records = 100k
+chronological split = 80% train / 10% valid / 10% test
+history_length = 10
+candidate_count = 8
+dram_capacity = 16
+lookahead = 256
+epochs = 10
+model = QMAP-Pool
+ablation = mean_pool
+policies = LRU / Random / LFU / CLOCK / QMAP-Pool
 ```
 
-先跑这几个策略：
+阶段 4 过程中排除的旧口径：
 
 ```text
-LRU
-LFU
-CLOCK
-QMAP-Pool
+dram_capacity = 64:
+  可以验证 pipeline，但 test 段 migrations=0、decision_count=0，没有策略比较价值。
+
+candidate_count = 64:
+  在 dram_capacity=16 下候选集合过宽，QMAP 容易选择过新的 DRAM 页；
+  replay diagnosis 显示 blackscholes 中大量选择 MRU-ish rank，导致迁移次数和 cost 明显上升。
+
+candidate_count = 8 + rank feature:
+  明显缓解 MRU 误驱逐问题，是阶段 5 应继续使用的配置。
 ```
 
-Random 可以先不跑，等正式实验再补。
-
-当前 100k pilot 已完成一次：
+最终 100k pilot 结果：
 
 ```text
-run id: real_pilot_100k_dram64
+run id: real_pilot_100k_dram16_c8_rankfix
 workloads: parsec_blackscholes / parsec_canneal / parsec_streamcluster / parsec_dedup
-policies: LRU / Random / LFU / CLOCK / QMAP-Pool
-dram_capacity: 64
-QMAP: mean_pool, epochs=10, batch_size=32
+result: outputs/results/real_pilot_dram16_c8_rankfix/summary.md
+diagnosis: outputs/results/real_pilot_dram16_c8_rankfix/diagnosis.md
 ```
 
-结果摘要：
+| Workload | Best baseline | Best baseline cost | QMAP-Pool cost | QMAP-Pool vs best | 结论 |
+|---|---|---:|---:|---:|---|
+| parsec_blackscholes | LRU | 11023.00 | 11159.00 | +1.23% | QMAP 略差，主要成本来自额外迁移 |
+| parsec_canneal | LFU | 14574.00 | 14398.00 | -1.21% | QMAP 优于最佳 baseline |
+| parsec_streamcluster | LFU | 14473.00 | 14260.00 | -1.47% | QMAP 优于最佳 baseline |
+| parsec_dedup | LRU | 10052.00 | 10052.00 | +0.00% | 默认 split 无 eviction，不能作为有效比较 |
 
-| Workload | QMAP samples | Test hit rate | NVM writes | Cost | Migrations | Decisions |
-|---|---:|---:|---:|---:|---:|---:|
-| parsec_blackscholes | 47 | 99.50 | 4 | 10074.00 | 0 | 0 |
-| parsec_canneal | 111 | 99.69 | 2 | 10043.00 | 0 | 0 |
-| parsec_streamcluster | 110 | 99.69 | 1 | 10037.00 | 0 | 0 |
-| parsec_dedup | 60 | 99.90 | 7 | 10052.00 | 0 | 0 |
-
-结论：真实 trace pipeline 已经从 processed CSV 跑通到 JSONL、QMAP-Pool 训练和 replay 评估；但 100k test 段在 `dram_capacity=64` 下没有触发策略决策，所有 baseline 与 QMAP-Pool 完全相同。下一轮先试 `dram_capacity=32`，如果 `decision_count` 仍然接近 0，再降到 `16` 或切换到 1M trace。
-
-pilot 输出建议：
+dedup 额外补了 pressure window：
 
 ```text
-outputs/results/real_pilot/summary.md
-outputs/checkpoints/real_pilot/<workload>/qmap_epoch_10.pth
+run id: real_pilot_dedup_pressure_c8_rankfix
+records = 50k
+result: outputs/results/real_pilot_dedup_pressure_c8_rankfix/summary.md
+```
+
+| Workload | Best baseline | Best baseline cost | QMAP-Pool cost | QMAP-Pool vs best | 结论 |
+|---|---|---:|---:|---:|---|
+| parsec_dedup pressure | CLOCK | 7306.00 | 7366.00 | +0.82% | QMAP 与 LRU 持平，接近 CLOCK |
+
+阶段 4 结论：
+
+```text
+1. 四个 PARSEC workload 都已跑过 100k pilot。
+2. blackscholes / canneal / streamcluster 在 c8/rankfix 配置下都有有效 eviction。
+3. dedup 默认 100k chronological split 的 test 段没有 eviction 压力，必须使用 pressure window 或更大 trace。
+4. QMAP-Pool 在 canneal、streamcluster 上已经超过最佳 baseline；在 blackscholes 上略差；在 dedup pressure 上接近最佳 baseline。
+5. 阶段 5 不应沿用 dram64 或 candidate_count=64，应冻结 c8/rankfix 配置。
 ```
 
 严格依赖关系：
 
 ```text
-pilot 通过后再跑 full-scale。
+阶段 5 必须基于阶段 4 最终口径：
+dram_capacity=16, candidate_count=8, lookahead=256, QMAP-Pool mean_pool。
 ```
 
 可以并行：
 
 ```text
-不同 workload 的 pilot 可以并行；
-同一 workload 内 QMAP-Pool 训练和 QMAP-Pool 评估串行；
-baselines 的 replay 可以和 QMAP 训练并行，因为 baselines 不依赖 checkpoint。
+不同 workload 的 1M/5M trace 采集可以并行；
+不同 workload 的 QMAP-Pool 训练可以并行；
+baselines replay 可以和 QMAP-Pool 训练并行。
 ```
 
 ### 阶段 5：正式真实数据实验
 
-目标：把论文主表补完整。
+目标：把论文主表补完整，并验证阶段 4 的结论能否在 1M/5M 规模上保持。
 
-正式实验策略：
-
-```text
-LRU
-Random
-LFU
-CLOCK
-QMAP-Pool
-```
-
-如果时间允许，再加：
+阶段 5 固定口径：
 
 ```text
-QMAP-Full 仅作为历史对照，可选，不作为主线。
+history_length = 10
+candidate_count = 8
+dram_capacity = 16
+lookahead = 256
+epochs = 10
+batch_size = 32
+model = QMAP-Pool
+ablation = mean_pool
+policies = LRU / Random / LFU / CLOCK / QMAP-Pool
 ```
 
 正式 trace 规模建议：
 
 ```text
-每个 workload 1M 到 5M accesses。
-如果服务器时间紧，先用 1M。
-如果 1M 结果稳定，再扩到 5M。
+第一轮：每个 workload 1M accesses。
+第二轮：如果 1M 结果稳定，再扩到 5M accesses。
+不要直接从 100k 跳到所有 workload 的 5M，否则排错成本太高。
+```
+
+阶段 5 workload 安排：
+
+```text
+必须跑：
+  parsec_blackscholes
+  parsec_canneal
+  parsec_streamcluster
+  parsec_dedup pressure window
+
+dedup 注意：
+  默认 chronological split 在 100k 下 test 段没有 eviction；
+  1M/5M 时也必须先检查 test 段 decision_count；
+  如果 decision_count 仍然太低，就用 pressure-aware window，避免把无压力结果写进主表。
+```
+
+1M 主实验命令模板：
+
+```bash
+python scripts/run_real_pilot.py \
+  --device cuda \
+  --limit 1000000 \
+  --raw_pattern "{workload}_1m.csv" \
+  --dram_capacity 16 \
+  --candidate_count 8 \
+  --lookahead 256 \
+  --epochs 10 \
+  --run_id real_workload_1m_c8_rankfix \
+  --result_dir outputs/results/real_workload_1m_c8_rankfix \
+  --checkpoint_dir outputs/checkpoints/real_workload_1m_c8_rankfix \
+  --jsonl_dir dataset/jsonl/real_workload_1m_c8_rankfix \
+  --normalized_raw_dir dataset/raw_traces/real_workload_1m_c8_rankfix
+```
+
+dedup pressure 1M 建议单独跑，避免覆盖默认 dedup 输出：
+
+```bash
+python scripts/run_real_pilot.py \
+  --workloads parsec_dedup \
+  --device cuda \
+  --limit 1000000 \
+  --raw_pattern "parsec_dedup_1m.csv" \
+  --dram_capacity 16 \
+  --candidate_count 8 \
+  --lookahead 256 \
+  --epochs 10 \
+  --run_id real_dedup_pressure_1m_c8_rankfix \
+  --normalized_raw_dir dataset/raw_traces/real_dedup_pressure_1m_c8_rankfix \
+  --processed_dir dataset/processed/real_dedup_pressure_1m_c8_rankfix \
+  --jsonl_dir dataset/jsonl/real_dedup_pressure_1m_c8_rankfix \
+  --result_dir outputs/results/real_dedup_pressure_1m_c8_rankfix \
+  --checkpoint_dir outputs/checkpoints/real_dedup_pressure_1m_c8_rankfix
+```
+
+每轮正式实验后必须检查：
+
+```text
+1. summary.md 中每个 workload 的 Migrations / Decision ms / QMAP-Pool vs best baseline。
+2. diagnosis.md 中 QMAP 是否再次大量选择过新的候选页。
+3. dedup 的 decision_count 是否足够；如果接近 0，该结果只能说明 workload 太容易，不能比较策略。
+4. QMAP-Pool 的 avg decision time；当前 100k pilot 中 QMAP 是毫秒级，baseline 是微秒级，论文里要作为 overhead 报告。
 ```
 
 输出建议：
 
 ```text
-outputs/results/real_workload_suite/summary.md
-outputs/results/real_workload_suite/<workload>/*.json
-outputs/checkpoints/real_workload_suite/<workload>/qmap_epoch_10.pth
+outputs/results/real_workload_1m_c8_rankfix/summary.md
+outputs/results/real_workload_1m_c8_rankfix/<workload>/*.json
+outputs/checkpoints/real_workload_1m_c8_rankfix/<workload>/qmap_epoch_10.pth
+
+outputs/results/real_workload_5m_c8_rankfix/summary.md
+outputs/results/real_workload_5m_c8_rankfix/<workload>/*.json
+outputs/checkpoints/real_workload_5m_c8_rankfix/<workload>/qmap_epoch_10.pth
 ```
 
 主表要报告：
@@ -647,12 +738,13 @@ NVM writes
 weighted access cost
 migration count
 avg decision time
+QMAP-Pool vs best baseline cost delta
 ```
 
 严格依赖关系：
 
 ```text
-真实 trace pilot 成功 -> 正式规模 trace -> 正式训练和评估 -> 汇总表格。
+1M trace 采集和质量检查 -> 1M 主实验 -> 诊断确认有效 -> 5M 扩展 -> 消融和多 seed。
 ```
 
 可以并行：
@@ -758,13 +850,14 @@ outputs/results/seed_stability/summary.md
 Step 1. 已完成：冻结 QMAP-Pool 为最终模型，所有新实验统一 mean_pool。
 Step 2. 已完成：在 WSL 搭建 PARSEC 环境，第一批固定为 blackscholes/canneal/streamcluster/dedup。
 Step 3. 已完成：写/确认 trace 采集工具，输出 PC,Address,RW；dedup 不稳定时用 ferret 替换。
-Step 4. 已完成前半：4 个 PARSEC 100k raw -> split -> 质量检查已通过；下一步进入 JSONL -> train -> eval。
-Step 5. 已完成 4 个 PARSEC workload 的 100k pilot trace，并跑通 `dram_capacity=64` 的 100k pilot 训练评估；结果显示 test 段没有 eviction 压力，下一步补 `dram_capacity=32/16` 压力版本。
-Step 6. 选择 3-4 个有代表性的 workload，扩到 1M 或 5M 正式实验。
-Step 7. 跑 LRU/Random/LFU/CLOCK/QMAP-Pool 主表。
-Step 8. 选 1-2 个真实 workload 做 no_rw/no_cost 消融。
-Step 9. 对关键结果做 3 seed 验证。
-Step 10. 汇总论文表格和图。
+Step 4. 已完成：4 个 PARSEC 100k raw -> split -> 质量检查已通过。
+Step 5. 已完成：阶段 4 100k pilot 已收敛到 `dram_capacity=16, candidate_count=8, lookahead=256`；canneal/streamcluster 上 QMAP-Pool 优于最佳 baseline，blackscholes 略差，dedup 需要 pressure window。
+Step 6. 下一步：按 c8/rankfix 口径采集并运行 1M 正式实验。
+Step 7. 1M 稳定后扩到 5M 正式实验。
+Step 8. 跑 LRU/Random/LFU/CLOCK/QMAP-Pool 主表。
+Step 9. 选 1-2 个真实 workload 做 no_rw/no_cost 消融。
+Step 10. 对关键结果做 3 seed 验证。
+Step 11. 汇总论文表格和图。
 ```
 
 ## 并行执行建议
