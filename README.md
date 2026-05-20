@@ -8,7 +8,7 @@ QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。�
 QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer
 ```
 
-Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前已完成第一批 4 个 PARSEC 100k 真实 trace 的阶段 4 pilot：`dram_capacity=16`、`candidate_count=8`、`lookahead=256`、QMAP-Pool mean_pool。该配置已经能触发真实 eviction，并且修正了早期 `candidate_count=64` 下 QMAP 过度选择 MRU 页导致迁移次数过多的问题。下一阶段应进入 1M/5M 规模的正式真实 workload 实验。
+Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前论文实验规模固定为：`1M real trace + pressure window + real ablation + seed stability`。暂不补 5M；如果后续老师要求更大规模，再重新采集真正的 5M trace 后补跑。当前 `outputs/results/real_workload_suite/5m/` 是 100k 回退结果，不能作为论文或文档中的 5M 实验结果。
 
 ## 当前状态
 
@@ -29,7 +29,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 2. QMAP 不是所有 workload 都优于 LFU，尤其在 hotset、phasechange、pcrwstress 上 LFU 仍然很强。
 3. mean pooling 比 Q-Former 更稳，且结构更简单、推理开销更低。
 4. 后续论文主线应改为 QMAP-Pool，而不是 QMAP-Full/Q-Former。
-5. 4 个 PARSEC 100k trace 的阶段 4 pilot 已完成；最终采用 `dram_capacity=16`、`candidate_count=8`、`lookahead=256`。blackscholes 略差于 LRU，canneal 和 streamcluster 优于最佳 baseline，dedup 需要压力窗口才有可比性。
+5. 真实实验主线已经固定为 1M 标准 split、streamcluster/dedup pressure window、真实消融和多 seed。QMAP-Pool 在 streamcluster pressure window 和 blackscholes 上稳定优于最佳 baseline，在 dedup 上基本持平，在 canneal 上稳定失败。
 ```
 
 ## 结果总览
@@ -47,8 +47,12 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 | 真实/标准 workload | 4 个 PARSEC 100k 真实 trace 已完成 | `outputs/results/real_trace_stats/summary.md` |
-| 真实 trace 100k pilot | 阶段 4 已完成；最终口径为 `dram_capacity=16`、`candidate_count=8`、QMAP-Pool mean_pool | `outputs/results/real_pilot_dram16_c8_rankfix/summary.md` |
-| dedup pressure pilot | 默认 dedup split 无 eviction，已补 50k pressure window | `outputs/results/real_pilot_dedup_pressure_c8_rankfix/summary.md` |
+| 真实 trace 100k pilot | 阶段 4 已完成；最终口径为 `dram_capacity=16`、`candidate_count=8`、QMAP-Pool mean_pool | `outputs/results/real_pilot/summary.md` |
+| 真实 trace 1M 主实验 | 阶段 5 的正式主结果；作为论文主表来源 | `outputs/results/real_workload_suite/1m/summary.md` |
+| pressure window 实验 | 阶段 5 的压力窗口补充；streamcluster 是最强真实正结果，dedup 基本持平 | `outputs/results/real_workload_suite_pressure/selected/summary.md` |
+| 真实数据消融 | 阶段 6 已完成；只保留 `QMAP-Pool / no_rw / no_cost` | `outputs/results/real_ablation/summary.md` |
+| 多 seed 稳定性 | 阶段 7 已完成；验证正结果和负例不是 seed 偶然 | `outputs/results/seed_stability/summary.md` |
+| 5M 实验 | 暂缓；当前 5M 目录实际是 100k 回退结果，不进入论文 | `outputs/results/real_workload_suite/5m/` |
 
 ## 目录结构
 
@@ -415,7 +419,7 @@ all splits = 80000 / 10000 / 10000
 schema check = 100000 rows per raw 100k CSV, bad rows = 0
 ```
 
-该质量检查已通过，可以进入阶段 4 的 100k pilot 训练评估。后续正式 PARSEC/YCSB 规模从 100k pilot 扩到 1M/5M。
+该质量检查已通过，可以进入阶段 4 的 100k pilot 训练评估。当前论文正式 PARSEC 规模固定为 1M；5M 作为后续可选扩展，不纳入当前实验主线。
 
 100k pilot 采集命令模板：
 
@@ -625,14 +629,16 @@ dram_capacity=16, candidate_count=8, lookahead=256, QMAP-Pool mean_pool。
 可以并行：
 
 ```text
-不同 workload 的 1M/5M trace 采集可以并行；
+不同 workload 的 1M trace 采集可以并行；如后续补 5M，也按 workload 并行采集；
 不同 workload 的 QMAP-Pool 训练可以并行；
 baselines replay 可以和 QMAP-Pool 训练并行。
 ```
 
 ### 阶段 5：正式真实数据实验
 
-目标：把论文主表补完整，并验证阶段 4 的结论能否在 1M/5M 规模上保持。
+状态：1M 主实验已完成；5M 暂缓。
+
+目标：把论文主表固定在 1M 真实 trace 和 pressure window 上，形成一套可信、可解释、可复现的实验结果。当前不再把 5M 作为必需项；如果后续老师要求，再重新采集真正的 5M trace 后补跑。
 
 阶段 5 固定口径：
 
@@ -663,12 +669,22 @@ rank_guard=2 能缓解 canneal 的 MRU-ish 误驱逐，但会明显伤害 blacks
 因此 Guard 不是当前阶段 5 的正式策略，只用于解释 canneal 的失败原因和候选 rank 敏感性。
 ```
 
-正式 trace 规模建议：
+正式 trace 规模决策：
 
 ```text
-第一轮：每个 workload 1M accesses。
-第二轮：如果 1M 结果稳定，再扩到 5M accesses。
-不要直接从 100k 跳到所有 workload 的 5M，否则排错成本太高。
+论文当前固定使用：
+  1M standard split
+  pressure window
+  real ablation
+  seed stability
+
+暂不使用：
+  5M
+
+原因：
+  当前 1M + pressure window 已经能形成完整实验闭环；
+  5M 目录中的现有结果实际只有 100k 规模，不能进入论文；
+  后续如需补 5M，必须重新采集真正 5M trace，并确认 trace_stats 中 records=5000000。
 ```
 
 阶段 5 workload 安排：
@@ -682,7 +698,7 @@ rank_guard=2 能缓解 canneal 的 MRU-ish 误驱逐，但会明显伤害 blacks
 
 dedup 注意：
   默认 chronological split 在 100k 下 test 段没有 eviction；
-  1M/5M 时也必须先检查 test 段 decision_count；
+  1M 或后续 5M 扩展时也必须先检查 test 段 decision_count；
   如果 decision_count 仍然太低，就用 pressure-aware window，避免把无压力结果写进主表。
 ```
 
@@ -719,7 +735,8 @@ dedup 注意：
     已用 pressure window 结果替代。
 
   outputs/results/real_workload_suite/5m/:
-    当前仍是旧的 100k 回退结果，不是正式 5M。
+    当前仍是旧的 100k 回退结果，不是正式 5M；
+    不进入论文主表、附表或实验结论。
 ```
 
 canneal 诊断结论：
@@ -779,16 +796,15 @@ python scripts/run_real_pilot.py \
 4. QMAP-Pool 的 avg decision time；当前 100k pilot 中 QMAP 是毫秒级，baseline 是微秒级，论文里要作为 overhead 报告。
 ```
 
-输出建议：
+当前论文采用的阶段 5 输出：
 
 ```text
-outputs/results/real_workload_1m_c8_rankfix/summary.md
-outputs/results/real_workload_1m_c8_rankfix/<workload>/*.json
-outputs/checkpoints/real_workload_1m_c8_rankfix/<workload>/qmap_epoch_10.pth
+outputs/results/real_workload_suite/1m/summary.md
+outputs/results/real_workload_suite/1m/<workload>/*.json
+outputs/checkpoints/real_workload_suite/1m/<workload>/qmap_epoch_10.pth
 
-outputs/results/real_workload_5m_c8_rankfix/summary.md
-outputs/results/real_workload_5m_c8_rankfix/<workload>/*.json
-outputs/checkpoints/real_workload_5m_c8_rankfix/<workload>/qmap_epoch_10.pth
+outputs/results/real_workload_suite_pressure/selected/summary.md
+outputs/results/real_workload_suite_pressure/selected/<workload>/*.json
 ```
 
 主表要报告：
@@ -805,7 +821,7 @@ QMAP-Pool vs best baseline cost delta
 严格依赖关系：
 
 ```text
-1M trace 采集和质量检查 -> 1M 主实验 -> 诊断确认有效 -> 5M 扩展 -> 消融和多 seed。
+1M trace 采集和质量检查 -> 1M 主实验 -> pressure window 诊断和补充 -> 消融 -> 多 seed -> 写实验部分。
 ```
 
 可以并行：
@@ -916,10 +932,11 @@ Step 5. 已完成：阶段 4 100k pilot 已收敛到 `dram_capacity=16, candidat
 Step 6. 已完成：真实 1M trace 已采集，1M standard split 主实验已跑完。
 Step 7. 已完成：streamcluster pressure window 已补，QMAP-Pool c8 有 -12.35% cost 改善。
 Step 8. 已完成：canneal epoch/candidate sweep 已补，确认 c8 负结果来自 rank 偏置；rank_guard=2 不作为统一主口径。
-Step 9. 下一步：把 1M 主表按 current status 固化，blackscholes 和 streamcluster pressure 作为正结果，canneal 作为负例诊断，dedup 标注 low-pressure tie。
-Step 10. 下一步：只选关键 workload 做必要消融，优先 streamcluster pressure 和 blackscholes；canneal 只做诊断附表。
-Step 11. 下一步：做多 seed 验证，优先 streamcluster pressure、blackscholes，以及 canneal 负例。
-Step 12. 暂缓：正式 5M。只有在 1M 主表、消融和多 seed 写法稳定后，再重新采真实 5M 并运行；当前 5M 目录不是有效 5M。
+Step 9. 已完成：1M 主表已固化，blackscholes 和 streamcluster pressure 作为正结果，canneal 作为负例诊断，dedup 标注 low-pressure tie。
+Step 10. 已完成：真实数据必要消融已完成，覆盖 streamcluster pressure 和 blackscholes。
+Step 11. 已完成：多 seed 验证已完成，覆盖 streamcluster pressure、blackscholes 和 canneal 负例。
+Step 12. 暂缓：正式 5M。当前论文不补 5M；如后续老师要求，必须重新采集真实 5M 并确认 records=5000000。
+Step 13. 当前下一步：开始写论文实验部分，按“1M 主实验 -> pressure window -> 消融 -> 多 seed -> overhead/局限性”的顺序组织。
 ```
 
 ## 并行执行建议
@@ -945,20 +962,65 @@ Step 12. 暂缓：正式 5M。只有在 1M 主表、消融和多 seed 写法稳�
 
 ## 建议论文最终表格
 
-```text
-Table 1: Synthetic workloads 上 QMAP-Pool vs LRU/Random/LFU/CLOCK
-Table 2: Real/PARSEC workloads 上 QMAP-Pool vs LRU/Random/LFU/CLOCK
-Table 3: Parameter sensitivity
-Table 4: Ablation on representative workloads
-Table 5: Inference overhead
-```
+当前论文实验规模固定为 `1M + pressure window + ablation + seed stability`。表格优先服务论文主线：QMAP-Pool 不是所有 workload 的无条件最优策略，但在有迁移压力和明显相位行为的真实 workload 上能稳定降低 weighted access cost，同时在 canneal 上暴露出候选 rank 敏感性。
 
-如果篇幅有限，保留：
+推荐进入论文正文的表格：
+
+| 表格 | 内容 | 数据来源 | 用途 |
+|---|---|---|---|
+| Table 1 | 1M 真实 trace 统计 | `outputs/results/real_workload_suite/1m/trace_stats/summary.md` | 说明数据规模、unique pages、write ratio、reuse ratio |
+| Table 2 | 1M 标准 split 主实验：LRU / Random / LFU / CLOCK / QMAP-Pool | `outputs/results/real_workload_suite/1m/summary.md` | 论文主表，展示 blackscholes 正结果、canneal 负例、dedup 持平、streamcluster standard split 低压力问题 |
+| Table 3 | pressure window 主实验 | `outputs/results/real_workload_suite_pressure/selected/summary.md` | 作为真实 workload 最强正结果，重点报告 streamcluster pressure 的 `-12.35%` cost delta |
+| Table 4 | 真实数据消融：QMAP-Pool / no_rw / no_cost | `outputs/results/real_ablation/summary.md` | 解释 read/write 特征和 cost-aware 训练是否贡献收益 |
+| Table 5 | 多 seed 稳定性 | `outputs/results/seed_stability/summary.md` | 证明 streamcluster pressure 和 blackscholes 的正结果不是训练 seed 偶然，canneal 负例也稳定 |
+
+推荐进入文档或附录的表格：
+
+| 表格 | 内容 | 数据来源 | 用途 |
+|---|---|---|---|
+| Appendix A | 100k pilot | `outputs/results/real_pilot/summary.md` | 说明如何从 100k pilot 收敛到 `dram_capacity=16, candidate_count=8` |
+| Appendix B | synthetic workload 原型对比 | `outputs/results/workload_suite/summary.md` 和 `outputs/results/workload_suite_pcrwstress/summary.md` | 作为方法原型有效性的补充，不作为最终真实结论 |
+| Appendix C | checkpoint sweep | `outputs/results/checkpoint_sweep/summary.md` | 说明 epoch 10 的选择依据 |
+| Appendix D | 参数敏感性 | `outputs/results/qmap_parameter_sensitivity/summary.md` | 说明 history/candidate/DRAM/lookahead 的影响 |
+| Appendix E | canneal 诊断或 Guard 对照 | `outputs/results/real_workload_suite_guard/` | 解释 canneal 失败原因和 rank_guard 为什么不进入统一主口径 |
+
+不建议进入论文的表格：
+
+| 内容 | 原因 |
+|---|---|
+| `outputs/results/real_workload_suite/5m/` | 当前实际是 100k 回退结果，不是 5M，不能引用 |
+| Q-Former K sweep / Q-Former light/tiny | 已不是论文主线，只保留为历史探索 |
+| Encoder 2/3 层 sweep | 已用于内部定型，不需要占正文篇幅 |
+| 旧的 `QMAP-Full` 命名表 | 容易和当前 `QMAP-Pool` 主线混淆 |
+
+正文实验部分推荐结构：
 
 ```text
-Table 1: Real workload main results
-Table 2: Synthetic workload main results
-Table 3: Ablation + overhead
+1. Experimental Setup
+   - Hybrid DRAM/NVM replay model
+   - Baselines: LRU, Random, LFU, CLOCK
+   - Metrics: hit rate, NVM writes, weighted access cost, migrations, decision overhead
+   - Dataset: PARSEC 1M traces and pressure windows
+
+2. Main Results on 1M Real Traces
+   - 先报告完整 1M 标准 split
+   - 明确说明 streamcluster standard split 几乎无 eviction，因此不能作为有效压力比较
+   - blackscholes 是小幅稳定正结果
+   - canneal 是稳定负例
+
+3. Pressure Window Results
+   - 重点报告 streamcluster pressure window
+   - QMAP-Pool 相比最佳 baseline 降低 weighted access cost 12.35%
+   - dedup pressure window 与 LRU 持平，作为边界案例
+
+4. Ablation Study
+   - streamcluster pressure 上 no_rw 和 no_cost 都变差
+   - blackscholes 上消融差异很小，说明该 workload 机制不强
+
+5. Seed Stability and Overhead
+   - 三个 seed 下 streamcluster pressure 和 blackscholes 都稳定优于 best baseline
+   - canneal 三个 seed 都稳定失败
+   - QMAP-Pool 推理开销明显高于传统策略，需要作为代价讨论
 ```
 
 ## 指标说明
