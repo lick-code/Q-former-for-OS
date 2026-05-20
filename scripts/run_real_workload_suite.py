@@ -56,6 +56,10 @@ def resolve_pattern(pattern, tag, accesses):
   return pattern.replace("{tag}", tag).replace("{accesses}", str(accesses))
 
 
+def raw_input_path(raw_dir, raw_pattern, workload):
+  return path_from_root(raw_dir, raw_pattern.format(workload=workload))
+
+
 def command_to_text(command):
   return " ".join(command)
 
@@ -98,6 +102,8 @@ def build_arg_parser():
   parser.add_argument("--skip_train", action="store_true")
   parser.add_argument("--dry_run", action="store_true",
                       help="Print the child command without running it.")
+  parser.add_argument("--skip_raw_check", action="store_true",
+                      help="Do not verify that every patterned raw trace exists.")
   return parser
 
 
@@ -150,6 +156,21 @@ def copy_tagged_summaries(result_dir, result_root, tag):
               tag, extension)))
 
 
+def check_raw_inputs(args, raw_pattern):
+  missing = []
+  for workload in split_csv(args.workloads):
+    path = raw_input_path(args.raw_dir, raw_pattern, workload)
+    if not os.path.exists(path):
+      missing.append(path)
+  if missing:
+    lines = ["Missing stage 5 raw trace input(s):"]
+    lines.extend("  {}".format(path) for path in missing)
+    lines.append(
+        "Generate or copy the requested *_{} files before rerunning.".format(
+            access_tag(args.accesses)))
+    raise FileNotFoundError("\n".join(lines))
+
+
 def main():
   args = build_arg_parser().parse_args()
   if args.accesses < 0:
@@ -178,6 +199,8 @@ def main():
   run_id = args.run_id or "{}_{}".format(data_root, tag)
   raw_pattern = resolve_pattern(args.raw_pattern, tag, args.accesses)
   workload_skips = build_workload_skips(args)
+  if not args.skip_prepare and not args.skip_raw_check:
+    check_raw_inputs(args, raw_pattern)
 
   command = [
       args.python, "scripts/run_real_pilot.py",

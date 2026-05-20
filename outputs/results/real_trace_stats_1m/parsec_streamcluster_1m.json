@@ -1,0 +1,100 @@
+{
+  "limit": 1000000,
+  "page_shift": 12,
+  "raw_trace": "dataset/raw_traces/parsec_streamcluster_1m_normalized.csv",
+  "skip": 0,
+  "source_trace": "dataset/raw_traces/parsec_streamcluster_1m.csv",
+  "split_policy": "chronological 80/10/10",
+  "splits": {
+    "test": {
+      "file": "dataset/processed/parsec_streamcluster_1m_test.csv",
+      "records": 100000,
+      "stats": {
+        "records": 100000,
+        "unique_pages": 9,
+        "write_ratio": 0.35172
+      }
+    },
+    "train": {
+      "file": "dataset/processed/parsec_streamcluster_1m_train.csv",
+      "records": 800000,
+      "stats": {
+        "records": 800000,
+        "unique_pages": 760,
+        "write_ratio": 0.34891625
+      }
+    },
+    "valid": {
+      "file": "dataset/processed/parsec_streamcluster_1m_valid.csv",
+      "records": 100000,
+      "stats": {
+        "records": 100000,
+        "unique_pages": 10,
+        "write_ratio": 0.35175
+      }
+    }
+  },
+  "stats": {
+    "mean_reuse_distance": 56.91613267376078,
+    "page_reuse_ratio": 0.999233,
+    "read_accesses": 650520,
+    "reuse_events": 999233,
+    "top_pages": [
+      {
+        "accesses": 481131,
+        "page_address": "0x7ffcd4671000",
+        "share": 0.481131
+      },
+      {
+        "accesses": 105871,
+        "page_address": "0x7d41fa21c000",
+        "share": 0.105871
+      },
+      {
+        "accesses": 57373,
+        "page_address": "0x7d41fb03b000",
+        "share": 0.057373
+      },
+      {
+        "accesses": 22434,
+        "page_address": "0x7d41fb1a8000",
+        "share": 0.022434
+      },
+      {
+        "accesses": 22347,
+        "page_address": "0x7d41faa39000",
+        "share": 0.022347
+      },
+      {
+        "accesses": 14710,
+        "page_address": "0x7d41f6dfd000",
+        "share": 0.01471
+      },
+      {
+        "accesses": 13975,
+        "page_address": "0x7d41fb03c000",
+        "share": 0.013975
+      },
+      {
+        "accesses": 11534,
+        "page_address": "0x7d41fa476000",
+        "share": 0.011534
+      },
+      {
+        "accesses": 8068,
+        "page_address": "0x7d41fb1a6000",
+        "share": 0.008068
+      },
+      {
+        "accesses": 6796,
+        "page_address": "0x7d41fa443000",
+        "share": 0.006796
+      }
+    ],
+    "total_accesses": 1000000,
+    "unique_pages": 767,
+    "unique_pcs": 4238,
+    "write_accesses": 349480,
+    "write_ratio": 0.34948
+  }
+}
