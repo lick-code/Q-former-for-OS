@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Run the 100k real/PARSEC QMAP pilot end to end.
+"""Run a real/PARSEC QMAP workload experiment end to end.
 
 Pipeline:
 
@@ -7,7 +7,7 @@ Pipeline:
   2. generate QMAP JSONL training samples from the train split
   3. train one QMAP-Pool checkpoint per workload
   4. evaluate LRU / Random / LFU / CLOCK / QMAP-Pool on each test split
-  5. write pilot-level CSV and Markdown summaries
+  5. write experiment-level CSV and Markdown summaries
 """
 
 import argparse
@@ -76,13 +76,19 @@ def run_command(command, log_path):
 
 def build_arg_parser():
   parser = argparse.ArgumentParser(
-      description="Run the 100k real/PARSEC QMAP pilot.")
+      description="Run a real/PARSEC QMAP workload experiment.")
   parser.add_argument("--workloads", default=",".join(DEFAULT_WORKLOADS),
                       help="Comma-separated workload names.")
   parser.add_argument("--policies", default=",".join(DEFAULT_POLICIES),
                       help="Comma-separated policies to evaluate.")
   parser.add_argument("--limit", type=int, default=100000,
                       help="Records kept from each raw trace. 0 means all.")
+  parser.add_argument("--skip", type=int, default=0,
+                      help="Records skipped before applying --limit.")
+  parser.add_argument("--workload_skips", default="",
+                      help=("Optional comma-separated workload=skip overrides, "
+                            "for pressure-window runs such as "
+                            "parsec_dedup=50000."))
   parser.add_argument("--page_shift", type=int, default=12)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=64)
@@ -137,6 +143,25 @@ def maybe_extend_device(command, device):
     command.extend(["--device", device])
 
 
+def parse_workload_skips(value):
+  skips = {}
+  if not value:
+    return skips
+  for item in split_csv(value):
+    if "=" not in item:
+      raise ValueError(
+          "--workload_skips entries must use workload=skip: {}".format(item))
+    workload, skip_text = item.split("=", 1)
+    workload = workload.strip()
+    if not workload:
+      raise ValueError("Empty workload in --workload_skips.")
+    skip = int(skip_text.strip())
+    if skip < 0:
+      raise ValueError("Skip must be non-negative for {}.".format(workload))
+    skips[workload] = skip
+  return skips
+
+
 def check_qmap_dependency(args, log_dir):
   command = [args.python, "-c", "import torch; print(torch.__version__)"]
   log_path = os.path.join(log_dir, "torch_check.log")
@@ -186,7 +211,7 @@ def check_required_trace_paths(paths):
       raise FileNotFoundError("{} not found: {}".format(key, paths[key]))
 
 
-def prepare_workload(args, workload, paths, log_dir):
+def prepare_workload(args, workload, paths, log_dir, skip):
   if args.skip_prepare:
     check_required_trace_paths(paths)
     return
@@ -203,6 +228,7 @@ def prepare_workload(args, workload, paths, log_dir):
       "--stats-dir", args.stats_dir,
       "--page-shift", str(args.page_shift),
       "--limit", str(args.limit),
+      "--skip", str(skip),
   ]
   run_command(command, os.path.join(log_dir, "{}_prepare.log".format(
       workload)))
@@ -376,13 +402,17 @@ def best_qmap_comparison(rows, workload):
 def write_summary_markdown(rows, output_path, args, workloads, policies):
   run_id = args.run_id or datetime.now().strftime("%Y%m%d_%H%M%S")
   with open(output_path, "w", encoding="utf-8") as output_file:
-    output_file.write("# Real 100k PARSEC Pilot\n\n")
+    output_file.write("# Real/PARSEC QMAP Experiment\n\n")
     output_file.write("## Setup\n\n")
     output_file.write("- run id: `{}`\n".format(run_id))
     output_file.write("- workloads: `{}`\n".format(", ".join(workloads)))
     output_file.write("- policies: `{}`\n".format(", ".join(
         display_policy(policy) for policy in policies)))
     output_file.write("- records per workload: `{}`\n".format(args.limit))
+    output_file.write("- global skip: `{}`\n".format(args.skip))
+    if args.workload_skips:
+      output_file.write("- workload skips: `{}`\n".format(
+          args.workload_skips))
     output_file.write("- split policy: `chronological 80/10/10`\n")
     output_file.write("- DRAM capacity: `{}` pages\n".format(
         args.dram_capacity))
@@ -445,8 +475,13 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
 
 def main():
   args = build_arg_parser().parse_args()
+  if args.limit < 0:
+    raise ValueError("--limit must be non-negative.")
+  if args.skip < 0:
+    raise ValueError("--skip must be non-negative.")
   workloads = split_csv(args.workloads)
   policies = split_csv(args.policies)
+  workload_skips = parse_workload_skips(args.workload_skips)
   unknown_policies = sorted(set(policies) - set(DEFAULT_POLICIES))
   if unknown_policies:
     raise ValueError("Unsupported policies: {}".format(unknown_policies))
@@ -464,7 +499,9 @@ def main():
   for workload in workloads:
     print("[workload] {}".format(workload), flush=True)
     paths = workload_paths(args, workload)
-    prepare_workload(args, workload, paths, log_dir)
+    prepare_workload(
+        args, workload, paths, log_dir,
+        workload_skips.get(workload, args.skip))
     checkpoint_path = None
     if "qmap" in policies:
       generate_jsonl(args, workload, paths, log_dir)
