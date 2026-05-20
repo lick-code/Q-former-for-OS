@@ -1,12 +1,12 @@
 Policy: lru
-Total accesses: 10000
-Hits: 9990
-Misses: 10
-Hit rate: 99.90%
-Migrations: 0
-NVM reads: 3
-NVM writes: 7
-Weighted access cost: 10052.00
-Policy decisions: 0
-Total decision time: 0.000000s
-Avg decision time: 0.000000 ms
+Total accesses: 100000
+Hits: 99946
+Misses: 54
+Hit rate: 99.95%
+Migrations: 38
+NVM reads: 4
+NVM writes: 50
+Weighted access cost: 100734.00
+Policy decisions: 38
+Total decision time: 0.000022s
+Avg decision time: 0.000572 ms

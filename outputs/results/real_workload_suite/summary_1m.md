@@ -22,41 +22,41 @@
 
 | Workload | Records | Unique pages | Unique PCs | Write ratio | Reuse ratio |
 |---|---:|---:|---:|---:|---:|
-| parsec_blackscholes | 100000 | 104 | 4471 | 0.3231 | 0.9990 |
-| parsec_canneal | 100000 | 157 | 1946 | 0.2736 | 0.9984 |
-| parsec_streamcluster | 100000 | 156 | 1941 | 0.2744 | 0.9984 |
-| parsec_dedup | 100000 | 121 | 2678 | 0.3963 | 0.9988 |
+| parsec_blackscholes | 1000000 | 23 | 611 | 0.3468 | 1.0000 |
+| parsec_canneal | 1000000 | 254 | 6821 | 0.2854 | 0.9997 |
+| parsec_streamcluster | 1000000 | 767 | 4238 | 0.3495 | 0.9992 |
+| parsec_dedup | 1000000 | 493 | 34 | 0.5000 | 0.9995 |
 
 ## Results
 
 | Workload | Policy | Hit rate (%) | NVM writes | Cost | Migrations | Decision ms |
 |---|---|---:|---:|---:|---:|---:|
-| parsec_blackscholes | LRU | 98.99 | 12 | 11023.00 | 85 | 0.000306 |
-| parsec_blackscholes | RANDOM | 98.33 | 22 | 11809.00 | 151 | 0.001256 |
-| parsec_blackscholes | LFU | 96.76 | 24 | 13548.00 | 308 | 0.006800 |
-| parsec_blackscholes | CLOCK | 98.87 | 12 | 11155.00 | 97 | 0.001819 |
-| parsec_blackscholes | QMAP-Pool | 98.85 | 9 | 11159.00 | 99 | 8.098019 |
-| parsec_canneal | LRU | 94.17 | 41 | 16499.00 | 567 | 0.000315 |
-| parsec_canneal | RANDOM | 93.78 | 55 | 17012.00 | 606 | 0.001396 |
-| parsec_canneal | LFU | 95.98 | 52 | 14574.00 | 386 | 0.005984 |
-| parsec_canneal | CLOCK | 94.47 | 37 | 16145.00 | 537 | 0.001525 |
-| parsec_canneal | QMAP-Pool | 96.08 | 41 | 14398.00 | 376 | 3.875590 |
-| parsec_streamcluster | LRU | 94.09 | 41 | 16587.00 | 575 | 0.000419 |
-| parsec_streamcluster | RANDOM | 93.73 | 51 | 17043.00 | 611 | 0.001281 |
-| parsec_streamcluster | LFU | 96.05 | 48 | 14473.00 | 379 | 0.006477 |
-| parsec_streamcluster | CLOCK | 94.32 | 32 | 16280.00 | 552 | 0.001629 |
-| parsec_streamcluster | QMAP-Pool | 96.20 | 40 | 14260.00 | 364 | 3.888736 |
-| parsec_dedup | LRU | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
-| parsec_dedup | RANDOM | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
-| parsec_dedup | LFU | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
-| parsec_dedup | CLOCK | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
-| parsec_dedup | QMAP-Pool | 99.90 | 7 | 10052.00 | 0 | 0.000000 |
+| parsec_blackscholes | LRU | 98.89 | 144 | 112958.00 | 1098 | 0.000288 |
+| parsec_blackscholes | RANDOM | 98.66 | 145 | 115505.00 | 1329 | 0.001238 |
+| parsec_blackscholes | LFU | 99.47 | 221 | 106952.00 | 510 | 0.005870 |
+| parsec_blackscholes | CLOCK | 99.09 | 107 | 110437.00 | 889 | 0.002007 |
+| parsec_blackscholes | QMAP-Pool | 99.46 | 32 | 105983.00 | 525 | 3.387825 |
+| parsec_canneal | LRU | 97.63 | 52 | 126178.00 | 2350 | 0.000287 |
+| parsec_canneal | RANDOM | 96.50 | 193 | 139465.00 | 3481 | 0.001163 |
+| parsec_canneal | LFU | 94.69 | 280 | 159919.00 | 5293 | 0.005749 |
+| parsec_canneal | CLOCK | 97.62 | 60 | 126325.00 | 2359 | 0.001727 |
+| parsec_canneal | QMAP-Pool | 95.42 | 51 | 150559.00 | 4567 | 2.401794 |
+| parsec_streamcluster | LRU | 99.99 | 4 | 100033.00 | 0 | 0.000000 |
+| parsec_streamcluster | RANDOM | 99.99 | 4 | 100033.00 | 0 | 0.000000 |
+| parsec_streamcluster | LFU | 99.99 | 4 | 100033.00 | 0 | 0.000000 |
+| parsec_streamcluster | CLOCK | 99.99 | 4 | 100033.00 | 0 | 0.000000 |
+| parsec_streamcluster | QMAP-Pool | 99.99 | 4 | 100033.00 | 0 | 0.000000 |
+| parsec_dedup | LRU | 99.95 | 50 | 100734.00 | 38 | 0.000572 |
+| parsec_dedup | RANDOM | 99.93 | 56 | 100968.00 | 56 | 0.001950 |
+| parsec_dedup | LFU | 99.89 | 106 | 101686.00 | 94 | 0.006607 |
+| parsec_dedup | CLOCK | 99.94 | 51 | 100751.00 | 39 | 0.002321 |
+| parsec_dedup | QMAP-Pool | 99.95 | 50 | 100734.00 | 38 | 18.408344 |
 
 ## QMAP-Pool vs Best Baseline By Cost
 
 | Workload | Best baseline and QMAP-Pool cost delta |
 |---|---:|
-| parsec_blackscholes | LRU +1.23% |
-| parsec_canneal | LFU -1.21% |
-| parsec_streamcluster | LFU -1.47% |
+| parsec_blackscholes | LFU -0.91% |
+| parsec_canneal | LRU +19.32% |
+| parsec_streamcluster | LRU +0.00% |
 | parsec_dedup | LRU +0.00% |

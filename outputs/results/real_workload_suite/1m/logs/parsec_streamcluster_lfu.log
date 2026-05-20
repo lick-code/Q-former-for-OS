@@ -1,12 +1,12 @@
 Policy: lfu
-Total accesses: 10000
-Hits: 9605
-Misses: 395
-Hit rate: 96.05%
-Migrations: 379
-NVM reads: 347
-NVM writes: 48
-Weighted access cost: 14473.00
-Policy decisions: 379
-Total decision time: 0.002455s
-Avg decision time: 0.006477 ms
+Total accesses: 100000
+Hits: 99991
+Misses: 9
+Hit rate: 99.99%
+Migrations: 0
+NVM reads: 5
+NVM writes: 4
+Weighted access cost: 100033.00
+Policy decisions: 0
+Total decision time: 0.000000s
+Avg decision time: 0.000000 ms

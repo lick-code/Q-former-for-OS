@@ -3,98 +3,98 @@
   "page_shift": 12,
   "raw_trace": "dataset/raw_traces/real_workload_suite/1m/parsec_streamcluster.csv",
   "skip": 0,
-  "source_trace": "dataset/raw_traces/parsec_streamcluster.csv",
+  "source_trace": "dataset/raw_traces/parsec_streamcluster_1m.csv",
   "split_policy": "chronological 80/10/10",
   "splits": {
     "test": {
       "file": "dataset/processed/real_workload_suite/1m/parsec_streamcluster_test.csv",
-      "records": 10000,
+      "records": 100000,
       "stats": {
-        "records": 10000,
-        "unique_pages": 31,
-        "write_ratio": 0.3188
+        "records": 100000,
+        "unique_pages": 9,
+        "write_ratio": 0.35172
       }
     },
     "train": {
       "file": "dataset/processed/real_workload_suite/1m/parsec_streamcluster_train.csv",
-      "records": 80000,
+      "records": 800000,
       "stats": {
-        "records": 80000,
-        "unique_pages": 155,
-        "write_ratio": 0.268325
+        "records": 800000,
+        "unique_pages": 760,
+        "write_ratio": 0.34891625
       }
     },
     "valid": {
       "file": "dataset/processed/real_workload_suite/1m/parsec_streamcluster_valid.csv",
-      "records": 10000,
+      "records": 100000,
       "stats": {
-        "records": 10000,
-        "unique_pages": 40,
-        "write_ratio": 0.2784
+        "records": 100000,
+        "unique_pages": 10,
+        "write_ratio": 0.35175
       }
     }
   },
   "stats": {
-    "mean_reuse_distance": 39.807159168302555,
-    "page_reuse_ratio": 0.99844,
-    "read_accesses": 72562,
-    "reuse_events": 99844,
+    "mean_reuse_distance": 56.91613267376078,
+    "page_reuse_ratio": 0.999233,
+    "read_accesses": 650520,
+    "reuse_events": 999233,
     "top_pages": [
       {
-        "accesses": 41748,
-        "page_address": "0x7ffce6553000",
-        "share": 0.41748
+        "accesses": 481131,
+        "page_address": "0x7ffcd4671000",
+        "share": 0.481131
       },
       {
-        "accesses": 11272,
-        "page_address": "0x7c52c2566000",
-        "share": 0.11272
+        "accesses": 105871,
+        "page_address": "0x7d41fa21c000",
+        "share": 0.105871
       },
       {
-        "accesses": 3404,
-        "page_address": "0x7c52c2bc8000",
-        "share": 0.03404
+        "accesses": 57373,
+        "page_address": "0x7d41fb03b000",
+        "share": 0.057373
       },
       {
-        "accesses": 2490,
-        "page_address": "0x7ffce6552000",
-        "share": 0.0249
+        "accesses": 22434,
+        "page_address": "0x7d41fb1a8000",
+        "share": 0.022434
       },
       {
-        "accesses": 2395,
-        "page_address": "0x7c52c2567000",
-        "share": 0.02395
+        "accesses": 22347,
+        "page_address": "0x7d41faa39000",
+        "share": 0.022347
       },
       {
-        "accesses": 2235,
-        "page_address": "0x7c52c1e2e000",
-        "share": 0.02235
+        "accesses": 14710,
+        "page_address": "0x7d41f6dfd000",
+        "share": 0.01471
       },
       {
-        "accesses": 1764,
-        "page_address": "0x7c52c2bc7000",
-        "share": 0.01764
+        "accesses": 13975,
+        "page_address": "0x7d41fb03c000",
+        "share": 0.013975
       },
       {
-        "accesses": 1418,
-        "page_address": "0x7c52c1a1f000",
-        "share": 0.01418
+        "accesses": 11534,
+        "page_address": "0x7d41fa476000",
+        "share": 0.011534
       },
       {
-        "accesses": 1410,
-        "page_address": "0x7c52c2bc6000",
-        "share": 0.0141
+        "accesses": 8068,
+        "page_address": "0x7d41fb1a6000",
+        "share": 0.008068
       },
       {
-        "accesses": 1347,
-        "page_address": "0x7c52c1e76000",
-        "share": 0.01347
+        "accesses": 6796,
+        "page_address": "0x7d41fa443000",
+        "share": 0.006796
       }
     ],
-    "total_accesses": 100000,
-    "unique_pages": 156,
-    "unique_pcs": 1941,
-    "write_accesses": 27438,
-    "write_ratio": 0.27438
+    "total_accesses": 1000000,
+    "unique_pages": 767,
+    "unique_pcs": 4238,
+    "write_accesses": 349480,
+    "write_ratio": 0.34948
   }
 }

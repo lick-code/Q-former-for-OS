@@ -1,6 +1,6 @@
 QMAP training configuration:
   train_data path: /home/likc/Q-former-for-OS/dataset/jsonl/real_workload_suite/1m/parsec_streamcluster_train.jsonl
-  number of training samples: 2987
+  number of training samples: 28409
   batch_size: 32
   epochs: 10
   learning rate: 0.0001
@@ -9,44 +9,123 @@ QMAP training configuration:
   ablation: mean_pool
   qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
   loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
-Epoch [1/10] iter=1 loss=-0.597863
-Epoch [1/10] avg_loss=-0.613606
+Epoch [1/10] iter=1 loss=-0.583706
+Epoch [1/10] iter=100 loss=-0.609181
+Epoch [1/10] iter=200 loss=-0.665227
+Epoch [1/10] iter=300 loss=-0.721286
+Epoch [1/10] iter=400 loss=-0.782561
+Epoch [1/10] iter=500 loss=-0.749732
+Epoch [1/10] iter=600 loss=-0.791416
+Epoch [1/10] iter=700 loss=-0.765786
+Epoch [1/10] iter=800 loss=-0.772273
+Epoch [1/10] avg_loss=-0.735697
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_1.pth
-Epoch [2/10] iter=95 loss=-0.630061
-Epoch [2/10] iter=100 loss=-0.647190
-Epoch [2/10] avg_loss=-0.684829
+Epoch [2/10] iter=889 loss=-0.782545
+Epoch [2/10] iter=900 loss=-0.782674
+Epoch [2/10] iter=1000 loss=-0.813665
+Epoch [2/10] iter=1100 loss=-0.743905
+Epoch [2/10] iter=1200 loss=-0.766642
+Epoch [2/10] iter=1300 loss=-0.771085
+Epoch [2/10] iter=1400 loss=-0.809455
+Epoch [2/10] iter=1500 loss=-0.819134
+Epoch [2/10] iter=1600 loss=-0.808153
+Epoch [2/10] iter=1700 loss=-0.764763
+Epoch [2/10] avg_loss=-0.784618
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_2.pth
-Epoch [3/10] iter=189 loss=-0.750793
-Epoch [3/10] iter=200 loss=-0.743688
-Epoch [3/10] avg_loss=-0.727106
+Epoch [3/10] iter=1777 loss=-0.776867
+Epoch [3/10] iter=1800 loss=-0.804421
+Epoch [3/10] iter=1900 loss=-0.763439
+Epoch [3/10] iter=2000 loss=-0.805209
+Epoch [3/10] iter=2100 loss=-0.809571
+Epoch [3/10] iter=2200 loss=-0.780162
+Epoch [3/10] iter=2300 loss=-0.774437
+Epoch [3/10] iter=2400 loss=-0.772780
+Epoch [3/10] iter=2500 loss=-0.783058
+Epoch [3/10] iter=2600 loss=-0.821640
+Epoch [3/10] avg_loss=-0.787602
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_3.pth
-Epoch [4/10] iter=283 loss=-0.752831
-Epoch [4/10] iter=300 loss=-0.758078
-Epoch [4/10] avg_loss=-0.740589
+Epoch [4/10] iter=2665 loss=-0.774837
+Epoch [4/10] iter=2700 loss=-0.757397
+Epoch [4/10] iter=2800 loss=-0.806804
+Epoch [4/10] iter=2900 loss=-0.831525
+Epoch [4/10] iter=3000 loss=-0.764673
+Epoch [4/10] iter=3100 loss=-0.809820
+Epoch [4/10] iter=3200 loss=-0.776623
+Epoch [4/10] iter=3300 loss=-0.736765
+Epoch [4/10] iter=3400 loss=-0.815465
+Epoch [4/10] iter=3500 loss=-0.787394
+Epoch [4/10] avg_loss=-0.789151
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_4.pth
-Epoch [5/10] iter=377 loss=-0.729793
-Epoch [5/10] iter=400 loss=-0.759285
-Epoch [5/10] avg_loss=-0.749544
+Epoch [5/10] iter=3553 loss=-0.809671
+Epoch [5/10] iter=3600 loss=-0.759287
+Epoch [5/10] iter=3700 loss=-0.786603
+Epoch [5/10] iter=3800 loss=-0.830775
+Epoch [5/10] iter=3900 loss=-0.777688
+Epoch [5/10] iter=4000 loss=-0.768964
+Epoch [5/10] iter=4100 loss=-0.776876
+Epoch [5/10] iter=4200 loss=-0.834438
+Epoch [5/10] iter=4300 loss=-0.821714
+Epoch [5/10] iter=4400 loss=-0.834104
+Epoch [5/10] avg_loss=-0.797337
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_5.pth
-Epoch [6/10] iter=471 loss=-0.791517
-Epoch [6/10] iter=500 loss=-0.779278
-Epoch [6/10] avg_loss=-0.761789
+Epoch [6/10] iter=4441 loss=-0.814707
+Epoch [6/10] iter=4500 loss=-0.755916
+Epoch [6/10] iter=4600 loss=-0.749343
+Epoch [6/10] iter=4700 loss=-0.801574
+Epoch [6/10] iter=4800 loss=-0.782856
+Epoch [6/10] iter=4900 loss=-0.795719
+Epoch [6/10] iter=5000 loss=-0.832233
+Epoch [6/10] iter=5100 loss=-0.828794
+Epoch [6/10] iter=5200 loss=-0.826154
+Epoch [6/10] iter=5300 loss=-0.807929
+Epoch [6/10] avg_loss=-0.804934
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_6.pth
-Epoch [7/10] iter=565 loss=-0.784060
-Epoch [7/10] iter=600 loss=-0.796907
-Epoch [7/10] avg_loss=-0.767657
+Epoch [7/10] iter=5329 loss=-0.806837
+Epoch [7/10] iter=5400 loss=-0.795853
+Epoch [7/10] iter=5500 loss=-0.820455
+Epoch [7/10] iter=5600 loss=-0.813323
+Epoch [7/10] iter=5700 loss=-0.813976
+Epoch [7/10] iter=5800 loss=-0.831143
+Epoch [7/10] iter=5900 loss=-0.826356
+Epoch [7/10] iter=6000 loss=-0.809131
+Epoch [7/10] iter=6100 loss=-0.822967
+Epoch [7/10] iter=6200 loss=-0.802736
+Epoch [7/10] avg_loss=-0.806835
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_7.pth
-Epoch [8/10] iter=659 loss=-0.749052
-Epoch [8/10] iter=700 loss=-0.783305
-Epoch [8/10] avg_loss=-0.771324
+Epoch [8/10] iter=6217 loss=-0.769236
+Epoch [8/10] iter=6300 loss=-0.802520
+Epoch [8/10] iter=6400 loss=-0.803801
+Epoch [8/10] iter=6500 loss=-0.801068
+Epoch [8/10] iter=6600 loss=-0.827409
+Epoch [8/10] iter=6700 loss=-0.801728
+Epoch [8/10] iter=6800 loss=-0.771000
+Epoch [8/10] iter=6900 loss=-0.807659
+Epoch [8/10] iter=7000 loss=-0.807388
+Epoch [8/10] iter=7100 loss=-0.785737
+Epoch [8/10] avg_loss=-0.807792
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_8.pth
-Epoch [9/10] iter=753 loss=-0.777961
-Epoch [9/10] iter=800 loss=-0.785380
-Epoch [9/10] avg_loss=-0.773487
+Epoch [9/10] iter=7105 loss=-0.799213
+Epoch [9/10] iter=7200 loss=-0.783579
+Epoch [9/10] iter=7300 loss=-0.828741
+Epoch [9/10] iter=7400 loss=-0.829416
+Epoch [9/10] iter=7500 loss=-0.807094
+Epoch [9/10] iter=7600 loss=-0.824007
+Epoch [9/10] iter=7700 loss=-0.820653
+Epoch [9/10] iter=7800 loss=-0.813187
+Epoch [9/10] iter=7900 loss=-0.793867
+Epoch [9/10] avg_loss=-0.808496
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_9.pth
-Epoch [10/10] iter=847 loss=-0.733377
-Epoch [10/10] iter=900 loss=-0.766166
-Epoch [10/10] avg_loss=-0.776860
+Epoch [10/10] iter=7993 loss=-0.735020
+Epoch [10/10] iter=8000 loss=-0.826500
+Epoch [10/10] iter=8100 loss=-0.747440
+Epoch [10/10] iter=8200 loss=-0.809943
+Epoch [10/10] iter=8300 loss=-0.781648
+Epoch [10/10] iter=8400 loss=-0.829204
+Epoch [10/10] iter=8500 loss=-0.826959
+Epoch [10/10] iter=8600 loss=-0.765091
+Epoch [10/10] iter=8700 loss=-0.768219
+Epoch [10/10] iter=8800 loss=-0.836384
+Epoch [10/10] avg_loss=-0.808971
 Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/real_workload_suite/1m/parsec_streamcluster/qmap_epoch_10.pth
 Training finished.
 /home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
