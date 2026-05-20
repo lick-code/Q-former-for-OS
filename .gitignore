@@ -22,9 +22,7 @@ tools/trace_collectors/**/build/
 *.exe
 
 # Large/local datasets
-*.jsonl
-!test_train_data_with_rw.jsonl
-!train_data.jsonl
+
 
 # OS/editor noise
 .DS_Store
