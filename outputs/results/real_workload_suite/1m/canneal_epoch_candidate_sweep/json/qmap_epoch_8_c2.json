@@ -1,0 +1,24 @@
+{
+  "avg_decision_time_ms": 2.3794205461915836,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 2660,
+  "decision_time_seconds": 6.329258652869612,
+  "dram_capacity": 16,
+  "hit_rate": 0.97324,
+  "hit_rate_percent": 97.324,
+  "hits": 97324,
+  "migrations": 2660,
+  "misses": 2676,
+  "nvm_reads": 2624,
+  "nvm_writes": 52,
+  "policy": "qmap",
+  "total_accesses": 100000,
+  "trace_path": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv",
+  "weighted_access_cost": 129588.0
+}
