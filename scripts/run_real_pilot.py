@@ -401,6 +401,9 @@ def best_qmap_comparison(rows, workload):
 
 def write_summary_markdown(rows, output_path, args, workloads, policies):
   run_id = args.run_id or datetime.now().strftime("%Y%m%d_%H%M%S")
+  test_accesses = {}
+  for row in rows:
+    test_accesses.setdefault(row["workload"], row["total_accesses"])
   with open(output_path, "w", encoding="utf-8") as output_file:
     output_file.write("# Real/PARSEC QMAP Experiment\n\n")
     output_file.write("## Setup\n\n")
@@ -408,7 +411,14 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
     output_file.write("- workloads: `{}`\n".format(", ".join(workloads)))
     output_file.write("- policies: `{}`\n".format(", ".join(
         display_policy(policy) for policy in policies)))
-    output_file.write("- records per workload: `{}`\n".format(args.limit))
+    if args.skip_prepare:
+      output_file.write(
+          "- records per workload: `external processed splits (--skip_prepare)`\n")
+    else:
+      output_file.write("- records per workload: `{}`\n".format(args.limit))
+    output_file.write("- test accesses: `{}`\n".format(", ".join(
+        "{}={}".format(workload, test_accesses.get(workload, ""))
+        for workload in workloads)))
     output_file.write("- global skip: `{}`\n".format(args.skip))
     if args.workload_skips:
       output_file.write("- workload skips: `{}`\n".format(

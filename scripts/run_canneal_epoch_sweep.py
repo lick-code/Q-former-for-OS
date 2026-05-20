@@ -94,7 +94,7 @@ def next_distance(trace, start_index, page):
   return math.inf
 
 
-def victim_diagnostics(trace_path, checkpoint_path, args):
+def victim_diagnostics(trace_path, checkpoint_path, args, candidate_count):
   import torch
   from qmap.qmap_eval import QMAPPolicy
 
@@ -103,7 +103,7 @@ def victim_diagnostics(trace_path, checkpoint_path, args):
       checkpoint_path,
       torch.device(args.device),
       args.history_length,
-      args.candidate_count,
+      candidate_count,
       args.lookahead,
       "mean_pool")
 
@@ -127,7 +127,7 @@ def victim_diagnostics(trace_path, checkpoint_path, args):
         dirty_pages.add(page)
     else:
       if len(dram) >= args.dram_capacity:
-        candidates = list(reversed(dram[-args.candidate_count:]))
+        candidates = list(reversed(dram[-candidate_count:]))
         decision_history = (history + [access])[-args.history_length:]
         victim = policy.choose_victim(
             dram, decision_history, 0, access_index, dram_insert_time,
@@ -215,6 +215,9 @@ def build_arg_parser():
   parser.add_argument("--page_shift", type=int, default=12)
   parser.add_argument("--history_length", type=int, default=10)
   parser.add_argument("--candidate_count", type=int, default=8)
+  parser.add_argument("--eval_candidate_counts", default="8",
+                      help=("Comma-separated candidate counts to use at eval "
+                            "time for QMAP checkpoints, e.g. 1,2,4,8."))
   parser.add_argument("--lookahead", type=int, default=256)
   parser.add_argument("--random_seed", type=int, default=0)
   parser.add_argument("--skip_baselines", action="store_true")
@@ -225,6 +228,7 @@ def build_arg_parser():
 def write_outputs(rows, output_dir):
   fields = [
       "epoch",
+      "eval_candidate_count",
       "policy",
       "weighted_access_cost",
       "hit_rate_percent",
@@ -265,7 +269,7 @@ def write_outputs(rows, output_dir):
       if row["policy"] != "qmap":
         continue
       output_file.write(
-          "| {epoch} | {weighted_access_cost:.2f} | "
+          "| {epoch}/{eval_candidate_count} | {weighted_access_cost:.2f} | "
           "{delta_vs_best_baseline_percent:+.2f}% | {migrations} | "
           "{nvm_writes} | {worse_than_lru} | {chosen_median} | "
           "{lru_median} | {top_ranks} |\n".format(**row))
@@ -297,8 +301,16 @@ def main():
   for row in baseline_rows:
     row = dict(row)
     row["epoch"] = "baseline"
+    row["eval_candidate_count"] = ""
     row["delta_vs_best_baseline_percent"] = 0.0
     rows.append(row)
+
+  eval_candidate_counts = [
+      int(item.strip()) for item in args.eval_candidate_counts.split(",")
+      if item.strip()
+  ]
+  if not eval_candidate_counts:
+    raise ValueError("At least one eval candidate count is required.")
 
   for epoch_text in [item.strip() for item in args.epochs.split(",")
                      if item.strip()]:
@@ -307,18 +319,28 @@ def main():
         args.checkpoint_dir, "qmap_epoch_{}.pth".format(epoch))
     if not os.path.exists(checkpoint_path):
       raise FileNotFoundError(checkpoint_path)
-    row = eval_policy(
-        args, "qmap",
-        os.path.join(json_dir, "qmap_epoch_{}.json".format(epoch)),
-        os.path.join(log_dir, "qmap_epoch_{}.log".format(epoch)),
-        checkpoint_path)
-    row["epoch"] = epoch
-    row["checkpoint"] = checkpoint_path
-    row["delta_vs_best_baseline_percent"] = (
-        (row["weighted_access_cost"] - best_cost) * 100.0 / best_cost)
-    if not args.skip_diagnostics:
-      row.update(victim_diagnostics(args.trace_path, checkpoint_path, args))
-    rows.append(row)
+    original_candidate_count = args.candidate_count
+    for eval_candidate_count in eval_candidate_counts:
+      args.candidate_count = eval_candidate_count
+      row = eval_policy(
+          args, "qmap",
+          os.path.join(
+              json_dir,
+              "qmap_epoch_{}_c{}.json".format(epoch, eval_candidate_count)),
+          os.path.join(
+              log_dir,
+              "qmap_epoch_{}_c{}.log".format(epoch, eval_candidate_count)),
+          checkpoint_path)
+      row["epoch"] = epoch
+      row["eval_candidate_count"] = eval_candidate_count
+      row["checkpoint"] = checkpoint_path
+      row["delta_vs_best_baseline_percent"] = (
+          (row["weighted_access_cost"] - best_cost) * 100.0 / best_cost)
+      if not args.skip_diagnostics:
+        row.update(victim_diagnostics(
+            args.trace_path, checkpoint_path, args, eval_candidate_count))
+      rows.append(row)
+    args.candidate_count = original_candidate_count
 
   csv_path, md_path = write_outputs(rows, args.output_dir)
   print("[done] csv={}".format(csv_path))
