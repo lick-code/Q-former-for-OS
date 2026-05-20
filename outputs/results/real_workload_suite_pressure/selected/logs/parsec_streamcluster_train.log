@@ -1,0 +1,83 @@
+QMAP training configuration:
+  train_data path: /home/likc/Q-former-for-OS/dataset/jsonl/real_workload_suite_pressure/selected/parsec_streamcluster_train.jsonl
+  number of training samples: 12501
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: mean_pool
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.601816
+Epoch [1/10] iter=100 loss=-0.662830
+Epoch [1/10] iter=200 loss=-0.727803
+Epoch [1/10] iter=300 loss=-0.787731
+Epoch [1/10] avg_loss=-0.713143
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_1.pth
+Epoch [2/10] iter=392 loss=-0.763549
+Epoch [2/10] iter=400 loss=-0.780413
+Epoch [2/10] iter=500 loss=-0.761089
+Epoch [2/10] iter=600 loss=-0.797097
+Epoch [2/10] iter=700 loss=-0.795311
+Epoch [2/10] avg_loss=-0.790104
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_2.pth
+Epoch [3/10] iter=783 loss=-0.800796
+Epoch [3/10] iter=800 loss=-0.806145
+Epoch [3/10] iter=900 loss=-0.774527
+Epoch [3/10] iter=1000 loss=-0.812826
+Epoch [3/10] iter=1100 loss=-0.814703
+Epoch [3/10] avg_loss=-0.805158
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_3.pth
+Epoch [4/10] iter=1174 loss=-0.819651
+Epoch [4/10] iter=1200 loss=-0.805056
+Epoch [4/10] iter=1300 loss=-0.819126
+Epoch [4/10] iter=1400 loss=-0.799207
+Epoch [4/10] iter=1500 loss=-0.816567
+Epoch [4/10] avg_loss=-0.809239
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_4.pth
+Epoch [5/10] iter=1565 loss=-0.811942
+Epoch [5/10] iter=1600 loss=-0.798456
+Epoch [5/10] iter=1700 loss=-0.830326
+Epoch [5/10] iter=1800 loss=-0.810367
+Epoch [5/10] iter=1900 loss=-0.817392
+Epoch [5/10] avg_loss=-0.811240
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_5.pth
+Epoch [6/10] iter=1956 loss=-0.815868
+Epoch [6/10] iter=2000 loss=-0.824918
+Epoch [6/10] iter=2100 loss=-0.796182
+Epoch [6/10] iter=2200 loss=-0.815463
+Epoch [6/10] iter=2300 loss=-0.802445
+Epoch [6/10] avg_loss=-0.812339
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_6.pth
+Epoch [7/10] iter=2347 loss=-0.823469
+Epoch [7/10] iter=2400 loss=-0.817934
+Epoch [7/10] iter=2500 loss=-0.822045
+Epoch [7/10] iter=2600 loss=-0.822293
+Epoch [7/10] iter=2700 loss=-0.806633
+Epoch [7/10] avg_loss=-0.812989
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_7.pth
+Epoch [8/10] iter=2738 loss=-0.818255
+Epoch [8/10] iter=2800 loss=-0.812521
+Epoch [8/10] iter=2900 loss=-0.824346
+Epoch [8/10] iter=3000 loss=-0.818079
+Epoch [8/10] iter=3100 loss=-0.809940
+Epoch [8/10] avg_loss=-0.816570
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_8.pth
+Epoch [9/10] iter=3129 loss=-0.817229
+Epoch [9/10] iter=3200 loss=-0.826640
+Epoch [9/10] iter=3300 loss=-0.807209
+Epoch [9/10] iter=3400 loss=-0.818689
+Epoch [9/10] iter=3500 loss=-0.825227
+Epoch [9/10] avg_loss=-0.819181
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_9.pth
+Epoch [10/10] iter=3520 loss=-0.819073
+Epoch [10/10] iter=3600 loss=-0.819403
+Epoch [10/10] iter=3700 loss=-0.820021
+Epoch [10/10] iter=3800 loss=-0.815862
+Epoch [10/10] iter=3900 loss=-0.771371
+Epoch [10/10] avg_loss=-0.820997
+Saved checkpoint: outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_10.pth
+Training finished.
+/home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
