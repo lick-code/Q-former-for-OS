@@ -1038,3 +1038,40 @@ outputs/checkpoints/workload_suite_pcrwstress/*/qmap_epoch_10.pth
 outputs/checkpoints/qmap_ablation/**/qmap_epoch_10.pth
 outputs/checkpoints/qmap_encoder_depth_comparison_writeheavy/**/qmap_epoch_20.pth
 ```
+
+## Stage 6: Real-workload ablation conclusion
+
+Stage 6 answers: why QMAP works, and which feature/loss terms contribute.
+
+Scope:
+
+- `parsec_streamcluster` pressure window: main positive real workload case.
+- `parsec_blackscholes` standard 1M split: smaller positive standard split case.
+- Variants: `QMAP-Pool`, `no_rw`, `no_cost`.
+- Configuration: `history_length=10`, `candidate_count=8`, `lookahead=256`, `dram_capacity=16`, `epochs=10`, `batch_size=32`, `seed=3136859`.
+
+Result table:
+
+| workload | variant | cost | vs QMAP-Pool | NVM writes | migrations |
+|---|---|---:|---:|---:|---:|
+| streamcluster_pressure | QMAP-Pool | 264501.00 | +0.00% | 589 | 5541 |
+| streamcluster_pressure | no_rw | 265905.00 | +0.53% | 592 | 5667 |
+| streamcluster_pressure | no_cost | 265395.00 | +0.34% | 584 | 5625 |
+| blackscholes | QMAP-Pool | 105983.00 | +0.00% | 32 | 525 |
+| blackscholes | no_rw | 105961.00 | -0.02% | 32 | 523 |
+| blackscholes | no_cost | 105983.00 | +0.00% | 32 | 525 |
+
+Interpretation:
+
+- On `streamcluster_pressure`, both ablations make cost worse, so the real positive case supports the claim that QMAP uses read/write access context and cost-aware supervision. Removing RW hurts more (`+0.53%`) than removing the write-sensitivity / migration-cost loss terms (`+0.34%`).
+- On `blackscholes`, the deltas are effectively neutral (`-0.02%` and `+0.00%`). This workload has a small active page set and the gain is already small, so the ablation does not expose a strong mechanism there.
+- No full canneal ablation is needed for the main story. Canneal remains a failure-diagnosis case, not the primary evidence for QMAP's benefit.
+
+Artifacts:
+
+- `outputs/results/real_ablation/summary.md`
+- `outputs/results/real_ablation/summary.csv`
+- `outputs/results/real_ablation/*/*/qmap.json`
+- `outputs/checkpoints/real_ablation/*/*/qmap_epoch_10.pth`
+- `dataset/jsonl/real_ablation/*/*/*.jsonl`
+- Runner: `scripts/run_real_ablation.py`

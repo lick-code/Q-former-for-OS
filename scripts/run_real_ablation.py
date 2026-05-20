@@ -239,8 +239,13 @@ def write_server_script(path, python_bin, device):
       "$PY scripts/run_real_ablation.py --skip_generate --run_torch --summarize --python \"$PY\" --device \"$DEVICE\"",
       "",
   ]
-  with open(path, "w", encoding="utf-8", newline="\n") as output_file:
-    output_file.write("\n".join(lines))
+  try:
+    with open(path, "w", encoding="utf-8", newline="\n") as output_file:
+      output_file.write("\n".join(lines))
+  except PermissionError:
+    print("[warn] cannot write server script: {}".format(rel(path)),
+          flush=True)
+    return
   print("[done] server script: {}".format(rel(path)), flush=True)
 
 
