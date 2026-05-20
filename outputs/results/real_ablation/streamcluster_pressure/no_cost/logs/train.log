@@ -1,0 +1,83 @@
+QMAP training configuration:
+  train_data path: dataset/jsonl/real_ablation/streamcluster_pressure/no_cost/parsec_streamcluster_train.jsonl
+  number of training samples: 12501
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: no_cost
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.602095
+Epoch [1/10] iter=100 loss=-0.664719
+Epoch [1/10] iter=200 loss=-0.729613
+Epoch [1/10] iter=300 loss=-0.789180
+Epoch [1/10] avg_loss=-0.714412
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_1.pth
+Epoch [2/10] iter=392 loss=-0.764623
+Epoch [2/10] iter=400 loss=-0.781401
+Epoch [2/10] iter=500 loss=-0.762249
+Epoch [2/10] iter=600 loss=-0.797590
+Epoch [2/10] iter=700 loss=-0.795821
+Epoch [2/10] avg_loss=-0.790963
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_2.pth
+Epoch [3/10] iter=783 loss=-0.802013
+Epoch [3/10] iter=800 loss=-0.806887
+Epoch [3/10] iter=900 loss=-0.775504
+Epoch [3/10] iter=1000 loss=-0.814415
+Epoch [3/10] iter=1100 loss=-0.815280
+Epoch [3/10] avg_loss=-0.806054
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_3.pth
+Epoch [4/10] iter=1174 loss=-0.819731
+Epoch [4/10] iter=1200 loss=-0.805213
+Epoch [4/10] iter=1300 loss=-0.819189
+Epoch [4/10] iter=1400 loss=-0.799896
+Epoch [4/10] iter=1500 loss=-0.817437
+Epoch [4/10] avg_loss=-0.810086
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_4.pth
+Epoch [5/10] iter=1565 loss=-0.811937
+Epoch [5/10] iter=1600 loss=-0.799019
+Epoch [5/10] iter=1700 loss=-0.830479
+Epoch [5/10] iter=1800 loss=-0.811059
+Epoch [5/10] iter=1900 loss=-0.818523
+Epoch [5/10] avg_loss=-0.812080
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_5.pth
+Epoch [6/10] iter=1956 loss=-0.816875
+Epoch [6/10] iter=2000 loss=-0.825310
+Epoch [6/10] iter=2100 loss=-0.796998
+Epoch [6/10] iter=2200 loss=-0.817050
+Epoch [6/10] iter=2300 loss=-0.802976
+Epoch [6/10] avg_loss=-0.813200
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_6.pth
+Epoch [7/10] iter=2347 loss=-0.824219
+Epoch [7/10] iter=2400 loss=-0.817952
+Epoch [7/10] iter=2500 loss=-0.822452
+Epoch [7/10] iter=2600 loss=-0.822433
+Epoch [7/10] iter=2700 loss=-0.807340
+Epoch [7/10] avg_loss=-0.813833
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_7.pth
+Epoch [8/10] iter=2738 loss=-0.818472
+Epoch [8/10] iter=2800 loss=-0.813260
+Epoch [8/10] iter=2900 loss=-0.822133
+Epoch [8/10] iter=3000 loss=-0.806062
+Epoch [8/10] iter=3100 loss=-0.813755
+Epoch [8/10] avg_loss=-0.817169
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_8.pth
+Epoch [9/10] iter=3129 loss=-0.826573
+Epoch [9/10] iter=3200 loss=-0.823775
+Epoch [9/10] iter=3300 loss=-0.816495
+Epoch [9/10] iter=3400 loss=-0.826926
+Epoch [9/10] iter=3500 loss=-0.816340
+Epoch [9/10] avg_loss=-0.820013
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_9.pth
+Epoch [10/10] iter=3520 loss=-0.821721
+Epoch [10/10] iter=3600 loss=-0.821764
+Epoch [10/10] iter=3700 loss=-0.821431
+Epoch [10/10] iter=3800 loss=-0.823966
+Epoch [10/10] iter=3900 loss=-0.778265
+Epoch [10/10] avg_loss=-0.823464
+Saved checkpoint: outputs/checkpoints/real_ablation/streamcluster_pressure/no_cost/qmap_epoch_10.pth
+Training finished.
+/home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
