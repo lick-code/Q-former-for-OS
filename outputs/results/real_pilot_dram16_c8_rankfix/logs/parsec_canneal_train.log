@@ -1,0 +1,53 @@
+QMAP training configuration:
+  train_data path: /home/likc/Q-former-for-OS/dataset/jsonl/real_pilot_dram16_c8_rankfix/parsec_canneal_train.jsonl
+  number of training samples: 3001
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: mean_pool
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.632194
+Epoch [1/10] avg_loss=-0.613233
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_1.pth
+Epoch [2/10] iter=95 loss=-0.635798
+Epoch [2/10] iter=100 loss=-0.653826
+Epoch [2/10] avg_loss=-0.684100
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_2.pth
+Epoch [3/10] iter=189 loss=-0.726775
+Epoch [3/10] iter=200 loss=-0.665739
+Epoch [3/10] avg_loss=-0.727427
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_3.pth
+Epoch [4/10] iter=283 loss=-0.763022
+Epoch [4/10] iter=300 loss=-0.735474
+Epoch [4/10] avg_loss=-0.740788
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_4.pth
+Epoch [5/10] iter=377 loss=-0.765904
+Epoch [5/10] iter=400 loss=-0.773829
+Epoch [5/10] avg_loss=-0.749329
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_5.pth
+Epoch [6/10] iter=471 loss=-0.698529
+Epoch [6/10] iter=500 loss=-0.729153
+Epoch [6/10] avg_loss=-0.760302
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_6.pth
+Epoch [7/10] iter=565 loss=-0.796457
+Epoch [7/10] iter=600 loss=-0.791012
+Epoch [7/10] avg_loss=-0.767755
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_7.pth
+Epoch [8/10] iter=659 loss=-0.782581
+Epoch [8/10] iter=700 loss=-0.754696
+Epoch [8/10] avg_loss=-0.771369
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_8.pth
+Epoch [9/10] iter=753 loss=-0.765643
+Epoch [9/10] iter=800 loss=-0.778955
+Epoch [9/10] avg_loss=-0.774007
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_9.pth
+Epoch [10/10] iter=847 loss=-0.776158
+Epoch [10/10] iter=900 loss=-0.820212
+Epoch [10/10] avg_loss=-0.777034
+Saved checkpoint: outputs/checkpoints/real_pilot_dram16_c8_rankfix/parsec_canneal/qmap_epoch_10.pth
+Training finished.
+/home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "

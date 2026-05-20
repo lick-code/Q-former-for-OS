@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-05-20T00:03:15",
+  "updated_at": "2026-05-20T09:18:32",
   "workloads": {
     "parsec_blackscholes": {
       "limit": 100000,
       "page_shift": 12,
-      "raw_trace": "dataset/raw_traces/real_pilot_dram16_rankfix/parsec_blackscholes.csv",
+      "raw_trace": "dataset/raw_traces/real_pilot_dram16_c8_rankfix/parsec_blackscholes.csv",
       "skip": 0,
       "source_trace": "dataset/raw_traces/parsec_blackscholes_100k.csv",
       "split_policy": "chronological 80/10/10",
@@ -104,7 +104,7 @@
     "parsec_canneal": {
       "limit": 100000,
       "page_shift": 12,
-      "raw_trace": "dataset/raw_traces/real_pilot_dram16_rankfix/parsec_canneal.csv",
+      "raw_trace": "dataset/raw_traces/real_pilot_dram16_c8_rankfix/parsec_canneal.csv",
       "skip": 0,
       "source_trace": "dataset/raw_traces/parsec_canneal_100k.csv",
       "split_policy": "chronological 80/10/10",
@@ -202,109 +202,109 @@
       }
     },
     "parsec_dedup": {
-      "limit": 50000,
+      "limit": 100000,
       "page_shift": 12,
-      "raw_trace": "dataset/raw_traces/real_pilot_dedup_pressure_rankfix/parsec_dedup.csv",
+      "raw_trace": "dataset/raw_traces/real_pilot_dram16_c8_rankfix/parsec_dedup.csv",
       "skip": 0,
       "source_trace": "dataset/raw_traces/parsec_dedup_100k.csv",
       "split_policy": "chronological 80/10/10",
       "splits": {
         "test": {
-          "file": "dataset/processed/real_pilot_dedup_pressure_rankfix/parsec_dedup_test.csv",
-          "records": 5000,
+          "file": "dataset/processed/parsec_dedup_test.csv",
+          "records": 10000,
           "stats": {
-            "records": 5000,
-            "unique_pages": 53,
-            "write_ratio": 0.3202
+            "records": 10000,
+            "unique_pages": 10,
+            "write_ratio": 0.5
           }
         },
         "train": {
-          "file": "dataset/processed/real_pilot_dedup_pressure_rankfix/parsec_dedup_train.csv",
-          "records": 40000,
+          "file": "dataset/processed/parsec_dedup_train.csv",
+          "records": 80000,
           "stats": {
-            "records": 40000,
-            "unique_pages": 79,
-            "write_ratio": 0.29105
+            "records": 80000,
+            "unique_pages": 111,
+            "write_ratio": 0.3703875
           }
         },
         "valid": {
-          "file": "dataset/processed/real_pilot_dedup_pressure_rankfix/parsec_dedup_valid.csv",
-          "records": 5000,
+          "file": "dataset/processed/parsec_dedup_valid.csv",
+          "records": 10000,
           "stats": {
-            "records": 5000,
-            "unique_pages": 43,
-            "write_ratio": 0.292
+            "records": 10000,
+            "unique_pages": 10,
+            "write_ratio": 0.5
           }
         }
       },
       "stats": {
-        "mean_reuse_distance": 45.87834832608739,
-        "page_reuse_ratio": 0.99826,
-        "read_accesses": 35297,
-        "reuse_events": 49913,
+        "mean_reuse_distance": 26.097467936202804,
+        "page_reuse_ratio": 0.99879,
+        "read_accesses": 60369,
+        "reuse_events": 99879,
         "top_pages": [
           {
-            "accesses": 23523,
+            "accesses": 29190,
+            "page_address": "0x7fff5d7fb000",
+            "share": 0.2919
+          },
+          {
+            "accesses": 24103,
             "page_address": "0x7fff5d801000",
-            "share": 0.47046
+            "share": 0.24103
           },
           {
             "accesses": 5768,
             "page_address": "0x7c7349f4a000",
-            "share": 0.11536
+            "share": 0.05768
+          },
+          {
+            "accesses": 5199,
+            "page_address": "0x7c7349f47000",
+            "share": 0.05199
+          },
+          {
+            "accesses": 2847,
+            "page_address": "0x7c7345bfd000",
+            "share": 0.02847
+          },
+          {
+            "accesses": 2444,
+            "page_address": "0x7c7345c01000",
+            "share": 0.02444
           },
           {
             "accesses": 2417,
             "page_address": "0x7c7349f44000",
-            "share": 0.04834
+            "share": 0.02417
           },
           {
             "accesses": 1794,
             "page_address": "0x7c7345bd6000",
-            "share": 0.03588
+            "share": 0.01794
           },
           {
-            "accesses": 971,
+            "accesses": 974,
             "page_address": "0x7c7349f42000",
-            "share": 0.01942
+            "share": 0.00974
           },
           {
-            "accesses": 800,
-            "page_address": "0x7c734921e000",
-            "share": 0.016
-          },
-          {
-            "accesses": 752,
+            "accesses": 802,
             "page_address": "0x7c7349419000",
-            "share": 0.01504
-          },
-          {
-            "accesses": 745,
-            "page_address": "0x7c7349f43000",
-            "share": 0.0149
-          },
-          {
-            "accesses": 714,
-            "page_address": "0x7c7349220000",
-            "share": 0.01428
-          },
-          {
-            "accesses": 630,
-            "page_address": "0x7c734921f000",
-            "share": 0.0126
+            "share": 0.00802
           }
         ],
-        "total_accesses": 50000,
-        "unique_pages": 87,
-        "unique_pcs": 2099,
-        "write_accesses": 14703,
-        "write_ratio": 0.29406
+        "total_accesses": 100000,
+        "unique_pages": 121,
+        "unique_pcs": 2678,
+        "write_accesses": 39631,
+        "write_ratio": 0.39631
       }
     },
     "parsec_streamcluster": {
       "limit": 100000,
       "page_shift": 12,
-      "raw_trace": "dataset/raw_traces/real_pilot_dram16_rankfix/parsec_streamcluster.csv",
+      "raw_trace": "dataset/raw_traces/real_pilot_dram16_c8_rankfix/parsec_streamcluster.csv",
       "skip": 0,
       "source_trace": "dataset/raw_traces/parsec_streamcluster_100k.csv",
       "split_policy": "chronological 80/10/10",

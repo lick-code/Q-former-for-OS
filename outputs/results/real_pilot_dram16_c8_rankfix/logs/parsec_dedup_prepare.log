@@ -1,0 +1,8 @@
+Workload: parsec_dedup
+Records: 100000
+Raw trace: /home/likc/Q-former-for-OS/dataset/raw_traces/real_pilot_dram16_c8_rankfix/parsec_dedup.csv
+Train split: /home/likc/Q-former-for-OS/dataset/processed/parsec_dedup_train.csv
+Valid split: /home/likc/Q-former-for-OS/dataset/processed/parsec_dedup_valid.csv
+Test split: /home/likc/Q-former-for-OS/dataset/processed/parsec_dedup_test.csv
+Manifest: /home/likc/Q-former-for-OS/dataset/metadata/real_workload_manifest.json
+Stats summary: /home/likc/Q-former-for-OS/outputs/results/real_trace_stats/summary.md
