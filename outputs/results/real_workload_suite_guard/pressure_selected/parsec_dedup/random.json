@@ -1,0 +1,26 @@
+{
+  "avg_decision_time_ms": 0.0016861380292819096,
+  "candidate_count": 8,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 130,
+  "decision_time_seconds": 0.00021919794380664825,
+  "dram_capacity": 16,
+  "hit_rate": 0.99927,
+  "hit_rate_percent": 99.92699999999999,
+  "hits": 199854,
+  "migrations": 130,
+  "misses": 146,
+  "nvm_reads": 41,
+  "nvm_writes": 105,
+  "policy": "random",
+  "rank_guard": 0,
+  "total_accesses": 200000,
+  "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_test.csv",
+  "weighted_access_cost": 202076.0
+}
