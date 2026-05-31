@@ -1,0 +1,7 @@
+workload,candidate_count,best_baseline_policy,best_baseline_cost,qmap_cost,delta_percent,qmap_migrations,decision_count,qmap_nvm_writes,avg_decision_time_ms,qmap_hit_rate_percent,best_baseline_nvm_writes,result_dir
+streamcluster_pressure,4,clock,301767.0,282349.0,-6.434765895541925,7169,7169,579,2.3015949285878468,96.4075,574,outputs/results/candidate_sensitivity/streamcluster_pressure/c4
+streamcluster_pressure,8,clock,301767.0,264501.0,-12.349262841861437,5541,5541,589,2.3835050329976784,97.2215,574,outputs/results/candidate_sensitivity/streamcluster_pressure/c8
+streamcluster_pressure,16,clock,301767.0,289085.0,-4.202580136330347,7897,7897,367,2.3667272313731353,96.04350000000001,574,outputs/results/candidate_sensitivity/streamcluster_pressure/c16
+canneal,4,lru,126178.0,134802.0,6.834788948945141,3134,3134,52,2.377924667476678,96.85000000000001,52,outputs/results/candidate_sensitivity/canneal/c4
+canneal,8,lru,126178.0,150559.0,19.322702848357082,4567,4567,51,2.4292403457876772,95.417,52,outputs/results/candidate_sensitivity/canneal/c8
+canneal,16,lru,126178.0,244261.0,93.5844600485029,12949,12949,301,2.3966563659359,87.035,52,outputs/results/candidate_sensitivity/canneal/c16

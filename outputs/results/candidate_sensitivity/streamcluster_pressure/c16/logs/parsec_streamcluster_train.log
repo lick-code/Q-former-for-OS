@@ -1,0 +1,83 @@
+QMAP training configuration:
+  train_data path: /home/likc/Q-former-for-OS/dataset/jsonl/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster_train.jsonl
+  number of training samples: 12501
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: mean_pool
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.709619
+Epoch [1/10] iter=100 loss=-0.773862
+Epoch [1/10] iter=200 loss=-0.825751
+Epoch [1/10] iter=300 loss=-0.844218
+Epoch [1/10] avg_loss=-0.807178
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_1.pth
+Epoch [2/10] iter=392 loss=-0.856001
+Epoch [2/10] iter=400 loss=-0.854393
+Epoch [2/10] iter=500 loss=-0.870072
+Epoch [2/10] iter=600 loss=-0.866078
+Epoch [2/10] iter=700 loss=-0.873067
+Epoch [2/10] avg_loss=-0.867897
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_2.pth
+Epoch [3/10] iter=783 loss=-0.882041
+Epoch [3/10] iter=800 loss=-0.881968
+Epoch [3/10] iter=900 loss=-0.877519
+Epoch [3/10] iter=1000 loss=-0.878882
+Epoch [3/10] iter=1100 loss=-0.885854
+Epoch [3/10] avg_loss=-0.879079
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_3.pth
+Epoch [4/10] iter=1174 loss=-0.880908
+Epoch [4/10] iter=1200 loss=-0.877474
+Epoch [4/10] iter=1300 loss=-0.873901
+Epoch [4/10] iter=1400 loss=-0.881440
+Epoch [4/10] iter=1500 loss=-0.880866
+Epoch [4/10] avg_loss=-0.881827
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_4.pth
+Epoch [5/10] iter=1565 loss=-0.884736
+Epoch [5/10] iter=1600 loss=-0.880679
+Epoch [5/10] iter=1700 loss=-0.885190
+Epoch [5/10] iter=1800 loss=-0.880006
+Epoch [5/10] iter=1900 loss=-0.881655
+Epoch [5/10] avg_loss=-0.883070
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_5.pth
+Epoch [6/10] iter=1956 loss=-0.883662
+Epoch [6/10] iter=2000 loss=-0.885326
+Epoch [6/10] iter=2100 loss=-0.882957
+Epoch [6/10] iter=2200 loss=-0.881408
+Epoch [6/10] iter=2300 loss=-0.882078
+Epoch [6/10] avg_loss=-0.883825
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_6.pth
+Epoch [7/10] iter=2347 loss=-0.881855
+Epoch [7/10] iter=2400 loss=-0.880038
+Epoch [7/10] iter=2500 loss=-0.884686
+Epoch [7/10] iter=2600 loss=-0.881991
+Epoch [7/10] iter=2700 loss=-0.888178
+Epoch [7/10] avg_loss=-0.884394
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_7.pth
+Epoch [8/10] iter=2738 loss=-0.881734
+Epoch [8/10] iter=2800 loss=-0.885881
+Epoch [8/10] iter=2900 loss=-0.887387
+Epoch [8/10] iter=3000 loss=-0.883625
+Epoch [8/10] iter=3100 loss=-0.890185
+Epoch [8/10] avg_loss=-0.884856
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_8.pth
+Epoch [9/10] iter=3129 loss=-0.886445
+Epoch [9/10] iter=3200 loss=-0.886305
+Epoch [9/10] iter=3300 loss=-0.879630
+Epoch [9/10] iter=3400 loss=-0.887521
+Epoch [9/10] iter=3500 loss=-0.886487
+Epoch [9/10] avg_loss=-0.885259
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_9.pth
+Epoch [10/10] iter=3520 loss=-0.882361
+Epoch [10/10] iter=3600 loss=-0.886438
+Epoch [10/10] iter=3700 loss=-0.893584
+Epoch [10/10] iter=3800 loss=-0.887298
+Epoch [10/10] iter=3900 loss=-0.883081
+Epoch [10/10] avg_loss=-0.885580
+Saved checkpoint: outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c16/parsec_streamcluster/qmap_epoch_10.pth
+Training finished.
+/home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
