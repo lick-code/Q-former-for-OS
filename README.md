@@ -53,6 +53,9 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | 真实数据消融 | 阶段 6 已完成；只保留 `QMAP-Pool / no_rw / no_cost` | `outputs/results/real_ablation/summary.md` |
 | 多 seed 稳定性 | 阶段 7 已完成；验证正结果和负例不是 seed 偶然 | `outputs/results/seed_stability/summary.md` |
 | 5M 实验 | 暂缓；当前 5M 目录实际是 100k 回退结果，不进入论文 | `outputs/results/real_workload_suite/5m/` |
+| cost-weight sensitivity | 待补；优先级最高，replay-only，不需要重新训练 | `outputs/results/cost_weight_sensitivity/summary.md` |
+| capacity sensitivity | 待补；覆盖 streamcluster pressure 和 canneal，DRAM cap=8/16/32 | `outputs/results/capacity_sensitivity/summary.md` |
+| candidate-count sensitivity | 待补；覆盖 streamcluster pressure 和 canneal，candidate count=4/8/16 | `outputs/results/candidate_sensitivity/summary.md` |
 
 ## 目录结构
 
@@ -936,7 +939,8 @@ Step 9. 已完成：1M 主表已固化，blackscholes 和 streamcluster pressure
 Step 10. 已完成：真实数据必要消融已完成，覆盖 streamcluster pressure 和 blackscholes。
 Step 11. 已完成：多 seed 验证已完成，覆盖 streamcluster pressure、blackscholes 和 canneal 负例。
 Step 12. 暂缓：正式 5M。当前论文不补 5M；如后续老师要求，必须重新采集真实 5M 并确认 records=5000000。
-Step 13. 当前下一步：开始写论文实验部分，按“1M 主实验 -> pressure window -> 消融 -> 多 seed -> overhead/局限性”的顺序组织。
+Step 13. 当前下一步：补三项附录级敏感性实验：cost-weight、capacity、candidate-count。
+Step 14. 敏感性实验补完后：开始写论文实验部分，按“1M 主实验 -> pressure window -> 消融 -> 多 seed -> overhead/局限性 -> 附录敏感性”的顺序组织。
 ```
 
 ## 并行执行建议
@@ -983,6 +987,9 @@ Step 13. 当前下一步：开始写论文实验部分，按“1M 主实验 -> p
 | Appendix C | checkpoint sweep | `outputs/results/checkpoint_sweep/summary.md` | 说明 epoch 10 的选择依据 |
 | Appendix D | 参数敏感性 | `outputs/results/qmap_parameter_sensitivity/summary.md` | 说明 history/candidate/DRAM/lookahead 的影响 |
 | Appendix E | canneal 诊断或 Guard 对照 | `outputs/results/real_workload_suite_guard/` | 解释 canneal 失败原因和 rank_guard 为什么不进入统一主口径 |
+| Appendix F | cost-weight sensitivity | `outputs/results/cost_weight_sensitivity/summary.md` | 回应 cost model 权重是否影响结论 |
+| Appendix G | capacity sensitivity | `outputs/results/capacity_sensitivity/summary.md` | 回应 `dram_capacity=16` 是否过于特殊 |
+| Appendix H | candidate-count sensitivity | `outputs/results/candidate_sensitivity/summary.md` | 支撑 canneal 失败和候选 rank/candidate count 有关 |
 
 不建议进入论文的表格：
 
@@ -1021,6 +1028,313 @@ Step 13. 当前下一步：开始写论文实验部分，按“1M 主实验 -> p
    - 三个 seed 下 streamcluster pressure 和 blackscholes 都稳定优于 best baseline
    - canneal 三个 seed 都稳定失败
    - QMAP-Pool 推理开销明显高于传统策略，需要作为代价讨论
+```
+
+## 待补三项敏感性实验
+
+下面三项用于增强论文防御性，不改变当前主实验结论。推荐全部放附录，正文只各用一句话概括。
+
+### 1. Cost-weight sensitivity
+
+优先级：最高。
+
+目的：回应 weighted access cost 中 `NVM write=8`、`migration=10` 是否过于主观。该实验不需要重新训练，只需要用已有 replay 结果重新计算 cost，或用 `qmap_eval.py` 指定不同 cost 参数重放。
+
+推荐 workload：
+
+```text
+streamcluster_pressure  正例，使用 pressure window
+blackscholes            小幅正例，使用 1M standard split
+canneal                 负例，使用 1M standard split
+```
+
+推荐 cost model：
+
+| Cost model | DRAM read/write | NVM read | NVM write | Migration |
+|---|---:|---:|---:|---:|
+| default | 1 | 2 | 8 | 10 |
+| mild | 1 | 2 | 4 | 5 |
+| write-heavy | 1 | 2 | 16 | 10 |
+| migration-heavy | 1 | 2 | 8 | 20 |
+
+最小实现方式：
+
+```text
+读取已有 JSON：
+  outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/*.json
+  outputs/results/real_workload_suite/1m/parsec_blackscholes/*.json
+  outputs/results/real_workload_suite/1m/parsec_canneal/*.json
+
+对每个 policy 重新计算：
+  reweighted_cost = hits * 1
+                  + nvm_reads * nvm_read_cost
+                  + nvm_writes * nvm_write_cost
+                  + migrations * migration_cost
+
+每个 workload / cost model 下：
+  best_baseline_cost = min(LRU, Random, LFU, CLOCK)
+  delta = (QMAP_cost - best_baseline_cost) / best_baseline_cost
+```
+
+如果想用 replay 而不是手工重算，也可以直接调用 `qmap/qmap_eval.py`。示例：
+
+```bash
+python qmap/qmap_eval.py \
+  --trace_path dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv \
+  --policy qmap \
+  --checkpoint outputs/checkpoints/real_workload_suite_pressure/selected/parsec_streamcluster/qmap_epoch_10.pth \
+  --dram_capacity 16 \
+  --history_length 10 \
+  --candidate_count 8 \
+  --lookahead 256 \
+  --page_shift 12 \
+  --device cuda \
+  --nvm_read_cost 2 \
+  --nvm_write_cost 16 \
+  --migration_cost 10 \
+  --json_output outputs/results/cost_weight_sensitivity/write_heavy/streamcluster_pressure/qmap.json
+```
+
+最终汇总表：
+
+| Cost model | streamcluster-p delta | blackscholes delta | canneal delta |
+|---|---:|---:|---:|
+| default | -12.35% | -0.91% | +19.32% |
+| mild | 待补 | 待补 | 待补 |
+| write-heavy | 待补 | 待补 | 待补 |
+| migration-heavy | 待补 | 待补 | 待补 |
+
+推荐输出：
+
+```text
+outputs/results/cost_weight_sensitivity/summary.md
+outputs/results/cost_weight_sensitivity/summary.csv
+```
+
+判断标准：
+
+```text
+如果 streamcluster_pressure 在大多数 cost model 下仍优于 best baseline，
+就可以在正文写：QMAP-Pool 的正结果不依赖单一 cost 权重。
+
+如果 canneal 在大多数 cost model 下仍失败，
+就可以写：canneal 是稳定边界案例，不是 cost 权重选择造成的偶然。
+```
+
+### 2. Capacity sensitivity
+
+优先级：高。
+
+目的：回应 `dram_capacity=16` pages 是否过小、结论是否只在单一容量下成立。该实验建议完整重新生成 JSONL、训练、评估，因为 `dram_capacity` 会影响候选样本生成和 replay 压力。
+
+固定配置：
+
+```text
+history_length = 10
+candidate_count = 8
+lookahead = 256
+epochs = 10
+batch_size = 32
+model = QMAP-Pool
+ablation = mean_pool
+policies = LRU / Random / LFU / CLOCK / QMAP-Pool
+```
+
+变量：
+
+```text
+workloads:
+  parsec_streamcluster pressure window
+  parsec_canneal 1M standard split
+
+dram_capacity:
+  8
+  16
+  32
+```
+
+streamcluster pressure window 命令模板：
+
+```bash
+for cap in 8 16 32; do
+  python scripts/run_real_pilot.py \
+    --skip_prepare \
+    --workloads parsec_streamcluster \
+    --policies lru,random,lfu,clock,qmap \
+    --processed_dir dataset/processed/real_workload_suite_pressure/selected \
+    --manifest dataset/metadata/real_workload_suite_pressure_manifest.json \
+    --jsonl_dir dataset/jsonl/capacity_sensitivity/streamcluster_pressure/cap${cap} \
+    --result_dir outputs/results/capacity_sensitivity/streamcluster_pressure/cap${cap} \
+    --checkpoint_dir outputs/checkpoints/capacity_sensitivity/streamcluster_pressure/cap${cap} \
+    --history_length 10 \
+    --candidate_count 8 \
+    --dram_capacity ${cap} \
+    --lookahead 256 \
+    --epochs 10 \
+    --batch_size 32 \
+    --run_id capacity_streamcluster_pressure_cap${cap} \
+    --device cuda
+done
+```
+
+canneal 命令模板：
+
+```bash
+for cap in 8 16 32; do
+  python scripts/run_real_pilot.py \
+    --skip_prepare \
+    --workloads parsec_canneal \
+    --policies lru,random,lfu,clock,qmap \
+    --processed_dir dataset/processed/real_workload_suite/1m \
+    --manifest dataset/metadata/real_workload_suite_1m_manifest.json \
+    --jsonl_dir dataset/jsonl/capacity_sensitivity/canneal/cap${cap} \
+    --result_dir outputs/results/capacity_sensitivity/canneal/cap${cap} \
+    --checkpoint_dir outputs/checkpoints/capacity_sensitivity/canneal/cap${cap} \
+    --history_length 10 \
+    --candidate_count 8 \
+    --dram_capacity ${cap} \
+    --lookahead 256 \
+    --epochs 10 \
+    --batch_size 32 \
+    --run_id capacity_canneal_cap${cap} \
+    --device cuda
+done
+```
+
+最终汇总表：
+
+| Workload | DRAM cap | best baseline cost | QMAP cost | delta | QMAP migrations | decision count |
+|---|---:|---:|---:|---:|---:|---:|
+| streamcluster-p | 8 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| streamcluster-p | 16 | 301767 | 264501 | -12.35% | 5541 | 5541 |
+| streamcluster-p | 32 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| canneal | 8 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| canneal | 16 | 126178 | 150559 | +19.32% | 4567 | 4567 |
+| canneal | 32 | 待补 | 待补 | 待补 | 待补 | 待补 |
+
+推荐输出：
+
+```text
+outputs/results/capacity_sensitivity/summary.md
+outputs/results/capacity_sensitivity/summary.csv
+```
+
+注意：上面的 `run_real_pilot.py` 命令会先在每个 `cap*` 子目录下生成单独的 `summary.md`。跑完 6 个组合后，需要把这些子目录结果汇总成 `outputs/results/capacity_sensitivity/summary.md` 和 `summary.csv`，再放入附录表。
+
+判断标准：
+
+```text
+如果 cap=32 下 decision_count 或 migrations 很低，把该行标注为 low-pressure，不强行解释优劣。
+如果 cap=8/16 下 streamcluster_pressure 都有优势，可以说明 QMAP-Pool 在有足够 replacement pressure 时稳定有效。
+如果 canneal 在不同容量下仍失败，可以说明它是 workload/candidate-rank 边界，而不是单一容量造成的偶然。
+```
+
+### 3. Candidate-count sensitivity
+
+优先级：中高。
+
+目的：补足 canneal 失败机制的证据。已有 `outputs/results/real_workload_suite/1m/canneal_epoch_candidate_sweep/summary.md` 能证明 canneal 与 candidate/rank 有关，但它更像诊断 sweep。建议补一个统一口径的小型 sensitivity：同一训练流程、同一 workload、同一 dram_capacity，只改变 candidate count。
+
+固定配置：
+
+```text
+history_length = 10
+dram_capacity = 16
+lookahead = 256
+epochs = 10
+batch_size = 32
+model = QMAP-Pool
+ablation = mean_pool
+policies = LRU / Random / LFU / CLOCK / QMAP-Pool
+```
+
+变量：
+
+```text
+workloads:
+  parsec_streamcluster pressure window
+  parsec_canneal 1M standard split
+
+candidate_count:
+  4
+  8
+  16
+```
+
+streamcluster pressure window 命令模板：
+
+```bash
+for cand in 4 8 16; do
+  python scripts/run_real_pilot.py \
+    --skip_prepare \
+    --workloads parsec_streamcluster \
+    --policies lru,random,lfu,clock,qmap \
+    --processed_dir dataset/processed/real_workload_suite_pressure/selected \
+    --manifest dataset/metadata/real_workload_suite_pressure_manifest.json \
+    --jsonl_dir dataset/jsonl/candidate_sensitivity/streamcluster_pressure/c${cand} \
+    --result_dir outputs/results/candidate_sensitivity/streamcluster_pressure/c${cand} \
+    --checkpoint_dir outputs/checkpoints/candidate_sensitivity/streamcluster_pressure/c${cand} \
+    --history_length 10 \
+    --candidate_count ${cand} \
+    --dram_capacity 16 \
+    --lookahead 256 \
+    --epochs 10 \
+    --batch_size 32 \
+    --run_id candidate_streamcluster_pressure_c${cand} \
+    --device cuda
+done
+```
+
+canneal 命令模板：
+
+```bash
+for cand in 4 8 16; do
+  python scripts/run_real_pilot.py \
+    --skip_prepare \
+    --workloads parsec_canneal \
+    --policies lru,random,lfu,clock,qmap \
+    --processed_dir dataset/processed/real_workload_suite/1m \
+    --manifest dataset/metadata/real_workload_suite_1m_manifest.json \
+    --jsonl_dir dataset/jsonl/candidate_sensitivity/canneal/c${cand} \
+    --result_dir outputs/results/candidate_sensitivity/canneal/c${cand} \
+    --checkpoint_dir outputs/checkpoints/candidate_sensitivity/canneal/c${cand} \
+    --history_length 10 \
+    --candidate_count ${cand} \
+    --dram_capacity 16 \
+    --lookahead 256 \
+    --epochs 10 \
+    --batch_size 32 \
+    --run_id candidate_canneal_c${cand} \
+    --device cuda
+done
+```
+
+最终汇总表：
+
+| Workload | Candidate count | best baseline cost | QMAP cost | delta | QMAP migrations | decision count |
+|---|---:|---:|---:|---:|---:|---:|
+| streamcluster-p | 4 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| streamcluster-p | 8 | 301767 | 264501 | -12.35% | 5541 | 5541 |
+| streamcluster-p | 16 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| canneal | 4 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| canneal | 8 | 126178 | 150559 | +19.32% | 4567 | 4567 |
+| canneal | 16 | 待补 | 待补 | 待补 | 待补 | 待补 |
+
+推荐输出：
+
+```text
+outputs/results/candidate_sensitivity/summary.md
+outputs/results/candidate_sensitivity/summary.csv
+```
+
+注意：上面的 `run_real_pilot.py` 命令会先在每个 `c*` 子目录下生成单独的 `summary.md`。跑完 6 个组合后，需要把这些子目录结果汇总成 `outputs/results/candidate_sensitivity/summary.md` 和 `summary.csv`，再放入附录表。
+
+判断标准：
+
+```text
+如果 canneal 随 candidate_count 增大而明显变差，可以支撑“candidate-rank sensitivity”解释。
+如果 streamcluster_pressure 在 c4/c8/c16 中至少 c8 或 c16 稳定优于 best baseline，可以说明正例不是单一 candidate_count 偶然。
+如果 c16 推理开销明显增加，需要在附录标注 avg decision time。
 ```
 
 ## 指标说明

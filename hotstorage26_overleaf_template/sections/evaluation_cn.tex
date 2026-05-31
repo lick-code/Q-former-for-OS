@@ -1,104 +1,167 @@
 \section{实验评估}
 \label{sec:evaluation}
 
-本节评估 QMAP-Pool 在 DRAM/NVM 混合内存页面迁移场景下的有效性。按照最终设计，QMAP-Pool 指由访问历史经过 Transformer Encoder 编码后，再对时间维做均值池化，并对候选迁移页进行打分的版本。我们不再使用额外的查询式聚合模块，以避免在当前数据规模下引入不稳定的结构复杂度。
+本节评估 QMAP 在真实程序访存 trace 上的页面迁移效果。与早期基于合成 trace 的原型验证不同，本文实验主线使用 PARSEC benchmark 采集得到的真实访存序列，并以标准时间顺序切分、压力窗口、真实消融和多随机种子稳定性共同构成证据链。为保持论文表述一致，后文统一将最终方法称为 QMAP。QMAP 的模型结构为 Transformer Encoder 对访问历史编码，然后在时间维上进行均值池化，并结合候选页特征输出迁移优先级。
 
-实验围绕三个问题展开。第一，QMAP-Pool 是否能够在写密集和迁移敏感的负载中降低系统代价，而不仅仅提升命中率。第二，QMAP-Pool 在不同访问局部性和读写结构下相对于经典替换策略的收益边界在哪里。第三，增加 Transformer Encoder 深度是否能带来足够收益，足以抵消额外推理开销。
+实验主要回答四个问题。第一，QMAP 在真实 1M trace 上是否能够降低混合内存系统的加权访问代价。第二，当标准时间切分缺少足够 eviction 压力时，QMAP 在压力窗口中是否仍然有效。第三，读写类型特征和代价感知训练目标是否对真实 workload 有贡献。第四，QMAP 的正结果和负结果是否对训练随机种子稳定。
 
 \subsection{实验设置}
 
-我们使用 trace-driven replay 评估页面迁移策略。系统包含一个容量受限的 DRAM 层和一个容量更大的 NVM 层。当一次访问在 DRAM 中未命中且 DRAM 已满时，策略需要从候选页面集合中选择一个页面迁移到 NVM。QMAP-Pool 在每次决策时读取最近的访存历史、页面候选特征和读写类型信息，输出候选页面的迁移优先级。所有负载均使用 2,000 次测试访问进行 replay。
+\textbf{系统模型。}
+我们使用 trace-driven replay 模拟 DRAM/NVM 混合内存系统。DRAM 是容量受限的快速层，NVM 是容量更大的慢速层。当一次访问未命中 DRAM 且 DRAM 已满时，替换策略需要从候选页面集合中选择一个页面迁出 DRAM。QMAP 将这一过程建模为候选页面排序问题：模型读取最近的访存历史、读写类型、程序上下文和候选页统计特征，为每个候选页面输出迁移分数，并选择分数最高的页面迁移到 NVM。
 
-比较策略包括 LRU、Random、LFU、CLOCK 和 QMAP-Pool。LRU、LFU 和 CLOCK 代表常见的启发式替换策略；Random 用于给出无状态策略下界。我们报告四类指标：DRAM 命中率、NVM 写入次数、页面迁移次数和加权访问代价。加权访问代价用于刻画 DRAM/NVM 非对称访问开销，当前 replay 模型中 DRAM 读写代价均为 1，NVM 读代价为 2，NVM 写代价为 8，页面迁移代价为 10。决策延迟来自 Python replay 原型，主要用于比较不同策略和模型结构的相对在线开销，并不代表优化后系统实现的绝对延迟。除特别说明外，数值越低表示系统代价越小，命中率越高表示缓存利用越好。
-
-表~\ref{tab:workloads} 给出本文使用的三个代表性负载。我们选择这些负载，是因为它们分别覆盖了写密集、阶段变化和读写压力混合三类对混合内存系统更有区分度的场景。
-
-\begin{table*}[t]
-  \centering
-  \caption{实验负载。}
-  \label{tab:workloads}
-  \small
-  \begin{tabular}{lrp{0.65\textwidth}}
-    \toprule
-    负载 & 测试访问数 & 负载特征 \\
-    \midrule
-    writeheavy & 2,000 & 写访问占比较高，NVM 写入代价主导总成本 \\
-    phasechange & 2,000 & 访问热点随时间阶段性切换 \\
-    pcrwstress & 2,000 & 程序上下文和读写模式共同变化 \\
-    \bottomrule
-  \end{tabular}
-\end{table*}
-
-\subsection{端到端性能}
-
-表~\ref{tab:end-to-end} 展示 QMAP-Pool 与四个经典策略在三类负载上的端到端 replay 结果。整体上，QMAP-Pool 的平均加权代价为 7,330，低于 LRU 的 7,927、Random 的 9,660 和 CLOCK 的 9,230；平均 NVM 写入次数为 128.3，也低于 LRU、Random 和 CLOCK。LFU 在平均代价上仍然最强，说明 QMAP-Pool 的优势不是无条件替代频率策略，而是在写密集和迁移敏感场景下减少高代价访问。
-
-\begin{table*}[t]
-  \centering
-  \caption{端到端 replay 性能。命中率越高越好；加权代价、NVM 写入、迁移次数和决策延迟越低越好。}
-  \label{tab:end-to-end}
-  \scriptsize
-  \begin{tabular}{llrrrrr}
-    \toprule
-    负载 & 策略 & 命中率(\%) & 加权代价 & NVM 写入 & 迁移次数 & 决策延迟(ms) \\
-    \midrule
-    writeheavy & LRU & 71.30 & 7,510 & 238 & 446 & 0.000 \\
-    writeheavy & Random & 66.45 & 8,721 & 310 & 543 & 0.001 \\
-    writeheavy & LFU & 71.95 & 7,339 & 224 & 433 & 0.023 \\
-    writeheavy & CLOCK & 68.05 & 8,313 & 282 & 511 & 0.001 \\
-    writeheavy & QMAP-Pool & \textbf{73.15} & \textbf{7,051} & \textbf{212} & \textbf{409} & 2.970 \\
-    \midrule
-    phasechange & LRU & 62.25 & 9,401 & 188 & 627 & 0.000 \\
-    phasechange & Random & 53.85 & 11,317 & 222 & 795 & 0.001 \\
-    phasechange & LFU & \textbf{71.70} & \textbf{7,170} & \textbf{112} & \textbf{438} & 0.022 \\
-    phasechange & CLOCK & 54.90 & 11,108 & 233 & 774 & 0.001 \\
-    phasechange & QMAP-Pool & 64.90 & 8,740 & 149 & 574 & 2.406 \\
-    \midrule
-    pcrwstress & LRU & 72.70 & 6,870 & \textbf{24} & 418 & 0.000 \\
-    pcrwstress & Random & 65.35 & 8,943 & 100 & 565 & 0.001 \\
-    pcrwstress & LFU & \textbf{76.05} & \textbf{6,133} & \textbf{24} & \textbf{351} & 0.023 \\
-    pcrwstress & CLOCK & 68.30 & 8,270 & 96 & 506 & 0.001 \\
-    pcrwstress & QMAP-Pool & 75.75 & 6,199 & \textbf{24} & 357 & 2.938 \\
-    \midrule
-    Average & LRU & 68.75 & 7,927 & 150.0 & 497.0 & 0.000 \\
-    Average & Random & 61.88 & 9,660 & 210.7 & 634.3 & 0.001 \\
-    Average & LFU & \textbf{73.23} & \textbf{6,881} & \textbf{120.0} & \textbf{407.3} & 0.023 \\
-    Average & CLOCK & 63.75 & 9,230 & 203.7 & 597.0 & 0.001 \\
-    Average & QMAP-Pool & 71.27 & 7,330 & 128.3 & 446.7 & 2.771 \\
-    \bottomrule
-  \end{tabular}
-\end{table*}
-
-在 writeheavy 上，QMAP-Pool 取得最高命中率和最低系统代价。相较 LRU，QMAP-Pool 将命中率从 71.30\% 提升到 73.15\%，将 NVM 写入从 238 次降至 212 次，降幅为 10.9\%，同时将加权代价从 7,510 降至 7,051，降幅为 6.1\%。相较更强的 LFU，QMAP-Pool 仍将加权代价降低 3.9\%，将 NVM 写入降低 5.4\%。这表明在写代价显著高于读代价的混合内存系统中，仅优化命中率并不充分，迁移策略需要显式避开未来可能产生高写入代价的页面。
-
-在 phasechange 上，LFU 取得最低代价。QMAP-Pool 相较 LRU 仍降低了 7.0\% 的加权代价，并将 NVM 写入从 188 次降至 149 次，但它没有追上 LFU。这说明当负载存在较强频率结构时，简单频率统计仍然是很强的基线。对系统论文而言，这一结果同样重要：QMAP-Pool 的价值不在于宣称所有场景都优于 LFU，而在于给出一种能感知写入代价和迁移代价的策略框架，并明确其适用边界。
-
-在 pcrwstress 上，QMAP-Pool 与 LFU 的差距很小。QMAP-Pool 的命中率为 75.75\%，接近 LFU 的 76.05\%；加权代价为 6,199，仅比 LFU 高 1.1\%，同时保持与 LRU/LFU 相同的 24 次 NVM 写入。相较 LRU，QMAP-Pool 将加权代价降低 9.8\%，迁移次数从 418 次降至 357 次。该结果说明，在读写模式和程序上下文共同变化的场景下，QMAP-Pool 能够学到比 LRU 更稳定的迁移顺序，并接近 LFU 的总体代价。
-
-\subsection{编码器深度和推理开销}
-
-QMAP-Pool 的在线部署成本主要来自每次 DRAM miss 后的候选页打分。为了判断是否需要更深的序列编码器，我们固定使用均值池化聚合方式，只改变 Transformer Encoder 的层数。表~\ref{tab:encoder-depth} 显示，在 writeheavy 负载上，增加编码器深度并没有带来稳定收益。
+\textbf{数据集。}
+真实 workload 来自 PARSEC benchmark，包括 \texttt{blackscholes}、\texttt{canneal}、\texttt{streamcluster} 和 \texttt{dedup}。我们使用 DynamoRIO/drmemtrace 采集用户态访存记录，并转换为 QMAP 使用的 \texttt{PC,Address,RW} 格式。每个 workload 采集 1M 条访存记录，并按照时间顺序切分为 80\% 训练、10\% 验证和 10\% 测试。表~\ref{tab:real-trace-stats} 给出 trace 统计。可以看到，不同 workload 在 unique pages、unique PCs 和写比例上差异明显：\texttt{blackscholes} 的工作集很小，\texttt{streamcluster} 和 \texttt{dedup} 的页面数更多，\texttt{dedup} 的写比例最高。
 
 \begin{table}[t]
   \centering
-  \caption{Transformer Encoder 层数对 writeheavy 的影响。}
-  \label{tab:encoder-depth}
+  \caption{1M PARSEC 真实 trace 统计。所有 workload 均采用 800K/100K/100K 的时间顺序切分。}
+  \label{tab:real-trace-stats}
   \scriptsize
-  \begin{tabular}{rrrrrr}
+  \begin{tabular}{lrrrr}
     \toprule
-    层数 & 命中率(\%) & 加权代价 & NVM 写入 & 迁移次数 & 延迟(ms) \\
+    Workload & Records & Unique pages & Unique PCs & Write ratio \\
     \midrule
-    1 & \textbf{73.35} & \textbf{7,837} & 209 & \textbf{405} & \textbf{3.073} \\
-    2 & 73.30 & 7,848 & 209 & 406 & 3.939 \\
-    3 & 73.30 & 7,842 & \textbf{208} & 406 & 4.105 \\
+    blackscholes & 1,000,000 & 23 & 611 & 0.3468 \\
+    canneal & 1,000,000 & 254 & 6,821 & 0.2854 \\
+    streamcluster & 1,000,000 & 767 & 4,238 & 0.3495 \\
+    dedup & 1,000,000 & 493 & 34 & 0.5000 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-单层编码器取得最低加权代价和最低推理延迟。两层编码器的代价略高，决策延迟增加 28.2\%；三层编码器虽然少 1 次 NVM 写入，但 NVM 读取和迁移次数增加，加权代价仍高于单层，同时延迟增加 33.6\%。因此，本文采用单层 Transformer Encoder 加均值池化作为默认结构。这一选择符合系统设计中的常见取舍：在收益有限时，在线路径应优先保留较低延迟和更少参数的实现。
+\textbf{比较策略和参数。}
+我们将 QMAP 与 LRU、Random、LFU 和 CLOCK 比较。LRU 和 CLOCK 代表常见低开销替换策略，LFU 代表频率统计基线，Random 用于给出无状态下界。除特别说明外，QMAP 使用相同的默认配置：历史长度为 10，候选页数量为 8，DRAM 容量为 16 页，lookahead 为 256，训练 10 个 epoch，batch size 为 32，随机种子为 3136859。
 
-\subsection{结果总结}
+\textbf{指标。}
+我们报告 DRAM 命中率、NVM 写入次数、加权访问代价、迁移次数和平均决策延迟。加权访问代价是主要指标，其代价模型为：DRAM read/write 均为 1，NVM read 为 2，NVM write 为 8，页面迁移为 10。该指标比命中率更适合 DRAM/NVM 混合内存，因为一次 NVM 写入或页面迁移的代价显著高于 DRAM 命中。决策延迟来自 Python replay 原型，主要用于比较相对在线开销，并不代表优化后的系统实现延迟。
 
-实验结果给出三个结论。第一，QMAP-Pool 在 writeheavy 中同时提升命中率、减少 NVM 写入并降低加权代价，说明面向混合内存的页面迁移策略需要显式考虑写入非对称性，而不能只追求 DRAM 命中率。第二，QMAP-Pool 在 pcrwstress 中接近 LFU，并显著优于 LRU/CLOCK，说明访问历史、程序上下文和读写类型能够为迁移决策提供有用信号。第三，QMAP-Pool 并不在所有负载上优于 LFU；phasechange 结果表明，当访问频率本身足够稳定且可被 LFU 捕获时，经典策略仍然具有很强竞争力。
+\subsection{1M 标准切分主实验}
 
-从系统角度看，这组结果支持一个更克制但更可靠的结论：QMAP-Pool 是一种适用于写敏感混合内存场景的学习型页面迁移策略。它在写密集负载上能减少高代价 NVM 写入，在复杂读写压力下接近强启发式策略；但在频率局部性特别明显的负载上，仍需要与 LFU 类策略结合或引入更强的在线自适应机制。后续工作可以沿两个方向推进：其一，将 QMAP-Pool 作为写敏感迁移器，与传统命中率导向策略做混合选择；其二，在更大规模和真实系统 trace 上验证当前 replay 结论的稳定性。
+表~\ref{tab:real-main} 展示 1M 标准时间切分下的端到端结果。QMAP 在 \texttt{blackscholes} 上相较最佳 baseline 将加权访问代价降低 0.91\%，在 \texttt{dedup} 上与 LRU 持平，在 \texttt{streamcluster} 标准测试段上所有策略都没有触发迁移，因而该标准切分不能形成有效策略比较。与此同时，QMAP 在 \texttt{canneal} 上明显失败，相较最佳 baseline 代价升高 19.32\%。这一组结果说明，真实 trace 中 workload 压力差异很大，不能仅凭标准切分得到单一结论：QMAP 在小工作集或低压力场景中可能与传统策略接近，在候选页排序出现偏差时也会产生明显负例。
+
+\begin{table*}[t]
+  \centering
+  \caption{1M 标准时间切分下的主实验结果。Cost delta 表示 QMAP 相对该 workload 最佳 baseline 的加权代价变化，负数表示 QMAP 更好。}
+  \label{tab:real-main}
+  \scriptsize
+  \begin{tabular}{llrrrrr}
+    \toprule
+    Workload & Policy & Hit rate(\%) & NVM writes & Cost & Migrations & Decision ms \\
+    \midrule
+    blackscholes & LRU & 98.89 & 144 & 112,958 & 1,098 & 0.000288 \\
+    blackscholes & Random & 98.66 & 145 & 115,505 & 1,329 & 0.001238 \\
+    blackscholes & LFU & 99.47 & 221 & 106,952 & 510 & 0.005870 \\
+    blackscholes & CLOCK & 99.09 & 107 & 110,437 & 889 & 0.002007 \\
+    blackscholes & QMAP & 99.46 & \textbf{32} & \textbf{105,983} & 525 & 3.387825 \\
+    \midrule
+    canneal & LRU & \textbf{97.63} & 52 & \textbf{126,178} & \textbf{2,350} & 0.000287 \\
+    canneal & Random & 96.50 & 193 & 139,465 & 3,481 & 0.001163 \\
+    canneal & LFU & 94.69 & 280 & 159,919 & 5,293 & 0.005749 \\
+    canneal & CLOCK & 97.62 & 60 & 126,325 & 2,359 & 0.001727 \\
+    canneal & QMAP & 95.42 & \textbf{51} & 150,559 & 4,567 & 2.401794 \\
+    \midrule
+    streamcluster & LRU & 99.99 & 4 & 100,033 & 0 & 0.000000 \\
+    streamcluster & Random & 99.99 & 4 & 100,033 & 0 & 0.000000 \\
+    streamcluster & LFU & 99.99 & 4 & 100,033 & 0 & 0.000000 \\
+    streamcluster & CLOCK & 99.99 & 4 & 100,033 & 0 & 0.000000 \\
+    streamcluster & QMAP & 99.99 & 4 & 100,033 & 0 & 0.000000 \\
+    \midrule
+    dedup & LRU & \textbf{99.95} & \textbf{50} & \textbf{100,734} & \textbf{38} & 0.000572 \\
+    dedup & Random & 99.93 & 56 & 100,968 & 56 & 0.001950 \\
+    dedup & LFU & 99.89 & 106 & 101,686 & 94 & 0.006607 \\
+    dedup & CLOCK & 99.94 & 51 & 100,751 & 39 & 0.002321 \\
+    dedup & QMAP & \textbf{99.95} & \textbf{50} & \textbf{100,734} & \textbf{38} & 18.408344 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\texttt{blackscholes} 是标准切分中的稳定正结果。虽然它的 active page set 较小，导致所有策略命中率都很高，但 QMAP 仍将 NVM 写入从 LFU 的 221 次降至 32 次，并将加权访问代价从最佳 baseline 的 106,952 降至 105,983。这说明 QMAP 的收益不一定来自显著提升命中率，而可能来自更好地规避高代价写入和迁移。
+
+\texttt{canneal} 是明确的负例。QMAP 的 NVM 写入数与 LRU 接近，分别为 51 和 52，但迁移次数从 LRU 的 2,350 增加到 4,567，最终导致加权访问代价显著升高。该结果表明，QMAP 在该 workload 上不是写入判断失败，而是候选迁移顺序不够稳健，导致过度迁移。这一负例对论文同样重要，因为它界定了 QMAP 当前版本的适用边界。
+
+\texttt{streamcluster} 标准测试段没有触发 eviction 决策，所有策略 cost 完全相同。因此该标准切分不能用于评价替换策略优劣。为避免用低压力测试段掩盖策略差异，我们进一步构造 pressure window，专门评估存在大量迁移决策的阶段。
+
+\subsection{压力窗口实验}
+
+表~\ref{tab:pressure-window} 展示压力窗口结果。压力窗口从 1M trace 中选择具有实际 eviction 压力的连续区间，训练和评估配置保持不变。该实验是本文最强的真实 workload 正结果：在 \texttt{streamcluster} pressure window 上，QMAP 将加权访问代价从最佳 baseline CLOCK 的 301,767 降至 264,501，降低 12.35\%；迁移次数从 8,937 降至 5,541，降低 38.0\%；命中率从 95.52\% 提升到 97.22\%。这表明，当真实 workload 进入存在明显迁移压力的阶段时，QMAP 能够利用访问历史和候选页特征显著改善迁移决策。
+
+\begin{table*}[t]
+  \centering
+  \caption{压力窗口实验结果。该实验用于避免标准测试段 eviction 压力不足造成的不可比较问题。}
+  \label{tab:pressure-window}
+  \scriptsize
+  \begin{tabular}{llrrrrr}
+    \toprule
+    Workload & Policy & Hit rate(\%) & NVM writes & Cost & Migrations & Decision ms \\
+    \midrule
+    streamcluster & LRU & 95.35 & 585 & 305,562 & 9,276 & 0.000318 \\
+    streamcluster & Random & 95.01 & 777 & 314,183 & 9,955 & 0.001190 \\
+    streamcluster & LFU & 92.84 & 740 & 361,877 & 14,311 & 0.005936 \\
+    streamcluster & CLOCK & 95.52 & \textbf{574} & 301,767 & 8,937 & 0.001553 \\
+    streamcluster & QMAP & \textbf{97.22} & 589 & \textbf{264,501} & \textbf{5,541} & 2.360334 \\
+    \midrule
+    dedup & LRU & \textbf{99.95} & \textbf{99} & \textbf{201,567} & \textbf{87} & 0.000418 \\
+    dedup & Random & 99.93 & 105 & 202,076 & 130 & 0.001658 \\
+    dedup & LFU & 99.88 & 233 & 203,845 & 221 & 0.006130 \\
+    dedup & CLOCK & \textbf{99.95} & 100 & 201,584 & 88 & 0.001643 \\
+    dedup & QMAP & \textbf{99.95} & \textbf{99} & \textbf{201,567} & \textbf{87} & 9.091155 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\texttt{dedup} pressure window 则是边界案例。QMAP 与 LRU 在命中率、NVM 写入、迁移次数和加权代价上完全持平，而 LFU 和 Random 更差。该结果不能证明 QMAP 在 \texttt{dedup} 上有显著优势，但说明 QMAP 在该弱压力窗口下没有引入额外代价。由于该窗口的迁移次数只有 87 次，策略间可区分空间有限，因此本文不将其作为主要正结果。
+
+\subsection{真实数据消融}
+
+为了分析 QMAP 的收益来源，我们在两个代表性 workload 上做必要消融：\texttt{streamcluster} pressure window 代表强正结果，\texttt{blackscholes} 代表标准切分中的小幅正结果。消融只保留两个最关键变体：去除读写类型特征（no\_rw）和去除写敏感/迁移代价相关损失项（no\_cost）。表~\ref{tab:real-ablation} 给出结果。
+
+\begin{table}[t]
+  \centering
+  \caption{真实数据消融实验。vs QMAP 表示相对 QMAP 的 cost 变化，正数表示变差。}
+  \label{tab:real-ablation}
+  \scriptsize
+  \begin{tabular}{llrrr}
+    \toprule
+    Workload & Variant & Cost & vs QMAP & Migrations \\
+    \midrule
+    streamcluster & QMAP & 264,501 & +0.00\% & 5,541 \\
+    streamcluster & no\_rw & 265,905 & +0.53\% & 5,667 \\
+    streamcluster & no\_cost & 265,395 & +0.34\% & 5,625 \\
+    \midrule
+    blackscholes & QMAP & 105,983 & +0.00\% & 525 \\
+    blackscholes & no\_rw & 105,961 & -0.02\% & 523 \\
+    blackscholes & no\_cost & 105,983 & +0.00\% & 525 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+在 \texttt{streamcluster} pressure window 上，两个消融都会使加权访问代价上升。去除读写类型特征后，cost 上升 0.53\%，迁移次数从 5,541 增至 5,667；去除代价相关损失项后，cost 上升 0.34\%，迁移次数增至 5,625。这说明 QMAP 在主要正结果中确实利用了读写上下文和代价感知训练信号。相比之下，\texttt{blackscholes} 上消融差异接近 0，说明该 workload 的工作集较小，策略收益主要来自少量迁移决策，消融不容易暴露明显机制差异。
+
+\subsection{多随机种子稳定性}
+
+最后，我们验证 QMAP 的结果是否只是单个训练随机种子的偶然现象。我们选择三个 workload：\texttt{streamcluster} pressure window 是最强正结果，\texttt{blackscholes} 是标准切分正结果，\texttt{canneal} 是稳定负例。每个 workload 使用三个训练种子：3136859、42 和 2026。baseline 固定复用确定性或固定随机种子结果，只重新训练 QMAP。
+
+\begin{table*}[t]
+  \centering
+  \caption{多随机种子稳定性。Delta 表示 QMAP 相对最佳 baseline 的 cost 变化。}
+  \label{tab:seed-stability}
+  \scriptsize
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Workload & Mean delta & Std delta & Min delta & Max delta & 结论 \\
+    \midrule
+    streamcluster pressure & -11.59\% & 0.83\% & -12.35\% & -10.43\% & 三个种子均优于最佳 baseline \\
+    blackscholes & -1.61\% & 0.51\% & -2.10\% & -0.91\% & 三个种子均优于最佳 baseline \\
+    canneal & +18.86\% & 1.63\% & +16.67\% & +20.59\% & 三个种子均差于最佳 baseline \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+表~\ref{tab:seed-stability} 显示，\texttt{streamcluster} pressure window 的平均改善为 11.59\%，标准差为 0.83\%，三个种子均明显优于最佳 baseline。 \texttt{blackscholes} 的改善幅度较小，平均为 1.61\%，但三个种子也全部优于 LFU。 \texttt{canneal} 的失败同样稳定，三个种子均显著差于 LRU。这组结果支持一个平衡结论：QMAP 的主要正结果不是训练 seed 偶然造成的；同时，QMAP 在 \texttt{canneal} 上的失败也是稳定边界，而非单次训练噪声。
+
+\subsection{实验结论}
+
+综合以上结果，QMAP 在真实 trace 上表现出明确但有边界的收益。第一，在具有实际迁移压力的 \texttt{streamcluster} pressure window 上，QMAP 相比最佳 baseline 降低 12.35\% 的加权访问代价，并显著减少迁移次数，这是本文最强的真实 workload 正结果。第二，在 \texttt{blackscholes} 标准 1M split 上，QMAP 稳定小幅优于 LFU，并显著减少 NVM 写入，说明即使在高命中率、小工作集场景中，面向代价的迁移决策仍然可能带来收益。第三，\texttt{dedup} pressure window 上 QMAP 与 LRU 持平，说明在迁移压力较弱或策略空间较小时，QMAP 不一定产生额外优势。第四，\texttt{canneal} 是稳定负例，QMAP 的迁移次数明显增加，暴露出当前候选页排序对特定访问模式仍然敏感。
+
+因此，本文不把 QMAP 表述为所有 workload 上都优于经典策略的通用替换器，而将其定位为面向 DRAM/NVM 混合内存、能在有明显迁移压力和访问相位特征的真实 workload 中降低加权访问代价的学习型页面迁移策略。当前结果也指出后续优化方向：需要进一步增强候选页排序的保守性和在线自适应能力，以避免在 \texttt{canneal} 这类 workload 上出现过度迁移。
