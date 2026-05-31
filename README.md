@@ -17,7 +17,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 ```text
 1. synthetic trace 上的 QMAP 原型 pipeline：trace -> JSONL -> train -> replay -> summary。
 2. LRU / Random / LFU / CLOCK / QMAP 的基础对比。
-3. checkpoint sweep、参数敏感性、消融实验。
+3. checkpoint sweep、参数敏感性、消融实验，以及真实数据上的 cost/capacity/candidate sensitivity。
 4. Q-Former 与 mean pooling 的对照。
 5. Encoder 层数对照，结果显示 1-layer mean_pool 已经足够稳。
 ```
@@ -30,6 +30,7 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 3. mean pooling 比 Q-Former 更稳，且结构更简单、推理开销更低。
 4. 后续论文主线应改为 QMAP-Pool，而不是 QMAP-Full/Q-Former。
 5. 真实实验主线已经固定为 1M 标准 split、streamcluster/dedup pressure window、真实消融和多 seed。QMAP-Pool 在 streamcluster pressure window 和 blackscholes 上稳定优于最佳 baseline，在 dedup 上基本持平，在 canneal 上稳定失败。
+6. 三项真实敏感性实验已完成：cost-weight 说明正负结论不依赖单一 cost 权重；capacity 说明 streamcluster pressure 在 cap=8/16 有稳定收益、cap=32 低压力接近持平；candidate-count 说明 streamcluster pressure 在 c4/c8/c16 都赢，而 canneal 随 candidate_count 增大明显恶化。
 ```
 
 ## 结果总览
@@ -53,9 +54,9 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | 真实数据消融 | 阶段 6 已完成；只保留 `QMAP-Pool / no_rw / no_cost` | `outputs/results/real_ablation/summary.md` |
 | 多 seed 稳定性 | 阶段 7 已完成；验证正结果和负例不是 seed 偶然 | `outputs/results/seed_stability/summary.md` |
 | 5M 实验 | 暂缓；当前 5M 目录实际是 100k 回退结果，不进入论文 | `outputs/results/real_workload_suite/5m/` |
-| cost-weight sensitivity | 待补；优先级最高，replay-only，不需要重新训练 | `outputs/results/cost_weight_sensitivity/summary.md` |
-| capacity sensitivity | 待补；覆盖 streamcluster pressure 和 canneal，DRAM cap=8/16/32 | `outputs/results/capacity_sensitivity/summary.md` |
-| candidate-count sensitivity | 待补；覆盖 streamcluster pressure 和 canneal，candidate count=4/8/16 | `outputs/results/candidate_sensitivity/summary.md` |
+| cost-weight sensitivity | 已完成；replay counter 重新加权，不重新训练 | `outputs/results/cost_weight_sensitivity/summary.md` |
+| capacity sensitivity | 已完成；覆盖 streamcluster pressure 和 canneal，DRAM cap=8/16/32 | `outputs/results/capacity_sensitivity/summary.md` |
+| candidate-count sensitivity | 已完成；覆盖 streamcluster pressure 和 canneal，candidate count=4/8/16 | `outputs/results/candidate_sensitivity/summary.md` |
 
 ## 目录结构
 
@@ -939,8 +940,8 @@ Step 9. 已完成：1M 主表已固化，blackscholes 和 streamcluster pressure
 Step 10. 已完成：真实数据必要消融已完成，覆盖 streamcluster pressure 和 blackscholes。
 Step 11. 已完成：多 seed 验证已完成，覆盖 streamcluster pressure、blackscholes 和 canneal 负例。
 Step 12. 暂缓：正式 5M。当前论文不补 5M；如后续老师要求，必须重新采集真实 5M 并确认 records=5000000。
-Step 13. 当前下一步：补三项附录级敏感性实验：cost-weight、capacity、candidate-count。
-Step 14. 敏感性实验补完后：开始写论文实验部分，按“1M 主实验 -> pressure window -> 消融 -> 多 seed -> overhead/局限性 -> 附录敏感性”的顺序组织。
+Step 13. 已完成：三项附录级敏感性实验已补完：cost-weight、capacity、candidate-count。
+Step 14. 当前下一步：开始写论文实验部分，按“1M 主实验 -> pressure window -> 消融 -> 多 seed -> overhead/局限性 -> 附录敏感性”的顺序组织。
 ```
 
 ## 并行执行建议
@@ -1028,17 +1029,22 @@ Step 14. 敏感性实验补完后：开始写论文实验部分，按“1M 主�
    - 三个 seed 下 streamcluster pressure 和 blackscholes 都稳定优于 best baseline
    - canneal 三个 seed 都稳定失败
    - QMAP-Pool 推理开销明显高于传统策略，需要作为代价讨论
+
+6. Appendix Sensitivity
+   - cost-weight sensitivity: 正负结论不依赖单一 cost 权重
+   - capacity sensitivity: streamcluster pressure 在 cap=8/16 有稳定收益，cap=32 接近持平
+   - candidate-count sensitivity: streamcluster pressure 在 c4/c8/c16 均获益，canneal 随 candidate_count 增大明显恶化
 ```
 
-## 待补三项敏感性实验
+## 已完成三项敏感性实验
 
-下面三项用于增强论文防御性，不改变当前主实验结论。推荐全部放附录，正文只各用一句话概括。
+下面三项用于增强论文防御性，不改变当前主实验结论。结果已经齐全，推荐全部放附录，正文只各用一句话概括。
 
 ### 1. Cost-weight sensitivity
 
-优先级：最高。
+状态：已完成。
 
-目的：回应 weighted access cost 中 `NVM write=8`、`migration=10` 是否过于主观。该实验不需要重新训练，只需要用已有 replay 结果重新计算 cost，或用 `qmap_eval.py` 指定不同 cost 参数重放。
+目的：回应 weighted access cost 中 `NVM write=8`、`migration=10` 是否过于主观。该实验不重新训练，直接用已有 replay JSON 计数重新计算 cost。
 
 推荐 workload：
 
@@ -1076,7 +1082,7 @@ canneal                 负例，使用 1M standard split
   delta = (QMAP_cost - best_baseline_cost) / best_baseline_cost
 ```
 
-如果想用 replay 而不是手工重算，也可以直接调用 `qmap/qmap_eval.py`。示例：
+复现时如果想重新 replay，而不是手工重算，也可以直接调用 `qmap/qmap_eval.py`。示例：
 
 ```bash
 python qmap/qmap_eval.py \
@@ -1095,35 +1101,34 @@ python qmap/qmap_eval.py \
   --json_output outputs/results/cost_weight_sensitivity/write_heavy/streamcluster_pressure/qmap.json
 ```
 
-最终汇总表：
+结果汇总：
 
 | Cost model | streamcluster-p delta | blackscholes delta | canneal delta |
 |---|---:|---:|---:|
 | default | -12.35% | -0.91% | +19.32% |
-| mild | 待补 | 待补 | 待补 |
-| write-heavy | 待补 | 待补 | 待补 |
-| migration-heavy | 待补 | 待补 | 待补 |
+| mild | -7.99% | -0.28% | +11.64% |
+| write-heavy | -12.12% | -2.28% | +19.25% |
+| migration-heavy | -18.21% | -0.73% | +31.10% |
 
-推荐输出：
+输出：
 
 ```text
 outputs/results/cost_weight_sensitivity/summary.md
 outputs/results/cost_weight_sensitivity/summary.csv
 ```
 
-判断标准：
+结论：
 
 ```text
-如果 streamcluster_pressure 在大多数 cost model 下仍优于 best baseline，
-就可以在正文写：QMAP-Pool 的正结果不依赖单一 cost 权重。
-
-如果 canneal 在大多数 cost model 下仍失败，
-就可以写：canneal 是稳定边界案例，不是 cost 权重选择造成的偶然。
+streamcluster_pressure 在所有 cost model 下都优于 best baseline。
+blackscholes 在所有 cost model 下都小幅优于 best baseline。
+canneal 在所有 cost model 下都差于 best baseline。
+因此，当前正负结论不依赖单一 cost 权重选择。
 ```
 
 ### 2. Capacity sensitivity
 
-优先级：高。
+状态：已完成。
 
 目的：回应 `dram_capacity=16` pages 是否过小、结论是否只在单一容量下成立。该实验建议完整重新生成 JSONL、训练、评估，因为 `dram_capacity` 会影响候选样本生成和 replay 压力。
 
@@ -1201,37 +1206,38 @@ for cap in 8 16 32; do
 done
 ```
 
-最终汇总表：
+结果汇总：
 
 | Workload | DRAM cap | best baseline cost | QMAP cost | delta | QMAP migrations | decision count |
 |---|---:|---:|---:|---:|---:|---:|
-| streamcluster-p | 8 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| streamcluster-p | 8 | 369999 | 331072 | -10.52% | 11592 | 11592 |
 | streamcluster-p | 16 | 301767 | 264501 | -12.35% | 5541 | 5541 |
-| streamcluster-p | 32 | 待补 | 待补 | 待补 | 待补 | 待补 |
-| canneal | 8 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| streamcluster-p | 32 | 216577 | 217150 | +0.26% | 1548 | 1548 |
+| canneal | 8 | 190696 | 314640 | +65.00% | 19176 | 19176 |
 | canneal | 16 | 126178 | 150559 | +19.32% | 4567 | 4567 |
-| canneal | 32 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| canneal | 32 | 101502 | 101320 | -0.18% | 116 | 116 |
 
-推荐输出：
+输出：
 
 ```text
 outputs/results/capacity_sensitivity/summary.md
 outputs/results/capacity_sensitivity/summary.csv
 ```
 
-注意：上面的 `run_real_pilot.py` 命令会先在每个 `cap*` 子目录下生成单独的 `summary.md`。跑完 6 个组合后，需要把这些子目录结果汇总成 `outputs/results/capacity_sensitivity/summary.md` 和 `summary.csv`，再放入附录表。
+注意：本地结果 JSON、summary 和 checkpoint 已齐全。JSONL 中间训练文件如果没有同步到本地，不影响论文表格；需要复现时可以由上面的命令重新生成。
 
-判断标准：
+结论：
 
 ```text
-如果 cap=32 下 decision_count 或 migrations 很低，把该行标注为 low-pressure，不强行解释优劣。
-如果 cap=8/16 下 streamcluster_pressure 都有优势，可以说明 QMAP-Pool 在有足够 replacement pressure 时稳定有效。
-如果 canneal 在不同容量下仍失败，可以说明它是 workload/candidate-rank 边界，而不是单一容量造成的偶然。
+streamcluster_pressure 在 cap=8 和 cap=16 下稳定优于 best baseline；
+cap=32 时 replacement pressure 明显降低，QMAP 与 best baseline 基本持平。
+canneal 在 cap=8 和 cap=16 下明显失败，cap=32 时压力较弱并接近持平。
+这说明 `dram_capacity=16` 不是孤立选择；QMAP-Pool 的收益主要出现在有足够 replacement pressure 的负载上。
 ```
 
 ### 3. Candidate-count sensitivity
 
-优先级：中高。
+状态：已完成。
 
 目的：补足 canneal 失败机制的证据。已有 `outputs/results/real_workload_suite/1m/canneal_epoch_candidate_sweep/summary.md` 能证明 canneal 与 candidate/rank 有关，但它更像诊断 sweep。建议补一个统一口径的小型 sensitivity：同一训练流程、同一 workload、同一 dram_capacity，只改变 candidate count。
 
@@ -1309,32 +1315,32 @@ for cand in 4 8 16; do
 done
 ```
 
-最终汇总表：
+结果汇总：
 
 | Workload | Candidate count | best baseline cost | QMAP cost | delta | QMAP migrations | decision count |
 |---|---:|---:|---:|---:|---:|---:|
-| streamcluster-p | 4 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| streamcluster-p | 4 | 301767 | 282349 | -6.43% | 7169 | 7169 |
 | streamcluster-p | 8 | 301767 | 264501 | -12.35% | 5541 | 5541 |
-| streamcluster-p | 16 | 待补 | 待补 | 待补 | 待补 | 待补 |
-| canneal | 4 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| streamcluster-p | 16 | 301767 | 289085 | -4.20% | 7897 | 7897 |
+| canneal | 4 | 126178 | 134802 | +6.83% | 3134 | 3134 |
 | canneal | 8 | 126178 | 150559 | +19.32% | 4567 | 4567 |
-| canneal | 16 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| canneal | 16 | 126178 | 244261 | +93.58% | 12949 | 12949 |
 
-推荐输出：
+输出：
 
 ```text
 outputs/results/candidate_sensitivity/summary.md
 outputs/results/candidate_sensitivity/summary.csv
 ```
 
-注意：上面的 `run_real_pilot.py` 命令会先在每个 `c*` 子目录下生成单独的 `summary.md`。跑完 6 个组合后，需要把这些子目录结果汇总成 `outputs/results/candidate_sensitivity/summary.md` 和 `summary.csv`，再放入附录表。
+注意：本地结果 JSON、summary 和 checkpoint 已齐全。JSONL 中间训练文件如果没有同步到本地，不影响论文表格；需要复现时可以由上面的命令重新生成。
 
-判断标准：
+结论：
 
 ```text
-如果 canneal 随 candidate_count 增大而明显变差，可以支撑“candidate-rank sensitivity”解释。
-如果 streamcluster_pressure 在 c4/c8/c16 中至少 c8 或 c16 稳定优于 best baseline，可以说明正例不是单一 candidate_count 偶然。
-如果 c16 推理开销明显增加，需要在附录标注 avg decision time。
+streamcluster_pressure 在 c4/c8/c16 下都优于 best baseline，c8 最好。
+canneal 在 c4/c8/c16 下都差于 best baseline，并且 candidate_count 越大越差。
+这直接支撑 canneal 失败来自 candidate/rank sensitivity，而不是单个训练 seed 或单个 candidate 设置的偶然。
 ```
 
 ## 指标说明
