@@ -1,0 +1,57 @@
+QMAP training configuration:
+  train_data path: /home/likc/Q-former-for-OS/dataset/jsonl/capacity_sensitivity/canneal/cap32/parsec_canneal_train.jsonl
+  number of training samples: 4237
+  batch_size: 32
+  epochs: 10
+  learning rate: 0.0001
+  weight decay: 0.0
+  device: cuda
+  ablation: mean_pool
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.523142
+Epoch [1/10] iter=100 loss=-0.524916
+Epoch [1/10] avg_loss=-0.510658
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_1.pth
+Epoch [2/10] iter=134 loss=-0.405632
+Epoch [2/10] iter=200 loss=-0.622496
+Epoch [2/10] avg_loss=-0.545574
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_2.pth
+Epoch [3/10] iter=267 loss=-0.500091
+Epoch [3/10] iter=300 loss=-0.491570
+Epoch [3/10] avg_loss=-0.550422
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_3.pth
+Epoch [4/10] iter=400 loss=-0.504385
+Epoch [4/10] iter=400 loss=-0.504385
+Epoch [4/10] iter=500 loss=-0.630549
+Epoch [4/10] avg_loss=-0.552184
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_4.pth
+Epoch [5/10] iter=533 loss=-0.615109
+Epoch [5/10] iter=600 loss=-0.642073
+Epoch [5/10] avg_loss=-0.553102
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_5.pth
+Epoch [6/10] iter=666 loss=-0.635016
+Epoch [6/10] iter=700 loss=-0.517637
+Epoch [6/10] avg_loss=-0.554366
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_6.pth
+Epoch [7/10] iter=799 loss=-0.549849
+Epoch [7/10] iter=800 loss=-0.580047
+Epoch [7/10] iter=900 loss=-0.491560
+Epoch [7/10] avg_loss=-0.557278
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_7.pth
+Epoch [8/10] iter=932 loss=-0.543230
+Epoch [8/10] iter=1000 loss=-0.565733
+Epoch [8/10] avg_loss=-0.558849
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_8.pth
+Epoch [9/10] iter=1065 loss=-0.469815
+Epoch [9/10] iter=1100 loss=-0.478003
+Epoch [9/10] avg_loss=-0.560034
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_9.pth
+Epoch [10/10] iter=1198 loss=-0.454898
+Epoch [10/10] iter=1200 loss=-0.659941
+Epoch [10/10] iter=1300 loss=-0.647404
+Epoch [10/10] avg_loss=-0.561984
+Saved checkpoint: outputs/checkpoints/capacity_sensitivity/canneal/cap32/parsec_canneal/qmap_epoch_10.pth
+Training finished.
+/home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
