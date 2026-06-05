@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Run from the repository root. Override PY/DEVICE if needed.
-PY=${PY:-'python'}
+PY=${PY:-'/home/likc/.conda/envs/qmap/bin/python'}
 DEVICE=${DEVICE:-'cuda'}
 WORKLOADS=${WORKLOADS:-'streamcluster_pressure,canneal'}
 CANDIDATES=${CANDIDATES:-'4,8,16'}

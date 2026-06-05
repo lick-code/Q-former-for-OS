@@ -4,14 +4,14 @@
 
 - run id: `capacity_streamcluster_pressure_cap8`
 - workloads: `parsec_streamcluster`
-- policies: `LRU, RANDOM, LFU, CLOCK, QMAP-Pool`
+- policies: `LRU, RANDOM, LFU, CLOCK, QMAP-CrossAttn`
 - records per workload: `external processed splits (--skip_prepare)`
 - test accesses: `parsec_streamcluster=200000`
 - global skip: `0`
 - split policy: `chronological 80/10/10`
 - DRAM capacity: `8` pages
 - h/c/d/l: `10/8/8/256`
-- QMAP model: `QMAP-Pool` (`ablation=mean_pool`)
+- QMAP model: `QMAP-CrossAttn` (`ablation=cross_attention`)
 - QMAP rank guard: `disabled`
 - page shift: `12`
 - epochs: `10`
@@ -30,14 +30,14 @@
 
 | Workload | Policy | Hit rate (%) | NVM writes | Cost | Migrations | Decision ms |
 |---|---|---:|---:|---:|---:|---:|
-| parsec_streamcluster | LRU | 92.47 | 731 | 369999.00 | 15055 | 0.000303 |
-| parsec_streamcluster | RANDOM | 89.95 | 2110 | 433691.00 | 20093 | 0.001152 |
-| parsec_streamcluster | LFU | 89.56 | 818 | 434464.00 | 20868 | 0.003447 |
-| parsec_streamcluster | CLOCK | 92.31 | 734 | 373526.00 | 15374 | 0.001570 |
-| parsec_streamcluster | QMAP-Pool | 94.20 | 592 | 331072.00 | 11592 | 2.299018 |
+| parsec_streamcluster | LRU | 92.47 | 731 | 369999.00 | 15055 | 0.000291 |
+| parsec_streamcluster | RANDOM | 89.95 | 2110 | 433691.00 | 20093 | 0.001203 |
+| parsec_streamcluster | LFU | 89.56 | 818 | 434464.00 | 20868 | 0.003339 |
+| parsec_streamcluster | CLOCK | 92.31 | 734 | 373526.00 | 15374 | 0.001388 |
+| parsec_streamcluster | QMAP-CrossAttn | 94.13 | 589 | 332660.00 | 11738 | 2.356620 |
 
-## QMAP-Pool vs Best Baseline By Cost
+## QMAP-CrossAttn vs Best Baseline By Cost
 
-| Workload | Best baseline and QMAP-Pool cost delta |
+| Workload | Best baseline and QMAP-CrossAttn cost delta |
 |---|---:|
-| parsec_streamcluster | LRU -10.52% |
+| parsec_streamcluster | LRU -10.09% |

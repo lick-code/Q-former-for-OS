@@ -4,14 +4,14 @@
 
 - run id: `capacity_canneal_cap8`
 - workloads: `parsec_canneal`
-- policies: `LRU, RANDOM, LFU, CLOCK, QMAP-Pool`
+- policies: `LRU, RANDOM, LFU, CLOCK, QMAP-CrossAttn`
 - records per workload: `external processed splits (--skip_prepare)`
 - test accesses: `parsec_canneal=100000`
 - global skip: `0`
 - split policy: `chronological 80/10/10`
 - DRAM capacity: `8` pages
 - h/c/d/l: `10/8/8/256`
-- QMAP model: `QMAP-Pool` (`ablation=mean_pool`)
+- QMAP model: `QMAP-CrossAttn` (`ablation=cross_attention`)
 - QMAP rank guard: `disabled`
 - page shift: `12`
 - epochs: `10`
@@ -30,14 +30,14 @@
 
 | Workload | Policy | Hit rate (%) | NVM writes | Cost | Migrations | Decision ms |
 |---|---|---:|---:|---:|---:|---:|
-| parsec_canneal | LRU | 91.87 | 228 | 190696.00 | 8120 | 0.000275 |
-| parsec_canneal | RANDOM | 89.55 | 653 | 218810.00 | 10444 | 0.001099 |
-| parsec_canneal | LFU | 85.09 | 910 | 269379.00 | 14901 | 0.003362 |
-| parsec_canneal | CLOCK | 91.39 | 156 | 195599.00 | 8605 | 0.001446 |
-| parsec_canneal | QMAP-Pool | 80.82 | 616 | 314640.00 | 19176 | 2.269642 |
+| parsec_canneal | LRU | 91.87 | 228 | 190696.00 | 8120 | 0.000289 |
+| parsec_canneal | RANDOM | 89.55 | 653 | 218810.00 | 10444 | 0.001101 |
+| parsec_canneal | LFU | 85.09 | 910 | 269379.00 | 14901 | 0.003308 |
+| parsec_canneal | CLOCK | 91.39 | 156 | 195599.00 | 8605 | 0.001448 |
+| parsec_canneal | QMAP-CrossAttn | 77.66 | 1195 | 352852.00 | 22334 | 2.287812 |
 
-## QMAP-Pool vs Best Baseline By Cost
+## QMAP-CrossAttn vs Best Baseline By Cost
 
-| Workload | Best baseline and QMAP-Pool cost delta |
+| Workload | Best baseline and QMAP-CrossAttn cost delta |
 |---|---:|
-| parsec_canneal | LRU +65.00% |
+| parsec_canneal | LRU +85.03% |

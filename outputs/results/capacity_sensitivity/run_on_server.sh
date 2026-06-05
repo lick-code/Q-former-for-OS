@@ -7,5 +7,5 @@ DEVICE=${DEVICE:-'cuda'}
 WORKLOADS=${WORKLOADS:-'streamcluster_pressure,canneal'}
 CAPACITIES=${CAPACITIES:-'8,16,32'}
 
-# Full pipeline: JSONL generation -> QMAP-Pool training -> policy eval -> final summary.
+# Full pipeline: JSONL generation -> QMAP-CrossAttn training -> policy eval -> final summary.
 $PY scripts/run_capacity_sensitivity.py --run --summarize --workloads "$WORKLOADS" --capacities "$CAPACITIES" --python "$PY" --device "$DEVICE"

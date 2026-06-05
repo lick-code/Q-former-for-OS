@@ -1,6 +1,6 @@
 # Stage 7 Seed Stability
 
-Purpose: answer whether the QMAP-Pool result is an accidental training-seed outcome.
+Purpose: answer whether the QMAP-CrossAttn result is an accidental training-seed outcome.
 
 ## Per-seed Results
 
@@ -27,4 +27,4 @@ Purpose: answer whether the QMAP-Pool result is an accidental training-seed outc
 ## Notes
 
 - LRU, LFU and CLOCK baselines are deterministic and reused from the existing stage 5/6 result directories.
-- Random is reused from the existing fixed-random-seed baseline run; QMAP-Pool is the only policy retrained across seeds.
+- Random is reused from the existing fixed-random-seed baseline run; QMAP-CrossAttn is the only policy retrained across seeds.

@@ -1,5 +1,5 @@
 {
-  "avg_decision_time_ms": 2.3015949285878468,
+  "avg_decision_time_ms": 2.2986209392888934,
   "candidate_count": 4,
   "cost_model": {
     "dram_read_cost": 1.0,
@@ -8,19 +8,19 @@
     "nvm_read_cost": 2.0,
     "nvm_write_cost": 8.0
   },
-  "decision_count": 7169,
-  "decision_time_seconds": 16.500134043046273,
+  "decision_count": 7367,
+  "decision_time_seconds": 16.93394045974128,
   "dram_capacity": 16,
-  "hit_rate": 0.964075,
-  "hit_rate_percent": 96.4075,
-  "hits": 192815,
-  "migrations": 7169,
-  "misses": 7185,
-  "nvm_reads": 6606,
-  "nvm_writes": 579,
+  "hit_rate": 0.963085,
+  "hit_rate_percent": 96.3085,
+  "hits": 192617,
+  "migrations": 7367,
+  "misses": 7383,
+  "nvm_reads": 6794,
+  "nvm_writes": 589,
   "policy": "qmap",
   "rank_guard": 0,
   "total_accesses": 200000,
   "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
-  "weighted_access_cost": 282349.0
+  "weighted_access_cost": 284587.0
 }
