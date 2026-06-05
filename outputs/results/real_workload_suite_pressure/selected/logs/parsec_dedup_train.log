@@ -6,8 +6,10 @@ QMAP training configuration:
   learning rate: 0.0001
   weight decay: 0.0
   device: cuda
-  ablation: mean_pool
+  ablation: cross_attention
   qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  extractor pooling_strategy: none
+  scorer scoring_input: context
   loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
 Epoch [1/10] iter=1 loss=-0.000000
 Epoch [1/10] avg_loss=0.000000
