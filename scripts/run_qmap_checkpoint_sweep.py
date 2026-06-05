@@ -16,8 +16,8 @@ import sys
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 CHECKPOINT_RE = re.compile(r"qmap_epoch_(\d+)\.pth$")
-QMAP_MODEL_NAME = "QMAP-Pool"
-QMAP_ABLATION = "mean_pool"
+QMAP_MODEL_NAME = "QMAP-CrossAttn"
+QMAP_ABLATION = "cross_attention"
 
 
 def path_from_root(*parts):
@@ -50,9 +50,10 @@ def build_arg_parser():
       default="cpu",
       help="Evaluation device passed to qmap_eval.py. Use cuda for GPU.")
   parser.add_argument("--ablation", default=QMAP_ABLATION,
-                      choices=("full", "no_pc", "no_rw", "mean_pool",
-                               "no_qformer", "no_cost"),
-                      help="Evaluation ablation. New experiments use mean_pool.")
+                      choices=("full", "cross_attention", "no_pc", "no_rw",
+                               "mean_pool", "no_qformer", "no_cost"),
+                      help=("Evaluation ablation. New experiments use "
+                            "cross_attention."))
   parser.add_argument("--python", default=sys.executable)
   return parser
 

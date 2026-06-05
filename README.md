@@ -2,13 +2,27 @@
 
 QMAP 是一个面向 DRAM/NVM 混合内存系统的页面迁移策略原型。它把页面迁移建模为候选页面排序问题：当 DRAM 已满并且一次 DRAM miss 触发迁移决策时，QMAP 从候选页面中选择最适合从 DRAM 降级到 NVM 的页面。
 
-和老师讨论后，后续主线不再使用 Q-Former。最终模型收敛为：
+## 2026-06-04 方法更新
+
+当前代码主线已经从旧的 `QMAP-Pool/mean_pool` 改为
+`QMAP-CrossAttn/cross_attention`。新方法不再在 Transformer Encoder
+之后做均值池化，也不再把均值池化后的全局向量和页面特征简单拼接。
 
 ```text
-QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer
+QMAP-CrossAttn =
+  access feature embedding
+  -> 1-layer Transformer Encoder 得到 X_enc
+  -> candidate page features 作为 Q
+  -> X_enc 作为 K/V 做 cross-attention
+  -> attention context vector 送入 MLP 输出 eviction score
 ```
 
-Q-Former 相关实验只作为前期探索记录保留，不再作为论文主线。当前论文实验规模固定为：`1M real trace + pressure window + real ablation + seed stability`。暂不补 5M；如果后续老师要求更大规模，再重新采集真正的 5M trace 后补跑。当前 `outputs/results/real_workload_suite/5m/` 是 100k 回退结果，不能作为论文或文档中的 5M 实验结果。
+旧的 `QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer`
+只作为历史口径保留；Q-Former 相关实验也只作为前期探索记录保留，不再作为论文主线。
+由于模型结构已经变化，旧结果目录中的 `QMAP-Pool/mean_pool` 指标不能直接作为
+新方法结果引用，正式实验需要重新生成 checkpoint 并重新 replay。
+
+当前论文实验规模仍固定为：`1M real trace + pressure window + real ablation + seed stability`。暂不补 5M；如果后续老师要求更大规模，再重新采集真正的 5M trace 后补跑。当前 `outputs/results/real_workload_suite/5m/` 是 100k 回退结果，不能作为论文或文档中的 5M 实验结果。
 
 ## 当前状态
 
@@ -18,8 +32,8 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 1. synthetic trace 上的 QMAP 原型 pipeline：trace -> JSONL -> train -> replay -> summary。
 2. LRU / Random / LFU / CLOCK / QMAP 的基础对比。
 3. checkpoint sweep、参数敏感性、消融实验，以及真实数据上的 cost/capacity/candidate sensitivity。
-4. Q-Former 与 mean pooling 的对照。
-5. Encoder 层数对照，结果显示 1-layer mean_pool 已经足够稳。
+4. Q-Former 与 mean pooling 的对照已经保留为历史记录。
+5. 当前代码默认使用 1-layer Transformer Encoder + candidate-page cross-attention。
 ```
 
 当前结论：
@@ -27,10 +41,9 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 ```text
 1. QMAP 在 writeheavy synthetic workload 上表现最好，能降低 NVM writes 和 weighted access cost。
 2. QMAP 不是所有 workload 都优于 LFU，尤其在 hotset、phasechange、pcrwstress 上 LFU 仍然很强。
-3. mean pooling 比 Q-Former 更稳，且结构更简单、推理开销更低。
-4. 后续论文主线应改为 QMAP-Pool，而不是 QMAP-Full/Q-Former。
-5. 真实实验主线已经固定为 1M 标准 split、streamcluster/dedup pressure window、真实消融和多 seed。QMAP-Pool 在 streamcluster pressure window 和 blackscholes 上稳定优于最佳 baseline，在 dedup 上基本持平，在 canneal 上稳定失败。
-6. 三项真实敏感性实验已完成：cost-weight 说明正负结论不依赖单一 cost 权重；capacity 说明 streamcluster pressure 在 cap=8/16 有稳定收益、cap=32 低压力接近持平；candidate-count 说明 streamcluster pressure 在 c4/c8/c16 都赢，而 canneal 随 candidate_count 增大明显恶化。
+3. 旧的 mean pooling 结论只作为历史对照；新论文主线应使用 QMAP-CrossAttn。
+4. 真实实验主线仍是 1M 标准 split、streamcluster/dedup pressure window、真实消融和多 seed。
+5. 旧 `QMAP-Pool/mean_pool` 结果已经不能代表当前方法；新结果需要按下面的服务器命令重跑。
 ```
 
 ## 结果总览
@@ -44,14 +57,14 @@ Q-Former 相关实验只作为前期探索记录保留，不再作为论文主�
 | 参数敏感性 | 已完成 | `outputs/results/qmap_parameter_sensitivity/summary.md` |
 | 消融实验 | 已完成 | `outputs/results/qmap_ablation/` |
 | cost-aware 权重实验 | 已完成 | `outputs/results/qmap_cost_w8_m4_writeheavy/summary.md` |
-| 阶段 0：实验口径冻结 | 已完成 | 新实验默认 `mean_pool`，表格统一 `QMAP-Pool` |
+| 阶段 0：实验口径冻结 | 已更新 | 新实验默认 `cross_attention`，表格统一 `QMAP-CrossAttn` |
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 | 真实/标准 workload | 4 个 PARSEC 100k 真实 trace 已完成 | `outputs/results/real_trace_stats/summary.md` |
-| 真实 trace 100k pilot | 阶段 4 已完成；最终口径为 `dram_capacity=16`、`candidate_count=8`、QMAP-Pool mean_pool | `outputs/results/real_pilot/summary.md` |
+| 真实 trace 100k pilot | 历史结果；新方法需按 `cross_attention` 重跑 | `outputs/results/real_pilot/summary.md` |
 | 真实 trace 1M 主实验 | 阶段 5 的正式主结果；作为论文主表来源 | `outputs/results/real_workload_suite/1m/summary.md` |
 | pressure window 实验 | 阶段 5 的压力窗口补充；streamcluster 是最强真实正结果，dedup 基本持平 | `outputs/results/real_workload_suite_pressure/selected/summary.md` |
-| 真实数据消融 | 阶段 6 已完成；只保留 `QMAP-Pool / no_rw / no_cost` | `outputs/results/real_ablation/summary.md` |
+| 真实数据消融 | 旧结果已完成；新方法需重跑 `QMAP-CrossAttn / no_rw / no_cost` | `outputs/results/real_ablation/summary.md` |
 | 多 seed 稳定性 | 阶段 7 已完成；验证正结果和负例不是 seed 偶然 | `outputs/results/seed_stability/summary.md` |
 | 5M 实验 | 暂缓；当前 5M 目录实际是 100k 回退结果，不进入论文 | `outputs/results/real_workload_suite/5m/` |
 | cost-weight sensitivity | 已完成；replay counter 重新加权，不重新训练 | `outputs/results/cost_weight_sensitivity/summary.md` |
@@ -70,7 +83,7 @@ qmap/
 
 policy_learning/cache_model/
   embed.py                      # QMAP embedding
-  model.py                      # Transformer、mean pooling、候选页 scorer；Q-Former 代码保留为历史探索
+  model.py                      # Transformer、candidate-page cross-attention、候选页 scorer；Q-Former/mean_pool 保留为历史探索
   qmap_loss.py                  # cost-aware ranking loss
   qmap_data.py                  # JSONL dataset 和 collate 逻辑
 
@@ -101,10 +114,10 @@ outputs/
 后续默认模型：
 
 ```text
-QMAP-Pool
+QMAP-CrossAttn
   access sequence encoder: Transformer Encoder
-  sequence aggregation: mean pooling
-  eviction decision: candidate scorer
+  sequence aggregation: none，保留完整 X_enc
+  eviction decision: page features query X_enc by cross-attention, then MLP scorer
 ```
 
 不再继续做：
@@ -113,15 +126,16 @@ QMAP-Pool
 Q-Former query 数 K sweep
 Q-Former light/tiny 变体
 Encoder 2/3 层 sweep
+把 mean_pool 作为论文主线
 把 Q-Former 作为论文主贡献点
 ```
 
 保留原因：
 
 ```text
-1. mean_pool 在 phasechange、pcrwstress 和 Q-Former 对照中更稳。
-2. Encoder 层数对照显示 1-layer mean_pool 的 weighted cost 最低且推理最快。
-3. 去掉 Q-Former 后论文主线更清晰，复杂度更低。
+1. Q-Former 和 mean_pool 结果是历史探索记录，便于解释方法演进。
+2. 当前论文方法已经改为页面特征查询完整 X_enc 的 cross-attention。
+3. 新方法需要重新训练和 replay，不能沿用旧 QMAP-Pool 数字。
 ```
 
 ## 下一步实验规划
@@ -132,14 +146,14 @@ Encoder 2/3 层 sweep
 
 状态：已完成。
 
-目标：把后续所有实验统一到 QMAP-Pool。
+目标：把后续所有实验统一到 QMAP-CrossAttn。
 
 已落实：
 
 ```text
-1. qmap_generator.py / qmap_train.py 默认 ablation=mean_pool。
-2. run_prototype_experiment.py、run_workload_suite.py、run_qmap_parameter_sensitivity.py 等新实验入口显式传入 mean_pool。
-3. 后续 summary 和论文表格统一叫 QMAP-Pool。
+1. qmap_generator.py / qmap_train.py 默认 ablation=cross_attention。
+2. run_prototype_experiment.py、run_workload_suite.py、run_qmap_parameter_sensitivity.py 等新实验入口显式传入 cross_attention。
+3. 后续 summary 和论文表格统一叫 QMAP-CrossAttn。
 4. Q-Former comparison、Q-Former K sweep、Encoder 2/3 层 sweep 加保护开关，仅用于复现历史探索。
 5. replay cost model 暂时不再改，继续使用当前 qmap_eval.py 的配置。
 ```
@@ -153,15 +167,15 @@ lookahead = 256
 dram_capacity = 16
 epochs = 10
 batch_size = 32
-model = QMAP-Pool
-ablation = mean_pool
+model = QMAP-CrossAttn
+ablation = cross_attention
 ```
 
 严格依赖关系：
 
 ```text
 阶段 0 必须在所有真实数据正式实验之前完成。
-否则后面结果会混入 Q-Former / mean_pool 两套口径，论文会很难写。
+否则后面结果会混入 Q-Former / mean_pool / cross_attention 多套口径，论文会很难写。
 ```
 
 可以并行：
@@ -219,7 +233,7 @@ dataset/metadata/parsec_workload_manifest.json
 ```text
 PARSEC 环境搭建
 trace 采集工具准备
-QMAP-Pool synthetic 复跑脚本整理
+QMAP-CrossAttn synthetic 复跑脚本整理
 ```
 
 ### 阶段 2：实现真实 trace 采集和转换
@@ -330,7 +344,7 @@ python qmap/qmap_generator.py \
   --lookahead 256 \
   --dram_capacity 64 \
   --page_shift 12 \
-  --ablation mean_pool
+  --ablation cross_attention
 ```
 
 生成结果：
@@ -1399,6 +1413,74 @@ CUDA_VISIBLE_DEVICES=2 python ...
 ```
 
 脚本内部仍然写 `--device cuda`。此时程序看到的 `cuda:0` 实际对应物理 GPU 2。
+
+### 按新方法重跑正式实验
+
+先确认服务器 Python 环境能导入 PyTorch：
+
+```bash
+python -c "import torch; print(torch.__version__)"
+python -m unittest tests.test_qmap_cross_attention
+python qmap/qmap_integration_test.py
+```
+
+当前主线脚本已经默认使用：
+
+```text
+model = QMAP-CrossAttn
+ablation = cross_attention
+```
+
+如果服务器上已经有 `dataset/processed/real_workload_suite/1m/` 下的 1M
+切分数据，可以直接跳过 prepare，重新生成 JSONL、重新训练、重新 replay：
+
+```bash
+tmux new -s qmap_xattn_1m
+CUDA_VISIBLE_DEVICES=0 python scripts/run_real_workload_suite.py \
+  --accesses 1000000 \
+  --skip_prepare \
+  --device cuda
+```
+
+pressure window 主实验建议单独跑：
+
+```bash
+tmux new -s qmap_xattn_pressure
+CUDA_VISIBLE_DEVICES=0 python scripts/run_real_pilot.py \
+  --skip_prepare \
+  --workloads parsec_streamcluster,parsec_dedup \
+  --policies lru,random,lfu,clock,qmap \
+  --processed_dir dataset/processed/real_workload_suite_pressure/selected \
+  --manifest dataset/metadata/real_workload_suite_pressure_manifest.json \
+  --jsonl_dir dataset/jsonl/real_workload_suite_pressure/selected \
+  --result_dir outputs/results/real_workload_suite_pressure/selected \
+  --checkpoint_dir outputs/checkpoints/real_workload_suite_pressure/selected \
+  --history_length 10 \
+  --candidate_count 8 \
+  --dram_capacity 16 \
+  --lookahead 256 \
+  --epochs 10 \
+  --batch_size 32 \
+  --device cuda \
+  --run_id real_pressure_selected_cross_attention
+```
+
+消融、seed 稳定性和敏感性实验在主结果跑完后执行：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/run_real_ablation.py --force_generate
+CUDA_VISIBLE_DEVICES=0 python scripts/run_real_ablation.py --skip_generate --run_torch --summarize --device cuda
+
+CUDA_VISIBLE_DEVICES=0 python scripts/run_seed_stability.py --skip_generate --run_torch --summarize --device cuda
+
+CUDA_VISIBLE_DEVICES=0 python scripts/run_capacity_sensitivity.py --run --summarize --device cuda
+CUDA_VISIBLE_DEVICES=0 python scripts/run_candidate_sensitivity.py --run --summarize --device cuda
+python scripts/run_cost_weight_sensitivity.py
+```
+
+上面的命令会把默认结果目录更新为 `QMAP-CrossAttn/cross_attention` 结果。
+如果不想覆盖旧 `QMAP-Pool/mean_pool` 结果，先备份 `outputs/results/`、
+`outputs/checkpoints/` 和需要保留的 `dataset/jsonl/` 子目录。
 
 ## 建议保留
 

@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Capacity-sensitivity runner for the real-workload QMAP-Pool experiments.
+"""Capacity-sensitivity runner for the real-workload QMAP-CrossAttn experiments.
 
 Default mode is local-safe:
 
@@ -29,7 +29,7 @@ BATCH_SIZE = 32
 LR = 1e-4
 SEED = 3136859
 NVM_WRITE_COST = 8.0
-QMAP_ABLATION = "mean_pool"
+QMAP_ABLATION = "cross_attention"
 
 DEFAULT_CAPACITIES = (8, 16, 32)
 BASELINE_POLICIES = ("lru", "random", "lfu", "clock")
@@ -324,20 +324,20 @@ def write_summary_markdown(rows, path, workload_keys, capacities):
   with open(path, "w", encoding="utf-8") as output_file:
     output_file.write("# Capacity Sensitivity\n\n")
     output_file.write(
-        "Purpose: test whether the QMAP-Pool conclusion depends on the "
+        "Purpose: test whether the QMAP-CrossAttn conclusion depends on the "
         "single `dram_capacity=16` setting.\n\n")
     output_file.write("## Setup\n\n")
     output_file.write("- workloads: `{}`\n".format(", ".join(workload_keys)))
     output_file.write("- DRAM capacities: `{}` pages\n".format(
         ", ".join(str(capacity) for capacity in capacities)))
     output_file.write("- policies: `{}`\n".format(", ".join(
-        policy.upper() if policy != "qmap" else "QMAP-Pool"
+        policy.upper() if policy != "qmap" else "QMAP-CrossAttn"
         for policy in POLICIES)))
     output_file.write("- h/c/l: `{}/{}/{}`\n".format(
         HISTORY_LENGTH, CANDIDATE_COUNT, LOOKAHEAD))
     output_file.write("- epochs: `{}`\n".format(EPOCHS))
     output_file.write("- batch size: `{}`\n".format(BATCH_SIZE))
-    output_file.write("- QMAP model: `QMAP-Pool` (`ablation={}`)\n\n".format(
+    output_file.write("- QMAP model: `QMAP-CrossAttn` (`ablation={}`)\n\n".format(
         QMAP_ABLATION))
 
     output_file.write("## Results\n\n")
@@ -399,7 +399,7 @@ def write_server_script(path, python_bin, device, workload_keys, capacities):
       "WORKLOADS=${WORKLOADS:-%s}" % shell_quote(workload_arg),
       "CAPACITIES=${CAPACITIES:-%s}" % shell_quote(capacity_arg),
       "",
-      "# Full pipeline: JSONL generation -> QMAP-Pool training -> policy eval -> final summary.",
+      "# Full pipeline: JSONL generation -> QMAP-CrossAttn training -> policy eval -> final summary.",
       run_line,
       "",
   ]
@@ -418,7 +418,7 @@ def write_server_script(path, python_bin, device, workload_keys, capacities):
 
 def build_arg_parser():
   parser = argparse.ArgumentParser(
-      description="Run capacity sensitivity for QMAP-Pool.")
+      description="Run capacity sensitivity for QMAP-CrossAttn.")
   parser.add_argument("--workloads", default=",".join(WORKLOADS.keys()),
                       help="Comma-separated keys: {}".format(
                           ",".join(WORKLOADS.keys())))

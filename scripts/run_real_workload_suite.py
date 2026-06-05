@@ -31,8 +31,8 @@ STAGE5_DRAM_CAPACITY = 16
 STAGE5_LOOKAHEAD = 256
 STAGE5_EPOCHS = 10
 STAGE5_BATCH_SIZE = 32
-STAGE5_MODEL = "QMAP-Pool"
-STAGE5_ABLATION = "mean_pool"
+STAGE5_MODEL = "QMAP-CrossAttn"
+STAGE5_ABLATION = "cross_attention"
 
 
 def path_from_root(*parts):
@@ -67,7 +67,8 @@ def command_to_text(command):
 
 def build_arg_parser():
   parser = argparse.ArgumentParser(
-      description="Run stage 5 real workload suite with fixed QMAP-Pool config.")
+      description=("Run stage 5 real workload suite with fixed "
+                   "QMAP-CrossAttn config."))
   parser.add_argument("--accesses", type=int, default=1000000,
                       help="Records kept per workload. Use 1000000 first, then 5000000.")
   parser.add_argument("--workloads", default=",".join(DEFAULT_WORKLOADS),
@@ -76,7 +77,8 @@ def build_arg_parser():
                       help="Comma-separated policies. Stage 5 default is all table policies.")
   parser.add_argument("--rank_guard", type=int, default=STAGE5_RANK_GUARD,
                       help=("QMAP inference rank guard. Stage 5 Guard "
-                            "default is 2; use 0 for unguarded QMAP-Pool."))
+                            "default is 2; use 0 for unguarded "
+                            "QMAP-CrossAttn."))
   parser.add_argument("--device", default="cuda",
                       help="cuda, cpu, or auto. Use auto to let child scripts decide.")
   parser.add_argument("--python", default=sys.executable)

@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Candidate-count sensitivity runner for QMAP-Pool real-workload results.
+"""Candidate-count sensitivity runner for QMAP-CrossAttn real-workload results.
 
 Default mode is local-safe and does not import torch:
 
@@ -28,7 +28,7 @@ PAGE_SHIFT = 12
 EPOCHS = 10
 BATCH_SIZE = 32
 DEFAULT_CANDIDATE_COUNTS = (4, 8, 16)
-QMAP_ABLATION = "mean_pool"
+QMAP_ABLATION = "cross_attention"
 POLICIES = ("lru", "random", "lfu", "clock", "qmap")
 BASELINE_POLICIES = ("lru", "random", "lfu", "clock")
 
@@ -268,9 +268,9 @@ def collect_summary_rows(workload_keys, candidate_counts):
 def conclusion_for_workload(rows):
   deltas = [row["delta_percent"] for row in rows]
   if all(delta < 0.0 for delta in deltas):
-    return "QMAP-Pool beats the best baseline for every tested candidate count."
+    return "QMAP-CrossAttn beats the best baseline for every tested candidate count."
   if all(delta > 0.0 for delta in deltas):
-    return "QMAP-Pool is worse than the best baseline for every tested candidate count."
+    return "QMAP-CrossAttn is worse than the best baseline for every tested candidate count."
   return "The conclusion changes with candidate count."
 
 
@@ -297,7 +297,7 @@ def write_summary(rows, output_dir):
     candidate_counts = sorted({row["candidate_count"] for row in rows})
     output_file.write("# Candidate-count Sensitivity\n\n")
     output_file.write(
-        "Purpose: test whether QMAP-Pool's real-workload result depends on "
+        "Purpose: test whether QMAP-CrossAttn's real-workload result depends on "
         "a single candidate_count setting.\n\n")
     output_file.write("## Setup\n\n")
     output_file.write("- workloads: `{}`\n".format(
@@ -309,7 +309,7 @@ def write_summary(rows, output_dir):
     output_file.write("- lookahead: `{}`\n".format(LOOKAHEAD))
     output_file.write("- epochs: `{}`\n".format(EPOCHS))
     output_file.write("- batch_size: `{}`\n".format(BATCH_SIZE))
-    output_file.write("- model: `QMAP-Pool` (`ablation={}`)\n\n".format(
+    output_file.write("- model: `QMAP-CrossAttn` (`ablation={}`)\n\n".format(
         QMAP_ABLATION))
 
     output_file.write("## Results\n\n")

@@ -258,9 +258,9 @@ def collect_summary_rows():
     pool_cost[workload_key] = float(baseline["weighted_access_cost"])
     rows.append({
         "workload": config["display"],
-        "variant": "QMAP-Pool",
+        "variant": "QMAP-CrossAttn",
         "cost": float(baseline["weighted_access_cost"]),
-        "vs_qmap_pool_percent": 0.0,
+        "vs_qmap_crossattn_percent": 0.0,
         "nvm_writes": baseline["nvm_writes"],
         "migrations": baseline["migrations"],
     })
@@ -275,7 +275,7 @@ def collect_summary_rows():
           "workload": config["display"],
           "variant": variant,
           "cost": cost,
-          "vs_qmap_pool_percent": (
+          "vs_qmap_crossattn_percent": (
               (cost - pool_cost[workload_key]) * 100.0 /
               pool_cost[workload_key]),
           "nvm_writes": data["nvm_writes"],
@@ -290,8 +290,8 @@ def write_summary(rows):
   csv_path = os.path.join(result_root, "summary.csv")
   md_path = os.path.join(result_root, "summary.md")
   fields = [
-      "workload", "variant", "cost", "vs_qmap_pool_percent", "nvm_writes",
-      "migrations",
+      "workload", "variant", "cost", "vs_qmap_crossattn_percent",
+      "nvm_writes", "migrations",
   ]
   with open(csv_path, "w", newline="", encoding="utf-8") as output_file:
     writer = csv.DictWriter(output_file, fieldnames=fields)
@@ -302,7 +302,7 @@ def write_summary(rows):
   with open(md_path, "w", encoding="utf-8") as output_file:
     output_file.write("# Real QMAP Ablation\n\n")
     output_file.write(
-        "| workload | variant | cost | vs QMAP-Pool | NVM writes | migrations |\n")
+        "| workload | variant | cost | vs QMAP-CrossAttn | NVM writes | migrations |\n")
     output_file.write("|---|---|---:|---:|---:|---:|\n")
     for row in rows:
       output_file.write(
@@ -311,7 +311,7 @@ def write_summary(rows):
               workload=row["workload"],
               variant=row["variant"],
               cost=row["cost"],
-              delta=row["vs_qmap_pool_percent"],
+              delta=row["vs_qmap_crossattn_percent"],
               writes=row["nvm_writes"],
               migrations=row["migrations"]))
   print("[done] summary: {}".format(rel(md_path)), flush=True)

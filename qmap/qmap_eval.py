@@ -40,7 +40,8 @@ NVM_READ_COST = 2.0
 NVM_WRITE_COST = 8.0
 MIGRATION_COST = 10.0
 ABLATION_CHOICES = (
-    "full", "no_pc", "no_rw", "mean_pool", "no_qformer", "no_cost")
+    "full", "cross_attention", "no_pc", "no_rw", "mean_pool",
+    "no_qformer", "no_cost")
 
 
 def build_arg_parser():
@@ -146,6 +147,25 @@ def checkpoint_uses_qformer(model_args, extractor_state):
   return any(key.startswith("_qformer.") for key in extractor_state)
 
 
+def infer_scorer_scoring_input(model_args, scorer_state):
+  """Infers whether a checkpoint scores cat(u, g) or the context vector g."""
+  hidden_dim = model_args.get("hidden_dim", 18)
+  first_weight = scorer_state.get("_scoring_mlp.0.weight")
+  if first_weight is not None and len(first_weight.shape) == 2:
+    input_dim = first_weight.shape[1]
+    if input_dim == hidden_dim:
+      return "context"
+    if input_dim == hidden_dim * 2:
+      return "concat"
+  return model_args.get("scoring_input", "context")
+
+
+def infer_extractor_pooling_strategy(model_args, scoring_input):
+  if model_args.get("pooling_strategy"):
+    return model_args["pooling_strategy"]
+  return "none" if scoring_input == "context" else "mean"
+
+
 def update_mru(dram_pages, page):
   """Moves an existing DRAM page to MRU position."""
   dram_pages.remove(page)
@@ -224,6 +244,10 @@ class QMAPPolicy(object):
     model_args = checkpoint.get("model_args", {})
     self._ablation = ablation or model_args.get("ablation", "mean_pool")
     extractor_state = checkpoint["extractor"]
+    scorer_state = checkpoint["scorer"]
+    scoring_input = infer_scorer_scoring_input(model_args, scorer_state)
+    pooling_strategy = infer_extractor_pooling_strategy(
+        model_args, scoring_input)
 
     self._feature_embedder = embed.QMAPAccessFeatureEmbedder(
         address_embedder=embed.DynamicVocabEmbedder(
@@ -242,7 +266,7 @@ class QMAPPolicy(object):
         feedforward_dim=model_args.get("feedforward_dim"),
         dropout=model_args.get("dropout", 0.0),
         use_qformer=checkpoint_uses_qformer(model_args, extractor_state),
-        pooling_strategy="mean").to(device)
+        pooling_strategy=pooling_strategy).to(device)
     self._page_state_dim = model_args.get("page_state_dim", 3)
     self._scorer = model.QMAPCandidateScorer(
         hidden_dim=model_args.get("hidden_dim", 18),
@@ -251,11 +275,12 @@ class QMAPPolicy(object):
         page_vocab_size=model_args.get("page_vocab_size", 100000),
         num_heads=model_args.get("num_heads", 2),
         dropout=model_args.get("dropout", 0.0),
-        page_dim=model_args.get("page_dim", 21)).to(device)
+        page_dim=model_args.get("page_dim", 21),
+        scoring_input=scoring_input).to(device)
 
     self._feature_embedder.load_state_dict(checkpoint["feature_embedder"])
     self._extractor.load_state_dict(extractor_state)
-    self._scorer.load_state_dict(checkpoint["scorer"])
+    self._scorer.load_state_dict(scorer_state)
 
     self._feature_embedder.eval()
     self._extractor.eval()

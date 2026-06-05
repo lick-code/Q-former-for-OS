@@ -41,8 +41,8 @@ PARAMETER_VALUES = {
     "dram_capacity": [64, 128, 256],
     "lookahead": [128, 256, 512],
 }
-QMAP_MODEL_NAME = "QMAP-Pool"
-QMAP_ABLATION = "mean_pool"
+QMAP_MODEL_NAME = "QMAP-CrossAttn"
+QMAP_ABLATION = "cross_attention"
 
 
 def path_from_root(*parts):

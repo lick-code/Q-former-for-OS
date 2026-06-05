@@ -230,9 +230,9 @@ def cost_model_table():
 
 def conclusion_for_workload(deltas):
   if all(delta < 0.0 for delta in deltas):
-    return "QMAP-Pool beats the best baseline under every tested cost model."
+    return "QMAP-CrossAttn beats the best baseline under every tested cost model."
   if all(delta > 0.0 for delta in deltas):
-    return "QMAP-Pool remains worse than the best baseline under every tested cost model."
+    return "QMAP-CrossAttn remains worse than the best baseline under every tested cost model."
   return "The conclusion changes across cost models."
 
 

@@ -24,8 +24,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DEFAULT_WORKLOADS = ("hotset", "writeheavy", "streaming", "phasechange",
                      "pcrwstress")
 DEFAULT_POLICIES = ("lru", "random", "lfu", "clock", "qmap")
-QMAP_MODEL_NAME = "QMAP-Pool"
-QMAP_ABLATION = "mean_pool"
+QMAP_MODEL_NAME = "QMAP-CrossAttn"
+QMAP_ABLATION = "cross_attention"
 
 
 def path_from_root(*parts):

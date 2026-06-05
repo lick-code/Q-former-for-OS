@@ -5,8 +5,8 @@ Pipeline:
 
   1. normalize and split each raw CSV trace into 80/10/10 train/valid/test
   2. generate QMAP JSONL training samples from the train split
-  3. train one QMAP-Pool checkpoint per workload
-  4. evaluate LRU / Random / LFU / CLOCK / QMAP-Pool on each test split
+  3. train one QMAP-CrossAttn checkpoint per workload
+  4. evaluate LRU / Random / LFU / CLOCK / QMAP-CrossAttn on each test split
   5. write experiment-level CSV and Markdown summaries
 """
 
@@ -27,8 +27,8 @@ DEFAULT_WORKLOADS = (
     "parsec_dedup",
 )
 DEFAULT_POLICIES = ("lru", "random", "lfu", "clock", "qmap")
-QMAP_MODEL_NAME = "QMAP-Pool"
-QMAP_ABLATION = "mean_pool"
+QMAP_MODEL_NAME = "QMAP-CrossAttn"
+QMAP_ABLATION = "cross_attention"
 
 
 def path_from_root(*parts):
@@ -141,7 +141,7 @@ def build_arg_parser():
   parser.add_argument("--skip_generate", action="store_true",
                       help="Use existing real-pilot JSONL files.")
   parser.add_argument("--skip_train", action="store_true",
-                      help="Use existing QMAP-Pool checkpoints.")
+                      help="Use existing QMAP-CrossAttn checkpoints.")
   parser.add_argument("--run_id", default=None,
                       help="Optional run id recorded in summary metadata.")
   return parser
@@ -494,8 +494,8 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
               migrations=row["migrations"],
               decision_ms=row["avg_decision_time_ms"]))
 
-    output_file.write("\n## QMAP-Pool vs Best Baseline By Cost\n\n")
-    output_file.write("| Workload | Best baseline and QMAP-Pool cost delta |\n")
+    output_file.write("\n## QMAP-CrossAttn vs Best Baseline By Cost\n\n")
+    output_file.write("| Workload | Best baseline and QMAP-CrossAttn cost delta |\n")
     output_file.write("|---|---:|\n")
     for workload in workloads:
       output_file.write("| {} | {} |\n".format(

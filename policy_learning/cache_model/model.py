@@ -113,13 +113,15 @@ class QFormer(nn.Module):
 
 
 class QMAPMacroscopicPatternExtractor(nn.Module):
-  """QMAP 第二阶段：TransformerEncoder + Q-Former 宏观模式提取。
+  """QMAP 第二阶段：TransformerEncoder 访存序列编码。
 
   输入来自第一阶段的联合访存特征：
     [batch_size, sequence_length, hidden_dim]
 
-  输出为 K 个宏观模式向量：
-    [batch_size, num_queries, hidden_dim]
+  主路径输出完整编码序列 X_enc：
+    [batch_size, sequence_length, hidden_dim]
+
+  历史实验仍可选择 Q-Former 或 mean/last pooling 输出。
   """
 
   def __init__(self, hidden_dim=18, num_queries=4, num_layers=1, num_heads=2,
@@ -134,12 +136,15 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
       num_heads (int): Transformer 和 Q-Former 的 attention head 数。
       feedforward_dim (int | None): Transformer FFN 中间维度。
       dropout (float): dropout rate。
+      use_qformer (bool): 是否走历史 Q-Former 路径。
+      pooling_strategy (str): "none" 返回完整 X_enc；"mean"/"last"
+        保留历史 pooling 路径。
     """
     super(QMAPMacroscopicPatternExtractor, self).__init__()
     if hidden_dim % num_heads != 0:
       raise ValueError("hidden_dim must be divisible by num_heads.")
-    if pooling_strategy not in ("mean", "last"):
-      raise ValueError("pooling_strategy must be 'mean' or 'last'.")
+    if pooling_strategy not in ("mean", "last", "none"):
+      raise ValueError("pooling_strategy must be 'mean', 'last' or 'none'.")
 
     if feedforward_dim is None:
       feedforward_dim = hidden_dim * 4
@@ -171,8 +176,7 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
         形状为 [batch_size, sequence_length, hidden_dim]。
 
     Returns:
-      torch.FloatTensor: Q-Former 输出 Z，
-        形状为 [batch_size, num_queries, hidden_dim]。
+      torch.FloatTensor: 编码后的访存序列或历史聚合结果。
     """
     sequence_length = access_features.shape[1]
     causal_mask = self._causal_mask(
@@ -184,6 +188,8 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
     encoded = encoded.transpose(0, 1)
     if self._use_qformer:
       return self._qformer(encoded)
+    if self._pooling_strategy == "none":
+      return encoded
     if self._pooling_strategy == "last":
       pooled = encoded[:, -1:, :]
     else:
@@ -277,19 +283,22 @@ class _LegacyHandcraftedQMAPCandidateScorer(nn.Module):
 class QMAPCandidateScorer(nn.Module):
   """Scores candidate pages using page-id embeddings and page-state features.
 
-  This implementation follows the QMAP method section: each candidate page is
-  represented by a learned page-id embedding concatenated with lightweight
-  page-state features, then matched against the Q-Former global access
-  representations and scored by a small MLP.
+  In the main QMAP path, each candidate page is projected into a page feature
+  vector and used as the Query. The Transformer encoded access sequence X_enc
+  is used as Key/Value. The resulting per-page context vector is scored by a
+  small MLP.
   """
 
   def __init__(self, hidden_dim=18, page_state_dim=3, page_embed_dim=8,
                page_vocab_size=100000, num_heads=2, mlp_hidden_dim=None,
-               dropout=0.0, page_dim=None):
+               dropout=0.0, page_dim=None, scoring_input="concat"):
     super(QMAPCandidateScorer, self).__init__()
     if hidden_dim % num_heads != 0:
       raise ValueError("hidden_dim must be divisible by num_heads.")
+    if scoring_input not in ("concat", "context"):
+      raise ValueError("scoring_input must be 'concat' or 'context'.")
 
+    self._scoring_input = scoring_input
     self._page_embedder = embed.DynamicVocabEmbedder(
         embed_dim=page_embed_dim, max_vocab_size=page_vocab_size)
     self._candidate_projector = nn.Linear(
@@ -306,8 +315,9 @@ class QMAPCandidateScorer(nn.Module):
 
     if mlp_hidden_dim is None:
       mlp_hidden_dim = hidden_dim * 2
+    mlp_input_dim = hidden_dim if scoring_input == "context" else hidden_dim * 2
     self._scoring_mlp = nn.Sequential(
-        nn.Linear(hidden_dim * 2, mlp_hidden_dim),
+        nn.Linear(mlp_input_dim, mlp_hidden_dim),
         nn.ReLU(),
         nn.Dropout(dropout),
         nn.Linear(mlp_hidden_dim, mlp_hidden_dim // 2),
@@ -319,7 +329,9 @@ class QMAPCandidateScorer(nn.Module):
     """Scores candidates.
 
     Args:
-      z: Q-Former output with shape [batch_size, K, hidden_dim].
+      z: Transformer encoded sequence X_enc [batch_size, sequence_length,
+        hidden_dim], or a historical pooled/Q-Former context
+        [batch_size, K, hidden_dim].
       candidate_pages: candidate page ids [batch_size, num_candidates]. If
         candidate_state_features is None, this is treated as a legacy
         handcrafted feature tensor.
@@ -349,7 +361,10 @@ class QMAPCandidateScorer(nn.Module):
     g = g.transpose(0, 1)
     g = self._context_norm(g + u)
 
-    scoring_features = torch.cat((u, g), dim=-1)
+    if self._scoring_input == "context":
+      scoring_features = g
+    else:
+      scoring_features = torch.cat((u, g), dim=-1)
     eviction_scores = self._scoring_mlp(scoring_features).squeeze(-1)
     if candidate_mask is not None:
       eviction_scores = eviction_scores.masked_fill(
@@ -449,7 +464,9 @@ if __name__ == "__main__":
       hidden_dim=18,
       num_queries=4,
       num_layers=1,
-      num_heads=2)
+      num_heads=2,
+      use_qformer=False,
+      pooling_strategy="none")
   z = extractor(access_features)
   print("input shape:", tuple(access_features.shape))
   print("Z shape:", tuple(z.shape))
@@ -459,7 +476,8 @@ if __name__ == "__main__":
   candidate_scorer = QMAPCandidateScorer(
       hidden_dim=18,
       page_dim=21,
-      num_heads=2)
+      num_heads=2,
+      scoring_input="context")
   eviction_scores = candidate_scorer(z, candidates)
   print("candidates shape:", tuple(candidates.shape))
   print("eviction_scores shape:", tuple(eviction_scores.shape))

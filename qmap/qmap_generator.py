@@ -19,7 +19,8 @@ import csv
 import json
 
 ABLATION_CHOICES = (
-    "full", "no_pc", "no_rw", "mean_pool", "no_qformer", "no_cost")
+    "full", "cross_attention", "no_pc", "no_rw", "mean_pool",
+    "no_qformer", "no_cost")
 
 
 def parse_int(value):
@@ -471,7 +472,7 @@ def build_arg_parser():
   parser.add_argument("--page_shift", type=int, default=0,
                       help="Right shift raw addresses to page addresses.")
   parser.add_argument("--ablation", choices=ABLATION_CHOICES,
-                      default="mean_pool",
+                      default="cross_attention",
                       help="QMAP ablation variant for generated samples.")
   return parser
 

@@ -22,8 +22,8 @@ from datetime import datetime
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-QMAP_MODEL_NAME = "QMAP-Pool"
-QMAP_ABLATION = "mean_pool"
+QMAP_MODEL_NAME = "QMAP-CrossAttn"
+QMAP_ABLATION = "cross_attention"
 
 
 def path_from_root(*parts):

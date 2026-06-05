@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Stage 7 seed-stability runner for real-workload QMAP-Pool results.
+"""Stage 7 seed-stability runner for real-workload QMAP-CrossAttn results.
 
 Default mode is local-safe and does not import torch:
 
@@ -35,7 +35,7 @@ EPOCHS = 10
 BATCH_SIZE = 32
 LR = 1e-4
 NVM_WRITE_COST = 8.0
-QMAP_ABLATION = "mean_pool"
+QMAP_ABLATION = "cross_attention"
 DEFAULT_SEEDS = (3136859, 42, 2026)
 BASELINE_POLICIES = ("lru", "random", "lfu", "clock")
 
@@ -404,7 +404,7 @@ def write_summary(rows, output_dir):
   with open(md_path, "w", encoding="utf-8") as output_file:
     output_file.write("# Stage 7 Seed Stability\n\n")
     output_file.write(
-        "Purpose: answer whether the QMAP-Pool result is an accidental "
+        "Purpose: answer whether the QMAP-CrossAttn result is an accidental "
         "training-seed outcome.\n\n")
     output_file.write("## Per-seed Results\n\n")
     output_file.write(
@@ -448,7 +448,7 @@ def write_summary(rows, output_dir):
         "the existing stage 5/6 result directories.\n")
     output_file.write(
         "- Random is reused from the existing fixed-random-seed baseline run; "
-        "QMAP-Pool is the only policy retrained across seeds.\n")
+        "QMAP-CrossAttn is the only policy retrained across seeds.\n")
 
   print("[done] detail csv: {}".format(rel(detail_csv)), flush=True)
   print("[done] summary csv: {}".format(rel(summary_csv)), flush=True)
@@ -473,7 +473,7 @@ def write_server_script(path, python_bin, device, workload_keys, seeds):
       "WORKLOADS=${WORKLOADS:-%s}" % shell_quote(workload_arg),
       "SEEDS=${SEEDS:-%s}" % shell_quote(seed_arg),
       "",
-      "# The script reuses existing JSONL by default, then trains/evaluates QMAP-Pool for each seed.",
+      "# The script reuses existing JSONL by default, then trains/evaluates QMAP-CrossAttn for each seed.",
       "$PY scripts/run_seed_stability.py --workloads \"$WORKLOADS\" --seeds \"$SEEDS\" --skip_generate --run_torch --summarize --python \"$PY\" --device \"$DEVICE\"",
       "",
   ]

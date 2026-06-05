@@ -22,7 +22,8 @@ from policy_learning.cache_model import model
 from policy_learning.cache_model import qmap_loss
 
 ABLATION_CHOICES = (
-    "full", "no_pc", "no_rw", "mean_pool", "no_qformer", "no_cost")
+    "full", "cross_attention", "no_pc", "no_rw", "mean_pool",
+    "no_qformer", "no_cost")
 
 
 class QMAPAccessSequenceDataset(Dataset):
@@ -182,7 +183,7 @@ def build_arg_parser():
   parser.add_argument("--seed", type=int, default=3136859,
                       help="Random seed for reproducible sensitivity runs.")
   parser.add_argument("--ablation", choices=ABLATION_CHOICES,
-                      default="mean_pool",
+                      default="cross_attention",
                       help="QMAP ablation variant to train.")
   return parser
 
@@ -209,6 +210,18 @@ def apply_batch_ablation(batch, ablation):
 
 def uses_qformer(ablation):
   return ablation == "full"
+
+
+def extractor_pooling_strategy(ablation):
+  if ablation in ("cross_attention", "no_pc", "no_rw", "no_cost"):
+    return "none"
+  return "mean"
+
+
+def scorer_scoring_input(ablation):
+  if ablation in ("cross_attention", "no_pc", "no_rw", "no_cost"):
+    return "context"
+  return "concat"
 
 
 def save_checkpoint(path, feature_embedder, extractor, scorer, optimizer, epoch,
@@ -250,6 +263,10 @@ def main():
   print("  weight decay:", args.weight_decay)
   print("  device:", device, flush=True)
   print("  ablation:", args.ablation, flush=True)
+  pooling_strategy = extractor_pooling_strategy(args.ablation)
+  scoring_input = scorer_scoring_input(args.ablation)
+  args.pooling_strategy = pooling_strategy
+  args.scoring_input = scoring_input
   print("  qformer: use={} queries={} layers={} heads={} dropout={}".format(
       uses_qformer(args.ablation),
       args.num_queries,
@@ -257,6 +274,8 @@ def main():
       args.num_heads,
       args.dropout),
         flush=True)
+  print("  extractor pooling_strategy:", pooling_strategy, flush=True)
+  print("  scorer scoring_input:", scoring_input, flush=True)
   print("  loss weights: inactivity={} coldness={} write_sensitivity={} "
         "migration_cost={}".format(
             args.inactivity_weight,
@@ -286,7 +305,7 @@ def main():
       feedforward_dim=args.feedforward_dim,
       dropout=args.dropout,
       use_qformer=uses_qformer(args.ablation),
-      pooling_strategy="mean").to(device)
+      pooling_strategy=pooling_strategy).to(device)
   scorer = model.QMAPCandidateScorer(
       hidden_dim=args.hidden_dim,
       page_state_dim=args.page_state_dim,
@@ -294,7 +313,8 @@ def main():
       page_vocab_size=args.page_vocab_size,
       num_heads=args.num_heads,
       dropout=args.dropout,
-      page_dim=args.page_dim).to(device)
+      page_dim=args.page_dim,
+      scoring_input=scoring_input).to(device)
   if args.ablation == "no_cost":
     loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
         lambda_1=args.inactivity_weight,

@@ -22,6 +22,9 @@ if QMAP_DIR not in sys.path:
 from qmap.qmap_generator import read_trace
 
 
+QMAP_ABLATION = "cross_attention"
+
+
 def path_from_root(*parts):
   return os.path.join(PROJECT_ROOT, *parts)
 
@@ -105,7 +108,7 @@ def victim_diagnostics(trace_path, checkpoint_path, args, candidate_count):
       args.history_length,
       candidate_count,
       args.lookahead,
-      "mean_pool")
+      QMAP_ABLATION)
 
   dram = []
   history = []
@@ -189,7 +192,7 @@ def eval_policy(args, policy, output_path, log_path, checkpoint_path=None):
   if policy == "qmap":
     command.extend([
         "--checkpoint", checkpoint_path,
-        "--ablation", "mean_pool",
+        "--ablation", QMAP_ABLATION,
         "--device", args.device,
     ])
   run_command(command, log_path)

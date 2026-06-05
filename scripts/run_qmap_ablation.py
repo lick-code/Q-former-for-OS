@@ -2,7 +2,7 @@
 """Run QMAP ablation experiments.
 
 Each variant is run as an independent generate -> train -> evaluate pipeline and
-is summarized against the frozen QMAP-Pool baseline. The default output layout is:
+is summarized against the frozen QMAP-CrossAttn baseline. The default output layout is:
 
   outputs/results/qmap_ablation/<variant>/qmap.json
   outputs/checkpoints/qmap_ablation/<variant>/qmap_epoch_<N>.pth
@@ -18,19 +18,21 @@ import sys
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-QMAP_MODEL_NAME = "QMAP-Pool"
-BASELINE_VARIANT = "mean_pool"
+QMAP_MODEL_NAME = "QMAP-CrossAttn"
+BASELINE_VARIANT = "cross_attention"
 
 VARIANT_PURPOSES = {
     "full": "historical Q-Former baseline",
+    "cross_attention": (
+        "Transformer-encoded sequence with candidate-page cross-attention"),
     "no_pc": "remove program-counter context from the access sequence",
     "no_rw": "remove read/write type from the access sequence",
-    "mean_pool": "QMAP-Pool baseline without Q-Former queries",
+    "mean_pool": "historical mean-pooling baseline without Q-Former queries",
     "no_qformer": "legacy alias for mean_pool",
     "no_cost": "disable write-sensitivity and migration-cost loss terms",
 }
 
-DEFAULT_VARIANTS = ("mean_pool", "no_pc", "no_rw", "no_cost")
+DEFAULT_VARIANTS = ("cross_attention", "no_pc", "no_rw", "no_cost")
 
 
 def path_from_root(*parts):
@@ -87,8 +89,9 @@ def parse_variants(text, allow_historical_qformer=False):
   if "full" in variants and not allow_historical_qformer:
     raise ValueError(
         "`full` is the historical Q-Former variant. New experiments are "
-        "frozen to QMAP-Pool/mean_pool; pass --allow_historical_qformer only "
-        "when intentionally reproducing old exploratory results.")
+        "frozen to QMAP-CrossAttn/cross_attention; pass "
+        "--allow_historical_qformer only when intentionally reproducing old "
+        "exploratory results.")
   if not variants:
     raise ValueError("At least one variant is required.")
   return variants
@@ -243,7 +246,7 @@ def add_relative_metrics(row, baseline):
     row["nvm_writes_delta_percent"] = 0.0
   row["hit_rate_delta_pp"] = (
       row["hit_rate_percent"] - baseline["hit_rate_percent"])
-  row["nvm_writes_saved_vs_qmap_pool"] = (
+  row["nvm_writes_saved_vs_qmap_crossattn"] = (
       row["nvm_writes"] - baseline["nvm_writes"])
   row["nvm_writes_reduction_vs_variant_percent"] = (
       (row["nvm_writes"] - base_writes) * 100.0 / row["nvm_writes"]
@@ -259,7 +262,7 @@ def write_summary_csv(rows, output_path):
       "weighted_access_cost",
       "cost_delta_percent",
       "nvm_writes",
-      "nvm_writes_saved_vs_qmap_pool",
+      "nvm_writes_saved_vs_qmap_crossattn",
       "nvm_writes_delta_percent",
       "nvm_writes_reduction_vs_variant_percent",
       "nvm_reads",
@@ -304,7 +307,7 @@ def write_summary_markdown(rows, output_path, args):
     output_file.write("- seed: `{}`\n\n".format(args.seed))
 
     if baseline is not None:
-      output_file.write("## QMAP-Pool Baseline\n\n")
+      output_file.write("## QMAP-CrossAttn Baseline\n\n")
       output_file.write(
         "| Hit rate (%) | Weighted cost | NVM writes | Migrations |\n")
       output_file.write("|---:|---:|---:|---:|\n")
@@ -315,15 +318,15 @@ def write_summary_markdown(rows, output_path, args):
     output_file.write("## Results\n\n")
     output_file.write(
         "| Variant | Purpose | Hit rate (%) | Hit delta (pp) | Cost | "
-        "Cost delta (%) | NVM writes | Writes delta vs QMAP-Pool | "
-        "Writes delta (%) | QMAP-Pool writes delta (%) | Decision ms |\n")
+        "Cost delta (%) | NVM writes | Writes delta vs QMAP-CrossAttn | "
+        "Writes delta (%) | QMAP-CrossAttn writes delta (%) | Decision ms |\n")
     output_file.write("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
     for row in rows:
       output_file.write(
           "| {variant} | {purpose} | {hit_rate_percent:.2f} | "
           "{hit_rate_delta_pp:+.2f} | {weighted_access_cost:.2f} | "
           "{cost_delta_percent:+.2f} | {nvm_writes} | "
-          "{nvm_writes_saved_vs_qmap_pool:+.0f} | "
+          "{nvm_writes_saved_vs_qmap_crossattn:+.0f} | "
           "{nvm_writes_delta_percent:+.2f} | "
           "{nvm_writes_reduction_vs_variant_percent:+.2f} | "
           "{avg_decision_time_ms:.6f} |\n".format(**row))

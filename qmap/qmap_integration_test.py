@@ -70,21 +70,22 @@ def main():
   access_features = feature_embedder(
       batch["physical_address"], batch["pc"], batch["rw"])
 
-  # 2. 宏观模式提取：Transformer Encoder + Q-Former。
+  # 2. 访存序列编码：Transformer Encoder 输出完整 X_enc。
   pattern_extractor = model.QMAPMacroscopicPatternExtractor(
       hidden_dim=18,
       num_queries=4,
       num_layers=1,
       num_heads=2,
       use_qformer=False,
-      pooling_strategy="mean")
+      pooling_strategy="none")
   z = pattern_extractor(access_features)
 
   # 3. 64 页面候选池打分。
   candidate_scorer = model.QMAPCandidateScorer(
       hidden_dim=18,
       page_state_dim=3,
-      num_heads=2)
+      num_heads=2,
+      scoring_input="context")
   candidate_pages = torch.randint(1, 4096, (2, 64))
   candidate_state_features = torch.randn(2, 64, 3)
   candidate_mask = torch.ones(2, 64)
