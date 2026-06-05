@@ -6,147 +6,149 @@ QMAP training configuration:
   learning rate: 0.0001
   weight decay: 0.0
   device: cuda
-  ablation: mean_pool
+  ablation: cross_attention
   qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  extractor pooling_strategy: none
+  scorer scoring_input: context
   loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
-Epoch [1/10] iter=1 loss=-0.618664
-Epoch [1/10] iter=100 loss=-0.665374
-Epoch [1/10] iter=200 loss=-0.731279
-Epoch [1/10] iter=300 loss=-0.776847
-Epoch [1/10] iter=400 loss=-0.789539
-Epoch [1/10] iter=500 loss=-0.742527
-Epoch [1/10] iter=600 loss=-0.795840
-Epoch [1/10] iter=700 loss=-0.808099
-Epoch [1/10] iter=800 loss=-0.804384
-Epoch [1/10] iter=900 loss=-0.787301
-Epoch [1/10] iter=1000 loss=-0.808543
-Epoch [1/10] avg_loss=-0.764312
+Epoch [1/10] iter=1 loss=-0.622429
+Epoch [1/10] iter=100 loss=-0.667279
+Epoch [1/10] iter=200 loss=-0.694417
+Epoch [1/10] iter=300 loss=-0.742279
+Epoch [1/10] iter=400 loss=-0.786348
+Epoch [1/10] iter=500 loss=-0.791231
+Epoch [1/10] iter=600 loss=-0.809304
+Epoch [1/10] iter=700 loss=-0.810025
+Epoch [1/10] iter=800 loss=-0.794330
+Epoch [1/10] iter=900 loss=-0.808071
+Epoch [1/10] iter=1000 loss=-0.827681
+Epoch [1/10] avg_loss=-0.760383
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_1.pth
-Epoch [2/10] iter=1097 loss=-0.826089
-Epoch [2/10] iter=1100 loss=-0.813341
-Epoch [2/10] iter=1200 loss=-0.790096
-Epoch [2/10] iter=1300 loss=-0.816667
-Epoch [2/10] iter=1400 loss=-0.757030
-Epoch [2/10] iter=1500 loss=-0.792418
-Epoch [2/10] iter=1600 loss=-0.803306
-Epoch [2/10] iter=1700 loss=-0.819107
-Epoch [2/10] iter=1800 loss=-0.818860
-Epoch [2/10] iter=1900 loss=-0.799806
-Epoch [2/10] iter=2000 loss=-0.796268
-Epoch [2/10] iter=2100 loss=-0.770720
-Epoch [2/10] avg_loss=-0.806859
+Epoch [2/10] iter=1097 loss=-0.795799
+Epoch [2/10] iter=1100 loss=-0.806631
+Epoch [2/10] iter=1200 loss=-0.815639
+Epoch [2/10] iter=1300 loss=-0.806294
+Epoch [2/10] iter=1400 loss=-0.769032
+Epoch [2/10] iter=1500 loss=-0.791228
+Epoch [2/10] iter=1600 loss=-0.795786
+Epoch [2/10] iter=1700 loss=-0.813987
+Epoch [2/10] iter=1800 loss=-0.798031
+Epoch [2/10] iter=1900 loss=-0.811464
+Epoch [2/10] iter=2000 loss=-0.788769
+Epoch [2/10] iter=2100 loss=-0.819286
+Epoch [2/10] avg_loss=-0.802893
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_2.pth
-Epoch [3/10] iter=2193 loss=-0.814108
-Epoch [3/10] iter=2200 loss=-0.794563
-Epoch [3/10] iter=2300 loss=-0.810752
-Epoch [3/10] iter=2400 loss=-0.830086
-Epoch [3/10] iter=2500 loss=-0.826527
-Epoch [3/10] iter=2600 loss=-0.798875
-Epoch [3/10] iter=2700 loss=-0.815041
-Epoch [3/10] iter=2800 loss=-0.774396
-Epoch [3/10] iter=2900 loss=-0.831221
-Epoch [3/10] iter=3000 loss=-0.826629
-Epoch [3/10] iter=3100 loss=-0.826130
-Epoch [3/10] iter=3200 loss=-0.795613
-Epoch [3/10] avg_loss=-0.812362
+Epoch [3/10] iter=2193 loss=-0.792985
+Epoch [3/10] iter=2200 loss=-0.795392
+Epoch [3/10] iter=2300 loss=-0.814278
+Epoch [3/10] iter=2400 loss=-0.796965
+Epoch [3/10] iter=2500 loss=-0.815129
+Epoch [3/10] iter=2600 loss=-0.820721
+Epoch [3/10] iter=2700 loss=-0.795101
+Epoch [3/10] iter=2800 loss=-0.800677
+Epoch [3/10] iter=2900 loss=-0.821219
+Epoch [3/10] iter=3000 loss=-0.821641
+Epoch [3/10] iter=3100 loss=-0.821695
+Epoch [3/10] iter=3200 loss=-0.797197
+Epoch [3/10] avg_loss=-0.808573
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_3.pth
-Epoch [4/10] iter=3289 loss=-0.790094
-Epoch [4/10] iter=3300 loss=-0.811441
-Epoch [4/10] iter=3400 loss=-0.817022
-Epoch [4/10] iter=3500 loss=-0.793708
-Epoch [4/10] iter=3600 loss=-0.818877
-Epoch [4/10] iter=3700 loss=-0.814271
-Epoch [4/10] iter=3800 loss=-0.804060
-Epoch [4/10] iter=3900 loss=-0.825290
-Epoch [4/10] iter=4000 loss=-0.794695
-Epoch [4/10] iter=4100 loss=-0.829822
-Epoch [4/10] iter=4200 loss=-0.829248
-Epoch [4/10] iter=4300 loss=-0.825553
-Epoch [4/10] avg_loss=-0.813725
+Epoch [4/10] iter=3289 loss=-0.796026
+Epoch [4/10] iter=3300 loss=-0.772279
+Epoch [4/10] iter=3400 loss=-0.782333
+Epoch [4/10] iter=3500 loss=-0.823868
+Epoch [4/10] iter=3600 loss=-0.826546
+Epoch [4/10] iter=3700 loss=-0.822989
+Epoch [4/10] iter=3800 loss=-0.828879
+Epoch [4/10] iter=3900 loss=-0.824359
+Epoch [4/10] iter=4000 loss=-0.754461
+Epoch [4/10] iter=4100 loss=-0.830928
+Epoch [4/10] iter=4200 loss=-0.828427
+Epoch [4/10] iter=4300 loss=-0.830427
+Epoch [4/10] avg_loss=-0.810981
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_4.pth
-Epoch [5/10] iter=4385 loss=-0.806830
-Epoch [5/10] iter=4400 loss=-0.798853
-Epoch [5/10] iter=4500 loss=-0.819000
-Epoch [5/10] iter=4600 loss=-0.841898
-Epoch [5/10] iter=4700 loss=-0.805322
-Epoch [5/10] iter=4800 loss=-0.821586
-Epoch [5/10] iter=4900 loss=-0.802462
-Epoch [5/10] iter=5000 loss=-0.820077
-Epoch [5/10] iter=5100 loss=-0.831294
-Epoch [5/10] iter=5200 loss=-0.827348
-Epoch [5/10] iter=5300 loss=-0.818139
-Epoch [5/10] iter=5400 loss=-0.792741
-Epoch [5/10] avg_loss=-0.814591
+Epoch [5/10] iter=4385 loss=-0.841016
+Epoch [5/10] iter=4400 loss=-0.814484
+Epoch [5/10] iter=4500 loss=-0.805953
+Epoch [5/10] iter=4600 loss=-0.818539
+Epoch [5/10] iter=4700 loss=-0.826888
+Epoch [5/10] iter=4800 loss=-0.794237
+Epoch [5/10] iter=4900 loss=-0.825163
+Epoch [5/10] iter=5000 loss=-0.805165
+Epoch [5/10] iter=5100 loss=-0.782974
+Epoch [5/10] iter=5200 loss=-0.817042
+Epoch [5/10] iter=5300 loss=-0.798559
+Epoch [5/10] iter=5400 loss=-0.817723
+Epoch [5/10] avg_loss=-0.812622
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_5.pth
-Epoch [6/10] iter=5481 loss=-0.821119
-Epoch [6/10] iter=5500 loss=-0.794991
-Epoch [6/10] iter=5600 loss=-0.836512
-Epoch [6/10] iter=5700 loss=-0.799683
-Epoch [6/10] iter=5800 loss=-0.808518
-Epoch [6/10] iter=5900 loss=-0.841079
-Epoch [6/10] iter=6000 loss=-0.822246
-Epoch [6/10] iter=6100 loss=-0.813248
-Epoch [6/10] iter=6200 loss=-0.828205
-Epoch [6/10] iter=6300 loss=-0.833067
-Epoch [6/10] iter=6400 loss=-0.831491
-Epoch [6/10] iter=6500 loss=-0.832920
-Epoch [6/10] avg_loss=-0.815088
+Epoch [6/10] iter=5481 loss=-0.815326
+Epoch [6/10] iter=5500 loss=-0.802763
+Epoch [6/10] iter=5600 loss=-0.816450
+Epoch [6/10] iter=5700 loss=-0.833150
+Epoch [6/10] iter=5800 loss=-0.807570
+Epoch [6/10] iter=5900 loss=-0.811843
+Epoch [6/10] iter=6000 loss=-0.833567
+Epoch [6/10] iter=6100 loss=-0.832431
+Epoch [6/10] iter=6200 loss=-0.838373
+Epoch [6/10] iter=6300 loss=-0.782203
+Epoch [6/10] iter=6400 loss=-0.811689
+Epoch [6/10] iter=6500 loss=-0.824553
+Epoch [6/10] avg_loss=-0.813006
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_6.pth
-Epoch [7/10] iter=6577 loss=-0.811689
-Epoch [7/10] iter=6600 loss=-0.827854
-Epoch [7/10] iter=6700 loss=-0.803552
-Epoch [7/10] iter=6800 loss=-0.828798
-Epoch [7/10] iter=6900 loss=-0.810937
-Epoch [7/10] iter=7000 loss=-0.789710
-Epoch [7/10] iter=7100 loss=-0.807786
-Epoch [7/10] iter=7200 loss=-0.823634
-Epoch [7/10] iter=7300 loss=-0.803958
-Epoch [7/10] iter=7400 loss=-0.819383
-Epoch [7/10] iter=7500 loss=-0.830318
-Epoch [7/10] iter=7600 loss=-0.799108
-Epoch [7/10] avg_loss=-0.815350
+Epoch [7/10] iter=6577 loss=-0.837228
+Epoch [7/10] iter=6600 loss=-0.805781
+Epoch [7/10] iter=6700 loss=-0.824553
+Epoch [7/10] iter=6800 loss=-0.796971
+Epoch [7/10] iter=6900 loss=-0.830958
+Epoch [7/10] iter=7000 loss=-0.836067
+Epoch [7/10] iter=7100 loss=-0.813035
+Epoch [7/10] iter=7200 loss=-0.805276
+Epoch [7/10] iter=7300 loss=-0.778368
+Epoch [7/10] iter=7400 loss=-0.798759
+Epoch [7/10] iter=7500 loss=-0.840055
+Epoch [7/10] iter=7600 loss=-0.832992
+Epoch [7/10] avg_loss=-0.817598
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_7.pth
-Epoch [8/10] iter=7673 loss=-0.828045
-Epoch [8/10] iter=7700 loss=-0.827718
-Epoch [8/10] iter=7800 loss=-0.822285
-Epoch [8/10] iter=7900 loss=-0.832805
-Epoch [8/10] iter=8000 loss=-0.834275
-Epoch [8/10] iter=8100 loss=-0.818253
-Epoch [8/10] iter=8200 loss=-0.822639
-Epoch [8/10] iter=8300 loss=-0.812446
-Epoch [8/10] iter=8400 loss=-0.827349
-Epoch [8/10] iter=8500 loss=-0.772632
-Epoch [8/10] iter=8600 loss=-0.831362
-Epoch [8/10] iter=8700 loss=-0.815254
-Epoch [8/10] avg_loss=-0.815554
+Epoch [8/10] iter=7673 loss=-0.820056
+Epoch [8/10] iter=7700 loss=-0.794856
+Epoch [8/10] iter=7800 loss=-0.770417
+Epoch [8/10] iter=7900 loss=-0.814389
+Epoch [8/10] iter=8000 loss=-0.839146
+Epoch [8/10] iter=8100 loss=-0.785281
+Epoch [8/10] iter=8200 loss=-0.827839
+Epoch [8/10] iter=8300 loss=-0.824976
+Epoch [8/10] iter=8400 loss=-0.819399
+Epoch [8/10] iter=8500 loss=-0.792123
+Epoch [8/10] iter=8600 loss=-0.827387
+Epoch [8/10] iter=8700 loss=-0.813772
+Epoch [8/10] avg_loss=-0.821714
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_8.pth
-Epoch [9/10] iter=8769 loss=-0.796868
-Epoch [9/10] iter=8800 loss=-0.800454
-Epoch [9/10] iter=8900 loss=-0.778055
-Epoch [9/10] iter=9000 loss=-0.825236
-Epoch [9/10] iter=9100 loss=-0.822764
-Epoch [9/10] iter=9200 loss=-0.805964
-Epoch [9/10] iter=9300 loss=-0.825922
-Epoch [9/10] iter=9400 loss=-0.830434
-Epoch [9/10] iter=9500 loss=-0.786574
-Epoch [9/10] iter=9600 loss=-0.823454
-Epoch [9/10] iter=9700 loss=-0.815899
-Epoch [9/10] iter=9800 loss=-0.800260
-Epoch [9/10] avg_loss=-0.815875
+Epoch [9/10] iter=8769 loss=-0.828410
+Epoch [9/10] iter=8800 loss=-0.810893
+Epoch [9/10] iter=8900 loss=-0.830532
+Epoch [9/10] iter=9000 loss=-0.833691
+Epoch [9/10] iter=9100 loss=-0.844531
+Epoch [9/10] iter=9200 loss=-0.836389
+Epoch [9/10] iter=9300 loss=-0.819907
+Epoch [9/10] iter=9400 loss=-0.798368
+Epoch [9/10] iter=9500 loss=-0.837339
+Epoch [9/10] iter=9600 loss=-0.810128
+Epoch [9/10] iter=9700 loss=-0.832300
+Epoch [9/10] iter=9800 loss=-0.837019
+Epoch [9/10] avg_loss=-0.822792
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_9.pth
-Epoch [10/10] iter=9865 loss=-0.837113
-Epoch [10/10] iter=9900 loss=-0.825227
-Epoch [10/10] iter=10000 loss=-0.823819
-Epoch [10/10] iter=10100 loss=-0.831694
-Epoch [10/10] iter=10200 loss=-0.842705
-Epoch [10/10] iter=10300 loss=-0.820591
-Epoch [10/10] iter=10400 loss=-0.802870
-Epoch [10/10] iter=10500 loss=-0.819840
-Epoch [10/10] iter=10600 loss=-0.822488
-Epoch [10/10] iter=10700 loss=-0.800093
-Epoch [10/10] iter=10800 loss=-0.816497
-Epoch [10/10] iter=10900 loss=-0.791714
-Epoch [10/10] avg_loss=-0.816005
+Epoch [10/10] iter=9865 loss=-0.754664
+Epoch [10/10] iter=9900 loss=-0.798843
+Epoch [10/10] iter=10000 loss=-0.829590
+Epoch [10/10] iter=10100 loss=-0.833702
+Epoch [10/10] iter=10200 loss=-0.845105
+Epoch [10/10] iter=10300 loss=-0.822110
+Epoch [10/10] iter=10400 loss=-0.827476
+Epoch [10/10] iter=10500 loss=-0.837435
+Epoch [10/10] iter=10600 loss=-0.835401
+Epoch [10/10] iter=10700 loss=-0.825613
+Epoch [10/10] iter=10800 loss=-0.827260
+Epoch [10/10] iter=10900 loss=-0.781096
+Epoch [10/10] avg_loss=-0.823198
 Saved checkpoint: outputs/checkpoints/seed_stability/canneal/seed_2026/qmap_epoch_10.pth
 Training finished.
 /home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.

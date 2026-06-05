@@ -1,5 +1,5 @@
 {
-  "avg_decision_time_ms": 2.4554084176459994,
+  "avg_decision_time_ms": 2.348399088397629,
   "candidate_count": 8,
   "cost_model": {
     "dram_read_cost": 1.0,
@@ -8,19 +8,19 @@
     "nvm_read_cost": 2.0,
     "nvm_write_cost": 8.0
   },
-  "decision_count": 4260,
-  "decision_time_seconds": 10.460039859171957,
+  "decision_count": 4253,
+  "decision_time_seconds": 9.987741322955117,
   "dram_capacity": 16,
-  "hit_rate": 0.95724,
-  "hit_rate_percent": 95.724,
-  "hits": 95724,
-  "migrations": 4260,
-  "misses": 4276,
-  "nvm_reads": 4220,
-  "nvm_writes": 56,
+  "hit_rate": 0.95731,
+  "hit_rate_percent": 95.731,
+  "hits": 95731,
+  "migrations": 4253,
+  "misses": 4269,
+  "nvm_reads": 4222,
+  "nvm_writes": 47,
   "policy": "qmap",
   "rank_guard": 0,
   "total_accesses": 100000,
   "trace_path": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv",
-  "weighted_access_cost": 147212.0
+  "weighted_access_cost": 147081.0
 }

@@ -8,57 +8,59 @@ QMAP training configuration:
   device: cuda
   ablation: no_cost
   qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  extractor pooling_strategy: none
+  scorer scoring_input: context
   loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
-Epoch [1/10] iter=1 loss=-0.585976
-Epoch [1/10] iter=100 loss=-0.626881
-Epoch [1/10] iter=200 loss=-0.669030
-Epoch [1/10] avg_loss=-0.624023
+Epoch [1/10] iter=1 loss=-0.599276
+Epoch [1/10] iter=100 loss=-0.655293
+Epoch [1/10] iter=200 loss=-0.635791
+Epoch [1/10] avg_loss=-0.624775
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_1.pth
-Epoch [2/10] iter=220 loss=-0.623413
-Epoch [2/10] iter=300 loss=-0.699298
-Epoch [2/10] iter=400 loss=-0.763542
-Epoch [2/10] avg_loss=-0.721973
+Epoch [2/10] iter=220 loss=-0.658387
+Epoch [2/10] iter=300 loss=-0.724616
+Epoch [2/10] iter=400 loss=-0.781583
+Epoch [2/10] avg_loss=-0.716276
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_2.pth
-Epoch [3/10] iter=439 loss=-0.778822
-Epoch [3/10] iter=500 loss=-0.785225
-Epoch [3/10] iter=600 loss=-0.792038
-Epoch [3/10] avg_loss=-0.789363
+Epoch [3/10] iter=439 loss=-0.796693
+Epoch [3/10] iter=500 loss=-0.786866
+Epoch [3/10] iter=600 loss=-0.805964
+Epoch [3/10] avg_loss=-0.792512
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_3.pth
-Epoch [4/10] iter=658 loss=-0.806974
-Epoch [4/10] iter=700 loss=-0.799507
-Epoch [4/10] iter=800 loss=-0.794628
-Epoch [4/10] avg_loss=-0.798887
+Epoch [4/10] iter=658 loss=-0.797832
+Epoch [4/10] iter=700 loss=-0.798876
+Epoch [4/10] iter=800 loss=-0.808459
+Epoch [4/10] avg_loss=-0.800700
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_4.pth
-Epoch [5/10] iter=877 loss=-0.813318
-Epoch [5/10] iter=900 loss=-0.810727
-Epoch [5/10] iter=1000 loss=-0.808972
-Epoch [5/10] avg_loss=-0.801969
+Epoch [5/10] iter=877 loss=-0.790759
+Epoch [5/10] iter=900 loss=-0.800896
+Epoch [5/10] iter=1000 loss=-0.807176
+Epoch [5/10] avg_loss=-0.804153
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_5.pth
-Epoch [6/10] iter=1096 loss=-0.800367
-Epoch [6/10] iter=1100 loss=-0.811910
-Epoch [6/10] iter=1200 loss=-0.799099
-Epoch [6/10] iter=1300 loss=-0.803264
-Epoch [6/10] avg_loss=-0.803977
+Epoch [6/10] iter=1096 loss=-0.811454
+Epoch [6/10] iter=1100 loss=-0.807094
+Epoch [6/10] iter=1200 loss=-0.797775
+Epoch [6/10] iter=1300 loss=-0.808867
+Epoch [6/10] avg_loss=-0.805389
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_6.pth
-Epoch [7/10] iter=1315 loss=-0.819603
-Epoch [7/10] iter=1400 loss=-0.800909
-Epoch [7/10] iter=1500 loss=-0.785703
-Epoch [7/10] avg_loss=-0.805097
+Epoch [7/10] iter=1315 loss=-0.791571
+Epoch [7/10] iter=1400 loss=-0.802654
+Epoch [7/10] iter=1500 loss=-0.809009
+Epoch [7/10] avg_loss=-0.806395
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_7.pth
-Epoch [8/10] iter=1534 loss=-0.793905
-Epoch [8/10] iter=1600 loss=-0.819400
-Epoch [8/10] iter=1700 loss=-0.806932
-Epoch [8/10] avg_loss=-0.805768
+Epoch [8/10] iter=1534 loss=-0.812925
+Epoch [8/10] iter=1600 loss=-0.797794
+Epoch [8/10] iter=1700 loss=-0.804961
+Epoch [8/10] avg_loss=-0.807070
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_8.pth
-Epoch [9/10] iter=1753 loss=-0.792612
-Epoch [9/10] iter=1800 loss=-0.806942
-Epoch [9/10] iter=1900 loss=-0.814004
-Epoch [9/10] avg_loss=-0.806156
+Epoch [9/10] iter=1753 loss=-0.828741
+Epoch [9/10] iter=1800 loss=-0.809915
+Epoch [9/10] iter=1900 loss=-0.810341
+Epoch [9/10] avg_loss=-0.807530
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_9.pth
-Epoch [10/10] iter=1972 loss=-0.796612
-Epoch [10/10] iter=2000 loss=-0.798335
-Epoch [10/10] iter=2100 loss=-0.815829
-Epoch [10/10] avg_loss=-0.806496
+Epoch [10/10] iter=1972 loss=-0.814304
+Epoch [10/10] iter=2000 loss=-0.805673
+Epoch [10/10] iter=2100 loss=-0.807724
+Epoch [10/10] avg_loss=-0.808252
 Saved checkpoint: outputs/checkpoints/real_ablation/blackscholes/no_cost/qmap_epoch_10.pth
 Training finished.
 /home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.

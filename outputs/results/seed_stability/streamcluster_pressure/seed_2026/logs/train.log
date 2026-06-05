@@ -6,77 +6,79 @@ QMAP training configuration:
   learning rate: 0.0001
   weight decay: 0.0
   device: cuda
-  ablation: mean_pool
+  ablation: cross_attention
   qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  extractor pooling_strategy: none
+  scorer scoring_input: context
   loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
-Epoch [1/10] iter=1 loss=-0.605180
-Epoch [1/10] iter=100 loss=-0.685558
-Epoch [1/10] iter=200 loss=-0.728204
-Epoch [1/10] iter=300 loss=-0.765171
-Epoch [1/10] avg_loss=-0.715315
+Epoch [1/10] iter=1 loss=-0.604970
+Epoch [1/10] iter=100 loss=-0.640887
+Epoch [1/10] iter=200 loss=-0.710612
+Epoch [1/10] iter=300 loss=-0.742679
+Epoch [1/10] avg_loss=-0.706804
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_1.pth
-Epoch [2/10] iter=392 loss=-0.774103
-Epoch [2/10] iter=400 loss=-0.769674
-Epoch [2/10] iter=500 loss=-0.800389
-Epoch [2/10] iter=600 loss=-0.792466
-Epoch [2/10] iter=700 loss=-0.797195
-Epoch [2/10] avg_loss=-0.787041
+Epoch [2/10] iter=392 loss=-0.750428
+Epoch [2/10] iter=400 loss=-0.751455
+Epoch [2/10] iter=500 loss=-0.731436
+Epoch [2/10] iter=600 loss=-0.787128
+Epoch [2/10] iter=700 loss=-0.786233
+Epoch [2/10] avg_loss=-0.783102
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_2.pth
-Epoch [3/10] iter=783 loss=-0.814405
-Epoch [3/10] iter=800 loss=-0.792053
-Epoch [3/10] iter=900 loss=-0.801081
-Epoch [3/10] iter=1000 loss=-0.795600
-Epoch [3/10] iter=1100 loss=-0.806088
-Epoch [3/10] avg_loss=-0.800730
+Epoch [3/10] iter=783 loss=-0.802182
+Epoch [3/10] iter=800 loss=-0.799593
+Epoch [3/10] iter=900 loss=-0.792053
+Epoch [3/10] iter=1000 loss=-0.787821
+Epoch [3/10] iter=1100 loss=-0.784930
+Epoch [3/10] avg_loss=-0.800619
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_3.pth
-Epoch [4/10] iter=1174 loss=-0.815148
-Epoch [4/10] iter=1200 loss=-0.801162
-Epoch [4/10] iter=1300 loss=-0.777396
-Epoch [4/10] iter=1400 loss=-0.811345
-Epoch [4/10] iter=1500 loss=-0.799598
-Epoch [4/10] avg_loss=-0.805171
+Epoch [4/10] iter=1174 loss=-0.804420
+Epoch [4/10] iter=1200 loss=-0.805575
+Epoch [4/10] iter=1300 loss=-0.792491
+Epoch [4/10] iter=1400 loss=-0.809166
+Epoch [4/10] iter=1500 loss=-0.805745
+Epoch [4/10] avg_loss=-0.805512
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_4.pth
-Epoch [5/10] iter=1565 loss=-0.812197
-Epoch [5/10] iter=1600 loss=-0.802289
-Epoch [5/10] iter=1700 loss=-0.810003
-Epoch [5/10] iter=1800 loss=-0.807844
-Epoch [5/10] iter=1900 loss=-0.798046
-Epoch [5/10] avg_loss=-0.807419
+Epoch [5/10] iter=1565 loss=-0.808508
+Epoch [5/10] iter=1600 loss=-0.811199
+Epoch [5/10] iter=1700 loss=-0.778837
+Epoch [5/10] iter=1800 loss=-0.806998
+Epoch [5/10] iter=1900 loss=-0.819919
+Epoch [5/10] avg_loss=-0.807660
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_5.pth
-Epoch [6/10] iter=1956 loss=-0.813569
-Epoch [6/10] iter=2000 loss=-0.800012
-Epoch [6/10] iter=2100 loss=-0.802726
-Epoch [6/10] iter=2200 loss=-0.811574
-Epoch [6/10] iter=2300 loss=-0.809945
-Epoch [6/10] avg_loss=-0.809276
+Epoch [6/10] iter=1956 loss=-0.821660
+Epoch [6/10] iter=2000 loss=-0.818079
+Epoch [6/10] iter=2100 loss=-0.806045
+Epoch [6/10] iter=2200 loss=-0.804433
+Epoch [6/10] iter=2300 loss=-0.818015
+Epoch [6/10] avg_loss=-0.808727
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_6.pth
-Epoch [7/10] iter=2347 loss=-0.810726
-Epoch [7/10] iter=2400 loss=-0.805962
-Epoch [7/10] iter=2500 loss=-0.823559
-Epoch [7/10] iter=2600 loss=-0.828753
-Epoch [7/10] iter=2700 loss=-0.780167
-Epoch [7/10] avg_loss=-0.810334
+Epoch [7/10] iter=2347 loss=-0.792023
+Epoch [7/10] iter=2400 loss=-0.811785
+Epoch [7/10] iter=2500 loss=-0.807034
+Epoch [7/10] iter=2600 loss=-0.798382
+Epoch [7/10] iter=2700 loss=-0.813532
+Epoch [7/10] avg_loss=-0.809319
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_7.pth
-Epoch [8/10] iter=2738 loss=-0.814318
-Epoch [8/10] iter=2800 loss=-0.817905
-Epoch [8/10] iter=2900 loss=-0.820390
-Epoch [8/10] iter=3000 loss=-0.821998
-Epoch [8/10] iter=3100 loss=-0.787980
-Epoch [8/10] avg_loss=-0.811078
+Epoch [8/10] iter=2738 loss=-0.819010
+Epoch [8/10] iter=2800 loss=-0.773543
+Epoch [8/10] iter=2900 loss=-0.804706
+Epoch [8/10] iter=3000 loss=-0.815415
+Epoch [8/10] iter=3100 loss=-0.817477
+Epoch [8/10] avg_loss=-0.809882
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_8.pth
-Epoch [9/10] iter=3129 loss=-0.788260
-Epoch [9/10] iter=3200 loss=-0.807337
-Epoch [9/10] iter=3300 loss=-0.824653
-Epoch [9/10] iter=3400 loss=-0.811676
-Epoch [9/10] iter=3500 loss=-0.817540
-Epoch [9/10] avg_loss=-0.812216
+Epoch [9/10] iter=3129 loss=-0.802134
+Epoch [9/10] iter=3200 loss=-0.810526
+Epoch [9/10] iter=3300 loss=-0.811025
+Epoch [9/10] iter=3400 loss=-0.817632
+Epoch [9/10] iter=3500 loss=-0.823949
+Epoch [9/10] avg_loss=-0.810864
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_9.pth
-Epoch [10/10] iter=3520 loss=-0.820929
-Epoch [10/10] iter=3600 loss=-0.823126
-Epoch [10/10] iter=3700 loss=-0.814655
-Epoch [10/10] iter=3800 loss=-0.808896
-Epoch [10/10] iter=3900 loss=-0.810562
-Epoch [10/10] avg_loss=-0.812978
+Epoch [10/10] iter=3520 loss=-0.810648
+Epoch [10/10] iter=3600 loss=-0.816188
+Epoch [10/10] iter=3700 loss=-0.822748
+Epoch [10/10] iter=3800 loss=-0.804914
+Epoch [10/10] iter=3900 loss=-0.814430
+Epoch [10/10] avg_loss=-0.811526
 Saved checkpoint: outputs/checkpoints/seed_stability/streamcluster_pressure/seed_2026/qmap_epoch_10.pth
 Training finished.
 /home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
