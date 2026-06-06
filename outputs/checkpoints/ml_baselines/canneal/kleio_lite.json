@@ -1,0 +1,31 @@
+{
+  "candidate_count": 8,
+  "feature_names": [
+    "bias",
+    "rank_norm",
+    "recency_norm",
+    "residency_norm",
+    "frequency_norm",
+    "recent_count_norm",
+    "recent_write_norm",
+    "dirty"
+  ],
+  "history_length": 10,
+  "label_lookahead": 256,
+  "lookahead": 256,
+  "policy": "kleio_lite",
+  "training": {
+    "sample_count": 280368,
+    "train_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_train.csv"
+  },
+  "weights": [
+    0.002957674120619869,
+    0.006992567312743122,
+    -0.07522050714225023,
+    0.06324606546134887,
+    0.019729701137782447,
+    0.0,
+    0.0,
+    0.03128289493577689
+  ]
+}

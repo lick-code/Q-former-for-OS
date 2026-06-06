@@ -1,0 +1,28 @@
+{
+  "avg_decision_time_ms": 0.06840809195695113,
+  "candidate_count": 8,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 2227,
+  "decision_time_seconds": 0.15234482078813016,
+  "dram_capacity": 16,
+  "hit_rate": 0.97757,
+  "hit_rate_percent": 97.757,
+  "hits": 97757,
+  "learned_model": "outputs/checkpoints/ml_baselines/canneal/kleio_lite.json",
+  "migrations": 2227,
+  "misses": 2243,
+  "nvm_reads": 2191,
+  "nvm_writes": 52,
+  "policy": "kleio_lite",
+  "rank_guard": 0,
+  "rank_score_penalty": 0.0,
+  "total_accesses": 100000,
+  "trace_path": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv",
+  "weighted_access_cost": 124825.0
+}

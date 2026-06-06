@@ -1,0 +1,28 @@
+{
+  "avg_decision_time_ms": 0.0658551908727624,
+  "candidate_count": 8,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 11613,
+  "decision_time_seconds": 0.7647763316053897,
+  "dram_capacity": 16,
+  "hit_rate": 0.941855,
+  "hit_rate_percent": 94.1855,
+  "hits": 188371,
+  "learned_model": "outputs/checkpoints/ml_baselines/streamcluster_pressure/kleio_lite.json",
+  "migrations": 11613,
+  "misses": 11629,
+  "nvm_reads": 10932,
+  "nvm_writes": 697,
+  "policy": "kleio_lite",
+  "rank_guard": 0,
+  "rank_score_penalty": 0.0,
+  "total_accesses": 200000,
+  "trace_path": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
+  "weighted_access_cost": 331941.0
+}
