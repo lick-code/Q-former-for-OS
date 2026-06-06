@@ -1,0 +1,27 @@
+{
+  "avg_decision_time_ms": 2.414045102651719,
+  "candidate_count": 8,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 3317,
+  "decision_time_seconds": 8.007387605495751,
+  "dram_capacity": 16,
+  "hit_rate": 0.96667,
+  "hit_rate_percent": 96.667,
+  "hits": 96667,
+  "migrations": 3317,
+  "misses": 3333,
+  "nvm_reads": 3247,
+  "nvm_writes": 86,
+  "policy": "qmap",
+  "rank_guard": 0,
+  "rank_score_penalty": 0.0,
+  "total_accesses": 100000,
+  "trace_path": "dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv",
+  "weighted_access_cost": 137019.0
+}
