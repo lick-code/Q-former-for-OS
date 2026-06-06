@@ -101,6 +101,10 @@ def build_arg_parser():
   parser.add_argument("--rank_guard", type=int, default=0,
                       help=("For QMAP eval, restrict inference to the first N "
                             "LRU-tail candidates. 0 disables the guard."))
+  parser.add_argument("--rank_score_penalty", type=float, default=0.0,
+                      help=("For QMAP eval, subtract penalty * normalized "
+                            "LRU-tail rank from eviction scores. 0 disables "
+                            "the penalty."))
   parser.add_argument("--lookahead", type=int, default=256)
   parser.add_argument("--dram_capacity", type=int, default=128)
   parser.add_argument("--epochs", type=int, default=10)
@@ -318,6 +322,8 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
     ])
     if args.rank_guard:
       command.extend(["--rank_guard", str(args.rank_guard)])
+    if args.rank_score_penalty:
+      command.extend(["--rank_score_penalty", str(args.rank_score_penalty)])
     maybe_extend_device(command, args.device)
   run_command(command, os.path.join(log_dir, "{}_{}.log".format(
       workload, policy)))
@@ -330,6 +336,7 @@ def evaluate_policy(args, workload, policy, paths, checkpoint_path, log_dir):
   row["jsonl"] = rel_path(paths["jsonl"]) if policy == "qmap" else ""
   row["candidate_count"] = row.get("candidate_count", "")
   row["rank_guard"] = row.get("rank_guard", "")
+  row["rank_score_penalty"] = row.get("rank_score_penalty", "")
   return row
 
 
@@ -353,6 +360,7 @@ def summary_row(row):
       "jsonl": row["jsonl"],
       "candidate_count": row.get("candidate_count", ""),
       "rank_guard": row.get("rank_guard", ""),
+      "rank_score_penalty": row.get("rank_score_penalty", ""),
       "checkpoint": row["checkpoint"],
   }
 
@@ -377,6 +385,7 @@ def write_summary_csv(rows, output_path):
       "jsonl",
       "candidate_count",
       "rank_guard",
+      "rank_score_penalty",
       "checkpoint",
   ]
   with open(output_path, "w", newline="", encoding="utf-8") as output_file:
@@ -450,6 +459,8 @@ def write_summary_markdown(rows, output_path, args, workloads, policies):
         display_qmap_model(args), QMAP_ABLATION))
     output_file.write("- QMAP rank guard: `{}`\n".format(
         args.rank_guard or "disabled"))
+    output_file.write("- QMAP rank score penalty: `{}`\n".format(
+        args.rank_score_penalty or "disabled"))
     output_file.write("- page shift: `{}`\n".format(args.page_shift))
     output_file.write("- epochs: `{}`\n".format(args.epochs))
     output_file.write("- batch size: `{}`\n".format(args.batch_size))
@@ -512,6 +523,8 @@ def main():
     raise ValueError("--rank_guard must be non-negative.")
   if args.rank_guard and args.rank_guard > args.candidate_count:
     raise ValueError("--rank_guard cannot exceed --candidate_count.")
+  if args.rank_score_penalty < 0.0:
+    raise ValueError("--rank_score_penalty must be non-negative.")
   workloads = split_csv(args.workloads)
   policies = split_csv(args.policies)
   workload_skips = parse_workload_skips(args.workload_skips)

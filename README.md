@@ -20,7 +20,7 @@ QMAP-CrossAttn =
 旧的 `QMAP-Pool = Transformer Encoder + mean pooling + candidate scorer`
 只作为历史口径保留；Q-Former 相关实验也只作为前期探索记录保留，不再作为论文主线。
 由于模型结构已经变化，旧结果目录中的 `QMAP-Pool/mean_pool` 指标不能直接作为
-新方法结果引用，正式实验需要重新生成 checkpoint 并重新 replay。
+新方法结果引用；当前正式结果已经按 `QMAP-CrossAttn/cross_attention` 重新训练并 replay。
 
 当前论文实验规模仍固定为：`1M real trace + pressure window + real ablation + seed stability`。暂不补 5M；如果后续老师要求更大规模，再重新采集真正的 5M trace 后补跑。当前 `outputs/results/real_workload_suite/5m/` 是 100k 回退结果，不能作为论文或文档中的 5M 实验结果。
 
@@ -43,7 +43,7 @@ QMAP-CrossAttn =
 2. QMAP 不是所有 workload 都优于 LFU，尤其在 hotset、phasechange、pcrwstress 上 LFU 仍然很强。
 3. 旧的 mean pooling 结论只作为历史对照；新论文主线应使用 QMAP-CrossAttn。
 4. 真实实验主线仍是 1M 标准 split、streamcluster/dedup pressure window、真实消融和多 seed。
-5. 旧 `QMAP-Pool/mean_pool` 结果已经不能代表当前方法；新结果需要按下面的服务器命令重跑。
+5. 当前正式结果已经重跑为 `QMAP-CrossAttn/cross_attention`；旧 `QMAP-Pool/mean_pool` 只作为历史对照。
 ```
 
 ## 结果总览
@@ -61,15 +61,16 @@ QMAP-CrossAttn =
 | Q-Former 对照 | 已完成，仅作历史参考 | `outputs/results/qmap_qformer_comparison_writeheavy/summary.md` |
 | Encoder 层数对照 | 已完成，仅作历史参考 | `outputs/results/qmap_encoder_depth_comparison_writeheavy/summary.md` |
 | 真实/标准 workload | 4 个 PARSEC 100k 真实 trace 已完成 | `outputs/results/real_trace_stats/summary.md` |
-| 真实 trace 100k pilot | 历史结果；新方法需按 `cross_attention` 重跑 | `outputs/results/real_pilot/summary.md` |
+| 真实 trace 100k pilot | 历史 pipeline 验证；不作为当前 CrossAttn 结论 | `outputs/results/real_pilot/summary.md` |
 | 真实 trace 1M 主实验 | 阶段 5 的正式主结果；作为论文主表来源 | `outputs/results/real_workload_suite/1m/summary.md` |
 | pressure window 实验 | 阶段 5 的压力窗口补充；streamcluster 是最强真实正结果，dedup 基本持平 | `outputs/results/real_workload_suite_pressure/selected/summary.md` |
-| 真实数据消融 | 旧结果已完成；新方法需重跑 `QMAP-CrossAttn / no_rw / no_cost` | `outputs/results/real_ablation/summary.md` |
-| 多 seed 稳定性 | 阶段 7 已完成；验证正结果和负例不是 seed 偶然 | `outputs/results/seed_stability/summary.md` |
+| 真实数据消融 | 已完成；当前口径为 `QMAP-CrossAttn / no_rw / no_cost` | `outputs/results/real_ablation/summary.md` |
+| 多 seed 稳定性 | 阶段 7 已完成；streamcluster 正结果稳定，blackscholes 混合，canneal 负例稳定 | `outputs/results/seed_stability/summary.md` |
 | 5M 实验 | 暂缓；当前 5M 目录实际是 100k 回退结果，不进入论文 | `outputs/results/real_workload_suite/5m/` |
 | cost-weight sensitivity | 已完成；replay counter 重新加权，不重新训练 | `outputs/results/cost_weight_sensitivity/summary.md` |
 | capacity sensitivity | 已完成；覆盖 streamcluster pressure 和 canneal，DRAM cap=8/16/32 | `outputs/results/capacity_sensitivity/summary.md` |
 | candidate-count sensitivity | 已完成；覆盖 streamcluster pressure 和 canneal，candidate count=4/8/16 | `outputs/results/candidate_sensitivity/summary.md` |
+| canneal targeted tuning | 新增代码入口；用 valid split 选择 epoch / candidate count / rank score penalty，再评 test | `outputs/results/canneal_tuned_eval/summary.md` |
 
 ## 目录结构
 
@@ -96,6 +97,7 @@ scripts/
   run_qmap_ablation.py                 # 消融实验
   run_qmap_encoder_depth_comparison.py # mean_pool 下 encoder 层数对照
   run_real_pilot.py                    # 真实/PARSEC trace 的 split -> JSONL -> train -> eval -> summary 统一入口
+  run_canneal_tuned_eval.py            # canneal 专项优化：valid 调参后只评一次 test
   diagnose_qmap_replay.py              # 真实 trace replay 诊断和 dedup pressure window 扫描
 
 dataset/
@@ -135,7 +137,7 @@ Encoder 2/3 层 sweep
 ```text
 1. Q-Former 和 mean_pool 结果是历史探索记录，便于解释方法演进。
 2. 当前论文方法已经改为页面特征查询完整 X_enc 的 cross-attention。
-3. 新方法需要重新训练和 replay，不能沿用旧 QMAP-Pool 数字。
+3. 新方法已经重新训练和 replay，不能沿用旧 QMAP-Pool 数字。
 ```
 
 ## 下一步实验规划
@@ -509,8 +511,8 @@ prepare_real_trace.py 规范化、80/10/10 切分和统计输出通过。
 ```text
 必须先有 raw trace，才能 split；
 必须 split 成 train/test，才能 generate JSONL；
-必须 generate JSONL，才能 train QMAP-Pool；
-必须有 checkpoint，才能评估 QMAP-Pool。
+必须 generate JSONL，才能 train QMAP-CrossAttn；
+必须有 checkpoint，才能评估 QMAP-CrossAttn。
 ```
 
 可以并行：
@@ -570,7 +572,10 @@ outputs/results/real_trace_stats/summary.md
 
 目标：确认真实数据 pipeline 能跑通，并找到能产生有效 eviction 压力的真实 trace 配置。
 
-最终采用的 pilot 口径：
+100k pilot 只作为 pipeline 和压力窗口选择依据，不作为当前论文结果表。当前论文结果以阶段 5 之后的
+`QMAP-CrossAttn` 1M/pressure/ablation/seed summary 为准。
+
+最终沿用到正式实验的配置口径：
 
 ```text
 records = 100k
@@ -580,9 +585,9 @@ candidate_count = 8
 dram_capacity = 16
 lookahead = 256
 epochs = 10
-model = QMAP-Pool
-ablation = mean_pool
-policies = LRU / Random / LFU / CLOCK / QMAP-Pool
+model = QMAP-CrossAttn
+ablation = cross_attention
+policies = LRU / Random / LFU / CLOCK / QMAP-CrossAttn
 ```
 
 阶段 4 过程中排除的旧口径：
@@ -599,7 +604,7 @@ candidate_count = 8 + rank feature:
   明显缓解 MRU 误驱逐问题，是阶段 5 应继续使用的配置。
 ```
 
-最终 100k pilot 结果：
+历史 100k pilot 输出：
 
 ```text
 run id: real_pilot_100k_dram16_c8_rankfix
@@ -608,24 +613,8 @@ result: outputs/results/real_pilot_dram16_c8_rankfix/summary.md
 diagnosis: outputs/results/real_pilot_dram16_c8_rankfix/diagnosis.md
 ```
 
-| Workload | Best baseline | Best baseline cost | QMAP-Pool cost | QMAP-Pool vs best | 结论 |
-|---|---|---:|---:|---:|---|
-| parsec_blackscholes | LRU | 11023.00 | 11159.00 | +1.23% | QMAP 略差，主要成本来自额外迁移 |
-| parsec_canneal | LFU | 14574.00 | 14398.00 | -1.21% | QMAP 优于最佳 baseline |
-| parsec_streamcluster | LFU | 14473.00 | 14260.00 | -1.47% | QMAP 优于最佳 baseline |
-| parsec_dedup | LRU | 10052.00 | 10052.00 | +0.00% | 默认 split 无 eviction，不能作为有效比较 |
-
-dedup 额外补了 pressure window：
-
-```text
-run id: real_pilot_dedup_pressure_c8_rankfix
-records = 50k
-result: outputs/results/real_pilot_dedup_pressure_c8_rankfix/summary.md
-```
-
-| Workload | Best baseline | Best baseline cost | QMAP-Pool cost | QMAP-Pool vs best | 结论 |
-|---|---|---:|---:|---:|---|
-| parsec_dedup pressure | CLOCK | 7306.00 | 7366.00 | +0.82% | QMAP 与 LRU 持平，接近 CLOCK |
+这些输出用于确认 `dram_capacity=16`、`candidate_count=8` 和 pressure window 的必要性。
+旧 `QMAP-Pool/mean_pool` 数字不进入当前论文结论，当前 README 后续只报告新方法结果。
 
 阶段 4 结论：
 
@@ -633,23 +622,23 @@ result: outputs/results/real_pilot_dedup_pressure_c8_rankfix/summary.md
 1. 四个 PARSEC workload 都已跑过 100k pilot。
 2. blackscholes / canneal / streamcluster 在 c8/rankfix 配置下都有有效 eviction。
 3. dedup 默认 100k chronological split 的 test 段没有 eviction 压力，必须使用 pressure window 或更大 trace。
-4. QMAP-Pool 在 canneal、streamcluster 上已经超过最佳 baseline；在 blackscholes 上略差；在 dedup pressure 上接近最佳 baseline。
-5. 阶段 5 不应沿用 dram64 或 candidate_count=64，应冻结 c8/rankfix 配置。
+4. pilot 的主要作用是筛出有效 eviction 压力和稳定的实验配置，不作为最终方法收益。
+5. 阶段 5 沿用 `dram_capacity=16, candidate_count=8, lookahead=256`，但模型口径改为 `QMAP-CrossAttn`。
 ```
 
 严格依赖关系：
 
 ```text
-阶段 5 必须基于阶段 4 最终口径：
-dram_capacity=16, candidate_count=8, lookahead=256, QMAP-Pool mean_pool。
+阶段 5 必须基于阶段 4 收敛出的系统配置：
+dram_capacity=16, candidate_count=8, lookahead=256, QMAP-CrossAttn cross_attention。
 ```
 
 可以并行：
 
 ```text
 不同 workload 的 1M trace 采集可以并行；如后续补 5M，也按 workload 并行采集；
-不同 workload 的 QMAP-Pool 训练可以并行；
-baselines replay 可以和 QMAP-Pool 训练并行。
+不同 workload 的 QMAP-CrossAttn 训练可以并行；
+baselines replay 可以和 QMAP-CrossAttn 训练并行。
 ```
 
 ### 阶段 5：正式真实数据实验
@@ -667,24 +656,24 @@ dram_capacity = 16
 lookahead = 256
 epochs = 10
 batch_size = 32
-model = QMAP-Pool
-ablation = mean_pool
-policies = LRU / Random / LFU / CLOCK / QMAP-Pool
+model = QMAP-CrossAttn
+ablation = cross_attention
+policies = LRU / Random / LFU / CLOCK / QMAP-CrossAttn
 ```
 
 当前阶段 5 口径决策：
 
 ```text
-正式主表仍使用 QMAP-Pool c8，也就是 rank_guard disabled。
-QMAP-Pool-Guard / rank_guard=2 只作为诊断和附表，不作为统一主口径。
+正式主表使用 QMAP-CrossAttn c8，rank_guard disabled。
+历史 QMAP-Pool-Guard / rank_guard=2 只作为诊断记录，不作为当前论文主口径。
 ```
 
 原因：
 
 ```text
-rank_guard=2 能缓解 canneal 的 MRU-ish 误驱逐，但会明显伤害 blackscholes 和 streamcluster pressure window。
-统一改成 Guard 后，blackscholes 从 -0.91% 变成 +3.41%，streamcluster pressure 从 -12.35% 降到 -2.36%。
-因此 Guard 不是当前阶段 5 的正式策略，只用于解释 canneal 的失败原因和候选 rank 敏感性。
+当前新方法主结果已经关闭 Guard：`rank_guard=0`。
+历史 Guard 结果来自旧 mean-pool 口径，不能和当前 CrossAttn 主结果混写。
+canneal 的负结果由当前 candidate-count sensitivity 解释：candidate_count 越大，误驱逐和迁移放大越明显。
 ```
 
 正式 trace 规模决策：
@@ -726,25 +715,30 @@ dedup 注意：
 结果目录：
   outputs/results/real_workload_suite/1m/
   outputs/results/real_workload_suite_pressure/selected/
-  outputs/results/real_workload_suite_guard/
+  outputs/results/real_workload_suite_guard/  # 历史诊断，不进入当前主结论
 
 可进主表：
-  parsec_blackscholes 1M standard, QMAP-Pool c8:
-    QMAP vs best baseline = -0.91%
-    结论：有效正结果。
+  parsec_blackscholes 1M standard, QMAP-CrossAttn c8:
+    best baseline = LFU, cost = 106952
+    QMAP-CrossAttn cost = 105983, delta = -0.91%
+    NVM writes = 32, migrations = 525
+    结论：单 seed 下小幅优于 best baseline，但 seed stability 显示该结论会翻转。
 
-  parsec_streamcluster pressure window, QMAP-Pool c8:
-    QMAP vs best baseline = -12.35%
+  parsec_streamcluster pressure window, QMAP-CrossAttn c8:
+    best baseline = CLOCK, cost = 301767
+    QMAP-CrossAttn cost = 269095, delta = -10.83%
+    NVM writes = 548, migrations = 5981
     结论：最强真实 workload 正结果。
 
-需要诊断或降级：
-  parsec_canneal 1M standard, QMAP-Pool c8:
-    QMAP vs LRU = +19.32%
-    迁移次数 4567 vs LRU 2350。
+  需要诊断或降级：
+  parsec_canneal 1M standard, QMAP-CrossAttn c8:
+    best baseline = LRU, cost = 126178
+    QMAP-CrossAttn cost = 150263, delta = +19.09%
+    迁移次数 4545 vs LRU 2350。
     结论：负结果/诊断案例，不强行改统一口径。
 
   parsec_dedup pressure window:
-    QMAP 与 LRU 持平，decision_count 只有 87。
+    QMAP-CrossAttn 与 LRU 持平，cost = 201567，decision_count = 87。
     结论：弱压力 trace，只能说明不差，不能证明优势。
 
 不能用作策略比较：
@@ -760,11 +754,37 @@ dedup 注意：
 canneal 诊断结论：
 
 ```text
-outputs/results/real_workload_suite/1m/canneal_epoch_candidate_sweep/
+outputs/results/candidate_sensitivity/summary.md
 
-c8 全 epoch 都差，说明不是 epoch 10 单点过拟合。
-eval candidate_count=2 可以把 canneal 从 +19.32% 改善到约 -0.85%，说明问题来自 c8 下 QMAP 过度选择靠近 MRU 的 rank。
-但 c2 / rank_guard=2 会伤害 blackscholes 和 streamcluster pressure，所以不作为统一主口径。
+candidate_count=4:  QMAP-CrossAttn vs LRU = +6.87%
+candidate_count=8:  QMAP-CrossAttn vs LRU = +19.09%
+candidate_count=16: QMAP-CrossAttn vs LRU = +134.56%
+
+这说明 canneal 失败不是单个 checkpoint 偶然，而是候选集合扩大后误驱逐和迁移被放大。
+当前统一主口径仍保持 c8，用 canneal 作为方法边界和失败诊断案例。
+如果目标是把 canneal 单独调到接近持平或反超，不再使用统一 c8 口径，而是使用
+`scripts/run_canneal_tuned_eval.py`：它先在 valid split 上选择
+`epoch / candidate_count / rank_score_penalty`，再只对选中的配置评一次 test。
+```
+
+canneal 专项优化命令：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/run_canneal_tuned_eval.py \
+  --device cuda \
+  --checkpoint_dir outputs/checkpoints/real_workload_suite/1m/parsec_canneal \
+  --valid_trace dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv \
+  --test_trace dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv \
+  --output_dir outputs/results/canneal_tuned_eval
+```
+
+默认搜索空间：
+
+```text
+epochs = 1,2,3,4,5,6,7,8,9,10
+candidate_counts = 1,2,4,8
+rank_score_penalties = 0,0.25,0.5,1.0,2.0
+selection = lowest validation weighted_access_cost
 ```
 
 1M 主实验命令模板：
@@ -808,10 +828,10 @@ python scripts/run_real_pilot.py \
 每轮正式实验后必须检查：
 
 ```text
-1. summary.md 中每个 workload 的 Migrations / Decision ms / QMAP-Pool vs best baseline。
+1. summary.md 中每个 workload 的 Migrations / Decision ms / QMAP-CrossAttn vs best baseline。
 2. diagnosis.md 中 QMAP 是否再次大量选择过新的候选页。
 3. dedup 的 decision_count 是否足够；如果接近 0，该结果只能说明 workload 太容易，不能比较策略。
-4. QMAP-Pool 的 avg decision time；当前 100k pilot 中 QMAP 是毫秒级，baseline 是微秒级，论文里要作为 overhead 报告。
+4. QMAP-CrossAttn 的 avg decision time；当前 QMAP 是毫秒级，baseline 是微秒级，论文里要作为 overhead 报告。
 ```
 
 当前论文采用的阶段 5 输出：
@@ -833,7 +853,7 @@ NVM writes
 weighted access cost
 migration count
 avg decision time
-QMAP-Pool vs best baseline cost delta
+QMAP-CrossAttn vs best baseline cost delta
 ```
 
 严格依赖关系：
@@ -848,7 +868,7 @@ QMAP-Pool vs best baseline cost delta
 多个 workload 的正式实验可以并行；
 多个 baseline policy 可以并行；
 多 seed 可以并行；
-同一 QMAP-Pool workload 的 generate/train/eval 必须串行。
+同一 QMAP-CrossAttn workload 的 generate/train/eval 必须串行。
 ```
 
 ### 阶段 6：只做必要消融
@@ -858,7 +878,7 @@ QMAP-Pool vs best baseline cost delta
 真实数据上建议只做：
 
 ```text
-QMAP-Pool
+QMAP-CrossAttn
 no_rw
 no_cost
 ```
@@ -882,7 +902,7 @@ Encoder 2/3 层 sweep
 
 ```text
 老师已经决定不走 Q-Former；
-真实数据实验的主要任务是证明 QMAP-Pool 在标准 workload 上仍然有效；
+真实数据实验的主要任务是验证 QMAP-CrossAttn 在真实 workload 上的收益边界；
 消融只需要说明 RW/cost-aware 是否有贡献。
 ```
 
@@ -905,9 +925,9 @@ Encoder 2/3 层 sweep
 不需要所有实验都多 seed。建议只对最关键结果做：
 
 ```text
-1. synthetic writeheavy: QMAP-Pool vs LFU/CLOCK
-2. 真实数据中 QMAP-Pool 表现最好的 workload
-3. 真实数据中 QMAP-Pool 表现最差或最接近 LFU 的 workload
+1. synthetic writeheavy: QMAP-CrossAttn vs LFU/CLOCK
+2. 真实数据中 QMAP-CrossAttn 表现最好的 workload
+3. 真实数据中 QMAP-CrossAttn 表现最差或最接近 LFU 的 workload
 ```
 
 建议 seed：
@@ -942,15 +962,15 @@ outputs/results/seed_stability/summary.md
 最实际的顺序：
 
 ```text
-Step 1. 已完成：冻结 QMAP-Pool 为最终模型，所有新实验统一 mean_pool。
+Step 1. 已完成：最终模型更新为 QMAP-CrossAttn，所有新实验统一 cross_attention。
 Step 2. 已完成：在 WSL 搭建 PARSEC 环境，第一批固定为 blackscholes/canneal/streamcluster/dedup。
 Step 3. 已完成：写/确认 trace 采集工具，输出 PC,Address,RW；dedup 不稳定时用 ferret 替换。
 Step 4. 已完成：4 个 PARSEC 100k raw -> split -> 质量检查已通过。
-Step 5. 已完成：阶段 4 100k pilot 已收敛到 `dram_capacity=16, candidate_count=8, lookahead=256`；canneal/streamcluster 上 QMAP-Pool 优于最佳 baseline，blackscholes 略差，dedup 需要 pressure window。
+Step 5. 已完成：阶段 4 100k pilot 已收敛到 `dram_capacity=16, candidate_count=8, lookahead=256`；pilot 只用于配置选择，最终指标看 CrossAttn 复跑结果。
 Step 6. 已完成：真实 1M trace 已采集，1M standard split 主实验已跑完。
-Step 7. 已完成：streamcluster pressure window 已补，QMAP-Pool c8 有 -12.35% cost 改善。
-Step 8. 已完成：canneal epoch/candidate sweep 已补，确认 c8 负结果来自 rank 偏置；rank_guard=2 不作为统一主口径。
-Step 9. 已完成：1M 主表已固化，blackscholes 和 streamcluster pressure 作为正结果，canneal 作为负例诊断，dedup 标注 low-pressure tie。
+Step 7. 已完成：streamcluster pressure window 已补，QMAP-CrossAttn c8 有 -10.83% cost 改善。
+Step 8. 已完成：canneal candidate-count sensitivity 已补，确认候选集合扩大后负结果明显放大；rank_guard=2 不作为统一主口径。
+Step 9. 已完成：1M 主表已固化，streamcluster pressure 作为稳定正结果，blackscholes 作为弱正/混合案例，canneal 作为负例诊断，dedup 标注 low-pressure tie。
 Step 10. 已完成：真实数据必要消融已完成，覆盖 streamcluster pressure 和 blackscholes。
 Step 11. 已完成：多 seed 验证已完成，覆盖 streamcluster pressure、blackscholes 和 canneal 负例。
 Step 12. 暂缓：正式 5M。当前论文不补 5M；如后续老师要求，必须重新采集真实 5M 并确认 records=5000000。
@@ -963,10 +983,10 @@ Step 14. 当前下一步：开始写论文实验部分，按“1M 主实验 -> p
 可以并行：
 
 ```text
-1. 真实 benchmark 环境搭建 和 QMAP-Pool 脚本整理。
+1. 真实 benchmark 环境搭建 和 QMAP-CrossAttn 脚本整理。
 2. 多个 workload 的 trace 采集。
 3. 多个 baseline replay。
-4. 多个 workload 的 QMAP-Pool 训练。
+4. 多个 workload 的 QMAP-CrossAttn 训练。
 5. 多 seed 实验。
 ```
 
@@ -981,17 +1001,17 @@ Step 14. 当前下一步：开始写论文实验部分，按“1M 主实验 -> p
 
 ## 建议论文最终表格
 
-当前论文实验规模固定为 `1M + pressure window + ablation + seed stability`。表格优先服务论文主线：QMAP-Pool 不是所有 workload 的无条件最优策略，但在有迁移压力和明显相位行为的真实 workload 上能稳定降低 weighted access cost，同时在 canneal 上暴露出候选 rank 敏感性。
+当前论文实验规模固定为 `1M + pressure window + ablation + seed stability`。表格优先服务论文主线：QMAP-CrossAttn 不是所有 workload 的无条件最优策略，但在 streamcluster pressure 这类有持续迁移压力的真实 workload 上能稳定降低 weighted access cost；blackscholes 是弱正/混合案例，canneal 是稳定负例并暴露出候选集合敏感性。
 
 推荐进入论文正文的表格：
 
 | 表格 | 内容 | 数据来源 | 用途 |
 |---|---|---|---|
 | Table 1 | 1M 真实 trace 统计 | `outputs/results/real_workload_suite/1m/trace_stats/summary.md` | 说明数据规模、unique pages、write ratio、reuse ratio |
-| Table 2 | 1M 标准 split 主实验：LRU / Random / LFU / CLOCK / QMAP-Pool | `outputs/results/real_workload_suite/1m/summary.md` | 论文主表，展示 blackscholes 正结果、canneal 负例、dedup 持平、streamcluster standard split 低压力问题 |
-| Table 3 | pressure window 主实验 | `outputs/results/real_workload_suite_pressure/selected/summary.md` | 作为真实 workload 最强正结果，重点报告 streamcluster pressure 的 `-12.35%` cost delta |
-| Table 4 | 真实数据消融：QMAP-Pool / no_rw / no_cost | `outputs/results/real_ablation/summary.md` | 解释 read/write 特征和 cost-aware 训练是否贡献收益 |
-| Table 5 | 多 seed 稳定性 | `outputs/results/seed_stability/summary.md` | 证明 streamcluster pressure 和 blackscholes 的正结果不是训练 seed 偶然，canneal 负例也稳定 |
+| Table 2 | 1M 标准 split 主实验：LRU / Random / LFU / CLOCK / QMAP-CrossAttn | `outputs/results/real_workload_suite/1m/summary.md` | 论文主表，展示 blackscholes 单 seed 小幅正、canneal 负例、dedup 持平、streamcluster standard split 低压力问题 |
+| Table 3 | pressure window 主实验 | `outputs/results/real_workload_suite_pressure/selected/summary.md` | 作为真实 workload 最强正结果，重点报告 streamcluster pressure 的 `-10.83%` cost delta |
+| Table 4 | 真实数据消融：QMAP-CrossAttn / no_rw / no_cost | `outputs/results/real_ablation/summary.md` | 解释 read/write 特征和 cost-aware 训练的贡献边界 |
+| Table 5 | 多 seed 稳定性 | `outputs/results/seed_stability/summary.md` | 证明 streamcluster pressure 正结果稳定，blackscholes 会随 seed 翻转，canneal 负例稳定 |
 
 推荐进入文档或附录的表格：
 
@@ -1013,7 +1033,7 @@ Step 14. 当前下一步：开始写论文实验部分，按“1M 主实验 -> p
 | `outputs/results/real_workload_suite/5m/` | 当前实际是 100k 回退结果，不是 5M，不能引用 |
 | Q-Former K sweep / Q-Former light/tiny | 已不是论文主线，只保留为历史探索 |
 | Encoder 2/3 层 sweep | 已用于内部定型，不需要占正文篇幅 |
-| 旧的 `QMAP-Full` 命名表 | 容易和当前 `QMAP-Pool` 主线混淆 |
+| 旧的 `QMAP-Full` / `QMAP-Pool` 命名表 | 容易和当前 `QMAP-CrossAttn` 主线混淆 |
 
 正文实验部分推荐结构：
 
@@ -1027,22 +1047,23 @@ Step 14. 当前下一步：开始写论文实验部分，按“1M 主实验 -> p
 2. Main Results on 1M Real Traces
    - 先报告完整 1M 标准 split
    - 明确说明 streamcluster standard split 几乎无 eviction，因此不能作为有效压力比较
-   - blackscholes 是小幅稳定正结果
+   - blackscholes 是单 seed 小幅正、多 seed 混合结果
    - canneal 是稳定负例
 
 3. Pressure Window Results
    - 重点报告 streamcluster pressure window
-   - QMAP-Pool 相比最佳 baseline 降低 weighted access cost 12.35%
+   - QMAP-CrossAttn 相比最佳 baseline 降低 weighted access cost 10.83%
    - dedup pressure window 与 LRU 持平，作为边界案例
 
 4. Ablation Study
-   - streamcluster pressure 上 no_rw 和 no_cost 都变差
-   - blackscholes 上消融差异很小，说明该 workload 机制不强
+   - streamcluster pressure 上 no_rw 略优于完整模型，no_cost 基本持平
+   - blackscholes 上消融变体更优，说明该 workload 不适合作为机制收益主证据
 
 5. Seed Stability and Overhead
-   - 三个 seed 下 streamcluster pressure 和 blackscholes 都稳定优于 best baseline
+   - 三个 seed 下 streamcluster pressure 都稳定优于 best baseline
+   - blackscholes 的 seed 结果会翻转，只作为弱正/混合案例
    - canneal 三个 seed 都稳定失败
-   - QMAP-Pool 推理开销明显高于传统策略，需要作为代价讨论
+   - QMAP-CrossAttn 推理开销明显高于传统策略，需要作为代价讨论
 
 6. Appendix Sensitivity
    - cost-weight sensitivity: 正负结论不依赖单一 cost 权重
@@ -1063,8 +1084,8 @@ Step 14. 当前下一步：开始写论文实验部分，按“1M 主实验 -> p
 推荐 workload：
 
 ```text
-streamcluster_pressure  正例，使用 pressure window
-blackscholes            小幅正例，使用 1M standard split
+streamcluster_pressure  稳定正例，使用 pressure window
+blackscholes            弱正/混合案例，使用 1M standard split
 canneal                 负例，使用 1M standard split
 ```
 
@@ -1119,10 +1140,10 @@ python qmap/qmap_eval.py \
 
 | Cost model | streamcluster-p delta | blackscholes delta | canneal delta |
 |---|---:|---:|---:|
-| default | -12.35% | -0.91% | +19.32% |
-| mild | -7.99% | -0.28% | +11.64% |
-| write-heavy | -12.12% | -2.28% | +19.25% |
-| migration-heavy | -18.21% | -0.73% | +31.10% |
+| default | -10.83% | +3.37% | +2.45% |
+| mild | -6.98% | +2.03% | +1.48% |
+| write-heavy | -10.73% | +2.54% | +2.44% |
+| migration-heavy | -15.91% | +6.65% | +3.94% |
 
 输出：
 
@@ -1135,9 +1156,9 @@ outputs/results/cost_weight_sensitivity/summary.csv
 
 ```text
 streamcluster_pressure 在所有 cost model 下都优于 best baseline。
-blackscholes 在所有 cost model 下都小幅优于 best baseline。
+blackscholes 在该重算表中所有 cost model 下都差于 best baseline，说明它只能作为弱正/混合案例。
 canneal 在所有 cost model 下都差于 best baseline。
-因此，当前正负结论不依赖单一 cost 权重选择。
+因此，最强正例 streamcluster_pressure 和负例 canneal 都不依赖单一 cost 权重选择。
 ```
 
 ### 2. Capacity sensitivity
@@ -1154,9 +1175,9 @@ candidate_count = 8
 lookahead = 256
 epochs = 10
 batch_size = 32
-model = QMAP-Pool
-ablation = mean_pool
-policies = LRU / Random / LFU / CLOCK / QMAP-Pool
+model = QMAP-CrossAttn
+ablation = cross_attention
+policies = LRU / Random / LFU / CLOCK / QMAP-CrossAttn
 ```
 
 变量：
@@ -1224,12 +1245,12 @@ done
 
 | Workload | DRAM cap | best baseline cost | QMAP cost | delta | QMAP migrations | decision count |
 |---|---:|---:|---:|---:|---:|---:|
-| streamcluster-p | 8 | 369999 | 331072 | -10.52% | 11592 | 11592 |
-| streamcluster-p | 16 | 301767 | 264501 | -12.35% | 5541 | 5541 |
-| streamcluster-p | 32 | 216577 | 217150 | +0.26% | 1548 | 1548 |
-| canneal | 8 | 190696 | 314640 | +65.00% | 19176 | 19176 |
-| canneal | 16 | 126178 | 150559 | +19.32% | 4567 | 4567 |
-| canneal | 32 | 101502 | 101320 | -0.18% | 116 | 116 |
+| streamcluster-p | 8 | 369999 | 332660 | -10.09% | 11738 | 11738 |
+| streamcluster-p | 16 | 301767 | 269095 | -10.83% | 5981 | 5981 |
+| streamcluster-p | 32 | 216577 | 217348 | +0.36% | 1566 | 1566 |
+| canneal | 8 | 190696 | 352852 | +85.03% | 22334 | 22334 |
+| canneal | 16 | 126178 | 150263 | +19.09% | 4545 | 4545 |
+| canneal | 32 | 101502 | 101298 | -0.20% | 114 | 114 |
 
 输出：
 
@@ -1246,7 +1267,7 @@ outputs/results/capacity_sensitivity/summary.csv
 streamcluster_pressure 在 cap=8 和 cap=16 下稳定优于 best baseline；
 cap=32 时 replacement pressure 明显降低，QMAP 与 best baseline 基本持平。
 canneal 在 cap=8 和 cap=16 下明显失败，cap=32 时压力较弱并接近持平。
-这说明 `dram_capacity=16` 不是孤立选择；QMAP-Pool 的收益主要出现在有足够 replacement pressure 的负载上。
+这说明 `dram_capacity=16` 不是孤立选择；QMAP-CrossAttn 的收益主要出现在有足够 replacement pressure 且访问模式适合学习的负载上。
 ```
 
 ### 3. Candidate-count sensitivity
@@ -1263,9 +1284,9 @@ dram_capacity = 16
 lookahead = 256
 epochs = 10
 batch_size = 32
-model = QMAP-Pool
-ablation = mean_pool
-policies = LRU / Random / LFU / CLOCK / QMAP-Pool
+model = QMAP-CrossAttn
+ablation = cross_attention
+policies = LRU / Random / LFU / CLOCK / QMAP-CrossAttn
 ```
 
 变量：
@@ -1333,12 +1354,12 @@ done
 
 | Workload | Candidate count | best baseline cost | QMAP cost | delta | QMAP migrations | decision count |
 |---|---:|---:|---:|---:|---:|---:|
-| streamcluster-p | 4 | 301767 | 282349 | -6.43% | 7169 | 7169 |
-| streamcluster-p | 8 | 301767 | 264501 | -12.35% | 5541 | 5541 |
-| streamcluster-p | 16 | 301767 | 289085 | -4.20% | 7897 | 7897 |
-| canneal | 4 | 126178 | 134802 | +6.83% | 3134 | 3134 |
-| canneal | 8 | 126178 | 150559 | +19.32% | 4567 | 4567 |
-| canneal | 16 | 126178 | 244261 | +93.58% | 12949 | 12949 |
+| streamcluster-p | 4 | 301767 | 284587 | -5.69% | 7367 | 7367 |
+| streamcluster-p | 8 | 301767 | 269095 | -10.83% | 5981 | 5981 |
+| streamcluster-p | 16 | 301767 | 286669 | -5.00% | 7673 | 7673 |
+| canneal | 4 | 126178 | 134851 | +6.87% | 3139 | 3139 |
+| canneal | 8 | 126178 | 150263 | +19.09% | 4545 | 4545 |
+| canneal | 16 | 126178 | 295968 | +134.56% | 17636 | 17636 |
 
 输出：
 
@@ -1442,6 +1463,27 @@ CUDA_VISIBLE_DEVICES=0 python scripts/run_real_workload_suite.py \
   --device cuda
 ```
 
+如果只想针对 canneal 重新做“接近持平/反超”的专项优化，先复用上面 1M
+主实验已经训练出的 canneal checkpoints，然后单独跑 valid-tuned eval：
+
+```bash
+tmux new -s qmap_canneal_tune
+CUDA_VISIBLE_DEVICES=0 python scripts/run_canneal_tuned_eval.py \
+  --device cuda \
+  --checkpoint_dir outputs/checkpoints/real_workload_suite/1m/parsec_canneal \
+  --valid_trace dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv \
+  --test_trace dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv \
+  --output_dir outputs/results/canneal_tuned_eval
+```
+
+输出看这里：
+
+```text
+outputs/results/canneal_tuned_eval/summary.md
+outputs/results/canneal_tuned_eval/summary.csv
+outputs/results/canneal_tuned_eval/selected_config.json
+```
+
 pressure window 主实验建议单独跑：
 
 ```bash
@@ -1510,26 +1552,26 @@ Stage 6 answers: why QMAP works, and which feature/loss terms contribute.
 Scope:
 
 - `parsec_streamcluster` pressure window: main positive real workload case.
-- `parsec_blackscholes` standard 1M split: smaller positive standard split case.
-- Variants: `QMAP-Pool`, `no_rw`, `no_cost`.
+- `parsec_blackscholes` standard 1M split: weak/mixed boundary case.
+- Variants: `QMAP-CrossAttn`, `no_rw`, `no_cost`.
 - Configuration: `history_length=10`, `candidate_count=8`, `lookahead=256`, `dram_capacity=16`, `epochs=10`, `batch_size=32`, `seed=3136859`.
 
 Result table:
 
-| workload | variant | cost | vs QMAP-Pool | NVM writes | migrations |
+| workload | variant | cost | vs QMAP-CrossAttn | NVM writes | migrations |
 |---|---|---:|---:|---:|---:|
-| streamcluster_pressure | QMAP-Pool | 264501.00 | +0.00% | 589 | 5541 |
-| streamcluster_pressure | no_rw | 265905.00 | +0.53% | 592 | 5667 |
-| streamcluster_pressure | no_cost | 265395.00 | +0.34% | 584 | 5625 |
-| blackscholes | QMAP-Pool | 105983.00 | +0.00% | 32 | 525 |
-| blackscholes | no_rw | 105961.00 | -0.02% | 32 | 523 |
-| blackscholes | no_cost | 105983.00 | +0.00% | 32 | 525 |
+| streamcluster_pressure | QMAP-CrossAttn | 269095.00 | +0.00% | 548 | 5981 |
+| streamcluster_pressure | no_rw | 267644.00 | -0.54% | 550 | 5848 |
+| streamcluster_pressure | no_cost | 269174.00 | +0.03% | 563 | 5980 |
+| blackscholes | QMAP-CrossAttn | 110557.00 | +0.00% | 116 | 895 |
+| blackscholes | no_rw | 106302.00 | -3.85% | 32 | 554 |
+| blackscholes | no_cost | 105752.00 | -4.35% | 32 | 504 |
 
 Interpretation:
 
-- On `streamcluster_pressure`, both ablations make cost worse, so the real positive case supports the claim that QMAP uses read/write access context and cost-aware supervision. Removing RW hurts more (`+0.53%`) than removing the write-sensitivity / migration-cost loss terms (`+0.34%`).
-- On `blackscholes`, the deltas are effectively neutral (`-0.02%` and `+0.00%`). This workload has a small active page set and the gain is already small, so the ablation does not expose a strong mechanism there.
-- No full canneal ablation is needed for the main story. Canneal remains a failure-diagnosis case, not the primary evidence for QMAP's benefit.
+- On `streamcluster_pressure`, `no_cost` is nearly tied with the full model (`+0.03%`), while `no_rw` is slightly better (`-0.54%`). This means the current real ablation does not support a strong claim that every feature/loss term independently improves this workload.
+- On `blackscholes`, both ablations are better than the full model in this rerun. Because blackscholes is already weak/mixed in seed stability, it should not be used as the main mechanism-evidence workload.
+- The safer paper claim is that QMAP-CrossAttn has a stable positive real workload in `streamcluster_pressure`, while feature/loss ablations show small and workload-dependent effects rather than universal gains.
 
 Artifacts:
 
@@ -1542,44 +1584,44 @@ Artifacts:
 
 ## Stage 7: Seed stability conclusion
 
-Stage 7 answers: is the QMAP-Pool result just an accidental training-seed outcome?
+Stage 7 answers: is the QMAP-CrossAttn result just an accidental training-seed outcome?
 
 Scope:
 
 - `streamcluster_pressure`: strongest positive real workload case.
-- `blackscholes`: standard 1M split positive case.
+- `blackscholes`: standard 1M split weak/mixed case.
 - `canneal`: negative / robustness-boundary case.
 - Seeds: `3136859`, `42`, `2026`.
-- Baselines are reused from the existing deterministic or fixed-random-seed runs. Only QMAP-Pool is retrained for each seed.
+- Baselines are reused from the existing deterministic or fixed-random-seed runs. Only QMAP-CrossAttn is retrained for each seed.
 
 Per-seed results:
 
 | workload | seed | QMAP cost | best baseline cost | delta | migrations | writes |
 |---|---:|---:|---:|---:|---:|---:|
-| streamcluster_pressure | 3136859 | 264501.00 | 301767.00 | -12.35% | 5541 | 589 |
-| streamcluster_pressure | 42 | 270304.00 | 301767.00 | -10.43% | 6068 | 590 |
-| streamcluster_pressure | 2026 | 265585.00 | 301767.00 | -11.99% | 5639 | 590 |
+| streamcluster_pressure | 3136859 | 269095.00 | 301767.00 | -10.83% | 5981 | 548 |
+| streamcluster_pressure | 42 | 266439.00 | 301767.00 | -11.71% | 5715 | 593 |
+| streamcluster_pressure | 2026 | 269501.00 | 301767.00 | -10.69% | 5995 | 590 |
 | blackscholes | 3136859 | 105983.00 | 106952.00 | -0.91% | 525 | 32 |
-| blackscholes | 42 | 104707.00 | 106952.00 | -2.10% | 409 | 32 |
-| blackscholes | 2026 | 105002.00 | 106952.00 | -1.82% | 438 | 28 |
-| canneal | 3136859 | 150559.00 | 126178.00 | +19.32% | 4567 | 51 |
-| canneal | 42 | 152154.00 | 126178.00 | +20.59% | 4718 | 40 |
-| canneal | 2026 | 147212.00 | 126178.00 | +16.67% | 4260 | 56 |
+| blackscholes | 42 | 109794.00 | 106952.00 | +2.66% | 878 | 20 |
+| blackscholes | 2026 | 105862.00 | 106952.00 | -1.02% | 514 | 32 |
+| canneal | 3136859 | 150263.00 | 126178.00 | +19.09% | 4545 | 42 |
+| canneal | 42 | 144827.00 | 126178.00 | +14.78% | 4041 | 60 |
+| canneal | 2026 | 147081.00 | 126178.00 | +16.57% | 4253 | 47 |
 
 Stability summary:
 
 | workload | mean delta | std delta | min/max delta | conclusion |
 |---|---:|---:|---:|---|
-| streamcluster_pressure | -11.59% | 0.83% | -12.35% / -10.43% | Stable positive. All seeds beat the best baseline. |
-| blackscholes | -1.61% | 0.51% | -2.10% / -0.91% | Stable positive. All seeds beat the best baseline. |
-| canneal | +18.86% | 1.63% | +16.67% / +20.59% | Stable negative boundary. All seeds are worse than the best baseline. |
+| streamcluster_pressure | -11.08% | 0.45% | -11.71% / -10.69% | Stable positive. All seeds beat the best baseline. |
+| blackscholes | +0.24% | 1.71% | -1.02% / +2.66% | Mixed. Seed can flip the conclusion. |
+| canneal | +16.81% | 1.77% | +14.78% / +19.09% | Stable negative boundary. All seeds are worse than the best baseline. |
 
 Interpretation:
 
 - The strong `streamcluster_pressure` result is not a seed accident. All three retrainings remain clearly better than the best baseline, with a narrow delta range.
-- The smaller `blackscholes` gain is also not a seed accident. The improvement is modest, but every seed still beats LFU.
-- The `canneal` failure is robust rather than noise. QMAP-Pool consistently over-migrates and loses to LRU across all seeds.
-- No further seed-stability runs are needed for the current story. The result supports a balanced claim: QMAP-Pool has stable wins on the selected positive workloads, and the known canneal boundary is also stable.
+- `blackscholes` is mixed: two seeds beat LFU slightly, one seed loses. It should be described as a weak/borderline case, not as stable positive evidence.
+- The `canneal` failure is robust rather than noise. QMAP-CrossAttn consistently over-migrates and loses to LRU across all seeds.
+- No further seed-stability runs are needed for the current story. The result supports a balanced claim: QMAP-CrossAttn has a stable win on streamcluster pressure, a mixed blackscholes boundary, and a stable canneal failure case.
 
 Artifacts:
 

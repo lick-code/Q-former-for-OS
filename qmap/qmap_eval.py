@@ -60,6 +60,10 @@ def build_arg_parser():
   parser.add_argument("--rank_guard", type=int, default=0,
                       help=("For QMAP, restrict inference to the first N "
                             "LRU-tail candidates. 0 disables the guard."))
+  parser.add_argument("--rank_score_penalty", type=float, default=0.0,
+                      help=("For QMAP, subtract penalty * normalized_rank "
+                            "from candidate scores. Rank 0 is the oldest "
+                            "LRU-tail page; 0 disables the penalty."))
   parser.add_argument("--lookahead", type=int, default=256,
                       help=("Scale used for DRAM residency features. Match "
                             "the generator lookahead used for training."))
@@ -133,6 +137,18 @@ def dram_access_cost(rw, args):
 
 def nvm_access_cost(rw, args):
   return args.nvm_write_cost if rw else args.nvm_read_cost
+
+
+def rank_score_penalty_values(candidate_count, penalty):
+  """Returns per-rank score penalties for LRU-tail candidates."""
+  if candidate_count <= 0:
+    raise ValueError("candidate_count must be positive.")
+  if penalty < 0.0:
+    raise ValueError("rank_score_penalty must be non-negative.")
+  if candidate_count == 1 or penalty == 0.0:
+    return [0.0 for _ in range(candidate_count)]
+  normalizer = float(candidate_count - 1)
+  return [penalty * rank / normalizer for rank in range(candidate_count)]
 
 
 def uses_qformer(ablation):
@@ -219,13 +235,16 @@ class QMAPPolicy(object):
   """Loads a trained QMAP checkpoint and scores LRU-tail candidates."""
 
   def __init__(self, checkpoint_path, device, history_length, candidate_count,
-               lookahead=256, ablation=None, rank_guard=0):
+               lookahead=256, ablation=None, rank_guard=0,
+               rank_score_penalty=0.0):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
     if candidate_count <= 0:
       raise ValueError("candidate_count must be positive.")
     if rank_guard < 0:
       raise ValueError("rank_guard must be non-negative.")
+    if rank_score_penalty < 0.0:
+      raise ValueError("rank_score_penalty must be non-negative.")
 
     # Lazy imports keep LRU/Random evaluation runnable without importing torch.
     import torch
@@ -238,6 +257,7 @@ class QMAPPolicy(object):
     self._candidate_count = candidate_count
     self._effective_candidate_count = (
         min(candidate_count, rank_guard) if rank_guard else candidate_count)
+    self._rank_score_penalty = rank_score_penalty
     self._lookahead = lookahead
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
@@ -330,6 +350,13 @@ class QMAPPolicy(object):
       z = self._extractor(access_features)
       eviction_scores = self._scorer(
           z, candidate_pages, candidate_state_features, candidate_mask)
+      if self._rank_score_penalty:
+        rank_penalties = torch.tensor(
+            [rank_score_penalty_values(
+                eviction_scores.shape[1], self._rank_score_penalty)],
+            dtype=eviction_scores.dtype,
+            device=self._device)
+        eviction_scores = eviction_scores - rank_penalties
       victim_index = int(torch.argmax(eviction_scores, dim=1).item())
     return candidates[victim_index]
 
@@ -361,7 +388,8 @@ def replay(args):
         args.candidate_count,
         args.lookahead,
         args.ablation,
-        args.rank_guard)
+        args.rank_guard,
+        args.rank_score_penalty)
 
   for access_index, access in enumerate(trace):
     page = access["page"]
@@ -452,6 +480,8 @@ def print_stats(policy, stats):
 
 def main():
   args = build_arg_parser().parse_args()
+  if args.rank_score_penalty < 0.0:
+    raise ValueError("--rank_score_penalty must be non-negative.")
   stats = replay(args)
   print_stats(args.policy, stats)
   if args.json_output:
@@ -461,6 +491,7 @@ def main():
     metrics = stats.to_dict(args.policy, args.trace_path, args.dram_capacity)
     metrics["candidate_count"] = args.candidate_count
     metrics["rank_guard"] = args.rank_guard
+    metrics["rank_score_penalty"] = args.rank_score_penalty
     metrics["cost_model"] = {
         "dram_read_cost": args.dram_read_cost,
         "dram_write_cost": args.dram_write_cost,

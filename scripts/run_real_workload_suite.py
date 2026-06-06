@@ -26,7 +26,8 @@ DEFAULT_POLICIES = ("lru", "random", "lfu", "clock", "qmap")
 
 STAGE5_HISTORY_LENGTH = 10
 STAGE5_CANDIDATE_COUNT = 8
-STAGE5_RANK_GUARD = 2
+STAGE5_RANK_GUARD = 0
+STAGE5_RANK_SCORE_PENALTY = 0.0
 STAGE5_DRAM_CAPACITY = 16
 STAGE5_LOOKAHEAD = 256
 STAGE5_EPOCHS = 10
@@ -76,9 +77,13 @@ def build_arg_parser():
   parser.add_argument("--policies", default=",".join(DEFAULT_POLICIES),
                       help="Comma-separated policies. Stage 5 default is all table policies.")
   parser.add_argument("--rank_guard", type=int, default=STAGE5_RANK_GUARD,
-                      help=("QMAP inference rank guard. Stage 5 Guard "
-                            "default is 2; use 0 for unguarded "
-                            "QMAP-CrossAttn."))
+                      help=("QMAP inference rank guard. Stage 5 default is "
+                            "0, which keeps QMAP-CrossAttn unguarded."))
+  parser.add_argument("--rank_score_penalty", type=float,
+                      default=STAGE5_RANK_SCORE_PENALTY,
+                      help=("QMAP score penalty for newer LRU-tail ranks. "
+                            "Stage 5 default is 0; canneal tuning may set "
+                            "this separately."))
   parser.add_argument("--device", default="cuda",
                       help="cuda, cpu, or auto. Use auto to let child scripts decide.")
   parser.add_argument("--python", default=sys.executable)
@@ -136,6 +141,7 @@ def write_stage5_config(path, args, tag, command, result_dir, checkpoint_dir):
       "history_length": STAGE5_HISTORY_LENGTH,
       "candidate_count": STAGE5_CANDIDATE_COUNT,
       "rank_guard": args.rank_guard,
+      "rank_score_penalty": args.rank_score_penalty,
       "dram_capacity": STAGE5_DRAM_CAPACITY,
       "lookahead": STAGE5_LOOKAHEAD,
       "epochs": STAGE5_EPOCHS,
@@ -190,6 +196,8 @@ def main():
     raise ValueError("--rank_guard must be non-negative.")
   if args.rank_guard and args.rank_guard > STAGE5_CANDIDATE_COUNT:
     raise ValueError("--rank_guard cannot exceed candidate_count.")
+  if args.rank_score_penalty < 0.0:
+    raise ValueError("--rank_score_penalty must be non-negative.")
 
   tag = access_tag(args.accesses)
   result_dir = args.result_root
@@ -224,6 +232,7 @@ def main():
       "--history_length", str(STAGE5_HISTORY_LENGTH),
       "--candidate_count", str(STAGE5_CANDIDATE_COUNT),
       "--rank_guard", str(args.rank_guard),
+      "--rank_score_penalty", str(args.rank_score_penalty),
       "--dram_capacity", str(STAGE5_DRAM_CAPACITY),
       "--lookahead", str(STAGE5_LOOKAHEAD),
       "--epochs", str(STAGE5_EPOCHS),
