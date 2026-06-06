@@ -1,59 +1,65 @@
 QMAP training configuration:
-  train_data path: dataset/jsonl/qmap_parameter_sensitivity/h10_c64_d128_l512.jsonl
+  train_data path: /home/likc/Q-former-for-OS/dataset/jsonl/qmap_parameter_sensitivity/h10_c64_d128_l512.jsonl
   number of training samples: 6064
   batch_size: 32
   epochs: 10
   learning rate: 0.0001
+  weight decay: 0.0
   device: cuda
-Epoch [1/10] iter=1 loss=-0.688673
-Epoch [1/10] iter=100 loss=-0.728237
-Epoch [1/10] avg_loss=-0.716940
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_1.pth
-Epoch [2/10] iter=191 loss=-0.753391
-Epoch [2/10] iter=200 loss=-0.758456
-Epoch [2/10] iter=300 loss=-0.853460
-Epoch [2/10] avg_loss=-0.843740
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_2.pth
-Epoch [3/10] iter=381 loss=-0.873984
-Epoch [3/10] iter=400 loss=-0.865535
-Epoch [3/10] iter=500 loss=-0.882663
-Epoch [3/10] avg_loss=-0.875249
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_3.pth
-Epoch [4/10] iter=571 loss=-0.878541
-Epoch [4/10] iter=600 loss=-0.889277
-Epoch [4/10] iter=700 loss=-0.888419
-Epoch [4/10] avg_loss=-0.882808
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_4.pth
-Epoch [5/10] iter=761 loss=-0.888996
-Epoch [5/10] iter=800 loss=-0.891600
-Epoch [5/10] iter=900 loss=-0.891076
-Epoch [5/10] avg_loss=-0.887956
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_5.pth
-Epoch [6/10] iter=951 loss=-0.891403
-Epoch [6/10] iter=1000 loss=-0.895307
-Epoch [6/10] iter=1100 loss=-0.878606
-Epoch [6/10] avg_loss=-0.891553
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_6.pth
-Epoch [7/10] iter=1141 loss=-0.897341
-Epoch [7/10] iter=1200 loss=-0.891736
-Epoch [7/10] iter=1300 loss=-0.892441
-Epoch [7/10] avg_loss=-0.894126
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_7.pth
-Epoch [8/10] iter=1331 loss=-0.892884
-Epoch [8/10] iter=1400 loss=-0.894913
-Epoch [8/10] iter=1500 loss=-0.896566
-Epoch [8/10] avg_loss=-0.896389
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_8.pth
-Epoch [9/10] iter=1521 loss=-0.893499
-Epoch [9/10] iter=1600 loss=-0.904981
-Epoch [9/10] iter=1700 loss=-0.903309
-Epoch [9/10] avg_loss=-0.898548
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_9.pth
-Epoch [10/10] iter=1711 loss=-0.899902
-Epoch [10/10] iter=1800 loss=-0.900774
-Epoch [10/10] iter=1900 loss=-0.901449
-Epoch [10/10] avg_loss=-0.900519
-Saved checkpoint: outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_10.pth
+  ablation: cross_attention
+  qformer: use=False queries=4 layers=1 heads=2 dropout=0.0
+  extractor pooling_strategy: none
+  scorer scoring_input: context
+  loss weights: inactivity=1.0 coldness=1.0 write_sensitivity=4.0 migration_cost=2.0
+Epoch [1/10] iter=1 loss=-0.698028
+Epoch [1/10] iter=100 loss=-0.761307
+Epoch [1/10] avg_loss=-0.758922
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_1.pth
+Epoch [2/10] iter=191 loss=-0.822785
+Epoch [2/10] iter=200 loss=-0.811147
+Epoch [2/10] iter=300 loss=-0.842480
+Epoch [2/10] avg_loss=-0.832853
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_2.pth
+Epoch [3/10] iter=381 loss=-0.857773
+Epoch [3/10] iter=400 loss=-0.852530
+Epoch [3/10] iter=500 loss=-0.871927
+Epoch [3/10] avg_loss=-0.863688
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_3.pth
+Epoch [4/10] iter=571 loss=-0.868463
+Epoch [4/10] iter=600 loss=-0.878082
+Epoch [4/10] iter=700 loss=-0.872813
+Epoch [4/10] avg_loss=-0.878416
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_4.pth
+Epoch [5/10] iter=761 loss=-0.885006
+Epoch [5/10] iter=800 loss=-0.882815
+Epoch [5/10] iter=900 loss=-0.886126
+Epoch [5/10] avg_loss=-0.885019
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_5.pth
+Epoch [6/10] iter=951 loss=-0.885864
+Epoch [6/10] iter=1000 loss=-0.886489
+Epoch [6/10] iter=1100 loss=-0.892765
+Epoch [6/10] avg_loss=-0.888850
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_6.pth
+Epoch [7/10] iter=1141 loss=-0.893846
+Epoch [7/10] iter=1200 loss=-0.890578
+Epoch [7/10] iter=1300 loss=-0.892478
+Epoch [7/10] avg_loss=-0.891449
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_7.pth
+Epoch [8/10] iter=1331 loss=-0.900305
+Epoch [8/10] iter=1400 loss=-0.899039
+Epoch [8/10] iter=1500 loss=-0.891316
+Epoch [8/10] avg_loss=-0.893211
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_8.pth
+Epoch [9/10] iter=1521 loss=-0.902375
+Epoch [9/10] iter=1600 loss=-0.890747
+Epoch [9/10] iter=1700 loss=-0.897664
+Epoch [9/10] avg_loss=-0.894544
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_9.pth
+Epoch [10/10] iter=1711 loss=-0.891238
+Epoch [10/10] iter=1800 loss=-0.893187
+Epoch [10/10] iter=1900 loss=-0.908337
+Epoch [10/10] avg_loss=-0.895610
+Saved checkpoint: /home/likc/Q-former-for-OS/outputs/checkpoints/qmap_parameter_sensitivity/h10_c64_d128_l512/qmap_epoch_10.pth
 Training finished.
-/home/tingkun/miniconda3/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+/home/likc/.conda/envs/qmap/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
   "Positional args are being deprecated, use kwargs instead. Refer to "

@@ -1,17 +1,26 @@
 {
-  "avg_decision_time_ms": 3.932635537635739,
-  "decision_count": 730,
-  "decision_time_seconds": 2.8708239424740896,
+  "avg_decision_time_ms": 3.0711129972518516,
+  "candidate_count": 16,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 725,
+  "decision_time_seconds": 2.2265569230075926,
   "dram_capacity": 128,
-  "hit_rate": 0.571,
-  "hit_rate_percent": 57.099999999999994,
-  "hits": 1142,
-  "migrations": 730,
-  "misses": 858,
-  "nvm_reads": 731,
-  "nvm_writes": 127,
+  "hit_rate": 0.5735,
+  "hit_rate_percent": 57.35,
+  "hits": 1147,
+  "migrations": 725,
+  "misses": 853,
+  "nvm_reads": 724,
+  "nvm_writes": 129,
   "policy": "qmap",
+  "rank_guard": 0,
   "total_accesses": 2000,
-  "trace_path": "dataset/processed/try_test.csv",
-  "weighted_access_cost": 10412.0
+  "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/try_test.csv",
+  "weighted_access_cost": 10877.0
 }
