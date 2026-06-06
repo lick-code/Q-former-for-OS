@@ -24,7 +24,7 @@
     "--candidate_count",
     "8",
     "--rank_guard",
-    "2",
+    "0",
     "--dram_capacity",
     "16",
     "--lookahead",
@@ -53,7 +53,7 @@
     "cuda",
     "--skip_prepare"
   ],
-  "created_at": "2026-06-05T17:50:50",
+  "created_at": "2026-06-06T11:20:39",
   "dram_capacity": 16,
   "epochs": 10,
   "history_length": 10,
@@ -66,7 +66,7 @@
     "clock",
     "qmap"
   ],
-  "rank_guard": 2,
+  "rank_guard": 0,
   "result_dir": "/home/likc/Q-former-for-OS/outputs/results/real_workload_suite/1m",
   "tag": "1m",
   "workloads": [
