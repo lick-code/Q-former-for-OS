@@ -71,6 +71,7 @@ QMAP-CrossAttn =
 | capacity sensitivity | 已完成；覆盖 streamcluster pressure 和 canneal，DRAM cap=8/16/32 | `outputs/results/capacity_sensitivity/summary.md` |
 | candidate-count sensitivity | 已完成；覆盖 streamcluster pressure 和 canneal，candidate count=4/8/16 | `outputs/results/candidate_sensitivity/summary.md` |
 | canneal targeted tuning | 新增代码入口；用 valid split 选择 epoch / candidate count / rank score penalty，再评 test | `outputs/results/canneal_tuned_eval/summary.md` |
+| learned ML baselines | 新增 Kleio-lite / PatternS-lite trace-replay baseline，用于和 QMAP-CrossAttn 对比 | `outputs/results/ml_baselines/summary.md` |
 
 ## 目录结构
 
@@ -80,6 +81,7 @@ qmap/
   qmap_generator.py             # 从 CSV trace 生成 QMAP JSONL 样本
   qmap_train.py                 # 训练 QMAP checkpoint
   qmap_eval.py                  # replay 评估 LRU / Random / LFU / CLOCK / QMAP
+  learned_baselines.py          # Kleio-lite / PatternS-lite 轻量学习型 baseline 训练入口
   qmap_integration_test.py      # 模型和 loss 的 smoke test
 
 policy_learning/cache_model/
@@ -98,6 +100,7 @@ scripts/
   run_qmap_encoder_depth_comparison.py # mean_pool 下 encoder 层数对照
   run_real_pilot.py                    # 真实/PARSEC trace 的 split -> JSONL -> train -> eval -> summary 统一入口
   run_canneal_tuned_eval.py            # canneal 专项优化：valid 调参后只评一次 test
+  run_learned_baselines.py             # 训练并评估 Kleio-lite / PatternS-lite trace-replay baseline
   diagnose_qmap_replay.py              # 真实 trace replay 诊断和 dedup pressure window 扫描
 
 dataset/
@@ -1482,6 +1485,49 @@ CUDA_VISIBLE_DEVICES=0 python scripts/run_canneal_tuned_eval.py \
 outputs/results/canneal_tuned_eval/summary.md
 outputs/results/canneal_tuned_eval/summary.csv
 outputs/results/canneal_tuned_eval/selected_config.json
+```
+
+新增机器学习 baseline 可单独跑。当前实现不是完整复现 Kleio / PatternS 系统，
+而是在相同 replay/cost 口径下实现 paper-aligned lite 版：
+
+```text
+Kleio-lite:
+  用 train split 中的 eviction 决策样本训练 per-page future-hotness predictor；
+  replay 时在 LRU-tail 候选页里驱逐 predicted hotness 最低的页。
+
+PatternS-lite:
+  先按 train split 的页访问模式做 page pattern clustering；
+  再对每个 page group 训练 hotness predictor；
+  replay 时按候选页所属 group 的预测结果驱逐最低 hotness 页。
+```
+
+服务器命令：
+
+```bash
+tmux new -s qmap_ml_baselines
+CUDA_VISIBLE_DEVICES=0 python scripts/run_learned_baselines.py \
+  --run \
+  --summarize \
+  --include_rule_baselines
+```
+
+默认覆盖：
+
+```text
+blackscholes 1M standard
+canneal 1M standard
+streamcluster pressure window
+dedup pressure window
+```
+
+输出看这里：
+
+```text
+outputs/checkpoints/ml_baselines/<workload>/kleio_lite.json
+outputs/checkpoints/ml_baselines/<workload>/patterns_lite.json
+outputs/results/ml_baselines/<workload>/*.json
+outputs/results/ml_baselines/summary.csv
+outputs/results/ml_baselines/summary.md
 ```
 
 pressure window 主实验建议单独跑：

@@ -10,9 +10,9 @@ the prototype metrics used by the paper experiments:
   - weighted access cost
   - policy decision/inference overhead
 
-Supported policies are LRU, Random, LFU, CLOCK, and QMAP. The QMAP path loads a
-checkpoint produced by qmap_train.py and uses the same lightweight feature
-construction as qmap_generator.py.
+Supported policies are LRU, Random, LFU, CLOCK, QMAP, and lightweight learned
+baselines. The QMAP path loads a checkpoint produced by qmap_train.py and uses
+the same lightweight feature construction as qmap_generator.py.
 """
 
 import argparse
@@ -50,8 +50,12 @@ def build_arg_parser():
                       help="Input CSV trace with PC,Address and optional RW.")
   parser.add_argument("--checkpoint", default=None,
                       help="QMAP checkpoint path. Required for --policy qmap.")
+  parser.add_argument("--learned_model", default=None,
+                      help=("JSON model path for kleio_lite or "
+                            "patterns_lite policies."))
   parser.add_argument("--policy",
-                      choices=("lru", "random", "lfu", "clock", "qmap"),
+                      choices=("lru", "random", "lfu", "clock", "qmap",
+                               "kleio_lite", "patterns_lite"),
                       required=True)
   parser.add_argument("--dram_capacity", type=int, default=128)
   parser.add_argument("--page_shift", type=int, default=0)
@@ -201,6 +205,10 @@ def choose_victim_lfu(dram_pages, access_frequency, last_access_time):
       dram_pages,
       key=lambda page: (access_frequency.get(page, 0),
                         last_access_time.get(page, -1)))
+
+
+def is_learned_policy(policy):
+  return policy in ("kleio_lite", "patterns_lite")
 
 
 class ClockPolicy(object):
@@ -374,6 +382,7 @@ def replay(args):
   history = []
   rng = random.Random(args.random_seed)
   clock_policy = ClockPolicy()
+  learned_policy = None
 
   qmap_policy = None
   if args.policy == "qmap":
@@ -390,6 +399,17 @@ def replay(args):
         args.ablation,
         args.rank_guard,
         args.rank_score_penalty)
+  elif is_learned_policy(args.policy):
+    if args.learned_model is None:
+      raise ValueError("--learned_model is required for {}.".format(
+          args.policy))
+    try:
+      from learned_baselines import LearnedBaselinePolicy
+      from learned_baselines import load_model
+    except ImportError:
+      from qmap.learned_baselines import LearnedBaselinePolicy
+      from qmap.learned_baselines import load_model
+    learned_policy = LearnedBaselinePolicy(load_model(args.learned_model))
 
   for access_index, access in enumerate(trace):
     page = access["page"]
@@ -428,6 +448,11 @@ def replay(args):
               dram_pages, access_frequency, last_access_time)
         elif args.policy == "clock":
           victim = clock_policy.choose_victim(dram_pages)
+        elif is_learned_policy(args.policy):
+          decision_history = (history + [access])[-args.history_length:]
+          victim = learned_policy.choose_victim(
+              dram_pages, decision_history, access_index, dram_insert_time,
+              dirty_pages, access_frequency, last_access_time)
         else:
           # qmap_generator.py includes the current miss in the fixed-length
           # access history before constructing a training sample. Keep replay
@@ -492,6 +517,8 @@ def main():
     metrics["candidate_count"] = args.candidate_count
     metrics["rank_guard"] = args.rank_guard
     metrics["rank_score_penalty"] = args.rank_score_penalty
+    if is_learned_policy(args.policy):
+      metrics["learned_model"] = args.learned_model
     metrics["cost_model"] = {
         "dram_read_cost": args.dram_read_cost,
         "dram_write_cost": args.dram_write_cost,
