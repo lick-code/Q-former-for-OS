@@ -1,0 +1,609 @@
+
+
+===== PAGE 1 =====
+Regular: Context-Aware Page Ranking for DRAM
+Demotion in Hybrid Memory Systems
+Anonymous Author(s)
+ABSTRACT
+DRAM–NVM hybrid memory systems address growing ca-
+pacity demands by pairing low-latency but capacity-limited
+DRAM with high-density but slower non-volatile memory
+(NVM). This asymmetry makes page demotion critical: poor
+victim selection can increase slow-tier accesses, NVM writes,
+and demotion overhead. Existing heuristics are lightweight
+but rely on coarse access signals; learning-based cache and
+prefetching policies do not directly optimize hybrid-memory
+demotion cost. We present CAPD, a lightweight context-
+aware page-demotion policy that ranks DRAM candidates
+using recent access context and page states. CAPD is trained
+offline with replay-derived rankings from future inactiv-
+ity, coldness, write sensitivity, and demotion cost, and is
+invoked only at demotion events. On real traces, CAPD re-
+duces weighted replay cost under DRAM capacity pressure,
+including a 10.83% reduction over the best classical baseline
+on thestreamclusterpressure window.
+1 INTRODUCTION
+With the growth of data-intensive applications such as ma-
+chine learning, graph analytics, and in-memory analytics,
+modern systems increasingly demand larger main-memory
+capacity and higher memory performance [4, 24, 30]. How-
+ever, DRAM scaling has become increasingly constrained,
+while non-volatile memory (NVM) provides higher density
+and lower cost per bit but suffers from higher write latency
+and limited write endurance [3, 7, 8, 13, 17, 19, 29, 31]. There-
+fore, DRAM–NVM hybrid memory systems, which combine
+low-latency DRAM with high-density NVM, have emerged
+as an important main-memory architecture [1, 7, 16, 19–21].
+In such systems, DRAM typically serves as a fast tier for
+hot and write-sensitive pages, while NVM provides a large-
+capacity tier for colder pages [ 1, 15, 16, 20, 21]. Since the
+DRAM tier is capacity-limited, the system requires demot-
+ing some DRAM-resident pages to NVM to preserve this
+placement goal; poor victim selection can increase access
+latency, amplify NVM write traffic, and accelerate device
+wear [7–10, 22, 28, 29, 31].
+Traditional replacement policies based on fixed heuristic
+rules, such as LRU, LFU, and CLOCK, often struggle with
+dynamic access behavior [2, 9]. Learning-based approaches
+can improve adaptability by exploiting access history and
+program context [5, 12, 23, 25], but many target cache hit rate
+or prefetching rather than write sensitivity and the cost of
+demoting pages from DRAM to NVM, while longer-history
+models may incur nontrivial online overhead due to large
+history windows or complex inference [12, 18, 23].
+To address these limitations, we present CAPD, a light-
+weight context-aware page demotion policy for hybrid
+DRAM–NVM memory systems. CAPD encodes recent access
+records using physical addresses, program counters (PCs),
+and read/write flags, then lets each DRAM candidate extract
+candidate-specific context for demotion scoring.
+In summary, this paper makes the following contributions:
+• We formulate DRAM page demotion in hybrid mem-
+ory as a cost-aware candidate-page ranking problem,
+enabling CAPD to select victims by comparing DRAM-
+resident candidates using recent access context and
+page-level states.
+• We design a lightweight access-sequence encoder and
+candidate-aware scoring mechanism that generates
+demotion-priority scores from recent access context
+and page-level representations.
+• We construct cost-aware reference rankings with of-
+fline replay and evaluate CAPD on real memory traces,
+showing cost reductions under DRAM capacity pres-
+sure and workload-dependent boundary cases.
+2 BACKGROUND AND MOTIV ATION
+2.1 Cost-Aware Page Demotion
+Beyond the basic DRAM–NVM tiering described above, the
+key policy question is which DRAM-resident page should be
+demoted under DRAM capacity pressure [1, 10, 14, 20, 21].
+This decision directly affects both performance and NVM
+write overhead: demoting soon-reused or write-intensive
+pages can increase slow-tier accesses and costly NVM
+writes [9, 11, 20]. Demotion can also consume memory band-
+width and incur page-management overhead [ 21, 26, 28].
+Therefore, DRAM-to-NVM demotion in hybrid memory
+should not be reduced to a simple recency- or frequency-only
+victim-selection problem.
+2.2 Context-Aware Candidate Ranking
+Traditional policies such as LRU, LFU, and CLOCK are effi-
+cient, but they rely on fixed heuristics and reduce page be-
+havior to simple signals such as recency or frequency [2, 6, 9].
+Two pages with similar recency or frequency can still have
+very different demotion costs: one may be read-only and
+
+
+===== PAGE 2 =====
+HotStorage ’26, September 28–29, 2026, Prague, Czechia Anon.
+Candidate-Aware Context Scoring4
+Input & Feature Construction1
+Access window (size H )
+Page Addr PC R/WPage Addr PC R/W
+Concat
+Concat
+Page Addr PC R/W
+Concat
+Record i
+. . .
+. . .
+Access Sequence Encoding
+TransformerEncoder
+2
+Candidate Page State3
+Encoded access sequence
+ID Emb. Freq Dirty Residency
+Page state vectors
+Update model parameters θ 
+Predicted Ranking from
+Candidate set
+Cost-Aware 
+Ranking 
+Optimization
+Reference Ranking Listwise Loss
+ Update
+Trace Replay
+(future inactivity, coldness,
+write sensitivity, demotion cost)
+Demotion Decision5
+DRAM
+NVM
+(demote victim to NVM)
+Cross-Attention
+MLP ScorerMLP Scorer
+Figure 1: Overall framework of CAPD.
+cold, while another may be dirty, write-intensive, or likely to
+be reused soon [9, 11, 20]. These differences matter in hybrid
+memory systems because write behavior and demotion cost
+directly affect the benefit of keeping a page in DRAM [9, 11].
+Learning-based policies can use access history to improve
+adaptivity, but they must remain lightweight enough for
+demotion-time decisions [12, 23, 25]. Modeling long histories
+or scoring each candidate against the full access sequence can
+introduce nontrivial online overhead [12, 18, 23]. At the same
+time, using only address sequences may miss useful signals
+from the program counter and read/write type [5, 9, 27].
+These observations motivate a lightweight context-aware
+ranking formulation: at each demotion point, the policy
+should use recent access context and page-level states to
+rank the current DRAM candidates and demote the page
+with the highest demotion priority. CAPD follows this direc-
+tion by learning a cost-aware candidate-page ranking policy
+for DRAM-to-NVM demotion.
+3 DESIGN
+3.1 Overall Framework
+Figure 1 illustrates the overall framework of CAPD. CAPD
+treats DRAM page demotion as a context-aware candidate
+ranking problem. It consists of four components: Multi-
+dimensional Feature Construction, Lightweight Access Se-
+quence Encoding, Candidate-Aware Context Scoring and
+Demotion Decision, and Cost-Aware Ranking Optimization.
+It encodes recent accesses with a lightweight Transformer,
+lets each candidate page query the encoded sequence to
+obtain a candidate-specific context, and scores the context
+for demotion. Training uses offline trace replay to derive a
+cost-aware ranking objective.
+3.2 Problem Definition
+We consider a DRAM–NVM hybrid memory system, where
+DRAM offers low-latency access but has limited capacity,
+while NVM provides larger capacity but higher write over-
+head. When DRAM capacity pressure triggers a demotion
+decision at time𝑡, the system must select one DRAM-resident
+victim page and demote it to NVM.
+At each demotion point𝑡, CAPD observes the recent access
+history H𝑡 and a candidate set C (𝑡)
+DRAM of DRAM-resident
+pages eligible for demotion. CAPD assigns each candidate
+page 𝑙 a demotion-priority score 𝑟𝑡 (𝑙) and selects highest-
+score page as the victim:
+𝑎∗
+𝑡 =arg max
+𝑙∈ C (𝑡)
+DRAM
+𝑟𝑡 (𝑙),(1)
+where 𝑟𝑡 (𝑙) denotes the priority of demoting page 𝑙 from
+DRAM to NVM at time𝑡.
+3.3 Multi-dimensional Feature
+Construction
+CAPD constructs multi-dimensional access features from
+memory-access records. Each record contains a page identi-
+fier 𝑚𝑡 derived from the physical address, a program counter
+identifier 𝑝𝑐𝑡, and a read/write flag 𝑟𝑤 𝑡, where 𝑟𝑤 𝑡 =0 for
+reads and 𝑟𝑤 𝑡 =1 for writes. These fields capture page-
+level locality, program context, and access type, respectively.
+CAPD embeds and concatenates these fields as:
+𝑥𝑡 =𝑒 𝑚 (𝑚𝑡 ) ∥𝑒 𝑝𝑐 (𝑝𝑐 𝑡 ) ∥𝑒 𝑟 𝑤(𝑟𝑤 𝑡 ) ∈R 𝑑,(2)
+where ∥ denotes concatenation and 𝑑=𝑑 𝑚 +𝑑 𝑝𝑐 +𝑑 𝑟 𝑤.
+At a demotion point 𝑡, CAPD constructs a historical access
+window from the most recent𝐻access representations:
+𝑋𝑡 =[𝑥 𝑡−𝐻+1 , . . . , 𝑥𝑡 ]⊤ ∈R 𝐻×𝑑 ,(3)
+where𝐻denotes the sliding-window length.
+
+
+===== PAGE 3 =====
+Regular: Context-Aware Page Ranking for DRAM Demotion in Hybrid Memory Systems HotStorage ’26, September 28–29, 2026, Prague, Czechia
+3.4 Lightweight Access Sequence Encoding
+At each demotion point𝑡, CAPD treats the historical window
+𝑋𝑡 as an ordered sequence and adds positional encodings:
+e𝑋𝑡 =𝑋 𝑡 +𝑃,(4)
+where𝑃∈R 𝐻×𝑑 denotes the positional encoding.
+A lightweight single-layer Transformer encoder then pro-
+duces contextualized access representations:
+𝑋 𝑒𝑛𝑐
+𝑡 =TEnc 1(e𝑋𝑡 )=[ℎ 𝑡−𝐻+1 , ℎ𝑡−𝐻+2 , . . . , ℎ𝑡 ]⊤ ∈R 𝐻×𝑑 .
+(5)
+Here,TEnc1(·) denotes a single-layer Transformer encoder
+and eachℎ 𝑖 denotes a contextualized representation.
+3.5 Candidate-Aware Context Scoring and
+Demotion Decision
+When a DRAM page demotion decision is triggered at time𝑡,
+CAPD constructs a page-level representation𝑢𝑙 for each can-
+didate page 𝑙∈ C (𝑡)
+DRAM from its page identifier embedding
+and lightweight state features, including recent frequency,
+dirty status, and residency duration. Rather than compress-
+ing the access history into a single shared context for all
+candidates, CAPD uses each candidate page representation
+as a query to extract a candidate-specific context from the
+encoded access sequence. CAPD projects the candidate rep-
+resentation into a query and the encoded access sequence
+into keys and values:
+𝑞𝑙 =𝑢 𝑙𝑊𝑄, 𝐾 𝑡 =𝑋 𝑒𝑛𝑐
+𝑡 𝑊𝐾, 𝑉 𝑡 =𝑋 𝑒𝑛𝑐
+𝑡 𝑊𝑉 .(6)
+CAPD then computes the candidate-specific context of page
+𝑙through cross-attention:
+𝑐𝑙 =softmax
+𝑞𝑙𝐾 ⊤
+𝑡√𝑑𝑎
+
+𝑉𝑡,(7)
+where 𝑑𝑎 denotes the attention dimension. The resulting
+vector𝑐 𝑙 the candidate-specific context.
+CAPD scores this context with a lightweight MLP:
+𝑟𝑡 (𝑙)=MLP(𝑐 𝑙 ),(8)
+where 𝑟𝑡 (𝑙) denotes the DRAM-to-NVM demotion-priority
+score. A higher score indicates that the page is more suitable
+for DRAM-to-NVM demotion.
+Ultimately, CAPD demotes the highest-scoring page:
+𝑎∗
+𝑡 =arg max
+𝑙∈ C (𝑡)
+DRAM
+𝑟𝑡 (𝑙).(9)
+3.6 Cost-Aware Ranking Optimization
+During training, CAPD uses offline trace replay to assign
+each candidate page 𝑙∈ C (𝑡)
+DRAM a cost-aware demotion
+relevance score:
+𝑦𝑡 (𝑙)=𝜆 1ˆ𝑑𝑡 (𝑙) +𝜆 2ˆ𝑞𝑡 (𝑙) −𝜆 3ˆ𝑤 𝑡 (𝑙) −𝜆 4ˆ𝑐𝑡 (𝑙),(10)
+where ˆ𝑑𝑡 (𝑙) , ˆ𝑞𝑡 (𝑙) , ˆ𝑤 𝑡 (𝑙) , and ˆ𝑐𝑡 (𝑙) denote the normalized
+future inactivity, coldness, write sensitivity, and demotion
+cost, respectively 𝜆1, 𝜆2, 𝜆3, 𝜆4 are non-negative weights, and
+a larger𝑦 𝑡 (𝑙)indicates a better demotion candidate.
+CAPD normalizes the predicted demotion-priority scores
+over the same candidate set:
+𝜋𝜃 (𝑎𝑡 =𝑙|𝑠 𝑡 )= exp(𝑟 𝑡 (𝑙))Í
+𝑗∈ C (𝑡)
+DRAM
+exp(𝑟 𝑡 (𝑗)) .(11)
+where 𝜋𝜃 (𝑎𝑡 =𝑙|𝑠 𝑡 ) denotes the probability of selecting
+page 𝑙 as the victim. CAPD optimizes the candidate ordering
+with a listwise DCG-based ranking loss:
+L𝑟𝑎𝑛𝑘 (𝑠𝑡, 𝜋𝜃 )=− 𝐷𝐶𝐺(𝑠 𝑡, 𝜋𝜃 )
+𝐼 𝐷𝐶𝐺(𝑠 𝑡 ) ,(12)
+where 𝐼 𝐷𝐶𝐺(𝑠 𝑡 ) denotes the ideal DCG induced by the ref-
+erence ranking. The DCG term uses 𝑦𝑡 (𝑙) as the relevance
+and a differentiable rank position induced by the predicted
+scores𝑟 𝑡 (𝑙).
+This training objective encourages CAPD to rank pages
+with higher𝑦 𝑡 (𝑙)closer to the top.
+3.7 Complexity and System Overhead
+For each demotion decision, CAPD encodes an access win-
+dow of length 𝐻, computes candidate-specific contexts
+through cross-attention, and scores all pages in C (𝑡)
+DRAM.
+With feature dimension 𝑑 and attention dimension 𝑑𝑎, the
+per-decision inference cost is
+O
+
+𝐻 2𝑑+𝐻𝑑 2 + |C (𝑡)
+DRAM|𝐻𝑑+ |C (𝑡)
+DRAM|𝑑2
+
+,(13)
+where the first two terms come from the single-layer Trans-
+former encoder, the third term comes from candidate-aware
+cross-attention over the access window, and the last term
+comes from lightweight page scoring. Positional encoding
+adds onlyO (𝐻𝑑)lower-order cost.
+CAPD performs inference only when DRAM capacity pres-
+sure triggers a demotion decision, rather than on the critical
+path of regular memory accesses. Its single-layer encoder,
+bounded history window, and lightweight page scorer keep
+the online execution path short.
+4 EV ALUATION
+4.1 Experimental Setup
+We evaluate CAPD using trace replay on PARSEC-derived
+memory traces. Each trace is split chronologically into train-
+ing, validation, and test windows, and all reported results use
+the held-out test window. Unless otherwise stated, the DRAM
+tier holds 16 pages, the history length is 10, the eviction can-
+didate set contains 8 pages, and the prediction lookahead is
+256 accesses.
+
+
+===== PAGE 4 =====
+HotStorage ’26, September 28–29, 2026, Prague, Czechia Anon.
+LRU
+Random
+LFU
+CLOCKKleio-lite
+PatternS-lite
+CAPD
+0.9
+1.0
+1.1
+1.2
+1.3
+Normalized weighted cost
+-0.91%
+blackscholes
+LRU
+Random
+LFU
+CLOCKKleio-lite
+PatternS-lite
+CAPD
+-10.83%
+streamcluster-pressure
+LRU
+Random
+LFU
+CLOCKKleio-lite
+PatternS-lite
+CAPD
+tie
+dedup-pressure
+1.0 = best classical baseline; lower is better
+LRU Random LFU CLOCK Kleio-lite PatternS-lite CAPD
+Hatched bar = best classical baseline
+Figure 2: Overall weighted-cost comparison. Costs are normalized to the best classical baseline in each workload;
+lower is better. The hatched bar marks the best classical baseline.
+We compare CAPD against four classical replacement poli-
+cies, LRU, Random, LFU, and CLOCK, and two learned trace-
+replay baselines. Kleio-lite predicts each page’s future hot-
+ness from a recent history window and evicts the candidate
+with the lowest predicted hotness. PatternS-lite first clusters
+pages by access sequence features and then predicts future
+hotness at the page-group level. These two baselines are not
+full system reproductions; they are replay-compatible imple-
+mentations that preserve the core prediction-and-eviction
+logic.
+We use a weighted cost metric:
+𝐶=𝑁 hit +2𝑁 nvm_read +8𝑁 nvm_write +10𝑁 migration.
+This metric charges NVM writes and migrations more heav-
+ily than DRAM hits, matching the asymmetric cost structure
+of hybrid DRAM–NVM memory. Lower cost is better.
+4.2 Main Results
+Figure 2 summarizes the main replay results. CAPD improves
+the weighted cost on workloads where replacement deci-
+sions expose a real tradeoff between hit rate, writes, and
+migrations. On streamcluster-pressure, CAPD reduces nor-
+malized cost by 10.83% over the best classical baseline and
+by 18.93% over the best learned baseline. On blackscholes,
+CAPD slightly improves over both groups of baselines. On
+dedup-pressure, the trace has very high locality under the
+tested configuration, so CAPD ties the best classical and
+learned policies.
+Table 1 gives the same comparison in absolute weighted
+cost. The strongest result is on streamcluster-pressure, where
+CAPD reduces migrations from 8937 under CLOCK to 5981
+while also increasing the hit rate from 95.52% to 97.00%. This
+shows that CAPD is not merely reducing writes by sacrificing
+locality; it learns eviction choices that jointly reduce NVM
+reads, NVM writes, and migrations. On blackscholes, CAPD
+is close to LFU in hit rate but writes substantially fewer
+NVM pages, leading to a small overall cost reduction. On
+dedup-pressure, almost all competitive policies converge to
+the same behavior, leaving little room for improvement.
+4.3 Capacity Sensitivity
+We next vary the DRAM capacity on streamcluster-pressure,
+the workload with the clearest memory-pressure behavior.
+This experiment tests whether CAPD only wins at a single
+cache size or remains useful across pressure levels.
+Table 2 shows that CAPD is most useful when DRAM
+pressure is high. With 8 and 16 DRAM pages, it reduces
+weighted cost by about 10% relative to the best rule-based
+policy. With 32 pages, the miss stream shrinks substantially
+and replacement decisions become less consequential; CAPD
+then converges to near parity with the best classical baseline.
+This behavior is expected for a learned eviction policy: its
+advantage appears when the cache is small enough that
+choosing the wrong victim causes repeated NVM accesses
+or migrations.
+
+
+===== PAGE 5 =====
+Regular: Context-Aware Page Ranking for DRAM Demotion in Hybrid Memory Systems HotStorage ’26, September 28–29, 2026, Prague, Czechia
+Table 1: Main replay metrics across rule-based baselines, learned baselines, and CAPD. Weighted cost, NVM writes,
+and migrations are lower-is-better; hit rate is higher-is-better.
+Workload Policy Weighted cost Hit rate (%) NVM writes Migrations
+blackscholes LRU 112,958 98.89 144 1,098
+blackscholes Random 115,505 98.66 145 1,329
+blackscholes LFU 106,952 99.47 221 510
+blackscholes CLOCK 110,437 99.09 107 889
+blackscholes Kleio-lite 110,390 99.04 2 942
+blackscholes PatternS-lite 107,207 99.36 49 627
+blackscholesCAPD 105,983 99.46 32 525
+streamcluster-pressure LRU 305,562 95.35 585 9,276
+streamcluster-pressure Random 314,183 95.01 777 9,955
+streamcluster-pressure LFU 361,877 92.84 740 14,311
+streamcluster-pressure CLOCK 301,767 95.52 574 8,937
+streamcluster-pressure Kleio-lite 331,941 94.19 697 11,613
+streamcluster-pressure PatternS-lite 332,226 94.15 629 11,676
+streamcluster-pressureCAPD 269,095 97.00 548 5,981
+dedup-pressure LRU 201,567 99.95 99 87
+dedup-pressure Random 202,076 99.93 105 130
+dedup-pressure LFU 203,845 99.88 233 221
+dedup-pressure CLOCK 201,584 99.95 100 88
+dedup-pressure Kleio-lite 201,567 99.95 99 87
+dedup-pressure PatternS-lite 201,567 99.95 99 87
+dedup-pressureCAPD 201,567 99.95 99 87
+Table 2: Capacity sensitivity on streamcluster-pressure.
+DRAM pages Best rule CAPDΔCAPD migrations
+8 369999 332660 -10.09% 11738
+16 301767 269095 -10.83% 5981
+32 216577 217348 +0.36% 1566
+4.4 Stability and Robustness
+Because CAPD is trained, we also check whether the main
+result depends on a single random seed. On streamcluster-
+pressure, three independent training seeds all beat the best
+classical baseline, with cost reductions ranging from 10.69%
+to 11.71% and a mean reduction of 11.08%. On blackscholes,
+the result is closer to parity: two seeds slightly beat LFU,
+while one seed is 2.66% worse, giving a mean delta of +0.24%.
+We therefore treat blackscholes as a near-tie workload rather
+than as the primary evidence for CAPD’s benefit.
+We also reweight the dominant pressure case under al-
+ternative cost models. On streamcluster-pressure, CAPD
+remains better than the best classical baseline under mild,
+write-heavy, and migration-heavy cost settings, with reduc-
+tions from 6.98% to 15.91%. This suggests that the result is
+not an artifact of a single hand-picked write or migration
+weight.
+4.5 Discussion
+The results support two conclusions. First, cross-attention
+over the encoded history is useful when eviction decisions
+must balance recency, write behavior, and migration cost
+under memory pressure. Second, CAPD is not designed to
+dominate every trace regime. When locality is already cap-
+tured by a simple policy, as in dedup-pressure, CAPD cor-
+rectly falls back to near-identical behavior; when a workload
+is near parity, as in blackscholes, training seed and small
+replay differences can change the ranking. The main benefit
+appears in pressure regimes where rule-based policies make
+avoidable migration-heavy eviction choices.
+5 CONCLUSION
+This paper presented CAPD, a lightweight context-aware
+DRAM page eviction policy for DRAM–NVM hybrid memory
+systems. CAPD formulates victim selection as a candidate-
+page ranking problem, combining multi-dimensional access
+context from physical addresses, program counters, and
+read/write flags with lightweight page-level states. Offline
+trace replay is used to construct cost-aware reference rank-
+ings, while online inference is invoked only at eviction points.
+Our evaluation on real PARSEC traces shows that CAPD can
+reduce weighted replay cost under replacement pressure,
+with the strongest improvement on streamcluster, while also
+revealing important boundary cases such as canneal. These
+results suggest that context-aware ranking is a promising di-
+rection for hybrid-memory page eviction, but also highlight
+the need for better candidate selection and lower-overhead
+runtime implementation.
+REFERENCES
+[1] Neha Agarwal and Thomas F Wenisch. 2017. Thermostat: Application-
+transparent page management for two-tiered main memory. InPro-
+ceedings of the Twenty-Second International Conference on Architectural
+Support for Programming Languages and Operating Systems. 631–644.
+
+
+===== PAGE 6 =====
+HotStorage ’26, September 28–29, 2026, Prague, Czechia Anon.
+[2] Laszlo A. Belady. 1966. A study of replacement algorithms for a virtual-
+storage computer.IBM Systems journal5, 2 (1966), 78–101.
+[3] Gaurav Dhiman, Raid Ayoub, and Tajana Rosing. 2009. PDRAM: A
+hybrid PRAM and DRAM main memory system. InProceedings of the
+46th Annual Design Automation Conference. 664–669.
+[4] Amir Gholami, Zhewei Yao, Sehoon Kim, Coleman Hooper, Michael W
+Mahoney, and Kurt Keutzer. 2024. Ai and memory wall.IEEE Micro
+44, 3 (2024), 33–39.
+[5] Milad Hashemi, Kevin Swersky, Jamie Smith, Grant Ayers, Heiner Litz,
+Jichuan Chang, Christos Kozyrakis, and Parthasarathy Ranganathan.
+2018. Learning memory access patterns. InInternational Conference
+on Machine Learning. PMLR, 1919–1928.
+[6] Song Jiang, Feng Chen, and Xiaodong Zhang. 2005. CLOCK-Pro: An
+Effective Improvement of the CLOCK Replacement.. InUSENIX ATC,
+General Track. 323–336.
+[7] Benjamin C. Lee, Engin Ipek, Onur Mutlu, and Doug Burger. 2009.
+Architecting Phase Change Memory as a Scalable DRAM Alternative.
+InProceedings of the 36th Annual International Symposium on Computer
+Architecture (ISCA).
+[8] Benjamin C Lee, Ping Zhou, Jun Yang, Youtao Zhang, Bo Zhao, Engin
+Ipek, Onur Mutlu, and Doug Burger. 2010. Phase-change technology
+and the future of main memory.IEEE micro30, 1 (2010), 143–143.
+[9] Soyoon Lee, Hyokyung Bahn, and Sam H Noh. 2013. CLOCK-DWF:
+A write-history-aware page replacement algorithm for hybrid PCM
+and DRAM memory architectures.IEEE Trans. Comput.63, 9 (2013),
+2187–2200.
+[10] Taehyung Lee, Sumit Kumar Monga, Changwoo Min, and Young Ik
+Eom. 2023. Memtis: Efficient memory tiering with dynamic page
+classification and page size determination. InProceedings of the 29th
+Symposium on Operating Systems Principles. 17–34.
+[11] Yang Li, Saugata Ghose, Jongmoo Choi, Jin Sun, Hui Wang, and Onur
+Mutlu. 2017. Utility-based hybrid memory management. In2017 IEEE
+International Conference on Cluster Computing (CLUSTER). IEEE, 152–
+165.
+[12] Evan Liu, Milad Hashemi, Kevin Swersky, Parthasarathy Ranganathan,
+and Junwhan Ahn. 2020. An imitation learning approach for cache
+replacement. InInternational Conference on Machine Learning. PMLR,
+6237–6247.
+[13] Hai-Kun Liu, Di Chen, Hai Jin, Xiao-Fei Liao, Bingsheng He, Kan
+Hu, and Yu Zhang. 2021. A survey of non-volatile main memory
+technologies: State-of-the-arts, practices, and future directions.Journal
+of Computer Science and Technology36, 1 (2021), 4–32.
+[14] Lei Liu, Shengjie Yang, Lu Peng, and Xinyu Li. 2019. Hierarchical
+hybrid memory management in OS for tiered memory systems.IEEE
+Transactions on Parallel and Distributed Systems30, 10 (2019), 2223–
+2236.
+[15] Hasan Al Maruf, Hao Wang, Abhishek Dhanotia, Johannes Weiner,
+Niket Agarwal, Pallab Bhattacharya, Chris Petersen, Mosharaf Chowd-
+hury, Shobhit Kanaujia, and Prakash Chauhan. 2023. Tpp: Transparent
+page placement for cxl-enabled tiered-memory. InProceedings of the
+28th ACM International Conference on Architectural Support for Pro-
+gramming Languages and Operating Systems, Volume 3. 742–755.
+[16] Jeffrey C. Mogul, Eduardo Argollo, Mehul M. Shah, and Paolo Fara-
+boschi. 2009. Operating System Support for NVM+DRAM Hybrid
+Main Memory. InProceedings of the 12th USENIX Workshop on Hot
+Topics in Operating Systems (HotOS).
+[17] Onur Mutlu. 2013. Memory scaling: A systems architecture perspective.
+In2013 5th IEEE International Memory Workshop. 21–25. https://doi.
+org/10.1109/IMW.2013.6582088
+[18] Songwen Pei, Jianan Li, Yihuan Qian, Jie Tang, and Jean-Luc Gaudiot.
+2022. TransMigrator: A Transformer-Based Predictive Page Migration
+Mechanism for Heterogeneous Memory. InNetwork and Parallel Com-
+puting: 19th IFIP WG 10.3 International Conference, NPC 2022, Jinan,
+China, September 24–25, 2022, Proceedings(Jinan, China). Springer-
+Verlag, Berlin, Heidelberg, 180–191. https://doi.org/10.1007/978-3-
+031-21395-3_17
+[19] Moinuddin K. Qureshi, Vijayalakshmi Srinivasan, and Jude A. Rivers.
+2009. Scalable High Performance Main Memory System Using Phase-
+Change Memory Technology. InProceedings of the 36th Annual Inter-
+national Symposium on Computer Architecture (ISCA).
+[20] Luiz E Ramos, Eugene Gorbatov, and Ricardo Bianchini. 2011. Page
+placement in hybrid memory systems. InProceedings of the interna-
+tional conference on Supercomputing. 85–95.
+[21] Amanda Raybuck, Tim Stamler, Wei Zhang, Mattan Erez, and Simon
+Peter. 2021. Hemem: Scalable tiered memory management for big
+data applications and real nvm. InProceedings of the ACM SIGOPS 28th
+Symposium on Operating Systems Principles. 392–407.
+[22] Reza Salkhordeh and Hossein Asadi. 2016. An operating system level
+data migration scheme in hybrid DRAM-NVM memory architecture.
+In2016 Design, Automation & Test in Europe Conference & Exhibition
+(DATE). IEEE, 936–941.
+[23] Zhan Shi, Xiangru Huang, Akanksha Jain, and Calvin Lin. 2019. Ap-
+plying deep learning to the cache replacement problem. InProceedings
+of the 52nd Annual IEEE/ACM International Symposium on Microarchi-
+tecture. 413–425.
+[24] Julian Shun and Guy E. Blelloch. 2013. Ligra: a lightweight graph
+processing framework for shared memory(PPoPP ’13). Association for
+Computing Machinery, New York, NY, USA, 135–146. https://doi.org/
+10.1145/2442516.2442530
+[25] Giuseppe Vietri, Liana V Rodriguez, Wendy A Martinez, Steven Lyons,
+Jason Liu, Raju Rangaswami, Ming Zhao, and Giri Narasimhan. 2018.
+Driving cache replacement with {ML-based} {LeCaR}. In10th USENIX
+Workshop on Hot Topics in Storage and File Systems (HotStorage 18).
+[26] Xiaoyuan Wang, Haikun Liu, Xiaofei Liao, Ji Chen, Hai Jin, Yu Zhang,
+Long Zheng, Bingsheng He, and Song Jiang. 2019. Supporting su-
+perpages and lightweight page migration in hybrid memory systems.
+ACM Transactions on Architecture and Code Optimization (TACO)16, 2
+(2019), 1–26.
+[27] Carole-Jean Wu, Aamer Jaleel, Will Hasenplaugh, Margaret Martonosi,
+Simon C Steely Jr, and Joel Emer. 2011. SHiP: Signature-based hit
+predictor for high performance caching. InProceedings of the 44th
+Annual IEEE/ACM international symposium on microarchitecture. 430–
+441.
+[28] Zi Yan, Daniel Lustig, David Nellans, and Abhishek Bhattacharjee. 2019.
+Nimble page management for tiered memory systems. InProceedings
+of the Twenty-Fourth International Conference on Architectural Support
+for Programming Languages and Operating Systems. 331–345.
+[29] Jian Yang, Juno Kim, Morteza Hoseinzadeh, Joseph Izraelevitz, and
+Steve Swanson. 2020. An empirical guide to the behavior and use of
+scalable persistent memory. In18th USENIX Conference on File and
+Storage Technologies (FAST 20). 169–182.
+[30] Matei Zaharia, Mosharaf Chowdhury, Tathagata Das, Ankur Dave,
+Justin Ma, Murphy McCauly, Michael J Franklin, Scott Shenker, and
+Ion Stoica. 2012. Resilient Distributed Datasets: A Fault-Tolerant Ab-
+straction for In-Memory Cluster Computing. In9th USENIX symposium
+on networked systems design and implementation (NSDI 12). 15–28.
+[31] Ping Zhou, Bo Zhao, Jun Yang, and Youtao Zhang. 2009. A durable and
+energy efficient main memory using phase change memory technology.
+ACM SIGARCH computer architecture news37, 3 (2009), 14–23.
