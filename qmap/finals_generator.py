@@ -20,6 +20,7 @@ if PROJECT_ROOT not in sys.path:
 
 from qmap import candidate_filter
 from qmap import finals_config
+from qmap import finals_data
 from qmap import selector_search
 from qmap.qmap_generator import apply_history_ablation
 from qmap.qmap_generator import future_stats
@@ -498,6 +499,7 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
         "tail_policy": config["labels"]["tail_policy"],
         "history_page_field": "history_page_ids",
     })
+    metadata.update(finals_config.artifact_identity_from_config(config))
   finals_config.write_json(finals_config.metadata_path(output_path), metadata)
   return metadata
 
@@ -520,8 +522,23 @@ def fit_selector_and_generate(args):
       "test_trace": finals_config.fingerprint_file(test_path),
   }
   if is_v3 and config["run_profile"] == finals_config.OFFICIAL_PROFILE:
-    finals_config.assert_independent_trace_sources(
-        config, fingerprints=trace_fingerprints)
+    if config.get("validation", {}).get("require_data_manifest"):
+      manifest = finals_data.load_source_manifest(
+          config["data"]["source_manifest"], PROJECT_ROOT,
+          verify_files=True, require_quality_pass=True,
+          expected_workload=config["run"]["workload"])
+      finals_config.assert_independent_trace_sources(
+          config, source_manifest=manifest, project_root=PROJECT_ROOT)
+      bound_trace_fingerprints = {
+          "{}_trace".format(split): fingerprint
+          for split, fingerprint in
+          config["data"]["split_fingerprints"].items()
+      }
+      if trace_fingerprints != bound_trace_fingerprints:
+        raise ValueError("Resolved split fingerprints are stale.")
+    else:
+      finals_config.assert_independent_trace_sources(
+          config, fingerprints=trace_fingerprints)
     holdout = None
     selector_validation_trace = valid_trace
   else:
@@ -579,6 +596,7 @@ def fit_selector_and_generate(args):
         "selection_rule": (
             "selector_recall_desc,nregret_asc,uniform_distance,lexicographic"),
     })
+    selector_params.update(finals_config.artifact_identity_from_config(config))
   else:
     selector_params.update({
         "external_valid_trace_fingerprint": trace_fingerprints["valid_trace"],

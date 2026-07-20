@@ -2,7 +2,7 @@
 
 ## 1. 当前状态与边界
 
-当前本地状态：`IMPLEMENTED_UNVERIFIED`。
+最终阶段状态：`STAGE1_VERIFIED`。
 
 本文件中的命令仅供以后在具备 Python/PyTorch 环境的服务器执行。本地未执行任何语法检查、单元测试、数据生成、Trace Replay、训练、推理、网格搜索、smoke test 或端到端实验。
 
@@ -166,8 +166,17 @@ git diff -- \
 - 失败时重点检查：尾随空白、冲突标记、意外生成工件、源码目录中的 `__pycache__` 和旧 v2.1 工件修改。
 - 临时文件：无。该组命令只读。
 
-## 4. 验收完成后的状态转换条件
+## 4. 验收完成后的状态转换记录
 
-只有 3.1—3.8 全部满足、失败项完成修复并重新执行后，才可另行更新阶段报告状态。当前文档和代码不得据此预先写成 `PASSED`、`VERIFIED`、`STAGE1_CONFORMANT` 或“阶段1已完成”。
+2026-07-20 已完成服务器验收并由阶段报告回填状态。记录如下：
+
+- selector 有效集合：`SelectorRecall@K=0.0`、`effective_decision_points=1`、`nondiscriminative_ratio=0.5`、`fallback_uniform=false`；
+- 目标语义测试：`16 passed`，退出码 0；
+- 强化后的非平凡微型 E2E：`2 passed`，退出码 0；
+- 完整 pytest：`64 passed, 2 skipped`，退出码 0；两个 skip 是 `CAPD_RUN_STAGE1_E2E=0` 下的预期 server-only E2E；
+- `git diff --check`：无错误；
+- 仓库卫生：`.capd_stage1_tmp/logs/semantics.log` 已不再受跟踪，`.capd_stage1_tmp/` 已进入 `.gitignore`。
+
+状态由 `IMPLEMENTED_UNVERIFIED` 转换为 `STAGE1_VERIFIED`。该转换只确认阶段1语义与实现门禁，不确认正式数据、正式实验或性能结论；阶段2仍必须从 `IMPLEMENTED_UNVERIFIED` 开始并单独验收。
 
 服务器临时目录确认不再需要后，可在人工核对绝对路径确实指向仓库外 `/tmp/capd-stage1-v3-*` 后删除；删除操作不应写入自动化脚本，避免误删正式数据。

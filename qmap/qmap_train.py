@@ -470,6 +470,7 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
         "command": _command_text(),
     })
     if config["schema_version"] == finals_config.SCHEMA_VERSION:
+      payload.update(finals_config.artifact_identity_from_config(config))
       page_vocab = feature_embedder.page_embedder
       pc_vocab = feature_embedder.pc_embedder
       payload.update({

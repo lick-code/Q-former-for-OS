@@ -1,0 +1,25 @@
+{
+  "schema_version": "capd_finals_v3_candidate_inventory_1",
+  "contract_id": "CAPD-MIC-1.0",
+  "generated_by": "static_repository_review",
+  "candidates": {
+    "canneal": {
+      "legacy_metadata": "dataset/metadata/real_workload_suite_1m_manifest.json",
+      "static_status": "REJECTED",
+      "reason": "valid unique_page_count=30 is not greater than D=64, so the valid split cannot produce a victim decision",
+      "formal_source_manifest": "dataset/metadata/finals_v3_official/canneal.json"
+    },
+    "streamcluster_pressure": {
+      "legacy_metadata": "dataset/metadata/real_workload_suite_pressure_manifest.json",
+      "static_status": "INSUFFICIENT",
+      "reason": "all splits exceed D=64 in unique pages, but collection command, collection identity, raw/split fingerprints and a server audit are missing",
+      "formal_source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json"
+    },
+    "dedup_pressure": {
+      "legacy_metadata": "dataset/metadata/real_workload_suite_pressure_manifest.json",
+      "static_status": "REJECTED",
+      "reason": "valid unique_page_count=54 is not greater than D=64, so the valid split cannot produce a victim decision",
+      "formal_source_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json"
+    }
+  }
+}

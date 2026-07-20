@@ -51,6 +51,8 @@
     "strategy": "independent_valid_trace",
     "development_fallback": "train_trace_decision_holdout",
     "artifact_class": "official",
+    "require_data_manifest": true,
+    "data_quality_profile": "configs/finals/capd_stage2_data_profile.json",
     "holdout_fraction": 0.2,
     "rounding": "ceil",
     "guard_accesses": 256
@@ -98,24 +100,28 @@
   },
   "workloads": {
     "canneal": {
-      "train_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_train.csv",
-      "valid_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv",
-      "test_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv"
+      "train_trace": "dataset/processed/finals_v3_official/canneal/train.csv",
+      "valid_trace": "dataset/processed/finals_v3_official/canneal/valid.csv",
+      "test_trace": "dataset/processed/finals_v3_official/canneal/test.csv",
+      "source_manifest": "dataset/metadata/finals_v3_official/canneal.json"
     },
     "streamcluster_pressure": {
-      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv",
-      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv",
-      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv"
+      "train_trace": "dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "valid_trace": "dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv",
+      "test_trace": "dataset/processed/finals_v3_official/streamcluster_pressure/test.csv",
+      "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json"
     },
     "dedup_pressure": {
-      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_train.csv",
-      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_valid.csv",
-      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_test.csv"
+      "train_trace": "dataset/processed/finals_v3_official/dedup_pressure/train.csv",
+      "valid_trace": "dataset/processed/finals_v3_official/dedup_pressure/valid.csv",
+      "test_trace": "dataset/processed/finals_v3_official/dedup_pressure/test.csv",
+      "source_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json"
     }
   },
   "outputs": {
     "jsonl_root": "dataset/jsonl/finals_v3_official",
     "checkpoint_root": "outputs/checkpoints/finals_v3_official",
-    "result_root": "outputs/results/finals_v3_official"
+    "result_root": "outputs/results/finals_v3_official",
+    "data_audit_root": "dataset/metadata/finals_v3_official/reports"
   }
 }

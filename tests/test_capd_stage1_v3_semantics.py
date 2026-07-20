@@ -33,6 +33,8 @@ def resolved_v3(workload="canneal"):
   path = os.path.join(
       PROJECT_ROOT, "configs", "finals", "capd_direction1_v3.json")
   base = finals_config.load_config(path)
+  # Stage-1 semantic unit tests predate the stage-2 source-manifest gate.
+  base["validation"]["require_data_manifest"] = False
   return finals_config.resolve_config(base, workload, 64)
 
 

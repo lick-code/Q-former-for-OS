@@ -1,0 +1,44 @@
+{
+  "profile_id": "capd_finals_v3_official_data_v1",
+  "artifact_schema": "capd_finals_v3_0",
+  "contract_id": "CAPD-MIC-1.0",
+  "method_constants": {
+    "D": 64,
+    "K": 8,
+    "H": 10,
+    "Hc": 256,
+    "L": 256,
+    "pool_sizes_B": [8, 16, 32, 64]
+  },
+  "split_thresholds": {
+    "train": {
+      "min_accesses": 100000,
+      "min_victim_decisions": 4096,
+      "min_complete_window_decisions": 4096,
+      "min_effective_label_decisions": 1024
+    },
+    "valid": {
+      "min_accesses": 100000,
+      "min_victim_decisions": 1024,
+      "min_complete_window_decisions": 1024,
+      "min_effective_label_decisions": 256
+    },
+    "test": {
+      "min_accesses": 100000,
+      "min_victim_decisions": 1024
+    }
+  },
+  "distribution_thresholds": {
+    "max_nondiscriminative_ratio": 0.95,
+    "min_reuse_event_ratio": 0.01,
+    "max_top_1_percent_page_share": 0.90,
+    "extreme_write_ratio_low": 0.01,
+    "extreme_write_ratio_high": 0.99
+  },
+  "drift_thresholds": {
+    "max_write_ratio_span": 0.25,
+    "max_decision_ratio_span": 0.25,
+    "max_top_1_percent_page_share_span": 0.25
+  },
+  "drift_action": "warning"
+}

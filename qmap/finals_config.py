@@ -61,6 +61,8 @@ V3_CONTRACT_FIELDS = (
     ("features", "lru_direction"),
     ("validation", "strategy"),
     ("validation", "development_fallback"),
+    ("validation", "require_data_manifest"),
+    ("validation", "data_quality_profile"),
     ("metrics", "selector_recall_tie"),
     ("embedding", "page", "shared"),
     ("embedding", "page", "vocab_fit"),
@@ -232,8 +234,10 @@ def _normalized_path(path):
   return os.path.normcase(os.path.abspath(path))
 
 
-def assert_independent_trace_sources(config, fingerprints=None):
-  """Rejects overlapping official train/valid/test sources and contents."""
+def assert_independent_trace_sources(config, fingerprints=None,
+                                     source_manifest=None,
+                                     project_root=None):
+  """Rejects ambiguous sources; v3 manifests prove interval independence."""
   data = config.get("data", config.get("workloads", {}).get(
       config.get("run", {}).get("workload", ""), {}))
   paths = [data.get(name) for name in (
@@ -243,12 +247,72 @@ def assert_independent_trace_sources(config, fingerprints=None):
   normalized = [_normalized_path(path) for path in paths]
   if len(set(normalized)) != 3:
     raise ValueError("Official train/valid/test trace paths must be distinct.")
+  if source_manifest is not None:
+    from qmap import finals_data
+    root = project_root or config.get("run", {}).get(
+        "project_root") or os.getcwd()
+    finals_data.validate_source_manifest(
+        source_manifest, root, verify_files=False,
+        require_quality_pass=False,
+        expected_workload=config.get("run", {}).get("workload"))
+    for split_name, config_key in (
+        ("train", "train_trace"), ("valid", "valid_trace"),
+        ("test", "test_trace")):
+      declared = finals_data.resolve_path(
+          source_manifest["splits"][split_name]["path"], root)
+      configured = finals_data.resolve_path(data[config_key], root)
+      if os.path.normcase(declared) != os.path.normcase(configured):
+        raise ValueError(
+            "Config/manifest path mismatch for {}.".format(split_name))
+    return
   if fingerprints is not None:
     values = [fingerprints.get(name) for name in (
         "train_trace", "valid_trace", "test_trace")]
     if any(not value for value in values) or len(set(values)) != 3:
       raise ValueError(
           "Official train/valid/test trace fingerprints must be distinct.")
+
+
+def _requires_data_manifest(config):
+  return (
+      config.get("schema_version") == SCHEMA_VERSION and
+      config.get("run_profile") == OFFICIAL_PROFILE and
+      config.get("validation", {}).get("require_data_manifest") is True)
+
+
+def _bind_resolved_data_manifest(config, project_root=None):
+  """Verifies and binds a PASSED source manifest into a resolved config."""
+  if not _requires_data_manifest(config):
+    return config
+  from qmap import finals_data
+  root = project_root or config.get("run", {}).get(
+      "project_root") or os.getcwd()
+  manifest_path = config.get("data", {}).get("source_manifest")
+  if not manifest_path:
+    raise ValueError("Official v3 requires data.source_manifest.")
+  manifest = finals_data.load_source_manifest(
+      manifest_path, root, verify_files=True, require_quality_pass=True,
+      expected_workload=config.get("run", {}).get("workload"))
+  current_commit = current_git_commit(root)
+  if (current_commit == "unknown" or
+      manifest.get("git_commit") != current_commit):
+    raise ValueError(
+        "Data manifest git_commit does not match the current checkout.")
+  assert_independent_trace_sources(
+      config, source_manifest=manifest, project_root=root)
+  profile_path = config.get("validation", {}).get("data_quality_profile")
+  profile = finals_data.load_json(finals_data.resolve_path(profile_path, root))
+  profile_identity = finals_data.validate_data_profile(profile, config)
+  quality = manifest.get("quality_gate", {})
+  if (quality.get("profile_id") != profile_identity["profile_id"] or
+      quality.get("profile_fingerprint") !=
+      profile_identity["profile_fingerprint"]):
+    raise ValueError("Resolved config/data quality profile binding mismatch.")
+  binding = finals_data.manifest_binding(manifest_path, manifest, root)
+  config.setdefault("run", {}).update(binding)
+  config["data"]["split_fingerprints"] = copy.deepcopy(
+      binding["split_fingerprints"])
+  return config
 
 
 def _validate_v3_config(config, require_resolved=False):
@@ -299,6 +363,10 @@ def _validate_v3_config(config, require_resolved=False):
       raise ValueError("CAPD v3 replay.{} must be {}.".format(key, expected))
 
   validation = config["validation"]
+  if validation["require_data_manifest"] not in (True, False):
+    raise ValueError("validation.require_data_manifest must be boolean.")
+  if not validation["data_quality_profile"]:
+    raise ValueError("CAPD v3 requires a data quality profile path.")
   if validation["development_fallback"] != "train_trace_decision_holdout":
     raise ValueError("CAPD v3 must retain the named development fallback.")
   if profile == OFFICIAL_PROFILE:
@@ -380,6 +448,17 @@ def _validate_v3_config(config, require_resolved=False):
     if not config.get("run", {}).get("workload"):
       raise ValueError("Resolved config must include run.workload.")
     assert_independent_trace_sources(config)
+    if _requires_data_manifest(config):
+      required_binding = (
+          "source_manifest_fingerprint", "split_fingerprints",
+          "data_quality_profile_id", "data_quality_profile_fingerprint",
+          "data_quality_report_fingerprint")
+      missing_binding = [
+          key for key in required_binding if key not in config.get("run", {})]
+      if missing_binding:
+        raise ValueError(
+            "Resolved official v3 config lacks data binding: {}".format(
+                missing_binding))
   return config
 
 
@@ -394,6 +473,8 @@ def validate_config(config, require_resolved=False):
 
 def load_config(path, require_resolved=False):
   config = load_json(path)
+  if require_resolved:
+    _bind_resolved_data_manifest(config)
   validate_config(config, require_resolved=require_resolved)
   if require_resolved:
     recorded = config.get("run", {}).get("resolved_config_fingerprint")
@@ -495,7 +576,12 @@ def selector_contract(selector_params):
   missing = [key for key in required if key not in selector_params]
   if missing:
     raise ValueError("selector_params missing fields: {}".format(missing))
-  return {key: selector_params[key] for key in (("schema_version",) + required)
+  optional_binding = (
+      "source_manifest_fingerprint", "split_fingerprints",
+      "data_quality_profile_id", "data_quality_profile_fingerprint",
+      "data_quality_report_fingerprint")
+  return {key: selector_params[key]
+          for key in (("schema_version",) + required + optional_binding)
           if key in selector_params}
 
 
@@ -518,6 +604,12 @@ def artifact_identity_from_config(config):
         "artifact_class": config["validation"]["artifact_class"],
         "git_commit": config.get("run", {}).get("git_commit", "unknown"),
     })
+    for key in (
+        "source_manifest_fingerprint", "split_fingerprints",
+        "data_quality_profile_id", "data_quality_profile_fingerprint",
+        "data_quality_report_fingerprint"):
+      if key in config.get("run", {}):
+        identity[key] = copy.deepcopy(config["run"][key])
   return identity
 
 
@@ -753,6 +845,7 @@ def resolve_config(base_config, workload, pool_size_B, project_root=None,
     config["run"]["project_root"] = os.path.abspath(project_root)
     config["run"]["git_commit"] = current_git_commit(project_root)
   config["run"]["base_config_fingerprint"] = config_fingerprint(base_config)
+  _bind_resolved_data_manifest(config, project_root=project_root)
   validate_config(config, require_resolved=True)
   config["run"]["resolved_config_fingerprint"] = config_fingerprint(config)
   return config

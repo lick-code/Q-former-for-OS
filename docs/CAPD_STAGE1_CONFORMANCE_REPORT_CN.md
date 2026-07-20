@@ -2,11 +2,13 @@
 
 ## 1. 报告状态
 
-本地状态：`IMPLEMENTED_UNVERIFIED`
+阶段状态：`STAGE1_VERIFIED`
 
-本报告只记录代码与测试代码的静态构造结果。本地没有执行 Python 语法检查、单元测试、torch 前向、数据生成、Trace Replay、模型训练、模型推理、selector 网格搜索、smoke test、benchmark、端到端回归或实验，因此不得把本报告解释为 `PASSED`、`VERIFIED`、`STAGE1_CONFORMANT` 或“阶段1已完成”。
+本地仍未执行 Python、pytest、数据生成、Trace Replay、训练、推理或实验；`STAGE1_VERIFIED` 来自 2026-07-20 Linux 服务器验收结果的回填，而不是本地执行。该状态只表示 `CAPD-MIC-1.0` 阶段1语义、实现门禁和非平凡微型回归已通过，不表示正式数据已经可接受，不表示阶段2已经验证，也不产生任何性能结论。
 
-2026-07-20 首轮服务器验收反馈的三项修订已写入代码和测试，但本地只完成静态审查，尚待服务器复验：五访问手算代价修正为 35；selector 正式 Recall/NRegret 统一使用有效验证决策点；微型端到端 trace 改为包含冷热重访和写访问的非平凡工作负载。
+服务器验收记录：selector 有效集合诊断得到 `SelectorRecall@K=0.0`、`effective_decision_points=1`、`nondiscriminative_ratio=0.5`、`fallback_uniform=false`；目标语义测试 `16 passed`；强化后的非平凡微型 E2E `2 passed`，覆盖非 uniform fallback、有效决策点、非零 relevance range、有限且非零梯度和参数更新；完整 pytest 为 `64 passed, 2 skipped`，两个 skip 均为 `CAPD_RUN_STAGE1_E2E=0` 时预期跳过的 server-only E2E；各组退出码均为 0，`git diff --check` 无错误。
+
+仓库卫生收口：误跟踪的 `.capd_stage1_tmp/logs/semantics.log` 已不在当前索引中，`.gitignore` 已加入 `.capd_stage1_tmp/`。静态 `git ls-files` 复核为：stage1 临时文件 0、`__pycache__`/`.pyc` 0、`.pytest_cache` 0；同时发现既有历史 checkpoint 类文件 801、resolved config 35、log/result 路径文件 2071。后面三类是阶段1前已经受跟踪的历史实验工件，不作为 `capd_finals_v3_0` 输入；本次不做高风险、超出阶段1卫生问题范围的破坏性批量删除，阶段2通过目录和指纹门禁拒绝复用。
 
 唯一方法—实现依据：`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 中冻结的 `CAPD-MIC-1.0`。冻结合同的“实现状态”未被修改。
 
@@ -125,16 +127,14 @@
 
 ## 5. 静态无法确认及合同口径问题
 
-### 5.1 必须由服务器确认
+### 5.1 已由阶段1服务器验收确认
 
-- 所有 Python 文件的语法和导入关系；
-- NumPy selector 有效集 Recall/NRegret 累计及混合样本回归的实际数值；
-- PyTorch Transformer mask API、共享 embedding 梯度与 state dict；
-- 冻结词表 checkpoint round-trip；
-- ApproxNDCG 前向/反向和数值稳定性；
-- 非平凡微型端到端链、非 fallback selector、非零训练信号和固定种子确定性；
-- 全量 pytest 对旧 v2.1 路径的回归影响；
-- 真实 train/valid/test trace 的来源与时间范围是否确实不重叠。代码只能检查路径和内容指纹，无法仅凭文件静态证明采集时间边界。
+- 目标语义与 NumPy selector 有效集合诊断通过；
+- PyTorch 模型路径与强化后的非平凡微型端到端回归通过；
+- 完整 pytest 通过，只有两个受环境变量控制的预期 skip；
+- `git diff --check` 通过。
+
+真实 train/valid/test 的来源区间、真实 RW、压力和数据分布不属于阶段1语义门禁，必须由阶段2 manifest 与数据质量审计另行确认。
 
 ### 5.2 合同内部张力
 
@@ -144,17 +144,12 @@
 
 G11（闭环分布偏移审计）和 G12（代理标签—反事实代价审计）仍按冻结合同属于后续阶段的正式实验/审计工作，本阶段未执行，也未声称实现验证。
 
-## 6. 阶段2开始前必须满足的条件
+## 6. 阶段2启动记录
 
-1. 完整执行 `docs/CAPD_STAGE1_SERVER_VALIDATION_CN.md` 的 3.1—3.8，所有失败均修复并重新执行。
-2. 对上述 test 覆盖指标来源张力给出合同维护者的书面确认；若改变冻结语义，先提升合同版本。
-3. 确认 v3 official runner、smoke fallback 和 v2.1 runner 的互斥测试通过。
-4. 确认共享词表在 valid/test 前后不变化，checkpoint round-trip 后 OOV 仍为 `UNK=0`。
-5. 确认 generator/replay 候选快照和当前请求时序测试通过。
-6. 确认首次访问、clean/dirty 降级和五访问手算代价测试通过。
-7. 确认仓库没有新生成或改写 `dataset/`、`outputs/`、`results/`、`logs/`、resolved config、checkpoint 或 result。
-8. 只有上述条件满足后，才可进入阶段2重新选择/采集并构造正式 train/valid/test 数据；不得复用 v2.1 JSONL 或 checkpoint。
+阶段1服务器门禁已满足，允许进入阶段2“重新构造正式数据”。阶段2必须继续保持以下边界：不得复用 v2.1 JSONL、selector、checkpoint 或 result；不得把阶段1微型 E2E 工件提升为正式数据；不得把阶段2审计解释为候选筛选器效果、精排模型效果或系统性能结论。
 
 ## 7. 结论
 
-当前阶段状态：`IMPLEMENTED_UNVERIFIED`
+当前阶段状态：`STAGE1_VERIFIED`
+
+状态解释：语义与实现门禁已通过；正式数据、正式实验与性能结论均仍未验证。

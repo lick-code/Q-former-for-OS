@@ -217,6 +217,9 @@ class FinalsV3MiniEndToEndTest(unittest.TestCase):
     base_path = os.path.join(
         PROJECT_ROOT, "configs", "finals", "capd_direction1_v3.json")
     base = finals_config.load_config(base_path)
+    # This server-only stage-1 chain validates method semantics. Stage 2 has
+    # separate manifest/audit tests and keeps the production config gate on.
+    base["validation"]["require_data_manifest"] = False
     base["training"]["epochs"] = 1
     base["training"]["batch_size"] = 2
     base["workloads"]["mini_stage1"] = {
