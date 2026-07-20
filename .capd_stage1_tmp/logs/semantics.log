@@ -1,0 +1,33 @@
+......F.....................                                             [100%]
+=================================== FAILURES ===================================
+_ ReplayAccountingTest.test_first_read_write_hit_nvm_revisit_and_demotion_costs _
+
+self = <test_capd_stage1_v3_semantics.ReplayAccountingTest testMethod=test_first_read_write_hit_nvm_revisit_and_demotion_costs>
+
+    def test_first_read_write_hit_nvm_revisit_and_demotion_costs(self):
+      rows = [
+          (1, 1, 0),
+          (2, 1, 0),
+          (3, 2, 1),
+          (4, 3, 0),
+          (5, 1, 0),
+      ]
+      with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "trace.csv")
+        with open(path, "w", newline="", encoding="utf-8") as output_file:
+          writer = csv.writer(output_file)
+          writer.writerow(["PC", "Address", "RW"])
+          writer.writerows(rows)
+        stats = qmap_eval.replay(replay_args(path))
+      self.assertEqual(5, stats.total_accesses)
+      self.assertEqual(1, stats.hit_count)
+      self.assertEqual(4, stats.miss_count)
+      self.assertEqual(3, stats.nvm_read_count)
+      self.assertEqual(1, stats.nvm_write_count)
+      self.assertEqual(2, stats.migration_count)
+      # 2 + 1 + 8 + (2+10) + (2+10) = 33. Dirty demotion adds no write.
+>     self.assertEqual(33.0, stats.weighted_access_cost)
+E     AssertionError: 33.0 != 35.0
+
+tests/test_capd_stage1_v3_semantics.py:288: AssertionError
+1 failed, 27 passed in 0.34s
