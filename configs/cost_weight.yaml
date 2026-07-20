@@ -1,0 +1,44 @@
+schema_version: 1
+status: documentation_only
+description: Replay-only CAPD cost-weight robustness configuration.
+source_script: scripts/run_cost_weight_sensitivity.py
+
+workloads:
+  streamcluster_pressure:
+    result_dir: outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster
+  blackscholes:
+    result_dir: outputs/results/real_workload_suite/1m/parsec_blackscholes
+  canneal:
+    result_dir: outputs/results/real_workload_suite/1m/parsec_canneal
+
+policies:
+  - lru
+  - random
+  - lfu
+  - clock
+  - qmap
+
+cost_models:
+  default:
+    dram_access: 1.0
+    nvm_read: 2.0
+    nvm_write: 8.0
+    demotion: 10.0
+  mild:
+    dram_access: 1.0
+    nvm_read: 2.0
+    nvm_write: 4.0
+    demotion: 5.0
+  write_heavy:
+    dram_access: 1.0
+    nvm_read: 2.0
+    nvm_write: 16.0
+    demotion: 10.0
+  migration_heavy:
+    dram_access: 1.0
+    nvm_read: 2.0
+    nvm_write: 8.0
+    demotion: 20.0
+
+outputs:
+  result_root: outputs/results/cost_weight_sensitivity

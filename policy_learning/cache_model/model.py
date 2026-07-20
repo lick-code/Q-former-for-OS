@@ -289,7 +289,7 @@ class QMAPCandidateScorer(nn.Module):
   small MLP.
   """
 
-  def __init__(self, hidden_dim=18, page_state_dim=3, page_embed_dim=8,
+  def __init__(self, hidden_dim=18, page_state_dim=4, page_embed_dim=8,
                page_vocab_size=100000, num_heads=2, mlp_hidden_dim=None,
                dropout=0.0, page_dim=None, scoring_input="concat"):
     super(QMAPCandidateScorer, self).__init__()
@@ -335,8 +335,8 @@ class QMAPCandidateScorer(nn.Module):
       candidate_pages: candidate page ids [batch_size, num_candidates]. If
         candidate_state_features is None, this is treated as a legacy
         handcrafted feature tensor.
-      candidate_state_features: [recent frequency, dirty flag, residency
-        duration] features with shape [batch_size, num_candidates, 3].
+      candidate_state_features: [recent frequency, dirty flag, residency,
+        original pool LRU rank], shape [batch_size, num_candidates, 4].
       candidate_mask: 1 for real candidates and 0 for padding, with shape
         [batch_size, num_candidates].
 

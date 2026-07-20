@@ -1,0 +1,54 @@
+schema_version: 1
+status: documentation_only
+description: CAPD training-seed stability configuration.
+source_script: scripts/run_seed_stability.py
+
+workloads:
+  streamcluster_pressure:
+    train_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv
+    test_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv
+    source_jsonl: dataset/jsonl/real_workload_suite_pressure/selected/parsec_streamcluster_train.jsonl
+    baseline_dir: outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster
+  blackscholes:
+    train_trace: dataset/processed/real_workload_suite/1m/parsec_blackscholes_train.csv
+    test_trace: dataset/processed/real_workload_suite/1m/parsec_blackscholes_test.csv
+    source_jsonl: dataset/jsonl/real_workload_suite/1m/parsec_blackscholes_train.jsonl
+    baseline_dir: outputs/results/real_workload_suite/1m/parsec_blackscholes
+  canneal:
+    train_trace: dataset/processed/real_workload_suite/1m/parsec_canneal_train.csv
+    test_trace: dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv
+    source_jsonl: dataset/jsonl/real_workload_suite/1m/parsec_canneal_train.jsonl
+    baseline_dir: outputs/results/real_workload_suite/1m/parsec_canneal
+
+model:
+  public_name: CAPD
+  implementation_name: QMAP-CrossAttn
+  ablation: cross_attention
+  history_length: 10
+  candidate_count: 8
+  lookahead: 256
+  dram_capacity_pages: 16
+  page_shift: 12
+
+training:
+  seeds:
+    - 3136859
+    - 42
+    - 2026
+  epochs: 10
+  batch_size: 32
+  learning_rate: 0.0001
+  device: cuda
+
+evaluation:
+  baseline_policies:
+    - lru
+    - random
+    - lfu
+    - clock
+  learned_policy: qmap
+  nvm_write_cost: 8.0
+
+outputs:
+  result_root: outputs/results/seed_stability
+

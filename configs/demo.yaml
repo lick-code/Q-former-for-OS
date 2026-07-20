@@ -1,0 +1,40 @@
+schema_version: 1
+status: documentation_only
+description: Small end-to-end CAPD demonstration using a synthetic trace.
+source_script: scripts/run_prototype_experiment.py
+
+data:
+  train_trace: dataset/processed/try_train.csv
+  validation_trace: dataset/processed/try_valid.csv
+  test_trace: dataset/processed/try_test.csv
+  generated_records: 20000
+  page_shift: 12
+
+model:
+  public_name: CAPD
+  implementation_name: QMAP-CrossAttn
+  ablation: cross_attention
+  history_length: 10
+  candidate_count: 64
+  lookahead: 256
+  dram_capacity_pages: 128
+
+training:
+  epochs: 10
+  batch_size: 32
+  learning_rate: 0.0001
+  seed: 3136859
+  device: cuda
+
+evaluation:
+  policies:
+    - lru
+    - random
+    - lfu
+    - clock
+    - qmap
+
+outputs:
+  checkpoints: outputs/checkpoints/try_prototype
+  results: outputs/results/try_prototype
+

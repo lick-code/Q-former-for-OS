@@ -318,7 +318,9 @@ def build_labels(trace, current_index, candidate, lookahead):
 
   coldness = 1.0 - min(frequency / float(lookahead), 1.0)
   write_sensitivity = min(write_frequency / float(lookahead), 1.0)
-  migration_cost = 1.0 if candidate > 0x20 else 0.0
+  # Uniform schema-compatibility constant. Every replay victim has the same
+  # migration cost, so finals_v2 excludes this field from candidate ranking.
+  migration_cost = 0.0
   return inactivity, coldness, write_sensitivity, migration_cost
 
 

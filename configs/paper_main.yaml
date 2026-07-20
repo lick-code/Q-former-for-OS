@@ -1,0 +1,77 @@
+schema_version: 1
+status: documentation_only
+description: Main CAPD configuration reported in the latest paper.
+source_scripts:
+  - scripts/run_real_workload_suite.py
+  - scripts/run_real_pilot.py
+  - scripts/run_learned_baselines.py
+
+data:
+  page_shift: 12
+  address_granularity: 4KB_page
+  standard_split:
+    total_records: 1000000
+    train_records: 800000
+    validation_records: 100000
+    test_records: 100000
+  workloads:
+    blackscholes:
+      train_trace: dataset/processed/real_workload_suite/1m/parsec_blackscholes_train.csv
+      validation_trace: dataset/processed/real_workload_suite/1m/parsec_blackscholes_valid.csv
+      test_trace: dataset/processed/real_workload_suite/1m/parsec_blackscholes_test.csv
+    streamcluster_pressure:
+      train_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv
+      validation_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv
+      test_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv
+    dedup_pressure:
+      train_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_train.csv
+      validation_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_valid.csv
+      test_trace: dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_test.csv
+
+model:
+  public_name: CAPD
+  implementation_name: QMAP-CrossAttn
+  ablation: cross_attention
+  history_length: 10
+  candidate_count: 8
+  lookahead: 256
+  dram_capacity_pages: 16
+  address_embedding_dim: 8
+  pc_embedding_dim: 8
+  rw_embedding_dim: 2
+  transformer_layers: 1
+  attention_heads: 2
+  feedforward_dim: 72
+  candidate_page_embedding_dim: 8
+  candidate_state_features: 4
+
+training:
+  epochs: 10
+  batch_size: 32
+  learning_rate: 0.0001
+  seed: 3136859
+  device: cuda
+
+replay_cost:
+  dram_access: 1.0
+  nvm_read: 2.0
+  nvm_write: 8.0
+  demotion: 10.0
+
+evaluation:
+  classical_policies:
+    - lru
+    - random
+    - lfu
+    - clock
+  learned_policies:
+    - kleio_lite
+    - patterns_lite
+    - qmap
+
+outputs:
+  standard_results: outputs/results/real_workload_suite/1m
+  pressure_results: outputs/results/real_workload_suite_pressure/selected
+  learned_baseline_results: outputs/results/ml_baselines
+  main_figure: outputs/figures/capd_main_results.pdf
+

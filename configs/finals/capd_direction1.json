@@ -1,0 +1,76 @@
+{
+  "schema_version": "capd_finals_v2",
+  "run_profile": "official",
+  "memory": {
+    "dram_capacity_pages": 64,
+    "nvm_capacity_pages": null
+  },
+  "trace": {
+    "page_shift": 12
+  },
+  "candidate": {
+    "pool_size_B": 64,
+    "retained_K": 8,
+    "selector_history_Hc": 256
+  },
+  "history": {
+    "transformer_H": 10
+  },
+  "labels": {
+    "future_lookahead_L": 256,
+    "lambda_d": 1.0,
+    "lambda_q": 1.0,
+    "lambda_w": 4.0
+  },
+  "features": {
+    "residency_scale_Lres": 256,
+    "page_state_dim": 4,
+    "selector_clip_quantile": 0.99
+  },
+  "selector": {
+    "grid_step": 0.1,
+    "epsilon_y": 1e-08,
+    "behavior_policy": "lru"
+  },
+  "training": {
+    "seed": 3136859,
+    "epochs": 10,
+    "batch_size": 32,
+    "learning_rate": 0.0001
+  },
+  "evaluation": {
+    "random_seed": 0
+  },
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0,
+    "migration_cost": 10.0
+  },
+  "sweep": {
+    "pool_sizes_B": [8, 16, 32, 64]
+  },
+  "workloads": {
+    "canneal": {
+      "train_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv",
+      "test_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv"
+    },
+    "streamcluster_pressure": {
+      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv",
+      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv"
+    },
+    "dedup_pressure": {
+      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_valid.csv",
+      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_test.csv"
+    }
+  },
+  "outputs": {
+    "jsonl_root": "dataset/jsonl/finals_v2",
+    "checkpoint_root": "outputs/checkpoints/finals_v2",
+    "result_root": "outputs/results/finals_v2"
+  }
+}

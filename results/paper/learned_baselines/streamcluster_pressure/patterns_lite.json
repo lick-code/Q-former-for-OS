@@ -1,0 +1,28 @@
+{
+  "avg_decision_time_ms": 0.08504510217139823,
+  "candidate_count": 8,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 11676,
+  "decision_time_seconds": 0.9929866129532456,
+  "dram_capacity": 16,
+  "hit_rate": 0.94154,
+  "hit_rate_percent": 94.15400000000001,
+  "hits": 188308,
+  "learned_model": "outputs/checkpoints/ml_baselines/streamcluster_pressure/patterns_lite.json",
+  "migrations": 11676,
+  "misses": 11692,
+  "nvm_reads": 11063,
+  "nvm_writes": 629,
+  "policy": "patterns_lite",
+  "rank_guard": 0,
+  "rank_score_penalty": 0.0,
+  "total_accesses": 200000,
+  "trace_path": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
+  "weighted_access_cost": 332226.0
+}

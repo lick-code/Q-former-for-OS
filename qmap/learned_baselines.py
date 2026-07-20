@@ -30,6 +30,10 @@ except ImportError:
 
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+if PROJECT_ROOT not in sys.path:
+  sys.path.insert(0, PROJECT_ROOT)
+
+from qmap import finals_config
 KLEIO_LITE = "kleio_lite"
 PATTERNS_LITE = "patterns_lite"
 POLICY_CHOICES = (KLEIO_LITE, PATTERNS_LITE)
@@ -325,6 +329,7 @@ def train_kleio_lite(trace, args):
       "training": {
           "sample_count": len(samples),
           "train_trace": args.train_trace,
+          "dram_capacity": args.dram_capacity,
       },
   }
 
@@ -358,6 +363,7 @@ def train_patterns_lite(trace, args):
           "cluster_sample_counts": [len(samples)
                                     for samples in cluster_samples],
           "train_trace": args.train_trace,
+          "dram_capacity": args.dram_capacity,
       },
   }
 
@@ -451,7 +457,9 @@ def build_arg_parser():
   parser = argparse.ArgumentParser(
       description="Train lightweight learned replacement baselines.")
   parser.add_argument("--policy", choices=POLICY_CHOICES, required=True)
-  parser.add_argument("--train_trace", required=True)
+  parser.add_argument("--config", default=None,
+                      help="Resolved CAPD finals_v2 config.")
+  parser.add_argument("--train_trace", default=None)
   parser.add_argument("--model_output", required=True)
   parser.add_argument("--dram_capacity", type=int, default=16)
   parser.add_argument("--page_shift", type=int, default=12)
@@ -468,7 +476,25 @@ def build_arg_parser():
   return parser
 
 
+def apply_finals_config(args):
+  if not args.config:
+    return None
+  config = finals_config.load_config(args.config, require_resolved=True)
+  args.train_trace = config["data"]["train_trace"]
+  args.dram_capacity = int(config["memory"]["dram_capacity_pages"])
+  args.page_shift = int(config.get("trace", {}).get("page_shift", 12))
+  args.history_length = int(config["history"]["transformer_H"])
+  # Native learned baselines remain restricted to their original LRU-tail 8.
+  args.candidate_count = 8
+  args.lookahead = int(config["features"]["residency_scale_Lres"])
+  args.label_lookahead = int(config["labels"]["future_lookahead_L"])
+  args.seed = int(config["training"]["seed"])
+  return config
+
+
 def validate_args(args):
+  if not args.train_trace:
+    raise ValueError("--train_trace is required when --config is omitted.")
   if args.dram_capacity <= 0:
     raise ValueError("--dram_capacity must be positive.")
   if args.candidate_count <= 0:
@@ -487,8 +513,16 @@ def validate_args(args):
 
 def main():
   args = build_arg_parser().parse_args()
+  config = apply_finals_config(args)
   validate_args(args)
   model_dict = train_model(args)
+  if config is not None:
+    model_dict.update({
+        "schema_version": finals_config.SCHEMA_VERSION,
+        "workload": config["run"]["workload"],
+        "config_fingerprint": finals_config.config_fingerprint(config),
+        "experiment_contract": finals_config.contract_from_config(config),
+    })
   save_model(model_dict, args.model_output)
   print("[done] policy={} samples={} model={}".format(
       args.policy,

@@ -19,19 +19,30 @@ import argparse
 import json
 import os
 import random
+import shlex
 import sys
 import time
 
-from qmap_generator import build_candidate_state_features
-from qmap_generator import apply_history_ablation
-from qmap_generator import get_lru_tail_candidates_and_mask
-from qmap_generator import padded_history
-from qmap_generator import read_trace
+try:
+  from qmap_generator import build_candidate_state_features
+  from qmap_generator import apply_history_ablation
+  from qmap_generator import get_lru_tail_candidates_and_mask
+  from qmap_generator import padded_history
+  from qmap_generator import read_trace
+except ImportError:
+  from qmap.qmap_generator import build_candidate_state_features
+  from qmap.qmap_generator import apply_history_ablation
+  from qmap.qmap_generator import get_lru_tail_candidates_and_mask
+  from qmap.qmap_generator import padded_history
+  from qmap.qmap_generator import read_trace
 
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 if PROJECT_ROOT not in sys.path:
   sys.path.insert(0, PROJECT_ROOT)
+
+from qmap import candidate_filter
+from qmap import finals_config
 
 
 DRAM_READ_COST = 1.0
@@ -46,8 +57,12 @@ ABLATION_CHOICES = (
 
 def build_arg_parser():
   parser = argparse.ArgumentParser(description="Evaluate QMAP by trace replay.")
-  parser.add_argument("--trace_path", required=True,
+  parser.add_argument("--trace_path", default=None,
                       help="Input CSV trace with PC,Address and optional RW.")
+  parser.add_argument("--config", default=None,
+                      help="Resolved CAPD finals_v2 config.")
+  parser.add_argument("--selector_params", default=None,
+                      help="Frozen selector_params.json for QMAP finals_v2.")
   parser.add_argument("--checkpoint", default=None,
                       help="QMAP checkpoint path. Required for --policy qmap.")
   parser.add_argument("--learned_model", default=None,
@@ -102,6 +117,10 @@ class ReplayStats(object):
     self.weighted_access_cost = 0.0
     self.decision_count = 0
     self.decision_time_seconds = 0.0
+    self.selector_decision_count = 0
+    self.selector_time_seconds = 0.0
+    self.selector_B_t = []
+    self.selector_K_t = []
 
   @property
   def hit_rate(self):
@@ -114,6 +133,19 @@ class ReplayStats(object):
     if self.decision_count == 0:
       return 0.0
     return self.decision_time_seconds * 1000.0 / float(self.decision_count)
+
+  @property
+  def avg_selector_time_ms(self):
+    if self.selector_decision_count == 0:
+      return 0.0
+    return (self.selector_time_seconds * 1000.0 /
+            float(self.selector_decision_count))
+
+  def record_selector(self, snapshot):
+    self.selector_decision_count += 1
+    self.selector_time_seconds += snapshot["selector_time_seconds"]
+    self.selector_B_t.append(snapshot["B_t"])
+    self.selector_K_t.append(snapshot["K_t"])
 
   def to_dict(self, policy, trace_path, dram_capacity):
     return {
@@ -132,6 +164,21 @@ class ReplayStats(object):
         "decision_count": self.decision_count,
         "decision_time_seconds": self.decision_time_seconds,
         "avg_decision_time_ms": self.avg_decision_time_ms,
+        "candidate_filter": {
+            "decision_count": self.selector_decision_count,
+            "min_B_t": min(self.selector_B_t) if self.selector_B_t else 0,
+            "max_B_t": max(self.selector_B_t) if self.selector_B_t else 0,
+            "mean_B_t": (sum(self.selector_B_t) /
+                         float(len(self.selector_B_t))
+                         if self.selector_B_t else 0.0),
+            "min_K_t": min(self.selector_K_t) if self.selector_K_t else 0,
+            "max_K_t": max(self.selector_K_t) if self.selector_K_t else 0,
+            "mean_K_t": (sum(self.selector_K_t) /
+                         float(len(self.selector_K_t))
+                         if self.selector_K_t else 0.0),
+            "selector_time_seconds": self.selector_time_seconds,
+            "avg_selector_time_ms": self.avg_selector_time_ms,
+        },
     }
 
 
@@ -211,6 +258,72 @@ def is_learned_policy(policy):
   return policy in ("kleio_lite", "patterns_lite")
 
 
+def validate_checkpoint_config_contract(checkpoint, config, selector_params):
+  """Rejects every frozen Generator/Trainer/Replay contract mismatch."""
+  if checkpoint.get("schema_version") != finals_config.SCHEMA_VERSION:
+    raise ValueError("Checkpoint is not a CAPD finals_v2 checkpoint.")
+  expected_contract = finals_config.contract_from_config(config)
+  finals_config.assert_contract_matches(
+      expected_contract, checkpoint.get("experiment_contract", {}),
+      "checkpoint")
+  expected_config_fingerprint = finals_config.config_fingerprint(config)
+  if checkpoint.get("config_fingerprint") != expected_config_fingerprint:
+    raise ValueError("Checkpoint/config fingerprint mismatch.")
+  expected_selector_fingerprint = finals_config.selector_fingerprint(
+      selector_params)
+  if checkpoint.get("selector_fingerprint") != expected_selector_fingerprint:
+    raise ValueError("Checkpoint/selector fingerprint mismatch.")
+  if checkpoint.get("workload") != config["run"]["workload"]:
+    raise ValueError("Checkpoint/workload mismatch.")
+  model_args = checkpoint.get("model_args", {})
+  if int(model_args.get("page_state_dim", -1)) != expected_contract[
+      "page_state_dim"]:
+    raise ValueError("Checkpoint model page_state_dim mismatch.")
+  return expected_contract
+
+
+def apply_replay_finals_config(args):
+  """Makes the resolved config authoritative for every replay policy."""
+  config_path = getattr(args, "config", None)
+  if not config_path:
+    if not getattr(args, "trace_path", None):
+      raise ValueError("--trace_path is required when --config is omitted.")
+    return None
+  config = finals_config.load_config(config_path, require_resolved=True)
+  configured_trace = config["data"]["test_trace"]
+  supplied_trace = getattr(args, "trace_path", None)
+  if (supplied_trace and
+      os.path.abspath(supplied_trace) != os.path.abspath(configured_trace)):
+    raise ValueError("--trace_path does not match resolved config test_trace.")
+  args.trace_path = configured_trace
+  args.dram_capacity = int(config["memory"]["dram_capacity_pages"])
+  args.history_length = int(config["history"]["transformer_H"])
+  args.lookahead = int(config["features"]["residency_scale_Lres"])
+  args.page_shift = int(config.get("trace", {}).get("page_shift", 12))
+  args.random_seed = int(config["evaluation"]["random_seed"])
+  for name, value in config["cost_model"].items():
+    setattr(args, name, float(value))
+  if getattr(args, "rank_guard", 0) != 0:
+    raise ValueError("rank_guard is not part of the frozen finals_v2 path.")
+  if getattr(args, "rank_score_penalty", 0.0) != 0.0:
+    raise ValueError(
+        "rank_score_penalty is not part of the frozen finals_v2 path.")
+  if args.policy == "qmap":
+    if not getattr(args, "selector_params", None):
+      raise ValueError("--selector_params is required for finals QMAP replay.")
+    args.candidate_count = int(config["candidate"]["retained_K"])
+  return config
+
+
+def build_replay_decision_snapshot(
+    dram_pages, decision_history, access_index, dram_insert_time, dirty_pages,
+    selector_history, config, selector_params):
+  """Explicit adapter used by replay and Generator/Replay equivalence tests."""
+  return candidate_filter.build_filtered_candidate_snapshot(
+      dram_pages, decision_history, access_index, dram_insert_time,
+      dirty_pages, selector_history, config, selector_params)
+
+
 class ClockPolicy(object):
   """Small CLOCK policy over the current DRAM pages."""
 
@@ -240,35 +353,49 @@ class ClockPolicy(object):
 
 
 class QMAPPolicy(object):
-  """Loads a trained QMAP checkpoint and scores LRU-tail candidates."""
+  """Loads QMAP and uses the shared B-to-K selector in finals_v2."""
 
   def __init__(self, checkpoint_path, device, history_length, candidate_count,
                lookahead=256, ablation=None, rank_guard=0,
-               rank_score_penalty=0.0):
+               rank_score_penalty=0.0, config=None, selector_params=None):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
     if candidate_count <= 0:
       raise ValueError("candidate_count must be positive.")
-    if rank_guard < 0:
-      raise ValueError("rank_guard must be non-negative.")
-    if rank_score_penalty < 0.0:
-      raise ValueError("rank_score_penalty must be non-negative.")
+    if rank_guard < 0 or rank_score_penalty < 0.0:
+      raise ValueError("rank guard/penalty must be non-negative.")
 
-    # Lazy imports keep LRU/Random evaluation runnable without importing torch.
+    # Lazy imports keep classical-baseline replay independent of torch.
     import torch
     from policy_learning.cache_model import embed
     from policy_learning.cache_model import model
 
     self._torch = torch
     self._device = device
+    self._config = config
+    self._selector_params = selector_params
     self._history_length = history_length
     self._candidate_count = candidate_count
     self._effective_candidate_count = (
         min(candidate_count, rank_guard) if rank_guard else candidate_count)
     self._rank_score_penalty = rank_score_penalty
     self._lookahead = lookahead
+    self._selector_history = None
+    self.last_selector_snapshot = None
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
+    if config is not None:
+      if selector_params is None:
+        raise ValueError("Finals QMAP requires selector_params.")
+      contract = validate_checkpoint_config_contract(
+          checkpoint, config, selector_params)
+      self._history_length = contract["H"]
+      self._candidate_count = contract["K"]
+      self._effective_candidate_count = contract["K"]
+      self._lookahead = contract["Lres"]
+      self._selector_history = candidate_filter.SelectorHistory(
+          contract["Hc"])
+
     model_args = checkpoint.get("model_args", {})
     self._ablation = ablation or model_args.get("ablation", "mean_pool")
     extractor_state = checkpoint["extractor"]
@@ -276,7 +403,6 @@ class QMAPPolicy(object):
     scoring_input = infer_scorer_scoring_input(model_args, scorer_state)
     pooling_strategy = infer_extractor_pooling_strategy(
         model_args, scoring_input)
-
     self._feature_embedder = embed.QMAPAccessFeatureEmbedder(
         address_embedder=embed.DynamicVocabEmbedder(
             embed_dim=model_args.get("address_embed_dim", 8),
@@ -305,11 +431,9 @@ class QMAPPolicy(object):
         dropout=model_args.get("dropout", 0.0),
         page_dim=model_args.get("page_dim", 21),
         scoring_input=scoring_input).to(device)
-
     self._feature_embedder.load_state_dict(checkpoint["feature_embedder"])
     self._extractor.load_state_dict(extractor_state)
     self._scorer.load_state_dict(scorer_state)
-
     self._feature_embedder.eval()
     self._extractor.eval()
     self._scorer.eval()
@@ -318,28 +442,43 @@ class QMAPPolicy(object):
     if self._device.type == "cuda" and self._torch.cuda.is_available():
       self._torch.cuda.synchronize(self._device)
 
+  def observe(self, page, rw, access_index):
+    # Called after the decision and current-page insertion, so selector
+    # features at a decision never contain the triggering miss.
+    if self._selector_history is not None:
+      self._selector_history.observe(page, rw, access_index)
+
   def choose_victim(self, dram_pages, history, max_page, access_index,
                     dram_insert_time, dirty_pages):
-    candidates, candidate_mask = get_lru_tail_candidates_and_mask(
-        dram_pages, self._effective_candidate_count)
+    snapshot = None
+    if self._config is not None:
+      snapshot = build_replay_decision_snapshot(
+          dram_pages, history, access_index, dram_insert_time, dirty_pages,
+          self._selector_history, self._config, self._selector_params)
+      candidates = snapshot["candidate_pages"]
+      candidate_mask = snapshot["candidate_mask"]
+      candidate_state_features = snapshot["candidate_state_features"]
+    else:
+      candidates, candidate_mask = get_lru_tail_candidates_and_mask(
+          dram_pages, self._effective_candidate_count)
+      candidate_state_features = []
+      for rank, candidate in enumerate(candidates):
+        residency_duration = access_index - dram_insert_time.get(
+            candidate, access_index)
+        if self._page_state_dim >= 4:
+          features = build_candidate_state_features(
+              candidate, history, residency_duration,
+              candidate in dirty_pages, self._lookahead, rank=rank,
+              candidate_count=self._effective_candidate_count)
+        else:
+          features = build_candidate_state_features(
+              candidate, history, residency_duration,
+              candidate in dirty_pages, self._history_length)
+        candidate_state_features.append(features)
+
     physical_address, pc, rw = apply_history_ablation(
         *padded_history(history, self._history_length),
         ablation=self._ablation)
-    candidate_state_features = []
-    for rank, candidate in enumerate(candidates):
-      residency_duration = access_index - dram_insert_time.get(
-          candidate, access_index)
-      if self._page_state_dim >= 4:
-        features = build_candidate_state_features(
-            candidate, history, residency_duration, candidate in dirty_pages,
-            self._lookahead, rank=rank,
-            candidate_count=self._effective_candidate_count)
-      else:
-        features = build_candidate_state_features(
-            candidate, history, residency_duration, candidate in dirty_pages,
-            self._history_length)
-      candidate_state_features.append(features)
-
     torch = self._torch
     with torch.no_grad():
       physical_address = torch.tensor(
@@ -351,25 +490,25 @@ class QMAPPolicy(object):
       candidate_state_features = torch.tensor(
           [candidate_state_features], dtype=torch.float32,
           device=self._device)
-      candidate_mask = torch.tensor(
+      candidate_mask_tensor = torch.tensor(
           [candidate_mask], dtype=torch.float32, device=self._device)
-
       access_features = self._feature_embedder(physical_address, pc, rw)
       z = self._extractor(access_features)
       eviction_scores = self._scorer(
-          z, candidate_pages, candidate_state_features, candidate_mask)
+          z, candidate_pages, candidate_state_features,
+          candidate_mask_tensor)
       if self._rank_score_penalty:
         rank_penalties = torch.tensor(
             [rank_score_penalty_values(
                 eviction_scores.shape[1], self._rank_score_penalty)],
-            dtype=eviction_scores.dtype,
-            device=self._device)
+            dtype=eviction_scores.dtype, device=self._device)
         eviction_scores = eviction_scores - rank_penalties
       victim_index = int(torch.argmax(eviction_scores, dim=1).item())
+    self.last_selector_snapshot = snapshot
     return candidates[victim_index]
 
 
-def replay(args):
+def replay(args, finals_replay_config=None):
   trace, _ = read_trace(args.trace_path, args.page_shift)
   max_page = max((item["page"] for item in trace), default=1)
   stats = ReplayStats()
@@ -390,6 +529,15 @@ def replay(args):
     device = args.device
     if device is None:
       device = "cuda" if torch.cuda.is_available() else "cpu"
+    selector_params = None
+    if finals_replay_config is not None:
+      selector_params = finals_config.load_json(args.selector_params)
+      if selector_params.get("config_fingerprint") != (
+          finals_config.config_fingerprint(finals_replay_config)):
+        raise ValueError("Replay selector/config fingerprint mismatch.")
+      if selector_params.get("workload") != finals_replay_config[
+          "run"]["workload"]:
+        raise ValueError("Replay selector/workload mismatch.")
     qmap_policy = QMAPPolicy(
         args.checkpoint,
         torch.device(device),
@@ -398,7 +546,9 @@ def replay(args):
         args.lookahead,
         args.ablation,
         args.rank_guard,
-        args.rank_score_penalty)
+        args.rank_score_penalty,
+        config=finals_replay_config,
+        selector_params=selector_params)
   elif is_learned_policy(args.policy):
     if args.learned_model is None:
       raise ValueError("--learned_model is required for {}.".format(
@@ -409,7 +559,25 @@ def replay(args):
     except ImportError:
       from qmap.learned_baselines import LearnedBaselinePolicy
       from qmap.learned_baselines import load_model
-    learned_policy = LearnedBaselinePolicy(load_model(args.learned_model))
+    learned_model = load_model(args.learned_model)
+    if finals_replay_config is not None:
+      if learned_model.get("schema_version") != finals_config.SCHEMA_VERSION:
+        raise ValueError("Learned baseline is not a finals_v2 model.")
+      if learned_model.get("workload") != finals_replay_config[
+          "run"]["workload"]:
+        raise ValueError("Learned baseline workload mismatch.")
+      trained_capacity = learned_model.get("training", {}).get(
+          "dram_capacity")
+      expected_capacity = int(
+          finals_replay_config["memory"]["dram_capacity_pages"])
+      if trained_capacity is None or int(trained_capacity) != expected_capacity:
+        raise ValueError(
+            "Learned baseline must be retrained for DRAM capacity {}."
+            .format(expected_capacity))
+      if int(learned_model.get("candidate_count", -1)) != 8:
+        raise ValueError(
+            "Finals learned baselines must retain their native tail-8 pool.")
+    learned_policy = LearnedBaselinePolicy(learned_model)
 
   for access_index, access in enumerate(trace):
     page = access["page"]
@@ -461,6 +629,9 @@ def replay(args):
           victim = qmap_policy.choose_victim(
               dram_pages, decision_history, max_page, access_index,
               dram_insert_time, dirty_pages)
+          selector_snapshot = qmap_policy.last_selector_snapshot
+          if selector_snapshot is not None:
+            stats.record_selector(selector_snapshot)
           qmap_policy.synchronize()
         stats.decision_time_seconds += time.perf_counter() - decision_start
         stats.decision_count += 1
@@ -484,6 +655,8 @@ def replay(args):
     history.append(access)
     if len(history) > args.history_length:
       history.pop(0)
+    if qmap_policy is not None:
+      qmap_policy.observe(page, rw, access_index)
 
   return stats
 
@@ -501,24 +674,62 @@ def print_stats(policy, stats):
   print("Policy decisions:", stats.decision_count)
   print("Total decision time: {:.6f}s".format(stats.decision_time_seconds))
   print("Avg decision time: {:.6f} ms".format(stats.avg_decision_time_ms))
+  if stats.selector_decision_count:
+    print("Candidate filter decisions:", stats.selector_decision_count)
+    print("Candidate B_t range: {}..{}".format(
+        min(stats.selector_B_t), max(stats.selector_B_t)))
+    print("Retained K_t range: {}..{}".format(
+        min(stats.selector_K_t), max(stats.selector_K_t)))
+    print("Avg candidate filter time: {:.6f} ms".format(
+        stats.avg_selector_time_ms))
 
 
 def main():
   args = build_arg_parser().parse_args()
   if args.rank_score_penalty < 0.0:
     raise ValueError("--rank_score_penalty must be non-negative.")
-  stats = replay(args)
+  replay_config = apply_replay_finals_config(args)
+  stats = replay(args, finals_replay_config=replay_config)
   print_stats(args.policy, stats)
   if args.json_output:
     output_dir = os.path.dirname(os.path.abspath(args.json_output))
     if output_dir:
       os.makedirs(output_dir, exist_ok=True)
     metrics = stats.to_dict(args.policy, args.trace_path, args.dram_capacity)
-    metrics["candidate_count"] = args.candidate_count
+    metrics["candidate_count"] = (
+        8 if is_learned_policy(args.policy) else args.candidate_count)
+    metrics["candidate_scope"] = (
+        "full_dram" if args.policy in ("lru", "random", "lfu", "clock")
+        else ("native_lru_tail_8" if is_learned_policy(args.policy)
+              else "capd_selector_B_to_K"))
     metrics["rank_guard"] = args.rank_guard
     metrics["rank_score_penalty"] = args.rank_score_penalty
+    metrics["command"] = " ".join(
+        shlex.quote(value) for value in sys.argv)
+    if replay_config is not None:
+      metrics["schema_version"] = finals_config.SCHEMA_VERSION
+      metrics["workload"] = replay_config["run"]["workload"]
+      metrics["experiment_contract"] = finals_config.contract_from_config(
+          replay_config)
+      metrics["config_fingerprint"] = finals_config.config_fingerprint(
+          replay_config)
+      metrics["git_commit"] = replay_config.get("run", {}).get(
+          "git_commit", "unknown")
+      metrics["selector_params"] = args.selector_params
+      if args.selector_params:
+        metrics["selector_fingerprint"] = (
+            finals_config.selector_fingerprint(
+                finals_config.load_json(args.selector_params)))
+      finals_config.write_json(
+          os.path.join(output_dir, "resolved_config.json"), replay_config)
+    if args.checkpoint:
+      metrics["checkpoint"] = os.path.abspath(args.checkpoint)
+      metrics["checkpoint_fingerprint"] = finals_config.fingerprint_file(
+          args.checkpoint)
     if is_learned_policy(args.policy):
       metrics["learned_model"] = args.learned_model
+      metrics["learned_model_fingerprint"] = finals_config.fingerprint_file(
+          args.learned_model)
     metrics["cost_model"] = {
         "dram_read_cost": args.dram_read_cost,
         "dram_write_cost": args.dram_write_cost,

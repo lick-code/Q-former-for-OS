@@ -1,0 +1,43 @@
+schema_version: 1
+status: documentation_only
+description: CAPD DRAM-capacity sensitivity on streamcluster pressure.
+source_script: scripts/run_capacity_sensitivity.py
+
+workload:
+  name: streamcluster_pressure
+  implementation_name: parsec_streamcluster
+  processed_dir: dataset/processed/real_workload_suite_pressure/selected
+  manifest: dataset/metadata/real_workload_suite_pressure_manifest.json
+
+model:
+  public_name: CAPD
+  implementation_name: QMAP-CrossAttn
+  ablation: cross_attention
+  history_length: 10
+  candidate_count: 8
+  lookahead: 256
+  page_shift: 12
+
+training:
+  epochs: 10
+  batch_size: 32
+  learning_rate: 0.0001
+  seed: 3136859
+  device: cuda
+
+experiment:
+  dram_capacities_pages:
+    - 8
+    - 16
+    - 32
+  policies:
+    - lru
+    - random
+    - lfu
+    - clock
+    - qmap
+  nvm_write_cost: 8.0
+
+outputs:
+  result_root: outputs/results/capacity_sensitivity
+

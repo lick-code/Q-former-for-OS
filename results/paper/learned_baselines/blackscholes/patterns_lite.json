@@ -1,0 +1,28 @@
+{
+  "avg_decision_time_ms": 0.07514165754487925,
+  "candidate_count": 8,
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "decision_count": 627,
+  "decision_time_seconds": 0.04711381928063929,
+  "dram_capacity": 16,
+  "hit_rate": 0.99357,
+  "hit_rate_percent": 99.357,
+  "hits": 99357,
+  "learned_model": "outputs/checkpoints/ml_baselines/blackscholes/patterns_lite.json",
+  "migrations": 627,
+  "misses": 643,
+  "nvm_reads": 594,
+  "nvm_writes": 49,
+  "policy": "patterns_lite",
+  "rank_guard": 0,
+  "rank_score_penalty": 0.0,
+  "total_accesses": 100000,
+  "trace_path": "dataset/processed/real_workload_suite/1m/parsec_blackscholes_test.csv",
+  "weighted_access_cost": 107207.0
+}
