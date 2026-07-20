@@ -1202,7 +1202,7 @@ def audit_source_manifest(manifest_path, repo_root, config, profile):
   }
   drift_diagnostics = [
       "drift:{}".format(value) for value in
-      report["cross_split"]["distribution_drift"]["warnings"]
+      report["cross_split"]["distribution_drift"]["warnings"]]
   if profile.get("drift_action") == "reject":
     all_sufficiency.extend(drift_diagnostics)
   else:
