@@ -1,0 +1,19 @@
+{
+  "best_epoch": 1,
+  "best_validation_loss": 0.0,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "00c288d0c02f158802fbe629d11c687c8b73b9993803c92ae7a64d6ea39ab174",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/B32/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "1934adc624c981b5a607ab58d1cd7ff2c3dcef78b0e2f70ab42a038435b06feb",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/B32/qmap_last.pth"
+    }
+  },
+  "command": "/home/likc/Q-former-for-OS/qmap/qmap_train.py --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --selector_params dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B32/selector_params.json --train_data dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B32/train.jsonl --valid_data dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B32/valid.jsonl --output_dir outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/B32",
+  "config_fingerprint": "9070914bb4db71ae9979822d7a8d0cc86ae56ef90079dfde78cb4050239c3587",
+  "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "schema_version": "capd_finals_v2_1"
+}

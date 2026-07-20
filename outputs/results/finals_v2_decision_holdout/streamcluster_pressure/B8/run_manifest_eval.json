@@ -1,0 +1,21 @@
+{
+  "commands": [
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B8/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B8/qmap_best.pth",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/lru.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy random --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/random.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/lfu.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/clock.json",
+    "python -m qmap.learned_baselines --policy kleio_lite --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --model_output outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/kleio_lite.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/kleio_lite.json",
+    "python -m qmap.learned_baselines --policy patterns_lite --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --model_output outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/patterns_lite.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/patterns_lite.json"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json",
+  "config_fingerprint": "65d782877ec97ec2757bfa8e7dc83e394afff1cc5b43d2003e59442e899c4f38",
+  "dry_run": false,
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "include_baselines": true,
+  "schema_version": "capd_finals_v2_1",
+  "stage": "eval",
+  "validation_strategy": "train_trace_decision_holdout"
+}

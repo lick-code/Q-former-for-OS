@@ -1,0 +1,96 @@
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B64.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B64/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/B64/qmap_best.pth
+Policy: qmap
+Total accesses: 200000
+Hits: 199897
+Misses: 103
+Hit rate: 99.95%
+Migrations: 39
+NVM reads: 4
+NVM writes: 99
+Weighted access cost: 201087.00
+Policy decisions: 39
+Total decision time: 0.676058s
+Avg decision time: 17.334820 ms
+Candidate filter decisions: 39
+Candidate B_t range: 64..64
+Retained K_t range: 8..8
+Avg candidate filter time: 0.371414 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B64.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/lru.json
+Policy: lru
+Total accesses: 200000
+Hits: 199897
+Misses: 103
+Hit rate: 99.95%
+Migrations: 39
+NVM reads: 4
+NVM writes: 99
+Weighted access cost: 201087.00
+Policy decisions: 39
+Total decision time: 0.000018s
+Avg decision time: 0.000451 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B64.json --policy random --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/random.json
+Policy: random
+Total accesses: 200000
+Hits: 199895
+Misses: 105
+Hit rate: 99.95%
+Migrations: 41
+NVM reads: 6
+NVM writes: 99
+Weighted access cost: 201109.00
+Policy decisions: 41
+Total decision time: 0.000141s
+Avg decision time: 0.003437 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B64.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/lfu.json
+Policy: lfu
+Total accesses: 200000
+Hits: 199853
+Misses: 147
+Hit rate: 99.93%
+Migrations: 83
+NVM reads: 4
+NVM writes: 143
+Weighted access cost: 201835.00
+Policy decisions: 83
+Total decision time: 0.001688s
+Avg decision time: 0.020341 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B64.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/clock.json
+Policy: clock
+Total accesses: 200000
+Hits: 199896
+Misses: 104
+Hit rate: 99.95%
+Migrations: 40
+NVM reads: 4
+NVM writes: 100
+Weighted access cost: 201104.00
+Policy decisions: 40
+Total decision time: 0.000080s
+Avg decision time: 0.001994 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B64.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/baselines/kleio_lite.json
+Policy: kleio_lite
+Total accesses: 200000
+Hits: 199897
+Misses: 103
+Hit rate: 99.95%
+Migrations: 39
+NVM reads: 4
+NVM writes: 99
+Weighted access cost: 201087.00
+Policy decisions: 39
+Total decision time: 0.002642s
+Avg decision time: 0.067737 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B64.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/baselines/patterns_lite.json
+Policy: patterns_lite
+Total accesses: 200000
+Hits: 199897
+Misses: 103
+Hit rate: 99.95%
+Migrations: 39
+NVM reads: 4
+NVM writes: 99
+Weighted access cost: 201087.00
+Policy decisions: 39
+Total decision time: 0.008381s
+Avg decision time: 0.214886 ms
+[done] summary=outputs/results/finals_v2_decision_holdout/dedup_pressure/B64/summary.json

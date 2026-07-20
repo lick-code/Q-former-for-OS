@@ -1,0 +1,13 @@
+{
+  "commands": [
+    "python -m qmap.qmap_train --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B8.json --selector_params dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B8/selector_params.json --train_data dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B8/train.jsonl --valid_data dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B8/valid.jsonl --output_dir outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/B8"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B8.json",
+  "config_fingerprint": "4b46e74fb056de784a5e5613482719c7d4c1d57df5dfc0b9d0be8e0352a77a6e",
+  "dry_run": false,
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "include_baselines": false,
+  "schema_version": "capd_finals_v2_1",
+  "stage": "train",
+  "validation_strategy": "train_trace_decision_holdout"
+}

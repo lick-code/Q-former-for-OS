@@ -1,0 +1,19 @@
+{
+  "best_epoch": 10,
+  "best_validation_loss": -0.16617516055703163,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "8084003e319d44ba3bf96e11546738cea06922e3f1eb98cf742fa8def42610f9",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2_decision_holdout/canneal/B16/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "349ca3337cca0f41c87daf17ffa4f5c6fcac90345f3a15a70a63f8fbe4688b6d",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2_decision_holdout/canneal/B16/qmap_last.pth"
+    }
+  },
+  "command": "/home/likc/Q-former-for-OS/qmap/qmap_train.py --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B16.json --selector_params dataset/jsonl/finals_v2_decision_holdout/canneal/B16/selector_params.json --train_data dataset/jsonl/finals_v2_decision_holdout/canneal/B16/train.jsonl --valid_data dataset/jsonl/finals_v2_decision_holdout/canneal/B16/valid.jsonl --output_dir outputs/checkpoints/finals_v2_decision_holdout/canneal/B16",
+  "config_fingerprint": "adc5ce09415b028ed8cbd0b501cec24e2f056103a232734383517d776a651139",
+  "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "schema_version": "capd_finals_v2_1"
+}

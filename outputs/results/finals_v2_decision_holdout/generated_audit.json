@@ -1,0 +1,106 @@
+{
+  "audit_stage": "generated",
+  "errors": [],
+  "expected_jobs": 12,
+  "jobs": [
+    {
+      "B": 8,
+      "config": "configs/finals/resolved_v2_1/canneal_B8.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 16,
+      "config": "configs/finals/resolved_v2_1/canneal_B16.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 32,
+      "config": "configs/finals/resolved_v2_1/canneal_B32.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 64,
+      "config": "configs/finals/resolved_v2_1/canneal_B64.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 8,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B8.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 16,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B16.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 32,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B32.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 64,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B64.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 8,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B8.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    },
+    {
+      "B": 16,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B16.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    },
+    {
+      "B": 32,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B32.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    },
+    {
+      "B": 64,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B64.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    }
+  ],
+  "schema_version": "capd_finals_v2_1",
+  "status": "passed",
+  "validated_jobs": 12
+}

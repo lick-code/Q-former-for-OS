@@ -1,0 +1,49 @@
+{
+  "candidate_count": 8,
+  "config_fingerprint": "af9aba16ff59faa2c8fec1f4adb12f43584d76ea6c43e1a4aaf597b1cd7282e0",
+  "experiment_contract": {
+    "B": 64,
+    "D": 64,
+    "H": 10,
+    "Hc": 32,
+    "K": 8,
+    "L": 32,
+    "Lres": 256,
+    "page_state_dim": 4,
+    "schema_version": "capd_finals_v2_1",
+    "validation_guard_accesses": 32,
+    "validation_holdout_fraction": 0.2,
+    "validation_strategy": "train_trace_decision_holdout"
+  },
+  "feature_names": [
+    "bias",
+    "rank_norm",
+    "recency_norm",
+    "residency_norm",
+    "frequency_norm",
+    "recent_count_norm",
+    "recent_write_norm",
+    "dirty"
+  ],
+  "history_length": 10,
+  "label_lookahead": 32,
+  "lookahead": 256,
+  "policy": "kleio_lite",
+  "schema_version": "capd_finals_v2_1",
+  "training": {
+    "dram_capacity": 64,
+    "sample_count": 6344,
+    "train_trace": "/home/likc/Q-former-for-OS/dataset/jsonl/finals_v2_decision_holdout/smoke_workspace/traces/train.csv"
+  },
+  "weights": [
+    -0.0013495019289262822,
+    0.0005970032270582819,
+    0.007484980306140398,
+    -0.0012746921935716234,
+    0.011134820133370197,
+    0.0,
+    0.0,
+    -1.961800710596849e-05
+  ],
+  "workload": "synthetic_smoke"
+}

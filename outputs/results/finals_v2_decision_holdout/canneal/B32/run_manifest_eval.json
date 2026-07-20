@@ -1,0 +1,19 @@
+{
+  "commands": [
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/canneal/B32/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/canneal/B32/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/canneal/B32/qmap_best.pth",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/canneal/B32/lru.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json --policy random --json_output outputs/results/finals_v2_decision_holdout/canneal/B32/random.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/canneal/B32/lfu.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/canneal/B32/clock.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/canneal/B32/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/canneal/baselines/kleio_lite.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/canneal/B32/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/canneal/baselines/patterns_lite.json"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B32.json",
+  "config_fingerprint": "addc2ac058e04cf3c0cec5f2d2cd3792ebe924a9417f2200525b35571133d864",
+  "dry_run": false,
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "include_baselines": true,
+  "schema_version": "capd_finals_v2_1",
+  "stage": "eval",
+  "validation_strategy": "train_trace_decision_holdout"
+}

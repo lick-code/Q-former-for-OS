@@ -1,0 +1,466 @@
+{
+  "audit_stage": "complete",
+  "errors": [],
+  "expected_jobs": 12,
+  "jobs": [
+    {
+      "B": 8,
+      "config": "configs/finals/resolved_v2_1/canneal_B8.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "lfu": {
+          "hit_rate": 0.99895,
+          "weighted_access_cost": 100527.0
+        },
+        "lru": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.99899,
+          "weighted_access_cost": 100483.0
+        },
+        "qmap": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "random": {
+          "hit_rate": 0.99892,
+          "weighted_access_cost": 100560.0
+        }
+      },
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 16,
+      "config": "configs/finals/resolved_v2_1/canneal_B16.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "lfu": {
+          "hit_rate": 0.99895,
+          "weighted_access_cost": 100527.0
+        },
+        "lru": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.99899,
+          "weighted_access_cost": 100483.0
+        },
+        "qmap": {
+          "hit_rate": 0.99905,
+          "weighted_access_cost": 100417.0
+        },
+        "random": {
+          "hit_rate": 0.99892,
+          "weighted_access_cost": 100560.0
+        }
+      },
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 32,
+      "config": "configs/finals/resolved_v2_1/canneal_B32.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "lfu": {
+          "hit_rate": 0.99895,
+          "weighted_access_cost": 100527.0
+        },
+        "lru": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.99899,
+          "weighted_access_cost": 100483.0
+        },
+        "qmap": {
+          "hit_rate": 0.99904,
+          "weighted_access_cost": 100428.0
+        },
+        "random": {
+          "hit_rate": 0.99892,
+          "weighted_access_cost": 100560.0
+        }
+      },
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 64,
+      "config": "configs/finals/resolved_v2_1/canneal_B64.json",
+      "decision_holdout_fingerprint": "bf57b6ef45fe567426601c2beeb31f06c8b0bda5c12af170b727bcd77f2b30e9",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "lfu": {
+          "hit_rate": 0.99895,
+          "weighted_access_cost": 100527.0
+        },
+        "lru": {
+          "hit_rate": 0.99902,
+          "weighted_access_cost": 100450.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.99899,
+          "weighted_access_cost": 100483.0
+        },
+        "qmap": {
+          "hit_rate": 0.99904,
+          "weighted_access_cost": 100428.0
+        },
+        "random": {
+          "hit_rate": 0.99892,
+          "weighted_access_cost": 100560.0
+        }
+      },
+      "train_samples": 963,
+      "valid_samples": 242,
+      "workload": "canneal"
+    },
+    {
+      "B": 8,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B8.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "results": {
+        "clock": {
+          "hit_rate": 0.996575,
+          "weighted_access_cost": 207003.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.997055,
+          "weighted_access_cost": 205929.0
+        },
+        "lfu": {
+          "hit_rate": 0.986325,
+          "weighted_access_cost": 230951.0
+        },
+        "lru": {
+          "hit_rate": 0.997215,
+          "weighted_access_cost": 205571.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.9971,
+          "weighted_access_cost": 205824.0
+        },
+        "qmap": {
+          "hit_rate": 0.997065,
+          "weighted_access_cost": 205889.0
+        },
+        "random": {
+          "hit_rate": 0.995265,
+          "weighted_access_cost": 210023.0
+        }
+      },
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 16,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B16.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "results": {
+        "clock": {
+          "hit_rate": 0.996575,
+          "weighted_access_cost": 207003.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.997055,
+          "weighted_access_cost": 205929.0
+        },
+        "lfu": {
+          "hit_rate": 0.986325,
+          "weighted_access_cost": 230951.0
+        },
+        "lru": {
+          "hit_rate": 0.997215,
+          "weighted_access_cost": 205571.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.9971,
+          "weighted_access_cost": 205824.0
+        },
+        "qmap": {
+          "hit_rate": 0.99695,
+          "weighted_access_cost": 206136.0
+        },
+        "random": {
+          "hit_rate": 0.995265,
+          "weighted_access_cost": 210023.0
+        }
+      },
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 32,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B32.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "results": {
+        "clock": {
+          "hit_rate": 0.996575,
+          "weighted_access_cost": 207003.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.997055,
+          "weighted_access_cost": 205929.0
+        },
+        "lfu": {
+          "hit_rate": 0.986325,
+          "weighted_access_cost": 230951.0
+        },
+        "lru": {
+          "hit_rate": 0.997215,
+          "weighted_access_cost": 205571.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.9971,
+          "weighted_access_cost": 205824.0
+        },
+        "qmap": {
+          "hit_rate": 0.99701,
+          "weighted_access_cost": 206004.0
+        },
+        "random": {
+          "hit_rate": 0.995265,
+          "weighted_access_cost": 210023.0
+        }
+      },
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 64,
+      "config": "configs/finals/resolved_v2_1/streamcluster_pressure_B64.json",
+      "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+      "results": {
+        "clock": {
+          "hit_rate": 0.996575,
+          "weighted_access_cost": 207003.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.997055,
+          "weighted_access_cost": 205929.0
+        },
+        "lfu": {
+          "hit_rate": 0.986325,
+          "weighted_access_cost": 230951.0
+        },
+        "lru": {
+          "hit_rate": 0.997215,
+          "weighted_access_cost": 205571.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.9971,
+          "weighted_access_cost": 205824.0
+        },
+        "qmap": {
+          "hit_rate": 0.996965,
+          "weighted_access_cost": 206103.0
+        },
+        "random": {
+          "hit_rate": 0.995265,
+          "weighted_access_cost": 210023.0
+        }
+      },
+      "train_samples": 137,
+      "valid_samples": 35,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 8,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B8.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99948,
+          "weighted_access_cost": 201104.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "lfu": {
+          "hit_rate": 0.999265,
+          "weighted_access_cost": 201835.0
+        },
+        "lru": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "qmap": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "random": {
+          "hit_rate": 0.999475,
+          "weighted_access_cost": 201109.0
+        }
+      },
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    },
+    {
+      "B": 16,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B16.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99948,
+          "weighted_access_cost": 201104.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "lfu": {
+          "hit_rate": 0.999265,
+          "weighted_access_cost": 201835.0
+        },
+        "lru": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "qmap": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "random": {
+          "hit_rate": 0.999475,
+          "weighted_access_cost": 201109.0
+        }
+      },
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    },
+    {
+      "B": 32,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B32.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99948,
+          "weighted_access_cost": 201104.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "lfu": {
+          "hit_rate": 0.999265,
+          "weighted_access_cost": 201835.0
+        },
+        "lru": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "qmap": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "random": {
+          "hit_rate": 0.999475,
+          "weighted_access_cost": 201109.0
+        }
+      },
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    },
+    {
+      "B": 64,
+      "config": "configs/finals/resolved_v2_1/dedup_pressure_B64.json",
+      "decision_holdout_fingerprint": "0f7c02e664fea6723cde1c2b584d6c33d111d3e6bd57b9ba9e0cc1eddf9bb45d",
+      "results": {
+        "clock": {
+          "hit_rate": 0.99948,
+          "weighted_access_cost": 201104.0
+        },
+        "kleio_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "lfu": {
+          "hit_rate": 0.999265,
+          "weighted_access_cost": 201835.0
+        },
+        "lru": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "patterns_lite": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "qmap": {
+          "hit_rate": 0.999485,
+          "weighted_access_cost": 201087.0
+        },
+        "random": {
+          "hit_rate": 0.999475,
+          "weighted_access_cost": 201109.0
+        }
+      },
+      "train_samples": 225,
+      "valid_samples": 57,
+      "workload": "dedup_pressure"
+    }
+  ],
+  "schema_version": "capd_finals_v2_1",
+  "status": "passed",
+  "validated_jobs": 12
+}

@@ -1,0 +1,100 @@
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B8/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B8/qmap_best.pth
+Policy: qmap
+Total accesses: 200000
+Hits: 199413
+Misses: 587
+Hit rate: 99.71%
+Migrations: 523
+NVM reads: 575
+NVM writes: 12
+Weighted access cost: 205889.00
+Policy decisions: 523
+Total decision time: 1.831555s
+Avg decision time: 3.502018 ms
+Candidate filter decisions: 523
+Candidate B_t range: 8..8
+Retained K_t range: 8..8
+Avg candidate filter time: 0.069553 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/lru.json
+Policy: lru
+Total accesses: 200000
+Hits: 199443
+Misses: 557
+Hit rate: 99.72%
+Migrations: 493
+NVM reads: 543
+NVM writes: 14
+Weighted access cost: 205571.00
+Policy decisions: 493
+Total decision time: 0.000176s
+Avg decision time: 0.000358 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy random --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/random.json
+Policy: random
+Total accesses: 200000
+Hits: 199053
+Misses: 947
+Hit rate: 99.53%
+Migrations: 883
+NVM reads: 906
+NVM writes: 41
+Weighted access cost: 210023.00
+Policy decisions: 883
+Total decision time: 0.001267s
+Avg decision time: 0.001435 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/lfu.json
+Policy: lfu
+Total accesses: 200000
+Hits: 197265
+Misses: 2735
+Hit rate: 98.63%
+Migrations: 2671
+NVM reads: 2484
+NVM writes: 251
+Weighted access cost: 230951.00
+Policy decisions: 2671
+Total decision time: 0.056441s
+Avg decision time: 0.021131 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/clock.json
+Policy: clock
+Total accesses: 200000
+Hits: 199315
+Misses: 685
+Hit rate: 99.66%
+Migrations: 621
+NVM reads: 667
+NVM writes: 18
+Weighted access cost: 207003.00
+Policy decisions: 621
+Total decision time: 0.001162s
+Avg decision time: 0.001871 ms
+$ python -m qmap.learned_baselines --policy kleio_lite --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --model_output outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/kleio_lite.json
+[done] policy=kleio_lite samples=1384 model=outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/kleio_lite.json
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/kleio_lite.json
+Policy: kleio_lite
+Total accesses: 200000
+Hits: 199411
+Misses: 589
+Hit rate: 99.71%
+Migrations: 525
+NVM reads: 574
+NVM writes: 15
+Weighted access cost: 205929.00
+Policy decisions: 525
+Total decision time: 0.034077s
+Avg decision time: 0.064909 ms
+$ python -m qmap.learned_baselines --policy patterns_lite --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --model_output outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/patterns_lite.json
+[done] policy=patterns_lite samples=1384 model=outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/patterns_lite.json
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/patterns_lite.json
+Policy: patterns_lite
+Total accesses: 200000
+Hits: 199420
+Misses: 580
+Hit rate: 99.71%
+Migrations: 516
+NVM reads: 566
+NVM writes: 14
+Weighted access cost: 205824.00
+Policy decisions: 516
+Total decision time: 0.077667s
+Avg decision time: 0.150518 ms
+[done] summary=outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B8/summary.json

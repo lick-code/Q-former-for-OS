@@ -1,0 +1,13 @@
+{
+  "commands": [
+    "python -m qmap.finals_generator --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B16.json --selector-output dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/selector_params.json --validation-samples-output dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/selector_validation_samples.jsonl --train-output dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/train.jsonl --valid-output dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/valid.jsonl --summary-output dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/generator_summary.json"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B16.json",
+  "config_fingerprint": "66396fd6d80cd611f47779964fb92cee1e88a4b326cf32c973b7f9d7b41ab42f",
+  "dry_run": false,
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "include_baselines": false,
+  "schema_version": "capd_finals_v2_1",
+  "stage": "generate",
+  "validation_strategy": "train_trace_decision_holdout"
+}

@@ -1,0 +1,13 @@
+{
+  "commands": [
+    "python -m qmap.finals_generator --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B8.json --selector-output dataset/jsonl/finals_v2_decision_holdout/canneal/B8/selector_params.json --validation-samples-output dataset/jsonl/finals_v2_decision_holdout/canneal/B8/selector_validation_samples.jsonl --train-output dataset/jsonl/finals_v2_decision_holdout/canneal/B8/train.jsonl --valid-output dataset/jsonl/finals_v2_decision_holdout/canneal/B8/valid.jsonl --summary-output dataset/jsonl/finals_v2_decision_holdout/canneal/B8/generator_summary.json"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B8.json",
+  "config_fingerprint": "2b838e590de85e4a64118984a8c23d7bc93995ec8b03443245b3e55c401b7c70",
+  "dry_run": false,
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "include_baselines": false,
+  "schema_version": "capd_finals_v2_1",
+  "stage": "generate",
+  "validation_strategy": "train_trace_decision_holdout"
+}

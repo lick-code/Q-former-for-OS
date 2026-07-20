@@ -1,0 +1,19 @@
+{
+  "commands": [
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B32/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/dedup_pressure/B32/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/B32/qmap_best.pth",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B32/lru.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --policy random --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B32/random.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B32/lfu.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B32/clock.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B32/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/baselines/kleio_lite.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/dedup_pressure/B32/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/dedup_pressure/baselines/patterns_lite.json"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/dedup_pressure_B32.json",
+  "config_fingerprint": "9070914bb4db71ae9979822d7a8d0cc86ae56ef90079dfde78cb4050239c3587",
+  "dry_run": false,
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "include_baselines": true,
+  "schema_version": "capd_finals_v2_1",
+  "stage": "eval",
+  "validation_strategy": "train_trace_decision_holdout"
+}

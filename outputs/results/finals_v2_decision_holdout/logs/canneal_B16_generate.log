@@ -1,0 +1,5 @@
+$ python -m qmap.finals_generator --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B16.json --selector-output dataset/jsonl/finals_v2_decision_holdout/canneal/B16/selector_params.json --validation-samples-output dataset/jsonl/finals_v2_decision_holdout/canneal/B16/selector_validation_samples.jsonl --train-output dataset/jsonl/finals_v2_decision_holdout/canneal/B16/train.jsonl --valid-output dataset/jsonl/finals_v2_decision_holdout/canneal/B16/valid.jsonl --summary-output dataset/jsonl/finals_v2_decision_holdout/canneal/B16/generator_summary.json
+[done] selector=dataset/jsonl/finals_v2_decision_holdout/canneal/B16/selector_params.json
+[done] train_jsonl=dataset/jsonl/finals_v2_decision_holdout/canneal/B16/train.jsonl
+[done] valid_jsonl=dataset/jsonl/finals_v2_decision_holdout/canneal/B16/valid.jsonl
+[done] summary=dataset/jsonl/finals_v2_decision_holdout/canneal/B16/generator_summary.json

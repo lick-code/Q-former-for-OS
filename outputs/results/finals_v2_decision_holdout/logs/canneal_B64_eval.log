@@ -1,0 +1,96 @@
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B64.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/canneal/B64/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/canneal/B64/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/canneal/B64/qmap_best.pth
+Policy: qmap
+Total accesses: 100000
+Hits: 99904
+Misses: 96
+Hit rate: 99.90%
+Migrations: 32
+NVM reads: 94
+NVM writes: 2
+Weighted access cost: 100428.00
+Policy decisions: 32
+Total decision time: 0.649659s
+Avg decision time: 20.301835 ms
+Candidate filter decisions: 32
+Candidate B_t range: 64..64
+Retained K_t range: 8..8
+Avg candidate filter time: 0.378875 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B64.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/canneal/B64/lru.json
+Policy: lru
+Total accesses: 100000
+Hits: 99902
+Misses: 98
+Hit rate: 99.90%
+Migrations: 34
+NVM reads: 96
+NVM writes: 2
+Weighted access cost: 100450.00
+Policy decisions: 34
+Total decision time: 0.000012s
+Avg decision time: 0.000358 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B64.json --policy random --json_output outputs/results/finals_v2_decision_holdout/canneal/B64/random.json
+Policy: random
+Total accesses: 100000
+Hits: 99892
+Misses: 108
+Hit rate: 99.89%
+Migrations: 44
+NVM reads: 106
+NVM writes: 2
+Weighted access cost: 100560.00
+Policy decisions: 44
+Total decision time: 0.000070s
+Avg decision time: 0.001597 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B64.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/canneal/B64/lfu.json
+Policy: lfu
+Total accesses: 100000
+Hits: 99895
+Misses: 105
+Hit rate: 99.89%
+Migrations: 41
+NVM reads: 103
+NVM writes: 2
+Weighted access cost: 100527.00
+Policy decisions: 41
+Total decision time: 0.000914s
+Avg decision time: 0.022281 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B64.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/canneal/B64/clock.json
+Policy: clock
+Total accesses: 100000
+Hits: 99902
+Misses: 98
+Hit rate: 99.90%
+Migrations: 34
+NVM reads: 96
+NVM writes: 2
+Weighted access cost: 100450.00
+Policy decisions: 34
+Total decision time: 0.000068s
+Avg decision time: 0.001987 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B64.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/canneal/B64/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/canneal/baselines/kleio_lite.json
+Policy: kleio_lite
+Total accesses: 100000
+Hits: 99902
+Misses: 98
+Hit rate: 99.90%
+Migrations: 34
+NVM reads: 96
+NVM writes: 2
+Weighted access cost: 100450.00
+Policy decisions: 34
+Total decision time: 0.002333s
+Avg decision time: 0.068611 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B64.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/canneal/B64/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/canneal/baselines/patterns_lite.json
+Policy: patterns_lite
+Total accesses: 100000
+Hits: 99899
+Misses: 101
+Hit rate: 99.90%
+Migrations: 37
+NVM reads: 99
+NVM writes: 2
+Weighted access cost: 100483.00
+Policy decisions: 37
+Total decision time: 0.003677s
+Avg decision time: 0.099383 ms
+[done] summary=outputs/results/finals_v2_decision_holdout/canneal/B64/summary.json

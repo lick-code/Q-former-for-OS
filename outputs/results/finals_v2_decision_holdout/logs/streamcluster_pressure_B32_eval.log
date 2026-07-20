@@ -1,0 +1,96 @@
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B32/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B32/qmap_best.pth
+Policy: qmap
+Total accesses: 200000
+Hits: 199402
+Misses: 598
+Hit rate: 99.70%
+Migrations: 534
+NVM reads: 587
+NVM writes: 11
+Weighted access cost: 206004.00
+Policy decisions: 534
+Total decision time: 1.942154s
+Avg decision time: 3.636993 ms
+Candidate filter decisions: 534
+Candidate B_t range: 32..32
+Retained K_t range: 8..8
+Avg candidate filter time: 0.199905 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/lru.json
+Policy: lru
+Total accesses: 200000
+Hits: 199443
+Misses: 557
+Hit rate: 99.72%
+Migrations: 493
+NVM reads: 543
+NVM writes: 14
+Weighted access cost: 205571.00
+Policy decisions: 493
+Total decision time: 0.000160s
+Avg decision time: 0.000324 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy random --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/random.json
+Policy: random
+Total accesses: 200000
+Hits: 199053
+Misses: 947
+Hit rate: 99.53%
+Migrations: 883
+NVM reads: 906
+NVM writes: 41
+Weighted access cost: 210023.00
+Policy decisions: 883
+Total decision time: 0.001257s
+Avg decision time: 0.001423 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/lfu.json
+Policy: lfu
+Total accesses: 200000
+Hits: 197265
+Misses: 2735
+Hit rate: 98.63%
+Migrations: 2671
+NVM reads: 2484
+NVM writes: 251
+Weighted access cost: 230951.00
+Policy decisions: 2671
+Total decision time: 0.056889s
+Avg decision time: 0.021299 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/clock.json
+Policy: clock
+Total accesses: 200000
+Hits: 199315
+Misses: 685
+Hit rate: 99.66%
+Migrations: 621
+NVM reads: 667
+NVM writes: 18
+Weighted access cost: 207003.00
+Policy decisions: 621
+Total decision time: 0.001070s
+Avg decision time: 0.001723 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/kleio_lite.json
+Policy: kleio_lite
+Total accesses: 200000
+Hits: 199411
+Misses: 589
+Hit rate: 99.71%
+Migrations: 525
+NVM reads: 574
+NVM writes: 15
+Weighted access cost: 205929.00
+Policy decisions: 525
+Total decision time: 0.033671s
+Avg decision time: 0.064136 ms
+$ python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/patterns_lite.json
+Policy: patterns_lite
+Total accesses: 200000
+Hits: 199420
+Misses: 580
+Hit rate: 99.71%
+Migrations: 516
+NVM reads: 566
+NVM writes: 14
+Weighted access cost: 205824.00
+Policy decisions: 516
+Total decision time: 0.074626s
+Avg decision time: 0.144625 ms
+[done] summary=outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/summary.json

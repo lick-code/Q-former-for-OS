@@ -1,0 +1,19 @@
+{
+  "best_epoch": 10,
+  "best_validation_loss": -0.011641466058790684,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "5662905eca40db7277b74f5bd90e95e422104fea896d6ec3abbe106249b2702d",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B16/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "cc5406afa21a1b692080582de06573ac53abce8a4b39c167ead10dfb56e770bd",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B16/qmap_last.pth"
+    }
+  },
+  "command": "/home/likc/Q-former-for-OS/qmap/qmap_train.py --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B16.json --selector_params dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/selector_params.json --train_data dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/train.jsonl --valid_data dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B16/valid.jsonl --output_dir outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B16",
+  "config_fingerprint": "66396fd6d80cd611f47779964fb92cee1e88a4b326cf32c973b7f9d7b41ab42f",
+  "decision_holdout_fingerprint": "77e36339679c392aaec5dc9e05ac87a0026f845e3bb0d36b589fde88508f5daf",
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "schema_version": "capd_finals_v2_1"
+}

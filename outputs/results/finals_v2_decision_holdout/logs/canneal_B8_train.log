@@ -1,0 +1,19 @@
+$ python -m qmap.qmap_train --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/canneal_B8.json --selector_params dataset/jsonl/finals_v2_decision_holdout/canneal/B8/selector_params.json --train_data dataset/jsonl/finals_v2_decision_holdout/canneal/B8/train.jsonl --valid_data dataset/jsonl/finals_v2_decision_holdout/canneal/B8/valid.jsonl --output_dir outputs/checkpoints/finals_v2_decision_holdout/canneal/B8
+QMAP training: train=dataset/jsonl/finals_v2_decision_holdout/canneal/B8/train.jsonl valid=dataset/jsonl/finals_v2_decision_holdout/canneal/B8/valid.jsonl samples=963/242 device=cuda
+epoch=1/10 iter=1 loss=-0.207333
+epoch=1/10 train_loss=-0.099801 valid_loss=-0.183037
+epoch=2/10 train_loss=-0.101628 valid_loss=-0.187132
+epoch=3/10 train_loss=-0.104351 valid_loss=-0.192257
+epoch=4/10 iter=100 loss=-0.125254
+epoch=4/10 train_loss=-0.106955 valid_loss=-0.195970
+epoch=5/10 train_loss=-0.108653 valid_loss=-0.198258
+epoch=6/10 train_loss=-0.118095 valid_loss=-0.199664
+epoch=7/10 iter=200 loss=-0.154053
+epoch=7/10 train_loss=-0.110500 valid_loss=-0.200644
+epoch=8/10 train_loss=-0.111003 valid_loss=-0.201300
+epoch=9/10 train_loss=-0.111350 valid_loss=-0.201728
+epoch=10/10 iter=300 loss=-0.106041
+epoch=10/10 train_loss=-0.111609 valid_loss=-0.202092
+Training finished. best=outputs/checkpoints/finals_v2_decision_holdout/canneal/B8/qmap_best.pth last=outputs/checkpoints/finals_v2_decision_holdout/canneal/B8/qmap_last.pth
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "

@@ -1,0 +1,19 @@
+{
+  "commands": [
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy qmap --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/qmap.json --selector_params dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B32/selector_params.json --checkpoint outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B32/qmap_best.pth",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy lru --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/lru.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy random --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/random.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy lfu --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/lfu.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy clock --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/clock.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy kleio_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/kleio_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/kleio_lite.json",
+    "python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json --policy patterns_lite --json_output outputs/results/finals_v2_decision_holdout/streamcluster_pressure/B32/patterns_lite.json --learned_model outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/baselines/patterns_lite.json"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B32.json",
+  "config_fingerprint": "aa7631124744f1141faa7b99d8368e0a44ae24899b7c59ac3e5b81b3718eaac8",
+  "dry_run": false,
+  "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+  "include_baselines": true,
+  "schema_version": "capd_finals_v2_1",
+  "stage": "eval",
+  "validation_strategy": "train_trace_decision_holdout"
+}

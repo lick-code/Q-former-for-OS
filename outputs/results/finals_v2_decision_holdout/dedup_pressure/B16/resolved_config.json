@@ -1,0 +1,100 @@
+{
+  "candidate": {
+    "pool_size_B": 16,
+    "retained_K": 8,
+    "selector_history_Hc": 256
+  },
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "data": {
+    "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_test.csv",
+    "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_train.csv",
+    "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_valid.csv"
+  },
+  "evaluation": {
+    "random_seed": 0
+  },
+  "features": {
+    "page_state_dim": 4,
+    "residency_scale_Lres": 256,
+    "selector_clip_quantile": 0.99
+  },
+  "history": {
+    "transformer_H": 10
+  },
+  "labels": {
+    "future_lookahead_L": 256,
+    "lambda_d": 1.0,
+    "lambda_q": 1.0,
+    "lambda_w": 4.0
+  },
+  "memory": {
+    "dram_capacity_pages": 64,
+    "nvm_capacity_pages": null
+  },
+  "outputs": {
+    "checkpoint_root": "outputs/checkpoints/finals_v2_decision_holdout",
+    "jsonl_root": "dataset/jsonl/finals_v2_decision_holdout",
+    "result_root": "outputs/results/finals_v2_decision_holdout"
+  },
+  "run": {
+    "base_config_fingerprint": "943f141bd329d27ae535c5da748858151d2196a15410dd86dee8853a69297395",
+    "git_commit": "3cb5ce8c838cf8a5ded69287f1c72768a3b39d69",
+    "project_root": "/home/likc/Q-former-for-OS",
+    "resolved_config_fingerprint": "19b0a5354256731c9efb489c6d260b063af81a88ade24a2fdd39deb7ac393612",
+    "workload": "dedup_pressure"
+  },
+  "run_profile": "official",
+  "schema_version": "capd_finals_v2_1",
+  "selector": {
+    "behavior_policy": "lru",
+    "epsilon_y": 1e-08,
+    "grid_step": 0.1
+  },
+  "sweep": {
+    "pool_sizes_B": [
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "trace": {
+    "page_shift": 12
+  },
+  "training": {
+    "batch_size": 32,
+    "epochs": 10,
+    "learning_rate": 0.0001,
+    "seed": 3136859
+  },
+  "validation": {
+    "external_valid_trace_role": "diagnostic_only",
+    "guard_accesses": 256,
+    "holdout_fraction": 0.2,
+    "rounding": "ceil",
+    "strategy": "train_trace_decision_holdout"
+  },
+  "workloads": {
+    "canneal": {
+      "test_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv",
+      "train_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv"
+    },
+    "dedup_pressure": {
+      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_test.csv",
+      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_valid.csv"
+    },
+    "streamcluster_pressure": {
+      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
+      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv"
+    }
+  }
+}

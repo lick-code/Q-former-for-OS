@@ -1,0 +1,16 @@
+$ python -m qmap.qmap_train --config /home/likc/Q-former-for-OS/configs/finals/resolved_v2_1/streamcluster_pressure_B8.json --selector_params dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B8/selector_params.json --train_data dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B8/train.jsonl --valid_data dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B8/valid.jsonl --output_dir outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B8
+QMAP training: train=dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B8/train.jsonl valid=dataset/jsonl/finals_v2_decision_holdout/streamcluster_pressure/B8/valid.jsonl samples=137/35 device=cuda
+epoch=1/10 iter=1 loss=-0.093227
+epoch=1/10 train_loss=-0.041746 valid_loss=-0.011626
+epoch=2/10 train_loss=-0.053613 valid_loss=-0.011625
+epoch=3/10 train_loss=-0.041778 valid_loss=-0.011621
+epoch=4/10 train_loss=-0.053528 valid_loss=-0.011617
+epoch=5/10 train_loss=-0.041792 valid_loss=-0.011617
+epoch=6/10 train_loss=-0.041812 valid_loss=-0.011618
+epoch=7/10 train_loss=-0.041823 valid_loss=-0.011615
+epoch=8/10 train_loss=-0.053707 valid_loss=-0.011613
+epoch=9/10 train_loss=-0.053816 valid_loss=-0.011614
+epoch=10/10 train_loss=-0.053830 valid_loss=-0.011612
+Training finished. best=outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B8/qmap_best.pth last=outputs/checkpoints/finals_v2_decision_holdout/streamcluster_pressure/B8/qmap_last.pth
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
