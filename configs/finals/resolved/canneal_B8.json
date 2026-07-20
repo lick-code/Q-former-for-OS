@@ -1,0 +1,93 @@
+{
+  "candidate": {
+    "pool_size_B": 8,
+    "retained_K": 8,
+    "selector_history_Hc": 256
+  },
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "data": {
+    "test_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv",
+    "train_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_train.csv",
+    "valid_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv"
+  },
+  "evaluation": {
+    "random_seed": 0
+  },
+  "features": {
+    "page_state_dim": 4,
+    "residency_scale_Lres": 256,
+    "selector_clip_quantile": 0.99
+  },
+  "history": {
+    "transformer_H": 10
+  },
+  "labels": {
+    "future_lookahead_L": 256,
+    "lambda_d": 1.0,
+    "lambda_q": 1.0,
+    "lambda_w": 4.0
+  },
+  "memory": {
+    "dram_capacity_pages": 64,
+    "nvm_capacity_pages": null
+  },
+  "outputs": {
+    "checkpoint_root": "outputs/checkpoints/finals_v2",
+    "jsonl_root": "dataset/jsonl/finals_v2",
+    "result_root": "outputs/results/finals_v2"
+  },
+  "run": {
+    "base_config_fingerprint": "995b91803ad48328dae53923f938fbda5fca3fbe968235d492a67fcde372f8c2",
+    "git_commit": "66f097815ed50c0e7170842d0a2f07a90c7cfc2a",
+    "project_root": "/home/likc/Q-former-for-OS",
+    "resolved_config_fingerprint": "47ced022e7cd215a05c103c72fd898301fc0b824de1d2543144a2004794e271c",
+    "workload": "canneal"
+  },
+  "run_profile": "official",
+  "schema_version": "capd_finals_v2",
+  "selector": {
+    "behavior_policy": "lru",
+    "epsilon_y": 1e-08,
+    "grid_step": 0.1
+  },
+  "sweep": {
+    "pool_sizes_B": [
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "trace": {
+    "page_shift": 12
+  },
+  "training": {
+    "batch_size": 32,
+    "epochs": 10,
+    "learning_rate": 0.0001,
+    "seed": 3136859
+  },
+  "workloads": {
+    "canneal": {
+      "test_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_test.csv",
+      "train_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite/1m/parsec_canneal_valid.csv"
+    },
+    "dedup_pressure": {
+      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_test.csv",
+      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_dedup_valid.csv"
+    },
+    "streamcluster_pressure": {
+      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
+      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv"
+    }
+  }
+}

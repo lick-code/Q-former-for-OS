@@ -1,0 +1,21 @@
+{
+  "commands": [
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.finals_generator --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --selector-output dataset/jsonl/finals_v2/canneal/B64/selector_params.json --validation-samples-output dataset/jsonl/finals_v2/canneal/B64/selector_validation_samples.jsonl --train-output dataset/jsonl/finals_v2/canneal/B64/train.jsonl --valid-output dataset/jsonl/finals_v2/canneal/B64/valid.jsonl --summary-output dataset/jsonl/finals_v2/canneal/B64/generator_summary.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_train --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --selector_params dataset/jsonl/finals_v2/canneal/B64/selector_params.json --train_data dataset/jsonl/finals_v2/canneal/B64/train.jsonl --valid_data dataset/jsonl/finals_v2/canneal/B64/valid.jsonl --output_dir outputs/checkpoints/finals_v2/canneal/B64 --device cuda",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --policy qmap --json_output outputs/results/finals_v2/canneal/B64/qmap.json --selector_params dataset/jsonl/finals_v2/canneal/B64/selector_params.json --checkpoint outputs/checkpoints/finals_v2/canneal/B64/qmap_best.pth --device cuda",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --policy lru --json_output outputs/results/finals_v2/canneal/B64/lru.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --policy random --json_output outputs/results/finals_v2/canneal/B64/random.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --policy lfu --json_output outputs/results/finals_v2/canneal/B64/lfu.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --policy clock --json_output outputs/results/finals_v2/canneal/B64/clock.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.learned_baselines --policy kleio_lite --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --model_output outputs/checkpoints/finals_v2/canneal/baselines/kleio_lite.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --policy kleio_lite --json_output outputs/results/finals_v2/canneal/B64/kleio_lite.json --learned_model outputs/checkpoints/finals_v2/canneal/baselines/kleio_lite.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.learned_baselines --policy patterns_lite --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --model_output outputs/checkpoints/finals_v2/canneal/baselines/patterns_lite.json",
+    "/home/likc/.conda/envs/capd/bin/python -m qmap.qmap_eval --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --policy patterns_lite --json_output outputs/results/finals_v2/canneal/B64/patterns_lite.json --learned_model outputs/checkpoints/finals_v2/canneal/baselines/patterns_lite.json"
+  ],
+  "config": "/home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json",
+  "config_fingerprint": "955e735ee6b329e2488d8c55593918408ea55e7b6b4551f2283b9e70c9b9755d",
+  "git_commit": "66f097815ed50c0e7170842d0a2f07a90c7cfc2a",
+  "include_baselines": true,
+  "schema_version": "capd_finals_v2",
+  "stage": "all"
+}

@@ -1,0 +1,28 @@
+$ /home/likc/.conda/envs/capd/bin/python -m qmap.finals_generator --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --selector-output dataset/jsonl/finals_v2/canneal/B64/selector_params.json --validation-samples-output dataset/jsonl/finals_v2/canneal/B64/selector_validation_samples.jsonl --train-output dataset/jsonl/finals_v2/canneal/B64/train.jsonl --valid-output dataset/jsonl/finals_v2/canneal/B64/valid.jsonl --summary-output dataset/jsonl/finals_v2/canneal/B64/generator_summary.json
+[done] selector=dataset/jsonl/finals_v2/canneal/B64/selector_params.json
+[done] train_jsonl=dataset/jsonl/finals_v2/canneal/B64/train.jsonl
+[done] valid_jsonl=dataset/jsonl/finals_v2/canneal/B64/valid.jsonl
+[done] summary=dataset/jsonl/finals_v2/canneal/B64/generator_summary.json
+$ /home/likc/.conda/envs/capd/bin/python -m qmap.qmap_train --config /home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json --selector_params dataset/jsonl/finals_v2/canneal/B64/selector_params.json --train_data dataset/jsonl/finals_v2/canneal/B64/train.jsonl --valid_data dataset/jsonl/finals_v2/canneal/B64/valid.jsonl --output_dir outputs/checkpoints/finals_v2/canneal/B64 --device cuda
+Traceback (most recent call last):
+  File "/home/likc/.conda/envs/capd/lib/python3.7/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/home/likc/.conda/envs/capd/lib/python3.7/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/likc/Q-former-for-OS/qmap/qmap_train.py", line 489, in <module>
+    main()
+  File "/home/likc/Q-former-for-OS/qmap/qmap_train.py", line 368, in main
+    if args.valid_data else None)
+  File "/home/likc/Q-former-for-OS/qmap/qmap_train.py", line 55, in __init__
+    jsonl_path))
+ValueError: No QMAP training samples found in dataset/jsonl/finals_v2/canneal/B64/valid.jsonl.
+Traceback (most recent call last):
+  File "scripts/run_finals_v2.py", line 198, in <module>
+    main()
+  File "scripts/run_finals_v2.py", line 191, in main
+    execute(command, dry_run=args.dry_run)
+  File "scripts/run_finals_v2.py", line 65, in execute
+    subprocess.check_call(command, cwd=PROJECT_ROOT)
+  File "/home/likc/.conda/envs/capd/lib/python3.7/subprocess.py", line 363, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['/home/likc/.conda/envs/capd/bin/python', '-m', 'qmap.qmap_train', '--config', '/home/likc/Q-former-for-OS/configs/finals/resolved/canneal_B64.json', '--selector_params', 'dataset/jsonl/finals_v2/canneal/B64/selector_params.json', '--train_data', 'dataset/jsonl/finals_v2/canneal/B64/train.jsonl', '--valid_data', 'dataset/jsonl/finals_v2/canneal/B64/valid.jsonl', '--output_dir', 'outputs/checkpoints/finals_v2/canneal/B64', '--device', 'cuda']' returned non-zero exit status 1.
