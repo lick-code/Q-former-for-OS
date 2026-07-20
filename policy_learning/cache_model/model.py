@@ -17,6 +17,7 @@
 
 import abc
 import logging
+import math
 import torch
 from torch import distributions as td
 from torch import nn
@@ -71,6 +72,34 @@ class QMAPFeatureModel(nn.Module):
     return self._qmap_feature_embedder(physical_addresses, pcs, rw_flags)
 
 
+class SinusoidalPositionEncoding(nn.Module):
+  """Fixed Vaswani-style position encoding for oldest-to-newest history."""
+
+  def __init__(self, hidden_dim, max_sequence_length=4096):
+    super(SinusoidalPositionEncoding, self).__init__()
+    if hidden_dim <= 0 or max_sequence_length <= 0:
+      raise ValueError("Position-encoding dimensions must be positive.")
+    positions = torch.arange(max_sequence_length, dtype=torch.float32).unsqueeze(1)
+    frequencies = torch.exp(
+        torch.arange(0, hidden_dim, 2, dtype=torch.float32) *
+        (-math.log(10000.0) / hidden_dim))
+    encoding = torch.zeros(max_sequence_length, hidden_dim, dtype=torch.float32)
+    encoding[:, 0::2] = torch.sin(positions * frequencies)
+    encoding[:, 1::2] = torch.cos(
+        positions * frequencies[:encoding[:, 1::2].shape[1]])
+    self.register_buffer("encoding", encoding.unsqueeze(0), persistent=True)
+
+  def forward(self, inputs):
+    if inputs.ndim != 3:
+      raise ValueError("Position encoding expects [batch, sequence, hidden].")
+    sequence_length = inputs.shape[1]
+    if sequence_length > self.encoding.shape[1]:
+      raise ValueError("Input sequence exceeds fixed position-encoding size.")
+    position = self.encoding[:, :sequence_length, :].to(
+        device=inputs.device, dtype=inputs.dtype)
+    return inputs + position
+
+
 class QFormer(nn.Module):
   """QMAP Q-Former：用 K 个可学习 Query 提取宏观访存模式。"""
 
@@ -89,7 +118,7 @@ class QFormer(nn.Module):
         embed_dim=hidden_dim, num_heads=num_heads, dropout=dropout)
     self._norm = nn.LayerNorm(hidden_dim)
 
-  def forward(self, encoded_accesses):
+  def forward(self, encoded_accesses, history_mask=None):
     """Runs cross-attention from learnable queries to encoded accesses.
 
     Args:
@@ -106,8 +135,12 @@ class QFormer(nn.Module):
     # nn.MultiheadAttention 默认使用 [sequence_length, batch_size, hidden_dim]。
     query_seq = queries.transpose(0, 1)
     key_value_seq = encoded_accesses.transpose(0, 1)
+    key_padding_mask = None
+    if history_mask is not None:
+      key_padding_mask = history_mask <= 0
     attended, _ = self._cross_attention(
-        query=query_seq, key=key_value_seq, value=key_value_seq)
+        query=query_seq, key=key_value_seq, value=key_value_seq,
+        key_padding_mask=key_padding_mask)
     attended = attended.transpose(0, 1)
     return self._norm(attended + queries)
 
@@ -126,7 +159,8 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
 
   def __init__(self, hidden_dim=18, num_queries=4, num_layers=1, num_heads=2,
                feedforward_dim=None, dropout=0.0, use_qformer=True,
-               pooling_strategy="mean"):
+               pooling_strategy="mean", position_encoding="none",
+               max_sequence_length=4096):
     """Constructs the QMAP macroscopic pattern extractor.
 
     Args:
@@ -145,11 +179,18 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
       raise ValueError("hidden_dim must be divisible by num_heads.")
     if pooling_strategy not in ("mean", "last", "none"):
       raise ValueError("pooling_strategy must be 'mean', 'last' or 'none'.")
+    if position_encoding not in ("sinusoidal", "none"):
+      raise ValueError("position_encoding must be sinusoidal or none.")
 
     if feedforward_dim is None:
       feedforward_dim = hidden_dim * 4
     self._use_qformer = use_qformer
     self._pooling_strategy = pooling_strategy
+    self._position_encoding_name = position_encoding
+    self._position_encoding = (
+        SinusoidalPositionEncoding(
+            hidden_dim, max_sequence_length=max_sequence_length)
+        if position_encoding == "sinusoidal" else None)
 
     encoder_layer = nn.TransformerEncoderLayer(
         d_model=hidden_dim,
@@ -168,7 +209,7 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
     else:
       self._qformer = None
 
-  def forward(self, access_features):
+  def forward(self, access_features, history_mask=None):
     """Extracts macroscopic access patterns.
 
     Args:
@@ -179,21 +220,50 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
       torch.FloatTensor: 编码后的访存序列或历史聚合结果。
     """
     sequence_length = access_features.shape[1]
+    if history_mask is not None:
+      if history_mask.shape != access_features.shape[:2]:
+        raise ValueError("history_mask must match [batch, sequence].")
+      history_mask = history_mask.to(access_features.device)
+    if self._position_encoding is not None:
+      access_features = self._position_encoding(access_features)
     causal_mask = self._causal_mask(
         sequence_length, device=access_features.device)
 
     # TransformerEncoder 默认接收 [sequence_length, batch_size, hidden_dim]。
     sequence_first = access_features.transpose(0, 1)
-    encoded = self._transformer_encoder(sequence_first, mask=causal_mask)
+    encoded = self._transformer_encoder(
+        sequence_first, mask=causal_mask,
+        src_key_padding_mask=(history_mask <= 0
+                              if history_mask is not None else None))
     encoded = encoded.transpose(0, 1)
+    if history_mask is not None:
+      # Left-padding queries can be fully masked by causal + key padding masks
+      # in some PyTorch versions. Replace any resulting padded-token NaNs and
+      # make the no-contribution contract explicit before later attention.
+      encoded = encoded.masked_fill(
+          (history_mask <= 0).unsqueeze(-1), 0.0)
     if self._use_qformer:
-      return self._qformer(encoded)
+      return self._qformer(encoded, history_mask=history_mask)
     if self._pooling_strategy == "none":
       return encoded
     if self._pooling_strategy == "last":
-      pooled = encoded[:, -1:, :]
+      if history_mask is None:
+        pooled = encoded[:, -1:, :]
+      else:
+        last_indices = torch.clamp(
+            history_mask.long().sum(dim=1) - 1, min=0)
+        offsets = (history_mask.shape[1] - history_mask.long().sum(dim=1))
+        last_indices = last_indices + offsets
+        pooled = encoded[
+            torch.arange(encoded.shape[0], device=encoded.device),
+            last_indices].unsqueeze(1)
     else:
-      pooled = encoded.mean(dim=1, keepdim=True)
+      if history_mask is None:
+        pooled = encoded.mean(dim=1, keepdim=True)
+      else:
+        weights = history_mask.to(encoded.dtype).unsqueeze(-1)
+        pooled = ((encoded * weights).sum(dim=1, keepdim=True) /
+                  weights.sum(dim=1, keepdim=True).clamp_min(1.0))
     return pooled
 
   @staticmethod
@@ -291,7 +361,8 @@ class QMAPCandidateScorer(nn.Module):
 
   def __init__(self, hidden_dim=18, page_state_dim=4, page_embed_dim=8,
                page_vocab_size=100000, num_heads=2, mlp_hidden_dim=None,
-               dropout=0.0, page_dim=None, scoring_input="concat"):
+               dropout=0.0, page_dim=None, scoring_input="concat",
+               shared_page_embedding=False):
     super(QMAPCandidateScorer, self).__init__()
     if hidden_dim % num_heads != 0:
       raise ValueError("hidden_dim must be divisible by num_heads.")
@@ -299,8 +370,11 @@ class QMAPCandidateScorer(nn.Module):
       raise ValueError("scoring_input must be 'concat' or 'context'.")
 
     self._scoring_input = scoring_input
-    self._page_embedder = embed.DynamicVocabEmbedder(
-        embed_dim=page_embed_dim, max_vocab_size=page_vocab_size)
+    self._shared_page_embedding = bool(shared_page_embedding)
+    self._page_embedder = None
+    if not self._shared_page_embedding:
+      self._page_embedder = embed.DynamicVocabEmbedder(
+          embed_dim=page_embed_dim, max_vocab_size=page_vocab_size)
     self._candidate_projector = nn.Linear(
         page_embed_dim + page_state_dim, hidden_dim)
     self._legacy_candidate_projector = None
@@ -325,7 +399,8 @@ class QMAPCandidateScorer(nn.Module):
         nn.Linear(mlp_hidden_dim // 2, 1))
 
   def forward(self, z, candidate_pages, candidate_state_features=None,
-              candidate_mask=None):
+              candidate_mask=None, candidate_page_embeddings=None,
+              history_mask=None):
     """Scores candidates.
 
     Args:
@@ -349,15 +424,28 @@ class QMAPCandidateScorer(nn.Module):
             "candidate_state_features is required for QMAP candidate scoring.")
       u = self._legacy_candidate_projector(candidate_pages)
     else:
-      page_embeddings = self._page_embedder(candidate_pages.long())
+      if self._shared_page_embedding:
+        if candidate_page_embeddings is None:
+          raise ValueError(
+              "Shared page embedding mode requires candidate embeddings.")
+        page_embeddings = candidate_page_embeddings
+      else:
+        if candidate_page_embeddings is not None:
+          raise ValueError(
+              "External page embeddings require shared_page_embedding=True.")
+        page_embeddings = self._page_embedder(candidate_pages.long())
       candidate_inputs = torch.cat(
           (page_embeddings, candidate_state_features), dim=-1)
       u = self._candidate_projector(candidate_inputs)
 
     query_seq = u.transpose(0, 1)
     key_value_seq = z.transpose(0, 1)
+    key_padding_mask = None
+    if history_mask is not None and z.shape[1] == history_mask.shape[1]:
+      key_padding_mask = history_mask <= 0
     g, _ = self._cross_attention(
-        query=query_seq, key=key_value_seq, value=key_value_seq)
+        query=query_seq, key=key_value_seq, value=key_value_seq,
+        key_padding_mask=key_padding_mask)
     g = g.transpose(0, 1)
     g = self._context_norm(g + u)
 

@@ -60,7 +60,7 @@ def build_arg_parser():
   parser.add_argument("--trace_path", default=None,
                       help="Input CSV trace with PC,Address and optional RW.")
   parser.add_argument("--config", default=None,
-                      help="Resolved CAPD finals_v2 config.")
+                      help="Resolved, versioned CAPD finals config.")
   parser.add_argument("--selector_params", default=None,
                       help="Frozen selector_params.json for QMAP finals_v2.")
   parser.add_argument("--checkpoint", default=None,
@@ -260,8 +260,10 @@ def is_learned_policy(policy):
 
 def validate_checkpoint_config_contract(checkpoint, config, selector_params):
   """Rejects every frozen Generator/Trainer/Replay contract mismatch."""
-  if checkpoint.get("schema_version") != finals_config.SCHEMA_VERSION:
-    raise ValueError("Checkpoint is not a CAPD finals_v2.1 checkpoint.")
+  if checkpoint.get("schema_version") != config["schema_version"]:
+    raise ValueError("Checkpoint/config schema mismatch.")
+  finals_config.validate_artifact_identity(config, checkpoint, "checkpoint")
+  finals_config.validate_selector_params(config, selector_params)
   expected_contract = finals_config.contract_from_config(config)
   finals_config.assert_contract_matches(
       expected_contract, checkpoint.get("experiment_contract", {}),
@@ -273,17 +275,65 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
       selector_params)
   if checkpoint.get("selector_fingerprint") != expected_selector_fingerprint:
     raise ValueError("Checkpoint/selector fingerprint mismatch.")
+  if config["schema_version"] == finals_config.SCHEMA_VERSION:
+    embedded_selector = checkpoint.get("selector_params")
+    if embedded_selector is None:
+      raise ValueError("Checkpoint is missing embedded selector_params.")
+    finals_config.validate_selector_params(config, embedded_selector)
+    if finals_config.selector_fingerprint(
+        embedded_selector) != expected_selector_fingerprint:
+      raise ValueError("Checkpoint embedded selector mismatch.")
   expected_holdout_fingerprint = selector_params.get(
       "decision_holdout_fingerprint")
-  selector_holdout = selector_params.get("decision_holdout", {})
-  finals_config.validate_decision_holdout(selector_holdout, config)
-  if expected_holdout_fingerprint != selector_holdout["fingerprint"]:
-    raise ValueError("Selector decision holdout fingerprint mismatch.")
-  if checkpoint.get(
-      "decision_holdout_fingerprint") != expected_holdout_fingerprint:
-    raise ValueError("Checkpoint/decision holdout fingerprint mismatch.")
-  if checkpoint.get("workload") != config["run"]["workload"]:
-    raise ValueError("Checkpoint/workload mismatch.")
+  is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
+  is_v3_official = (
+      is_v3 and config["run_profile"] == finals_config.OFFICIAL_PROFILE)
+  if is_v3:
+    required_checkpoint = (
+        "feature_embedder", "extractor", "scorer", "model_args", "seed",
+        "best_epoch", "best_validation_loss", "selector_params",
+        "jsonl_fingerprints", "vocab_contract")
+    missing_checkpoint = [
+        key for key in required_checkpoint if key not in checkpoint]
+    if missing_checkpoint:
+      raise ValueError("Checkpoint missing fields: {}".format(
+          missing_checkpoint))
+    vocab_contract = checkpoint.get("vocab_contract", {})
+    required_vocab = (
+        "page_frozen", "pc_frozen", "unk_index",
+        "page_vocab_fingerprint", "pc_vocab_fingerprint")
+    if any(key not in vocab_contract for key in required_vocab):
+      raise ValueError("Checkpoint is missing the v3 vocabulary contract.")
+    if (vocab_contract["page_frozen"] is not True or
+        vocab_contract["pc_frozen"] is not True or
+        int(vocab_contract["unk_index"]) != 0):
+      raise ValueError("Checkpoint vocabularies must be frozen with UNK=0.")
+    model_args = checkpoint.get("model_args", {})
+    if model_args.get("shared_page_embedding") is not True:
+      raise ValueError("Checkpoint does not use the shared page embedding.")
+    if model_args.get("position_encoding") != "sinusoidal":
+      raise ValueError("Checkpoint position encoding mismatch.")
+    if int(checkpoint["seed"]) != int(config["training"]["seed"]):
+      raise ValueError("Checkpoint training seed mismatch.")
+    if int(checkpoint["best_epoch"]) <= 0:
+      raise ValueError("Checkpoint best_epoch must be positive.")
+    jsonl_fingerprints = checkpoint.get("jsonl_fingerprints", {})
+    if set(jsonl_fingerprints) != {"train", "valid"}:
+      raise ValueError("Checkpoint must bind train and valid JSONL.")
+  if is_v3_official:
+    if (selector_params.get("decision_holdout") is not None or
+        expected_holdout_fingerprint is not None or
+        checkpoint.get("decision_holdout") is not None or
+        checkpoint.get("decision_holdout_fingerprint") is not None):
+      raise ValueError("Official v3 rejects decision-holdout artifacts.")
+  else:
+    selector_holdout = selector_params.get("decision_holdout", {})
+    finals_config.validate_decision_holdout(selector_holdout, config)
+    if expected_holdout_fingerprint != selector_holdout["fingerprint"]:
+      raise ValueError("Selector decision holdout fingerprint mismatch.")
+    if checkpoint.get(
+        "decision_holdout_fingerprint") != expected_holdout_fingerprint:
+      raise ValueError("Checkpoint/decision holdout fingerprint mismatch.")
   model_args = checkpoint.get("model_args", {})
   if int(model_args.get("page_state_dim", -1)) != expected_contract[
       "page_state_dim"]:
@@ -391,6 +441,7 @@ class QMAPPolicy(object):
     self._lookahead = lookahead
     self._selector_history = None
     self.last_selector_snapshot = None
+    self._is_v3 = False
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
     if config is not None:
@@ -398,6 +449,7 @@ class QMAPPolicy(object):
         raise ValueError("Finals QMAP requires selector_params.")
       contract = validate_checkpoint_config_contract(
           checkpoint, config, selector_params)
+      self._is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
       self._history_length = contract["H"]
       self._candidate_count = contract["K"]
       self._effective_candidate_count = contract["K"]
@@ -429,7 +481,9 @@ class QMAPPolicy(object):
         feedforward_dim=model_args.get("feedforward_dim"),
         dropout=model_args.get("dropout", 0.0),
         use_qformer=checkpoint_uses_qformer(model_args, extractor_state),
-        pooling_strategy=pooling_strategy).to(device)
+        pooling_strategy=pooling_strategy,
+        position_encoding=model_args.get("position_encoding", "none"),
+        max_sequence_length=self._history_length).to(device)
     self._page_state_dim = model_args.get("page_state_dim", 3)
     self._scorer = model.QMAPCandidateScorer(
         hidden_dim=model_args.get("hidden_dim", 18),
@@ -439,10 +493,24 @@ class QMAPPolicy(object):
         num_heads=model_args.get("num_heads", 2),
         dropout=model_args.get("dropout", 0.0),
         page_dim=model_args.get("page_dim", 21),
-        scoring_input=scoring_input).to(device)
+        scoring_input=scoring_input,
+        shared_page_embedding=model_args.get(
+            "shared_page_embedding", False)).to(device)
     self._feature_embedder.load_state_dict(checkpoint["feature_embedder"])
     self._extractor.load_state_dict(extractor_state)
     self._scorer.load_state_dict(scorer_state)
+    if self._is_v3:
+      vocab_contract = checkpoint["vocab_contract"]
+      if (not self._feature_embedder.page_embedder.frozen or
+          not self._feature_embedder.pc_embedder.frozen):
+        raise ValueError("Loaded v3 vocabularies are not frozen.")
+      page_fingerprint = finals_config.fingerprint_value(
+          self._feature_embedder.page_embedder.input_to_index)
+      pc_fingerprint = finals_config.fingerprint_value(
+          self._feature_embedder.pc_embedder.input_to_index)
+      if (page_fingerprint != vocab_contract["page_vocab_fingerprint"] or
+          pc_fingerprint != vocab_contract["pc_vocab_fingerprint"]):
+        raise ValueError("Loaded vocabulary fingerprint mismatch.")
     self._feature_embedder.eval()
     self._extractor.eval()
     self._scorer.eval()
@@ -485,13 +553,17 @@ class QMAPPolicy(object):
               candidate in dirty_pages, self._history_length)
         candidate_state_features.append(features)
 
-    physical_address, pc, rw = apply_history_ablation(
+    history_page_ids, pc, rw = apply_history_ablation(
         *padded_history(history, self._history_length),
         ablation=self._ablation)
+    history_mask = ([0] * (self._history_length - len(history)) +
+                    [1] * len(history))
     torch = self._torch
     with torch.no_grad():
-      physical_address = torch.tensor(
-          [physical_address], dtype=torch.long, device=self._device)
+      history_page_ids = torch.tensor(
+          [history_page_ids], dtype=torch.long, device=self._device)
+      history_mask_tensor = torch.tensor(
+          [history_mask], dtype=torch.float32, device=self._device)
       pc = torch.tensor([pc], dtype=torch.long, device=self._device)
       rw = torch.tensor([rw], dtype=torch.long, device=self._device)
       candidate_pages = torch.tensor(
@@ -501,11 +573,17 @@ class QMAPPolicy(object):
           device=self._device)
       candidate_mask_tensor = torch.tensor(
           [candidate_mask], dtype=torch.float32, device=self._device)
-      access_features = self._feature_embedder(physical_address, pc, rw)
-      z = self._extractor(access_features)
+      access_features = self._feature_embedder(history_page_ids, pc, rw)
+      z = self._extractor(
+          access_features, history_mask=history_mask_tensor)
+      candidate_page_embeddings = (
+          self._feature_embedder.embed_pages(candidate_pages)
+          if getattr(self._scorer, "_shared_page_embedding", False) else None)
       eviction_scores = self._scorer(
           z, candidate_pages, candidate_state_features,
-          candidate_mask_tensor)
+          candidate_mask_tensor,
+          candidate_page_embeddings=candidate_page_embeddings,
+          history_mask=history_mask_tensor)
       if self._rank_score_penalty:
         rank_penalties = torch.tensor(
             [rank_score_penalty_values(
@@ -522,7 +600,9 @@ def replay(args, finals_replay_config=None):
   max_page = max((item["page"] for item in trace), default=1)
   stats = ReplayStats()
   dram_pages = []
-  nvm_pages = set()
+  # DRAM starts empty; every trace page is conceptually backed by unbounded
+  # NVM, so a page's first touch is charged as an NVM access.
+  nvm_pages = set(item["page"] for item in trace)
   dram_insert_time = {}
   dirty_pages = set()
   access_frequency = {}
@@ -547,11 +627,21 @@ def replay(args, finals_replay_config=None):
       if selector_params.get("workload") != finals_replay_config[
           "run"]["workload"]:
         raise ValueError("Replay selector/workload mismatch.")
-      finals_config.validate_decision_holdout(
-          selector_params.get("decision_holdout", {}), finals_replay_config)
-      if selector_params.get("decision_holdout_fingerprint") != (
-          selector_params["decision_holdout"]["fingerprint"]):
-        raise ValueError("Replay selector decision holdout mismatch.")
+      finals_config.validate_selector_params(
+          finals_replay_config, selector_params)
+      if (finals_replay_config["schema_version"] ==
+          finals_config.SCHEMA_VERSION and
+          finals_replay_config["run_profile"] ==
+          finals_config.OFFICIAL_PROFILE):
+        if (selector_params.get("decision_holdout") is not None or
+            selector_params.get("decision_holdout_fingerprint") is not None):
+          raise ValueError("Official replay rejects smoke holdout selector.")
+      else:
+        finals_config.validate_decision_holdout(
+            selector_params.get("decision_holdout", {}), finals_replay_config)
+        if selector_params.get("decision_holdout_fingerprint") != (
+            selector_params["decision_holdout"]["fingerprint"]):
+          raise ValueError("Replay selector decision holdout mismatch.")
     qmap_policy = QMAPPolicy(
         args.checkpoint,
         torch.device(device),
@@ -575,8 +665,12 @@ def replay(args, finals_replay_config=None):
       from qmap.learned_baselines import load_model
     learned_model = load_model(args.learned_model)
     if finals_replay_config is not None:
-      if learned_model.get("schema_version") != finals_config.SCHEMA_VERSION:
-        raise ValueError("Learned baseline is not a finals_v2.1 model.")
+      if learned_model.get("schema_version") != finals_replay_config[
+          "schema_version"]:
+        raise ValueError("Learned baseline/config schema mismatch.")
+      if finals_replay_config["schema_version"] == finals_config.SCHEMA_VERSION:
+        finals_config.validate_artifact_identity(
+            finals_replay_config, learned_model, "learned baseline")
       if learned_model.get("workload") != finals_replay_config[
           "run"]["workload"]:
         raise ValueError("Learned baseline workload mismatch.")
@@ -721,14 +815,32 @@ def main():
     metrics["command"] = " ".join(
         shlex.quote(value) for value in sys.argv)
     if replay_config is not None:
-      metrics["schema_version"] = finals_config.SCHEMA_VERSION
+      metrics["schema_version"] = replay_config["schema_version"]
       metrics["workload"] = replay_config["run"]["workload"]
+      metrics["workload_id"] = replay_config["run"]["workload"]
       metrics["experiment_contract"] = finals_config.contract_from_config(
           replay_config)
       metrics["config_fingerprint"] = finals_config.config_fingerprint(
           replay_config)
       metrics["git_commit"] = replay_config.get("run", {}).get(
           "git_commit", "unknown")
+      metrics["test_trace_fingerprint"] = finals_config.fingerprint_file(
+          args.trace_path)
+      metrics["nvm_capacity_pages"] = replay_config["memory"][
+          "nvm_capacity_pages"]
+      metrics["dram_initial_state"] = replay_config.get(
+          "replay", {}).get("dram_initial_state")
+      metrics["initial_residency"] = replay_config.get(
+          "replay", {}).get("initial_residency")
+      metrics["trace_page_backing"] = replay_config.get(
+          "replay", {}).get("trace_page_backing")
+      metrics["first_touch_accounting"] = replay_config.get(
+          "replay", {}).get("first_touch_accounting")
+      metrics["dirty_demotion_nvm_write"] = replay_config.get(
+          "replay", {}).get("dirty_demotion_nvm_write")
+      if replay_config["schema_version"] == finals_config.SCHEMA_VERSION:
+        metrics.update(finals_config.artifact_identity_from_config(
+            replay_config))
       metrics["selector_params"] = args.selector_params
       if args.selector_params:
         replay_selector = finals_config.load_json(args.selector_params)
@@ -736,6 +848,16 @@ def main():
             finals_config.selector_fingerprint(replay_selector))
         metrics["decision_holdout_fingerprint"] = replay_selector.get(
             "decision_holdout_fingerprint")
+        metrics["candidate_coverage_validation"] = {
+            key: replay_selector[key] for key in (
+                "PoolRecall@B", "SelectorRecall@K", "EndToEndRecall@K",
+                "TieCoverage@K", "NRegret")
+            if key in replay_selector
+        }
+        metrics["candidate_coverage_metric_source"] = (
+            "valid_trace" if replay_config.get("run_profile") ==
+            finals_config.OFFICIAL_PROFILE else
+            "train_trace_decision_holdout")
       finals_config.write_json(
           os.path.join(output_dir, "resolved_config.json"), replay_config)
     if args.checkpoint:
@@ -753,6 +875,16 @@ def main():
         "nvm_write_cost": args.nvm_write_cost,
         "migration_cost": args.migration_cost,
     }
+    if replay_config is not None:
+      validation_selector = (
+          finals_config.load_json(args.selector_params)
+          if args.selector_params else None)
+      finals_config.validate_result_contract(
+          replay_config, metrics,
+          selector_params=validation_selector,
+          checkpoint_fingerprint=(
+              metrics.get("checkpoint_fingerprint") if args.checkpoint
+              else None))
     with open(args.json_output, "w") as output_file:
       json.dump(
           metrics,

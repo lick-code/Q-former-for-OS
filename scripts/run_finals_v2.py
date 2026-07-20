@@ -112,23 +112,40 @@ def learned_train_command(python_bin, config_path, policy, model_path):
 
 def write_summary(config, paths, policies):
   results = {}
+  selector_params = None
+  checkpoint_fingerprint = None
+  if config["schema_version"] == finals_config.SCHEMA_VERSION:
+    selector_params = finals_config.load_json(paths["selector"])
+    checkpoint_path = os.path.join(paths["checkpoint_dir"], "qmap_best.pth")
+    checkpoint_fingerprint = finals_config.fingerprint_file(checkpoint_path)
   for policy in policies:
     path = os.path.join(paths["result_dir"], "{}.json".format(policy))
     if os.path.exists(path):
-      results[policy] = finals_config.load_json(path)
+      result = finals_config.load_json(path)
+      if config["schema_version"] == finals_config.SCHEMA_VERSION:
+        finals_config.validate_result_contract(
+            config, result,
+            selector_params=(selector_params if policy == "qmap" else None),
+            checkpoint_fingerprint=(
+                checkpoint_fingerprint if policy == "qmap" else None))
+      results[policy] = result
   summary = {
-      "schema_version": finals_config.SCHEMA_VERSION,
+      "schema_version": config["schema_version"],
       "workload": config["run"]["workload"],
       "experiment_contract": finals_config.contract_from_config(config),
       "config_fingerprint": finals_config.config_fingerprint(config),
       "results": results,
   }
+  if config["schema_version"] == finals_config.SCHEMA_VERSION:
+    summary.update(finals_config.artifact_identity_from_config(config))
   finals_config.write_json(paths["summary"], summary)
   return summary
 
 
-def main():
-  parser = argparse.ArgumentParser(description="Run one CAPD finals_v2.1 job.")
+def main(expected_schema=finals_config.LEGACY_SCHEMA_VERSION,
+         runner_label="finals_v2.1", expected_profile=None):
+  parser = argparse.ArgumentParser(
+      description="Run one CAPD {} job.".format(runner_label))
   parser.add_argument("--config", required=True)
   parser.add_argument("--stage", choices=("generate", "train", "eval", "all"),
                       default="all")
@@ -141,6 +158,15 @@ def main():
 
   config_path = os.path.abspath(args.config)
   config = finals_config.load_config(config_path, require_resolved=True)
+  if config["schema_version"] != expected_schema:
+    raise ValueError(
+        "{} runner rejects schema {}.".format(
+            runner_label, config["schema_version"]))
+  if (expected_profile is not None and
+      config.get("run_profile") != expected_profile):
+    raise ValueError(
+        "{} runner requires run_profile={}.".format(
+            runner_label, expected_profile))
   paths = artifact_paths(config)
   for key in ("jsonl_dir", "checkpoint_dir", "result_dir",
               "baseline_model_dir"):
@@ -181,7 +207,7 @@ def main():
   stage_manifest_path = os.path.join(
       paths["result_dir"], "run_manifest_{}.json".format(stage_key))
   stage_manifest = {
-      "schema_version": finals_config.SCHEMA_VERSION,
+      "schema_version": config["schema_version"],
       "config": config_path,
       "config_fingerprint": finals_config.config_fingerprint(config),
       "git_commit": config.get("run", {}).get("git_commit", "unknown"),
@@ -193,7 +219,7 @@ def main():
   }
   finals_config.write_json(stage_manifest_path, stage_manifest)
   manifest_index = {
-      "schema_version": finals_config.SCHEMA_VERSION,
+      "schema_version": config["schema_version"],
       "config": config_path,
       "config_fingerprint": finals_config.config_fingerprint(config),
       "git_commit": config.get("run", {}).get("git_commit", "unknown"),
@@ -201,7 +227,7 @@ def main():
   }
   if os.path.exists(paths["manifest"]):
     existing = finals_config.load_json(paths["manifest"])
-    if (existing.get("schema_version") == finals_config.SCHEMA_VERSION and
+    if (existing.get("schema_version") == config["schema_version"] and
         existing.get("config_fingerprint") ==
         manifest_index["config_fingerprint"]):
       manifest_index["stage_manifests"].update(
@@ -217,4 +243,5 @@ def main():
 
 
 if __name__ == "__main__":
-  main()
+  main(expected_schema=finals_config.LEGACY_SCHEMA_VERSION,
+       runner_label="finals_v2.1")

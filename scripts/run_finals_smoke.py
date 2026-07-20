@@ -138,7 +138,7 @@ def validate_outputs(config, paths):
     result_path = os.path.join(paths["result_dir"], "{}.json".format(policy))
     results[policy] = finals_config.load_json(result_path)
   report = {
-      "schema_version": finals_config.SCHEMA_VERSION,
+      "schema_version": finals_config.LEGACY_SCHEMA_VERSION,
       "status": "passed",
       "actual_B_t": candidate_metrics["max_B_t"],
       "actual_K_t": candidate_metrics["max_K_t"],

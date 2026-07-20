@@ -35,7 +35,7 @@ def audit_generated(config, paths):
   selector_path = require_file(paths["selector"])
   selector = finals_config.load_json(selector_path)
   config_fingerprint = finals_config.config_fingerprint(config)
-  if selector.get("schema_version") != finals_config.SCHEMA_VERSION:
+  if selector.get("schema_version") != finals_config.LEGACY_SCHEMA_VERSION:
     raise ValueError("Selector schema mismatch.")
   if selector.get("workload") != config["run"]["workload"]:
     raise ValueError("Selector workload mismatch.")
@@ -111,7 +111,7 @@ def audit_complete(config, paths, generated):
       paths["checkpoint_dir"], "qmap_best.pth"))
   checkpoint_manifest = finals_config.load_json(require_file(os.path.join(
       paths["checkpoint_dir"], "checkpoint_manifest.json")))
-  if checkpoint_manifest.get("schema_version") != finals_config.SCHEMA_VERSION:
+  if checkpoint_manifest.get("schema_version") != finals_config.LEGACY_SCHEMA_VERSION:
     raise ValueError("Checkpoint manifest schema mismatch.")
   if checkpoint_manifest.get("config_fingerprint") != (
       finals_config.config_fingerprint(config)):
@@ -132,7 +132,7 @@ def audit_complete(config, paths, generated):
     result = finals_config.load_json(result_path)
     if result.get("policy") != policy:
       raise ValueError("{} result policy mismatch.".format(policy))
-    if result.get("schema_version") != finals_config.SCHEMA_VERSION:
+    if result.get("schema_version") != finals_config.LEGACY_SCHEMA_VERSION:
       raise ValueError("{} result schema mismatch.".format(policy))
     if result.get("config_fingerprint") != expected_config_fingerprint:
       raise ValueError("{} result config fingerprint mismatch.".format(
@@ -234,7 +234,7 @@ def main():
         })
 
   report = {
-      "schema_version": finals_config.SCHEMA_VERSION,
+      "schema_version": finals_config.LEGACY_SCHEMA_VERSION,
       "audit_stage": args.stage,
       "status": "passed" if not errors and len(jobs) == 12 else "failed",
       "expected_jobs": 12,

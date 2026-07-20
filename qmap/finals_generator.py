@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Fit the CAPD selector and generate finals_v2.1 holdout JSONL files."""
+"""Fit the CAPD selector and generate versioned finals JSONL artifacts."""
 
 from __future__ import print_function
 
@@ -30,9 +30,10 @@ from qmap.qmap_generator import read_trace
 class FutureOracle(object):
   """Exact O(log n) future-window labels for a fixed trace and lookahead."""
 
-  def __init__(self, trace, lookahead):
+  def __init__(self, trace, lookahead, require_complete=True):
     self._trace_length = len(trace)
     self._lookahead = int(lookahead)
+    self._require_complete = bool(require_complete)
     self._positions = {}
     self._write_prefix = {}
     for index, access in enumerate(trace):
@@ -42,12 +43,17 @@ class FutureOracle(object):
       prefix.append(prefix[-1] + int(bool(access["rw"])))
 
   def stats(self, current_index, page):
+    if (self._require_complete and not has_complete_future_window(
+        current_index, self._lookahead, self._trace_length)):
+      raise ValueError(
+          "Future labels require t + L < N; decision {} has no complete "
+          "window of {} accesses in trace length {}.".format(
+              current_index, self._lookahead, self._trace_length))
     positions = self._positions.get(page, [])
     if not positions:
       return None, 0, 0
     start = bisect.bisect_right(positions, current_index)
-    end_index = min(
-        self._trace_length, current_index + 1 + self._lookahead)
+    end_index = current_index + 1 + self._lookahead
     end = bisect.bisect_left(positions, end_index, lo=start)
     if start >= end:
       return None, 0, 0
@@ -56,8 +62,16 @@ class FutureOracle(object):
             write_prefix[end] - write_prefix[start])
 
 
+def has_complete_future_window(current_index, lookahead, trace_length):
+  """Frozen tail guard: labels exist iff t + L < N."""
+  return int(current_index) + int(lookahead) < int(trace_length)
+
+
 def reference_labels(trace, current_index, page, lookahead,
-                     future_oracle=None):
+                     future_oracle=None, require_complete=True):
+  if (require_complete and
+      not has_complete_future_window(current_index, lookahead, len(trace))):
+    raise ValueError("Cannot generate labels from an incomplete future window.")
   if future_oracle is None:
     next_distance, frequency, write_frequency = future_stats(
         trace, current_index, page, lookahead)
@@ -243,23 +257,42 @@ def iter_validation_samples(trace, config, clipping, holdout=None):
       "w_R": 0.2,
   })
   lookahead = int(config["labels"]["future_lookahead_L"])
-  future_oracle = FutureOracle(trace, lookahead)
+  is_v3 = config.get("schema_version") == finals_config.SCHEMA_VERSION
+  future_oracle = FutureOracle(
+      trace, lookahead, require_complete=is_v3)
   pool_size = int(config["candidate"]["pool_size_B"])
   retained = int(config["candidate"]["retained_K"])
   for access_index, access in enumerate(trace):
+    complete_window = has_complete_future_window(
+        access_index, lookahead, len(trace))
     if (state.is_decision(access["page"]) and
-        decision_belongs_to_split(access_index, "valid", holdout)):
+        decision_belongs_to_split(access_index, "valid", holdout) and
+        (complete_window or not is_v3)):
       records = candidate_filter.build_pool_records(
           state.dram_pages, pool_size, access_index, state.selector_history,
           state.dirty_pages, params)
       labels = [
           reference_labels(
-              trace, access_index, item["page"], lookahead, future_oracle)
+              trace, access_index, item["page"], lookahead, future_oracle,
+              require_complete=is_v3)
           for item in records
       ]
-      yield {
+      all_dram_labels = {
+          page: reference_labels(
+              trace, access_index, page, lookahead, future_oracle,
+              require_complete=is_v3)["relevance"]
+          for page in state.dram_pages
+      }
+      global_maximum = max(all_dram_labels.values())
+      global_oracle = {
+          page for page, relevance in all_dram_labels.items()
+          if math.isclose(
+              relevance, global_maximum, rel_tol=0.0, abs_tol=1e-12)
+      }
+      pool_pages = [item["page"] for item in records]
+      sample = {
           "decision_index": access_index,
-          "P_t": [item["page"] for item in records],
+          "P_t": pool_pages,
           "B_t": len(records),
           "retained_K": retained,
           "selector_features": [item["selector_features"]
@@ -267,7 +300,19 @@ def iter_validation_samples(trace, config, clipping, holdout=None):
           "original_pool_ranks": [item["original_pool_rank"]
                                   for item in records],
           "relevance": [label["relevance"] for label in labels],
+          "global_oracle_in_pool": [
+              page in global_oracle for page in pool_pages],
+          "pool_recall": float(bool(set(pool_pages) & global_oracle)),
       }
+      if is_v3:
+        sample.update({
+            "schema_version": config["schema_version"],
+            "contract_id": finals_config.CONTRACT_ID,
+            "workload_id": config["run"]["workload"],
+            "run_profile": config["run_profile"],
+            "artifact_class": config["validation"]["artifact_class"],
+        })
+      yield sample
     state.advance(access, access_index)
 
 
@@ -331,7 +376,9 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
   lookahead = int(config["labels"]["future_lookahead_L"])
   retained = int(config["candidate"]["retained_K"])
   history_length = int(config["history"]["transformer_H"])
-  future_oracle = FutureOracle(trace, lookahead)
+  is_v3 = config.get("schema_version") == finals_config.SCHEMA_VERSION
+  future_oracle = FutureOracle(
+      trace, lookahead, require_complete=is_v3)
   decision_count = 0
   selector_time = 0.0
   bt_values = []
@@ -343,8 +390,11 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
     os.makedirs(directory, exist_ok=True)
   with open(output_path, "w", encoding="utf-8") as output_file:
     for access_index, access in enumerate(trace):
+      complete_window = has_complete_future_window(
+          access_index, lookahead, len(trace))
       if (state.is_decision(access["page"]) and
-          decision_belongs_to_split(access_index, split_name, holdout)):
+          decision_belongs_to_split(access_index, split_name, holdout) and
+          (complete_window or not is_v3)):
         decision_history = state.decision_history(access)
         snapshot = build_generator_decision_snapshot(
             state, access, access_index, config, selector_params)
@@ -352,16 +402,18 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
             item["page"] for item in snapshot["selected_records"]]
         labels = [
             reference_labels(
-                trace, access_index, page, lookahead, future_oracle)
+                trace, access_index, page, lookahead, future_oracle,
+                require_complete=is_v3)
             for page in selected_pages
         ]
         padded_labels = _pad_labels(labels, retained)
-        physical_address, pc, rw = apply_history_ablation(
+        history_page_ids, pc, rw = apply_history_ablation(
             *padded_history(decision_history, history_length),
             ablation="cross_attention")
+        history_mask = ([0] * (history_length - len(decision_history)) +
+                        [1] * len(decision_history))
         sample = {
-            "schema_version": finals_config.SCHEMA_VERSION,
-            "physical_address": physical_address,
+            "schema_version": config["schema_version"],
             "pc": pc,
             "rw": rw,
             "candidate_pages": snapshot["candidate_pages"],
@@ -375,6 +427,16 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
             # Constant and excluded by finals_v2 loss (lambda_4=0).
             "migration_cost": padded_labels["migration_cost"],
         }
+        if is_v3:
+          sample.update({
+              "contract_id": finals_config.CONTRACT_ID,
+              "workload_id": config["run"]["workload"],
+              "decision_index": access_index,
+              "history_page_ids": history_page_ids,
+              "history_mask": history_mask,
+          })
+        else:
+          sample["physical_address"] = history_page_ids
         output_file.write(json.dumps(sample, sort_keys=True) + "\n")
         decision_count += 1
         selector_time += snapshot["selector_time_seconds"]
@@ -384,11 +446,13 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
 
   data_fingerprint = finals_config.fingerprint_file(output_path)
   metadata = {
-      "schema_version": finals_config.SCHEMA_VERSION,
+      "schema_version": config["schema_version"],
       "workload": config["run"]["workload"],
+      "workload_id": config["run"]["workload"],
       "split": split_name,
       "source_partition": (
-          "train_trace_decision_holdout" if holdout else split_name),
+          "train_trace_decision_holdout" if holdout else
+          "independent_{}_trace".format(split_name)),
       "source_trace": trace_path,
       "source_trace_fingerprint": finals_config.fingerprint_file(trace_path),
       "resolved_config": os.path.abspath(resolved_config_path),
@@ -426,38 +490,60 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
       "git_commit": config.get("run", {}).get("git_commit", "unknown"),
       "command": command_text,
   }
+  if is_v3:
+    metadata.update({
+        "contract_id": finals_config.CONTRACT_ID,
+        "run_profile": config["run_profile"],
+        "artifact_class": config["validation"]["artifact_class"],
+        "tail_policy": config["labels"]["tail_policy"],
+        "history_page_field": "history_page_ids",
+    })
   finals_config.write_json(finals_config.metadata_path(output_path), metadata)
   return metadata
 
 
 def fit_selector_and_generate(args):
   config = finals_config.load_config(args.config, require_resolved=True)
+  is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
   configured_page_shift = int(config.get("trace", {}).get("page_shift", 12))
   if args.page_shift is not None and args.page_shift != configured_page_shift:
     raise ValueError("--page-shift does not match the resolved config.")
   args.page_shift = configured_page_shift
   train_path = config["data"]["train_trace"]
-  external_valid_path = config["data"]["valid_trace"]
+  valid_path = config["data"]["valid_trace"]
+  test_path = config["data"]["test_trace"]
   train_trace, train_rw_source = read_trace(train_path, args.page_shift)
-  external_valid_trace, external_valid_rw_source = read_trace(
-      external_valid_path, args.page_shift)
-
-  holdout = build_decision_holdout(train_trace, config)
+  valid_trace, valid_rw_source = read_trace(valid_path, args.page_shift)
+  trace_fingerprints = {
+      "train_trace": finals_config.fingerprint_file(train_path),
+      "valid_trace": finals_config.fingerprint_file(valid_path),
+      "test_trace": finals_config.fingerprint_file(test_path),
+  }
+  if is_v3 and config["run_profile"] == finals_config.OFFICIAL_PROFILE:
+    finals_config.assert_independent_trace_sources(
+        config, fingerprints=trace_fingerprints)
+    holdout = None
+    selector_validation_trace = valid_trace
+  else:
+    holdout = build_decision_holdout(train_trace, config)
+    selector_validation_trace = train_trace
 
   raw_observations, train_decisions = collect_training_observations(
       train_trace, config, holdout)
-  if train_decisions != holdout["train_decision_points"]:
+  if holdout is not None and train_decisions != holdout["train_decision_points"]:
     raise AssertionError("Training decision count does not match split plan.")
   clipping = selector_search.clipping_values(
       raw_observations,
       float(config["features"]["selector_clip_quantile"]))
   validation_fingerprint, validation_count = write_validation_samples(
       args.validation_samples_output,
-      iter_validation_samples(train_trace, config, clipping, holdout))
+      iter_validation_samples(
+          selector_validation_trace, config, clipping, holdout))
   if validation_count <= 0:
     raise ValueError(
-        "Decision holdout produced no selector/model validation samples.")
-  if validation_count != holdout["validation_decision_points"]:
+        "Validation trace produced no complete-window selector samples.")
+  if (holdout is not None and not is_v3 and
+      validation_count != holdout["validation_decision_points"]):
     raise AssertionError("Validation decision count does not match split plan.")
   search_result = selector_search.search_selector_weights_jsonl(
       args.validation_samples_output,
@@ -466,22 +552,40 @@ def fit_selector_and_generate(args):
       clipping, search_result)
   command_text = " ".join(shlex.quote(value) for value in sys.argv)
   selector_params.update({
-      "schema_version": finals_config.SCHEMA_VERSION,
+      "schema_version": config["schema_version"],
       "workload": config["run"]["workload"],
       "config_fingerprint": finals_config.config_fingerprint(config),
-      "train_trace_fingerprint": finals_config.fingerprint_file(train_path),
-      "external_valid_trace_fingerprint": finals_config.fingerprint_file(
-          external_valid_path),
-      "external_valid_trace_role": config["validation"][
-          "external_valid_trace_role"],
+      "train_trace_fingerprint": trace_fingerprints["train_trace"],
       "decision_holdout": holdout,
-      "decision_holdout_fingerprint": holdout["fingerprint"],
+      "decision_holdout_fingerprint": (
+          holdout["fingerprint"] if holdout is not None else None),
       "validation_samples_fingerprint": validation_fingerprint,
       "train_decision_points": train_decisions,
       "validation_decision_points": validation_count,
       "git_commit": config.get("run", {}).get("git_commit", "unknown"),
       "command": command_text,
   })
+  if holdout is None:
+    selector_params["decision_holdout_fingerprint"] = None
+  if is_v3:
+    selector_params.update({
+        "contract_id": finals_config.CONTRACT_ID,
+        "workload_id": config["run"]["workload"],
+        "run_profile": config["run_profile"],
+        "artifact_class": config["validation"]["artifact_class"],
+        "valid_trace_fingerprint": trace_fingerprints["valid_trace"],
+        "behavior_policy": config["selector"]["behavior_policy"],
+        "tail_policy": config["labels"]["tail_policy"],
+        "selection_rule": (
+            "selector_recall_desc,nregret_asc,uniform_distance,lexicographic"),
+    })
+  else:
+    selector_params.update({
+        "external_valid_trace_fingerprint": trace_fingerprints["valid_trace"],
+        "external_valid_trace_role": config["validation"][
+            "external_valid_trace_role"],
+    })
+  finals_config.validate_selector_params(config, selector_params)
   finals_config.write_json(args.selector_output, selector_params)
   finals_config.write_json(
       os.path.join(os.path.dirname(os.path.abspath(args.selector_output)),
@@ -491,30 +595,36 @@ def fit_selector_and_generate(args):
   train_metadata = generate_reranker_jsonl(
       train_trace, train_path, "train", args.train_output, config,
       selector_params, args.config, command_text, holdout=holdout)
+  reranker_valid_trace = valid_trace if holdout is None else train_trace
+  reranker_valid_path = valid_path if holdout is None else train_path
   valid_metadata = generate_reranker_jsonl(
-      train_trace, train_path, "valid", args.valid_output, config,
+      reranker_valid_trace, reranker_valid_path, "valid", args.valid_output, config,
       selector_params, args.config, command_text, holdout=holdout)
-  external_valid_diagnostics = trace_diagnostics(
-      external_valid_trace, config)
-  external_valid_diagnostics.update({
-      "path": external_valid_path,
-      "fingerprint": finals_config.fingerprint_file(external_valid_path),
-      "role": config["validation"]["external_valid_trace_role"],
-      "rw_source": external_valid_rw_source,
+  valid_diagnostics = trace_diagnostics(valid_trace, config)
+  valid_diagnostics.update({
+      "path": valid_path,
+      "fingerprint": trace_fingerprints["valid_trace"],
+      "role": ("selector_search_and_model_selection" if holdout is None
+               else config["validation"]["external_valid_trace_role"]),
+      "rw_source": valid_rw_source,
   })
   result = {
+      "schema_version": config["schema_version"],
       "selector_params": args.selector_output,
       "selector_fingerprint": finals_config.selector_fingerprint(
           selector_params),
       "decision_holdout": holdout,
       "train_metadata": train_metadata,
       "valid_metadata": valid_metadata,
-      "external_valid_trace_diagnostics": external_valid_diagnostics,
+      "valid_trace_diagnostics": valid_diagnostics,
+      "trace_fingerprints": trace_fingerprints,
       "rw_source": {
           "train_trace": train_rw_source,
-          "external_valid_trace": external_valid_rw_source,
+          "valid_trace": valid_rw_source,
       },
   }
+  if is_v3:
+    result.update(finals_config.artifact_identity_from_config(config))
   finals_config.write_json(args.summary_output, result)
   print("[done] selector={}".format(args.selector_output))
   print("[done] train_jsonl={}".format(args.train_output))
@@ -525,10 +635,10 @@ def fit_selector_and_generate(args):
 def build_arg_parser():
   parser = argparse.ArgumentParser(
       description=(
-          "Fit CAPD finals_v2.1 selector and generate decision-holdout "
+          "Fit a versioned CAPD selector and generate contract-bound "
           "train/valid JSONL."))
   parser.add_argument("--config", required=True,
-                      help="Resolved capd_finals_v2_1 config.")
+                      help="Resolved v2.1 or capd_finals_v3_0 config.")
   parser.add_argument("--selector-output", required=True)
   parser.add_argument("--validation-samples-output", required=True)
   parser.add_argument("--train-output", required=True)

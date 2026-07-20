@@ -97,14 +97,7 @@ class QMAPCostAwareRankingLoss(nn.Module):
 
   def _approx_ndcg_loss(self, scores, relevance, mask):
     """Differentiable NDCG approximation with soft item positions."""
-    score_i = scores.unsqueeze(2)
-    score_j = scores.unsqueeze(1)
-    pair_mask = mask.unsqueeze(2) * mask.unsqueeze(1)
-
-    # 1-based approximate position: one plus the expected number of valid
-    # candidates with a higher score than item i.
-    higher_prob = torch.sigmoid(self._alpha * (score_j - score_i)) * pair_mask
-    approx_pos = 1.0 + higher_prob.sum(dim=2)
+    approx_pos = self._approx_positions(scores, mask)
 
     gains = torch.expm1(relevance) * mask
     dcg = (gains / torch.log1p(approx_pos)).sum(dim=1)
@@ -115,7 +108,26 @@ class QMAPCostAwareRankingLoss(nn.Module):
         dtype=scores.dtype).unsqueeze(0)
     idcg = (sorted_gains / torch.log1p(positions)).sum(dim=1)
     ndcg = dcg / (idcg + 1e-8)
-    return -ndcg.mean()
+    valid_samples = mask.sum(dim=1) > 0
+    if not torch.any(valid_samples):
+      raise ValueError("ApproxNDCG requires at least one valid candidate.")
+    return -ndcg[valid_samples].mean()
+
+  def _approx_positions(self, scores, mask):
+    """Returns rho(i), excluding j=i and every padded i/j candidate."""
+    score_i = scores.unsqueeze(2)
+    score_j = scores.unsqueeze(1)
+    pair_mask = (mask.unsqueeze(2) > 0) & (mask.unsqueeze(1) > 0)
+    diagonal = torch.eye(
+        scores.shape[1], dtype=torch.bool, device=scores.device).unsqueeze(0)
+    pair_mask = pair_mask & ~diagonal
+
+    # 1-based approximate position: one plus the expected number of valid
+    # candidates with a higher score than item i. Self comparison is excluded.
+    higher_prob = (torch.sigmoid(self._alpha * (score_j - score_i)) *
+                   pair_mask.to(scores.dtype))
+    approx_pos = 1.0 + higher_prob.sum(dim=2)
+    return approx_pos.masked_fill(mask <= 0, 1.0)
 
 
 if __name__ == "__main__":

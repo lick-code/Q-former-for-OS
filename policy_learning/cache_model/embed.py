@@ -126,10 +126,11 @@ class ByteEmbedder(Embedder):
 
 
 class DynamicVocabEmbedder(Embedder):
-  """Dynamically constructs a vocab, assigning embeddings to new inputs.
+  """Train-fitted vocabulary embedder with reserved ``UNK=0``.
 
-  After max_vocab_size unique inputs are observed, all new inputs are assigned
-  to a UNK embedding.
+  Legacy callers may still grow the vocabulary before ``freeze`` is called.
+  CAPD finals v3 explicitly fits on train data and freezes before any
+  validation/test forward pass; unseen frozen inputs always map to index 0.
   """
 
   def __init__(self, embed_dim, max_vocab_size):
@@ -139,11 +140,60 @@ class DynamicVocabEmbedder(Embedder):
     self._input_to_index = {}
     # Reserve index 0 for UNK
     self._vocab_size = 1
+    self._frozen = False
 
     # Override default initialization of embeddings with Xavier
     weight = torch.zeros(max_vocab_size, embed_dim)
     nn.init.xavier_uniform_(weight)
     self._embedding = nn.Embedding(max_vocab_size, embed_dim, _weight=weight)
+
+  @property
+  def vocab_size(self):
+    return self._vocab_size
+
+  @property
+  def frozen(self):
+    return self._frozen
+
+  @property
+  def input_to_index(self):
+    return dict(self._input_to_index)
+
+  @staticmethod
+  def _flatten_inputs(inputs):
+    if torch.is_tensor(inputs):
+      return inputs.detach().cpu().reshape(-1).tolist(), tuple(inputs.shape)
+    values = list(inputs)
+    return values, (len(values),)
+
+  def _index_for(self, inp):
+    if (not self._frozen and inp not in self._input_to_index and
+        self._max_vocab_size > self._vocab_size):
+      self._input_to_index[inp] = self._vocab_size
+      self._vocab_size += 1
+    return self._input_to_index.get(inp, 0)
+
+  def fit(self, inputs):
+    """Adds train-only values to the vocabulary before it is frozen."""
+    if self._frozen:
+      raise ValueError("Cannot fit a frozen vocabulary.")
+    values = (inputs.detach().cpu().reshape(-1).tolist()
+              if torch.is_tensor(inputs) else inputs)
+    for inp in values:
+      self._index_for(inp)
+    return self
+
+  def freeze(self):
+    self._frozen = True
+    return self
+
+  def indices(self, inputs):
+    """Maps inputs to indices without exposing or mutating embedding weights."""
+    flat_inputs, input_shape = self._flatten_inputs(inputs)
+    return torch.tensor(
+        [self._index_for(inp) for inp in flat_inputs],
+        dtype=torch.long,
+        device=self._embedding.weight.device).view(*input_shape)
 
   def forward(self, inputs):
     """Returns embeddings for each int interpretted as a byte array.
@@ -157,24 +207,9 @@ class DynamicVocabEmbedder(Embedder):
       embeddings (torch.FloatTensor): embeddings of shape
         (*input_shape, embed_dim).
     """
-    def input_to_index(inp):
-      if (inp not in self._input_to_index and
-          self._max_vocab_size > self._vocab_size):
-        self._input_to_index[inp] = self._vocab_size
-        self._vocab_size += 1
-      # Return index 0 (UNK) if vocab is full and inp is not in vocab
-      return self._input_to_index.get(inp, 0)
-
-    if torch.is_tensor(inputs):
-      input_shape = inputs.shape
-      flat_inputs = inputs.detach().cpu().reshape(-1).tolist()
-    else:
-      input_shape = (len(inputs),)
-      flat_inputs = list(inputs)
-
+    flat_inputs, input_shape = self._flatten_inputs(inputs)
     indices = torch.tensor(
-        [input_to_index(inp) for inp in flat_inputs],
-        dtype=torch.long,
+        [self._index_for(inp) for inp in flat_inputs], dtype=torch.long,
         device=self._embedding.weight.device)
     embeddings = self._embedding(indices)
     return embeddings.view(*input_shape, self.embed_dim)
@@ -183,12 +218,14 @@ class DynamicVocabEmbedder(Embedder):
     state_dict = super().state_dict(destination, prefix, keep_vars)
     state_dict[prefix + "vocab_size"] = self._vocab_size
     state_dict[prefix + "input_to_index"] = self._input_to_index
+    state_dict[prefix + "vocab_frozen"] = self._frozen
     return state_dict
 
   def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
                             missing_keys, unexpected_keys, error_msgs):
     self._vocab_size = state_dict.pop(prefix + "vocab_size")
     self._input_to_index = state_dict.pop(prefix + "input_to_index")
+    self._frozen = state_dict.pop(prefix + "vocab_frozen", False)
     super()._load_from_state_dict(
         state_dict, prefix, local_metadata, strict, missing_keys,
         unexpected_keys, error_msgs)
@@ -231,7 +268,7 @@ class QMAPAccessFeatureEmbedder(Embedder):
   """Embeds and concatenates QMAP memory-access features.
 
   输入特征只包含全局访存信息：
-    - physical_addresses: 物理地址
+    - page_ids: 按 page_shift 归一化后的页面 ID
     - pcs: 程序计数器
     - rw_flags: 读写标志，0 读、1 写
 
@@ -246,18 +283,30 @@ class QMAPAccessFeatureEmbedder(Embedder):
     self._pc_embedder = pc_embedder
     self._rw_embedder = rw_embedder
 
-  def forward(self, physical_addresses, pcs, rw_flags):
+  @property
+  def page_embedder(self):
+    """The single page vocabulary/embedding used by both model paths."""
+    return self._address_embedder
+
+  @property
+  def pc_embedder(self):
+    return self._pc_embedder
+
+  def embed_pages(self, page_ids):
+    return self._address_embedder(page_ids)
+
+  def forward(self, page_ids, pcs, rw_flags):
     """Returns unified QMAP access embeddings.
 
     Args:
-      physical_addresses (torch.LongTensor): [batch_size, sequence_length]。
+      page_ids (torch.LongTensor): [batch_size, sequence_length]。
       pcs (torch.LongTensor): [batch_size, sequence_length]。
       rw_flags (torch.LongTensor): [batch_size, sequence_length]，0/1。
 
     Returns:
       torch.FloatTensor: [batch_size, sequence_length, hidden_dim]。
     """
-    address_embeddings = self._address_embedder(physical_addresses)
+    address_embeddings = self._address_embedder(page_ids)
     pc_embeddings = self._pc_embedder(pcs)
     rw_embeddings = self._rw_embedder(rw_flags)
 

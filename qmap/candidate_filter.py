@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Lightweight B-to-K candidate selector for CAPD finals_v2."""
+"""Lightweight B-to-K candidate selector shared by CAPD finals pipelines."""
 
 from __future__ import print_function
 
@@ -64,6 +64,15 @@ def build_candidate_pool(dram_pages, pool_size_B):
   return list(reversed(dram_pages[-pool_size:]))
 
 
+def lru_preference(original_pool_rank, pool_size):
+  """Returns frozen CAPD R_LRU using the original, unfiltered B_t rank."""
+  if original_pool_rank < 0 or original_pool_rank >= pool_size:
+    raise ValueError(
+        "original_pool_rank must be in [0, pool_size).")
+  denominator = max(int(pool_size) - 1, 1)
+  return 1.0 - int(original_pool_rank) / float(denominator)
+
+
 def raw_selector_values(page, original_pool_rank, pool_size, access_index,
                         selector_history, dirty_pages):
   last_access = selector_history.last_access_index(page, access_index)
@@ -71,14 +80,13 @@ def raw_selector_values(page, original_pool_rank, pool_size, access_index,
   access_count = selector_history.access_count(page)
   write_count = selector_history.write_count(page)
   clean = 0.0 if page in dirty_pages else 1.0
-  denominator = max(pool_size - 1, 1)
-  lru_preference = 1.0 - original_pool_rank / float(denominator)
+  lru_value = lru_preference(original_pool_rank, pool_size)
   return {
       "Delta": float(delta),
       "A": float(access_count),
       "W": float(write_count),
       "C": clean,
-      "R_LRU": lru_preference,
+      "R_LRU": lru_value,
   }
 
 
@@ -180,7 +188,7 @@ def build_candidate_state_features(selected_records, transformer_history,
     residency = access_index - dram_insert_time.get(page, access_index)
     normalized_residency = min(
         residency / float(max(1, residency_scale_Lres)), 1.0)
-    normalized_rank = rank / float(max(actual_pool_size - 1, 1))
+    normalized_rank = lru_preference(rank, actual_pool_size)
     pages.append(page)
     states.append([
         recent_frequency,

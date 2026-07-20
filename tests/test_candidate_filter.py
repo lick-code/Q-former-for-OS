@@ -72,7 +72,7 @@ class CandidateFilterTest(unittest.TestCase):
     self.assertEqual([2, 0, -1, -1], state["original_pool_ranks"])
     self.assertEqual(4, len(state["candidate_state_features"][0]))
     self.assertAlmostEqual(
-        2.0 / 3.0, state["candidate_state_features"][0][3])
+        1.0 / 3.0, state["candidate_state_features"][0][3])
     self.assertNotIn(
         selected[0]["selector_score"],
         state["candidate_state_features"][0])

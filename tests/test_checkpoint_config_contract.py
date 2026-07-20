@@ -39,6 +39,7 @@ class CheckpointConfigContractTest(unittest.TestCase):
     holdout["fingerprint"] = finals_config.decision_holdout_fingerprint(
         holdout)
     self.selector = {
+        "schema_version": self.config["schema_version"],
         "c_Delta": 10.0, "c_A": 2.0, "c_W": 1.0,
         "w_Delta": 0.2, "w_A": 0.2, "w_W": 0.2,
         "w_C": 0.2, "w_R": 0.2,
@@ -48,7 +49,7 @@ class CheckpointConfigContractTest(unittest.TestCase):
         "decision_holdout_fingerprint": holdout["fingerprint"],
     }
     self.checkpoint = {
-        "schema_version": finals_config.SCHEMA_VERSION,
+        "schema_version": self.config["schema_version"],
         "experiment_contract": finals_config.contract_from_config(
             self.config),
         "config_fingerprint": finals_config.config_fingerprint(self.config),

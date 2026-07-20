@@ -94,7 +94,8 @@ def read_trace(csv_path, page_shift):
       当前 example_memtrace.csv 的地址已经很小，默认使用 0。
 
   Returns:
-    tuple[list[dict], str]: trace 每条记录包含 pc、address、page、rw；
+    tuple[list[dict], str]: trace 每条记录包含 pc、address、page_id、rw；
+      ``page`` 是仅供旧路径使用的同值兼容别名；
       rw_source 描述 RW 字段来源。
   """
   trace = []
@@ -160,6 +161,7 @@ def read_trace(csv_path, page_shift):
       trace.append({
           "pc": pc,
           "address": address,
+          "page_id": page,
           "page": page,
           "rw": rw,
       })
@@ -169,7 +171,7 @@ def read_trace(csv_path, page_shift):
 def padded_history(history, history_length):
   """Converts recent accesses to fixed-length model input sequences.
 
-  QMAP 第一阶段需要长度固定的 [physical_address, pc, rw] 序列。
+  QMAP 第一阶段需要长度固定的 [page_id, pc, rw] 序列。
   当 trace 开头不足 history_length 条时，在左侧补 0。
   """
   padding = history_length - len(history)
@@ -232,7 +234,7 @@ def build_candidate_state_features(candidate, history, residency_duration,
     0. recent access frequency in the current history window
     1. dirty/write-touched state
     2. normalized residency duration in DRAM
-    3. optional normalized LRU-tail rank, where 0 is the oldest candidate
+    3. optional CAPD R_LRU, where 1 is the oldest candidate and 0 the newest
   """
   recent_frequency = sum(1 for item in history if item["page"] == candidate)
   recent_frequency = recent_frequency / max(1, len(history))
@@ -245,7 +247,7 @@ def build_candidate_state_features(candidate, history, residency_duration,
   ]
   if rank is not None:
     denominator = max(1, (candidate_count or 1) - 1)
-    features.append(rank / float(denominator))
+    features.append(1.0 - rank / float(denominator))
   return features
 
 

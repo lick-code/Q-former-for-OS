@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Train QMAP, including the strict CAPD finals_v2.1 holdout path."""
+"""Train QMAP with strict, versioned CAPD finals artifact contracts."""
 
 from __future__ import print_function
 
@@ -25,6 +25,7 @@ from policy_learning.cache_model import embed
 from policy_learning.cache_model import model
 from policy_learning.cache_model import qmap_loss
 from qmap import finals_config
+from qmap.qmap_generator import read_trace
 
 
 ABLATION_CHOICES = (
@@ -35,13 +36,19 @@ ABLATION_CHOICES = (
 class QMAPAccessSequenceDataset(Dataset):
   """Loads and validates complete QMAP JSONL samples."""
 
-  REQUIRED_FIELDS = (
+  LEGACY_REQUIRED_FIELDS = (
       "physical_address", "pc", "rw", "inactivity", "coldness",
       "write_sensitivity", "migration_cost")
+  V3_REQUIRED_FIELDS = (
+      "schema_version", "contract_id", "workload_id", "decision_index",
+      "history_page_ids", "history_mask", "pc", "rw", "candidate_pages",
+      "candidate_state_features", "candidate_mask", "original_pool_ranks",
+      "inactivity", "coldness", "write_sensitivity", "migration_cost")
 
-  def __init__(self, jsonl_path, expected_shape=None):
+  def __init__(self, jsonl_path, expected_shape=None, expected_identity=None):
     self._samples = []
     self._expected_shape = expected_shape
+    self._expected_identity = expected_identity
     with open(jsonl_path, "r", encoding="utf-8") as input_file:
       for line_number, line in enumerate(input_file, start=1):
         line = line.strip()
@@ -63,8 +70,13 @@ class QMAPAccessSequenceDataset(Dataset):
         "candidate_state_features", sample.get("candidates_features"))
     candidate_count = len(state_features)
     return {
-        "physical_address": torch.tensor(
-            sample["physical_address"], dtype=torch.long),
+        "history_page_ids": torch.tensor(
+            sample.get("history_page_ids", sample.get("physical_address")),
+            dtype=torch.long),
+        "history_mask": torch.tensor(
+            sample.get("history_mask", [1] * len(sample.get(
+                "history_page_ids", sample.get("physical_address", [])))),
+            dtype=torch.float32),
         "pc": torch.tensor(sample["pc"], dtype=torch.long),
         "rw": torch.tensor(sample["rw"], dtype=torch.long),
         "candidate_pages": torch.tensor(
@@ -88,15 +100,38 @@ class QMAPAccessSequenceDataset(Dataset):
     }
 
   def _validate_sample(self, sample, line_number):
-    missing = [field for field in self.REQUIRED_FIELDS if field not in sample]
+    schema = sample.get("schema_version")
+    is_v3 = schema == finals_config.SCHEMA_VERSION
+    required = (self.V3_REQUIRED_FIELDS if is_v3 else
+                self.LEGACY_REQUIRED_FIELDS)
+    missing = [field for field in required if field not in sample]
     if missing:
       raise ValueError("Line {} missing fields: {}".format(
           line_number, missing))
-    sequence_length = len(sample["physical_address"])
+    if is_v3 and "physical_address" in sample:
+      raise ValueError(
+          "Line {} v3 rejects legacy field physical_address.".format(
+              line_number))
+    history_field = "history_page_ids" if is_v3 else "physical_address"
+    sequence_length = len(sample[history_field])
     if not (len(sample["pc"]) == sequence_length and
             len(sample["rw"]) == sequence_length):
       raise ValueError("Line {} has inconsistent sequence lengths.".format(
           line_number))
+    if is_v3:
+      if len(sample["history_mask"]) != sequence_length:
+        raise ValueError("Line {} history_mask length mismatch.".format(
+            line_number))
+      if any(value not in (0, 1) for value in sample["history_mask"]):
+        raise ValueError("Line {} history_mask must be binary.".format(
+            line_number))
+      if sample["contract_id"] != finals_config.CONTRACT_ID:
+        raise ValueError("Line {} contract_id mismatch.".format(line_number))
+      if self._expected_identity:
+        for key, expected in self._expected_identity.items():
+          if sample.get(key) != expected:
+            raise ValueError(
+                "Line {} {} mismatch.".format(line_number, key))
 
     state_features = sample.get(
         "candidate_state_features", sample.get("candidates_features"))
@@ -128,9 +163,33 @@ class QMAPAccessSequenceDataset(Dataset):
       finals_config.assert_contract_matches(expected, actual,
                                              "JSONL line {}".format(
                                                  line_number))
-      if sample.get("schema_version") != finals_config.SCHEMA_VERSION:
-        raise ValueError("Line {} is not a finals_v2.1 sample.".format(
+      expected_schema = (self._expected_identity or {}).get(
+          "schema_version", finals_config.SCHEMA_VERSION)
+      if sample.get("schema_version") != expected_schema:
+        raise ValueError("Line {} schema_version mismatch.".format(
             line_number))
+
+  def page_vocab_values(self):
+    """Yields train-only history and real candidate page IDs."""
+    for sample in self._samples:
+      history = sample.get(
+          "history_page_ids", sample.get("physical_address", []))
+      history_mask = sample.get("history_mask", [1] * len(history))
+      for page, valid in zip(history, history_mask):
+        if valid:
+          yield page
+      pages = sample.get("candidate_pages", [])
+      mask = sample.get("candidate_mask", [1] * len(pages))
+      for page, valid in zip(pages, mask):
+        if valid:
+          yield page
+
+  def pc_vocab_values(self):
+    for sample in self._samples:
+      history_mask = sample.get("history_mask", [1] * len(sample["pc"]))
+      for pc, valid in zip(sample["pc"], history_mask):
+        if valid:
+          yield pc
 
 
 def build_arg_parser():
@@ -138,7 +197,7 @@ def build_arg_parser():
   parser.add_argument("--train_data", required=True)
   parser.add_argument("--valid_data", default=None)
   parser.add_argument("--config", default=None,
-                      help="Resolved CAPD finals_v2.1 config.")
+                      help="Resolved, versioned CAPD finals config.")
   parser.add_argument("--selector_params", default=None)
   parser.add_argument("--output_dir", default="qmap_checkpoints")
   parser.add_argument("--epochs", type=int, default=10)
@@ -215,61 +274,62 @@ def _validate_finals_artifacts(config, config_path, selector_path,
     raise ValueError(
         "--selector_params and --valid_data are required with --config.")
   selector_params = finals_config.load_json(selector_path)
+  finals_config.validate_selector_params(config, selector_params)
   expected_config_fingerprint = finals_config.config_fingerprint(config)
-  if selector_params.get("config_fingerprint") != expected_config_fingerprint:
-    raise ValueError("selector_params/config fingerprint mismatch.")
-  if selector_params.get("workload") != config["run"]["workload"]:
-    raise ValueError("selector_params/workload mismatch.")
   selector_fingerprint = finals_config.selector_fingerprint(selector_params)
   selector_holdout = selector_params.get("decision_holdout")
-  if not selector_holdout:
-    raise ValueError("selector_params has no decision holdout plan.")
-  finals_config.validate_decision_holdout(selector_holdout, config)
   holdout_fingerprint = selector_params.get("decision_holdout_fingerprint")
-  if holdout_fingerprint != selector_holdout["fingerprint"]:
-    raise ValueError("selector_params decision holdout fingerprint mismatch.")
+  is_v3_official = (
+      config["schema_version"] == finals_config.SCHEMA_VERSION and
+      config["run_profile"] == finals_config.OFFICIAL_PROFILE)
+  if is_v3_official:
+    if selector_holdout is not None or holdout_fingerprint is not None:
+      raise ValueError("Official v3 rejects decision-holdout artifacts.")
+  else:
+    if not selector_holdout:
+      raise ValueError("selector_params has no decision holdout plan.")
+    finals_config.validate_decision_holdout(selector_holdout, config)
+    if holdout_fingerprint != selector_holdout["fingerprint"]:
+      raise ValueError("selector_params decision holdout fingerprint mismatch.")
   contract = finals_config.contract_from_config(config)
   expected_shape = {
       "H": contract["H"], "K": contract["K"],
       "page_state_dim": contract["page_state_dim"]}
   metadata_by_split = {}
   for split, path in (("train", train_path), ("valid", valid_path)):
-    metadata = finals_config.load_jsonl_metadata(path)
-    if metadata.get("split") != split:
-      raise ValueError("{} JSONL split metadata mismatch.".format(split))
-    if metadata.get("workload") != config["run"]["workload"]:
-      raise ValueError("{} JSONL workload mismatch.".format(split))
-    if metadata.get("config_fingerprint") != expected_config_fingerprint:
-      raise ValueError("{} JSONL config fingerprint mismatch.".format(split))
-    if metadata.get("selector_fingerprint") != selector_fingerprint:
-      raise ValueError("{} JSONL selector fingerprint mismatch.".format(
-          split))
-    if metadata.get("source_partition") != "train_trace_decision_holdout":
+    metadata = finals_config.load_jsonl_metadata(
+        path, config=config, split=split, selector_params=selector_params)
+    expected_partition = (
+        "independent_{}_trace".format(split) if is_v3_official else
+        "train_trace_decision_holdout")
+    if metadata.get("source_partition") != expected_partition:
       raise ValueError("{} JSONL has the wrong source partition.".format(
           split))
-    if metadata.get("decision_holdout_fingerprint") != holdout_fingerprint:
-      raise ValueError("{} JSONL decision holdout mismatch.".format(split))
-    finals_config.validate_decision_holdout(
-        metadata.get("decision_holdout", {}), config)
-    if metadata["decision_holdout"] != selector_holdout:
-      raise ValueError("{} JSONL decision holdout plan mismatch.".format(
-          split))
+    expected_trace_key = (
+        "{}_trace_fingerprint".format(split) if is_v3_official else
+        "train_trace_fingerprint")
     if metadata.get("source_trace_fingerprint") != selector_params.get(
-        "train_trace_fingerprint"):
+        expected_trace_key):
       raise ValueError("{} JSONL source trace mismatch.".format(split))
+    if not is_v3_official:
+      if metadata.get("decision_holdout_fingerprint") != holdout_fingerprint:
+        raise ValueError("{} JSONL decision holdout mismatch.".format(split))
+      finals_config.validate_decision_holdout(
+          metadata.get("decision_holdout", {}), config)
+      if metadata["decision_holdout"] != selector_holdout:
+        raise ValueError("{} JSONL decision holdout plan mismatch.".format(
+            split))
     if int(metadata.get("sample_count", 0)) <= 0:
       raise ValueError("{} JSONL must contain validation-ready samples.".format(
           split))
-    expected_count_key = (
-        "train_decision_points" if split == "train"
-        else "validation_decision_points")
-    if int(metadata["sample_count"]) != int(
-        selector_params["decision_holdout"].get(expected_count_key, -1)):
-      raise ValueError("{} JSONL sample count/split plan mismatch.".format(
-          split))
-    finals_config.assert_contract_matches(
-        contract, metadata.get("experiment_contract", {}),
-        "{} JSONL".format(split))
+    if not is_v3_official and config["schema_version"] != finals_config.SCHEMA_VERSION:
+      expected_count_key = (
+          "train_decision_points" if split == "train"
+          else "validation_decision_points")
+      if int(metadata["sample_count"]) != int(
+          selector_params["decision_holdout"].get(expected_count_key, -1)):
+        raise ValueError("{} JSONL sample count/split plan mismatch.".format(
+            split))
     finals_config.assert_contract_matches(
         expected_shape, metadata.get("shape", {}),
         "{} JSONL shape".format(split))
@@ -285,6 +345,13 @@ def _validate_finals_artifacts(config, config_path, selector_path,
       "decision_holdout_fingerprint": holdout_fingerprint,
       "metadata": metadata_by_split,
       "expected_shape": expected_shape,
+      "sample_identity": ({
+          "schema_version": config["schema_version"],
+          "contract_id": finals_config.CONTRACT_ID,
+          "workload_id": config["run"]["workload"],
+      } if config["schema_version"] == finals_config.SCHEMA_VERSION else {
+          "schema_version": config["schema_version"],
+      }),
   }
 
 
@@ -303,6 +370,20 @@ def apply_finals_config(args):
   args.coldness_weight = float(labels["lambda_q"])
   args.write_sensitivity_weight = float(labels["lambda_w"])
   args.migration_cost_weight = 0.0
+  args.approx_ndcg_alpha = float(config.get("loss", {}).get(
+      "approx_ndcg_alpha", 10.0))
+  args.position_encoding = config.get("model", {}).get(
+      "position_encoding", "none")
+  args.shared_page_embedding = (
+      config.get("embedding", {}).get("page", {}).get("shared", False))
+  if config["schema_version"] == finals_config.SCHEMA_VERSION:
+    args.address_vocab_size = int(
+        config["embedding"]["page"]["max_vocab_size"])
+    args.page_vocab_size = args.address_vocab_size
+    args.pc_vocab_size = int(config["embedding"]["pc"]["max_vocab_size"])
+    if args.address_embed_dim != args.page_embed_dim:
+      raise ValueError(
+          "Shared history/candidate page embedding requires equal dimensions.")
   if args.ablation != "cross_attention":
     raise ValueError("Finals direction-1 training requires cross_attention.")
   return _validate_finals_artifacts(
@@ -314,16 +395,21 @@ def _forward_loss(batch, feature_embedder, extractor, scorer, loss_fn,
                   ablation):
   batch = apply_batch_ablation(batch, ablation)
   access_features = feature_embedder(
-      batch["physical_address"], batch["pc"], batch["rw"])
-  z = extractor(access_features)
+      batch["history_page_ids"], batch["pc"], batch["rw"])
+  z = extractor(access_features, history_mask=batch["history_mask"])
   if (batch["legacy_candidates"] != 0).any():
     eviction_scores = scorer(
         z, batch["candidate_state_features"],
         candidate_mask=batch["candidate_mask"])
   else:
+    candidate_page_embeddings = (
+        feature_embedder.embed_pages(batch["candidate_pages"])
+        if getattr(scorer, "_shared_page_embedding", False) else None)
     eviction_scores = scorer(
         z, batch["candidate_pages"], batch["candidate_state_features"],
-        batch["candidate_mask"])
+        batch["candidate_mask"],
+        candidate_page_embeddings=candidate_page_embeddings,
+        history_mask=batch["history_mask"])
   return loss_fn(
       eviction_scores, batch["inactivity"], batch["coldness"],
       batch["write_sensitivity"], batch["migration_cost"],
@@ -348,10 +434,13 @@ def evaluate_loss(dataloader, device, feature_embedder, extractor, scorer,
 
 
 def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
-                       validation_loss, args, finals_context):
+                       validation_loss, args, finals_context,
+                       best_epoch=None, best_validation_loss=None):
   payload = {
       "epoch": epoch,
       "validation_loss": validation_loss,
+      "best_epoch": best_epoch,
+      "best_validation_loss": best_validation_loss,
       "model_args": vars(args).copy(),
       "feature_embedder": feature_embedder.state_dict(),
       "extractor": extractor.state_dict(),
@@ -359,8 +448,9 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
       "optimizer": optimizer.state_dict(),
   }
   if finals_context:
+    config = finals_context["config"]
     payload.update({
-        "schema_version": finals_config.SCHEMA_VERSION,
+        "schema_version": config["schema_version"],
         "experiment_contract": finals_context["contract"],
         "config_fingerprint": finals_context["config_fingerprint"],
         "selector_params": finals_context["selector_params"],
@@ -368,16 +458,34 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
         "decision_holdout": finals_context["decision_holdout"],
         "decision_holdout_fingerprint": finals_context[
             "decision_holdout_fingerprint"],
-        "workload": finals_context["config"]["run"]["workload"],
+        "workload": config["run"]["workload"],
+        "workload_id": config["run"]["workload"],
         "seed": args.seed,
         "jsonl_fingerprints": {
             split: metadata["data_fingerprint"]
             for split, metadata in finals_context["metadata"].items()
         },
-        "git_commit": finals_context["config"].get(
+        "git_commit": config.get(
             "run", {}).get("git_commit", "unknown"),
         "command": _command_text(),
     })
+    if config["schema_version"] == finals_config.SCHEMA_VERSION:
+      page_vocab = feature_embedder.page_embedder
+      pc_vocab = feature_embedder.pc_embedder
+      payload.update({
+          "contract_id": finals_config.CONTRACT_ID,
+          "run_profile": config["run_profile"],
+          "artifact_class": config["validation"]["artifact_class"],
+          "vocab_contract": {
+              "page_frozen": page_vocab.frozen,
+              "pc_frozen": pc_vocab.frozen,
+              "unk_index": 0,
+              "page_vocab_fingerprint": finals_config.fingerprint_value(
+                  page_vocab.input_to_index),
+              "pc_vocab_fingerprint": finals_config.fingerprint_value(
+                  pc_vocab.input_to_index),
+          },
+      })
   return payload
 
 
@@ -396,11 +504,22 @@ def main():
     device_name = "cuda" if torch.cuda.is_available() else "cpu"
   device = torch.device(device_name)
   expected_shape = finals_context["expected_shape"] if finals_context else None
+  sample_identity = (finals_context["sample_identity"]
+                     if finals_context else None)
   train_dataset = QMAPAccessSequenceDataset(
-      args.train_data, expected_shape=expected_shape)
+      args.train_data, expected_shape=expected_shape,
+      expected_identity=sample_identity)
   valid_dataset = (QMAPAccessSequenceDataset(
-      args.valid_data, expected_shape=expected_shape)
+      args.valid_data, expected_shape=expected_shape,
+      expected_identity=sample_identity)
                    if args.valid_data else None)
+  if finals_context:
+    if len(train_dataset) != int(
+        finals_context["metadata"]["train"]["sample_count"]):
+      raise ValueError("Train JSONL row count/metadata mismatch.")
+    if valid_dataset is not None and len(valid_dataset) != int(
+        finals_context["metadata"]["valid"]["sample_count"]):
+      raise ValueError("Valid JSONL row count/metadata mismatch.")
   train_loader = DataLoader(
       train_dataset, batch_size=args.batch_size, shuffle=True,
       num_workers=args.num_workers, drop_last=False)
@@ -422,6 +541,20 @@ def main():
       pc_embedder=embed.DynamicVocabEmbedder(
           embed_dim=args.pc_embed_dim, max_vocab_size=args.pc_vocab_size),
       rw_embedder=embed.RWFlagEmbedder(embed_dim=args.rw_embed_dim)).to(device)
+  is_v3 = bool(
+      finals_context and finals_context["config"]["schema_version"] ==
+      finals_config.SCHEMA_VERSION)
+  if is_v3:
+    # Both vocabularies are fitted from the complete train trace only, then
+    # frozen before a validation batch can reach either embedder.
+    train_trace, _ = read_trace(
+        finals_context["config"]["data"]["train_trace"],
+        int(finals_context["config"]["trace"]["page_shift"]))
+    feature_embedder.page_embedder.fit(
+        (access["page_id"] for access in train_trace)).freeze()
+    feature_embedder.pc_embedder.fit(
+        (access["pc"] for access in train_trace)).freeze()
+    del train_trace
   if feature_embedder.embed_dim != args.hidden_dim:
     raise ValueError("hidden_dim ({}) must equal embedding dimension ({})."
                      .format(args.hidden_dim, feature_embedder.embed_dim))
@@ -430,20 +563,26 @@ def main():
       num_layers=args.num_layers, num_heads=args.num_heads,
       feedforward_dim=args.feedforward_dim, dropout=args.dropout,
       use_qformer=uses_qformer(args.ablation),
-      pooling_strategy=args.pooling_strategy).to(device)
+      pooling_strategy=args.pooling_strategy,
+      position_encoding=getattr(args, "position_encoding", "none"),
+      max_sequence_length=(expected_shape["H"] if expected_shape else
+                           4096)).to(device)
   scorer = model.QMAPCandidateScorer(
       hidden_dim=args.hidden_dim, page_state_dim=args.page_state_dim,
       page_embed_dim=args.page_embed_dim,
       page_vocab_size=args.page_vocab_size, num_heads=args.num_heads,
       dropout=args.dropout, page_dim=args.page_dim,
-      scoring_input=args.scoring_input).to(device)
+      scoring_input=args.scoring_input,
+      shared_page_embedding=getattr(
+          args, "shared_page_embedding", False)).to(device)
   loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
       lambda_1=args.inactivity_weight,
       lambda_2=args.coldness_weight,
       lambda_3=0.0 if args.ablation == "no_cost" else (
           args.write_sensitivity_weight),
       lambda_4=0.0 if args.ablation == "no_cost" else (
-          args.migration_cost_weight)).to(device)
+          args.migration_cost_weight),
+      alpha=getattr(args, "approx_ndcg_alpha", 10.0)).to(device)
   parameters = (list(feature_embedder.parameters()) +
                 list(extractor.parameters()) + list(scorer.parameters()))
   optimizer = optim.AdamW(
@@ -480,24 +619,27 @@ def main():
         args.ablation) if valid_loader else train_loss)
     if not math.isfinite(train_loss) or not math.isfinite(validation_loss):
       raise ValueError("Non-finite training or validation loss detected.")
+    is_best = validation_loss < best_loss
+    if is_best:
+      best_loss = validation_loss
+      best_epoch = epoch
     payload = checkpoint_payload(
         feature_embedder, extractor, scorer, optimizer, epoch,
-        validation_loss, args, finals_context)
+        validation_loss, args, finals_context,
+        best_epoch=best_epoch, best_validation_loss=best_loss)
     torch.save(payload, last_path)
     if finals_context is None:
       # Preserve historical experiment-script checkpoint names outside the
       # isolated finals_v2.1 path.
       torch.save(payload, os.path.join(
           args.output_dir, "qmap_epoch_{}.pth".format(epoch)))
-    if validation_loss < best_loss:
-      best_loss = validation_loss
-      best_epoch = epoch
+    if is_best:
       torch.save(payload, best_path)
     print("epoch={}/{} train_loss={:.6f} valid_loss={:.6f}".format(
         epoch, args.epochs, train_loss, validation_loss), flush=True)
 
   manifest = {
-      "schema_version": (finals_config.SCHEMA_VERSION
+      "schema_version": (finals_context["config"]["schema_version"]
                          if finals_context else "legacy_qmap"),
       "best_epoch": best_epoch,
       "best_validation_loss": best_loss,
@@ -517,6 +659,15 @@ def main():
                      finals_config.current_git_commit(PROJECT_ROOT)),
       "command": _command_text(),
   }
+  if is_v3:
+    manifest.update(finals_config.artifact_identity_from_config(
+        finals_context["config"]))
+    manifest["selector_fingerprint"] = finals_context[
+        "selector_fingerprint"]
+    manifest["jsonl_fingerprints"] = {
+        split: metadata["data_fingerprint"]
+        for split, metadata in finals_context["metadata"].items()
+    }
   finals_config.write_json(
       os.path.join(args.output_dir, "checkpoint_manifest.json"), manifest)
   print("Training finished. best={} last={}".format(

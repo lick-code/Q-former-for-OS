@@ -518,11 +518,13 @@ def main():
   model_dict = train_model(args)
   if config is not None:
     model_dict.update({
-        "schema_version": finals_config.SCHEMA_VERSION,
+        "schema_version": config["schema_version"],
         "workload": config["run"]["workload"],
         "config_fingerprint": finals_config.config_fingerprint(config),
         "experiment_contract": finals_config.contract_from_config(config),
     })
+    if config["schema_version"] == finals_config.SCHEMA_VERSION:
+      model_dict.update(finals_config.artifact_identity_from_config(config))
   save_model(model_dict, args.model_output)
   print("[done] policy={} samples={} model={}".format(
       args.policy,
