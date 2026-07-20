@@ -195,9 +195,10 @@ def _uniform_fallback(total_count, coverage_metrics=None,
   return {
       "weights": uniform,
       "PoolRecall@B": float(coverage_metrics.get("PoolRecall@B", 0.0)),
-      "SelectorRecall@K": float(
-          coverage_metrics.get("SelectorRecall@K", 0.0)),
-      "Recall@K": float(coverage_metrics.get("SelectorRecall@K", 0.0)),
+      # No R_t^y > epsilon_y decision exists, so the frozen selector metric
+      # has an empty effective set. Do not reuse all-window diagnostic recall.
+      "SelectorRecall@K": 0.0,
+      "Recall@K": 0.0,
       "EndToEndRecall@K": float(
           coverage_metrics.get("EndToEndRecall@K", 0.0)),
       "TieCoverage@K": float(coverage_metrics.get("TieCoverage@K", 0.0)),
@@ -216,7 +217,7 @@ def _search_chunks(chunks, epsilon_y):
   grid = weight_grid()
   if len(grid) != 1001:
     raise AssertionError("Expected exactly 1001 selector weights.")
-  recall_totals = np.zeros(len(grid), dtype=np.float64)
+  selector_recall_totals = np.zeros(len(grid), dtype=np.float64)
   pool_recall_totals = np.zeros(len(grid), dtype=np.float64)
   end_to_end_totals = np.zeros(len(grid), dtype=np.float64)
   tie_coverage_totals = np.zeros(len(grid), dtype=np.float64)
@@ -229,7 +230,6 @@ def _search_chunks(chunks, epsilon_y):
     total_count += len(chunk)
     all_arrays = _sample_arrays(chunk)
     all_metrics = evaluate_weight_batch_metrics(all_arrays, grid)
-    recall_totals += all_metrics["SelectorRecall@K"] * len(chunk)
     pool_recall_totals += all_metrics["PoolRecall@B"] * len(chunk)
     end_to_end_totals += all_metrics["EndToEndRecall@K"] * len(chunk)
     tie_coverage_totals += all_metrics["TieCoverage@K"] * len(chunk)
@@ -250,6 +250,8 @@ def _search_chunks(chunks, epsilon_y):
       continue
     arrays = _sample_arrays(valid_samples)
     metrics = evaluate_weight_batch_metrics(arrays, grid)
+    selector_recall_totals += (
+        metrics["SelectorRecall@K"] * len(valid_samples))
     regret_totals += metrics["NRegret"] * len(valid_samples)
     valid_count += len(valid_samples)
 
@@ -257,7 +259,6 @@ def _search_chunks(chunks, epsilon_y):
     if total_count:
       coverage = {
           "PoolRecall@B": pool_recall_totals[0] / float(total_count),
-          "SelectorRecall@K": recall_totals[0] / float(total_count),
           "EndToEndRecall@K": end_to_end_totals[0] / float(total_count),
           "TieCoverage@K": tie_coverage_totals[0] / float(total_count),
       }
@@ -269,7 +270,7 @@ def _search_chunks(chunks, epsilon_y):
                           if total_count else 0.0),
         unique_oracle_ratio=(unique_oracle_count / float(total_count)
                              if total_count else 0.0))
-  recalls = recall_totals / float(total_count)
+  recalls = selector_recall_totals / float(valid_count)
   pool_recalls = pool_recall_totals / float(total_count)
   end_to_end_recalls = end_to_end_totals / float(total_count)
   tie_coverages = tie_coverage_totals / float(total_count)

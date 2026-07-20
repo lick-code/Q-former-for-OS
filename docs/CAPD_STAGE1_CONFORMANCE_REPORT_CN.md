@@ -6,6 +6,8 @@
 
 本报告只记录代码与测试代码的静态构造结果。本地没有执行 Python 语法检查、单元测试、torch 前向、数据生成、Trace Replay、模型训练、模型推理、selector 网格搜索、smoke test、benchmark、端到端回归或实验，因此不得把本报告解释为 `PASSED`、`VERIFIED`、`STAGE1_CONFORMANT` 或“阶段1已完成”。
 
+2026-07-20 首轮服务器验收反馈的三项修订已写入代码和测试，但本地只完成静态审查，尚待服务器复验：五访问手算代价修正为 35；selector 正式 Recall/NRegret 统一使用有效验证决策点；微型端到端 trace 改为包含冷热重访和写访问的非平凡工作负载。
+
 唯一方法—实现依据：`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 中冻结的 `CAPD-MIC-1.0`。冻结合同的“实现状态”未被修改。
 
 服务器验收命令：`docs/CAPD_STAGE1_SERVER_VALIDATION_CN.md`。
@@ -81,15 +83,15 @@
 - 修改文件：`configs/finals/capd_direction1_v3.json`、`qmap/finals_config.py`、`qmap/qmap_eval.py`。
 - 实现方式：配置显式冻结 DRAM 初始为空、所有 trace 页面由 NVM 后备、首次访问计 NVM、NVM 容量无界、dirty 降级不增加 NVM 写；replay 初始化显式 NVM 页面全集，miss 按 rw 计一次 NVM 读/写，降级只增加固定迁移代价。
 - 对应测试：`ReplayAccountingTest.test_first_read_write_hit_nvm_revisit_and_demotion_costs`、`DirtyAccountingTest.test_dirty_and_clean_victim_each_migrate_once_without_writeback_count`。
-- 静态审查结果：五访问 trace 精确断言 1 hit、4 miss、3 NVM read、1 NVM write、2 migration、总代价 33；clean/dirty 降级均只迁移一次；未运行。
+- 静态审查结果：五访问 trace 精确断言 1 hit、4 miss、3 NVM read、1 NVM write、2 migration，总代价为 `2+1+8+(2+10)+(2+10)=35`；clean/dirty 降级均只迁移一次；未运行。`qmap_eval.py` 回放记账实现未因本次修订改动。
 - 待服务器验证：CLOCK/Random/LFU/QMAP 各策略共用记账路径且结果字段一致。
 
 ### G10：三级覆盖指标与 NRegret
 
 - 修改文件：`qmap/selector_search.py`、`qmap/finals_generator.py`、`qmap/finals_config.py`、`qmap/qmap_eval.py`。
-- 实现方式：独立计算并写入 selector 参数 `PoolRecall@B`、`SelectorRecall@K`、`EndToEndRecall@K`、`TieCoverage@K`、`NRegret`；Recall 类指标在所有完整窗口决策点统计，NRegret 只在池内 relevance range 大于 epsilon 的有效点统计；result 以 `valid_trace` 为明确来源记录这些 selector 覆盖指标，避免伪装成 test 未来标签。
-- 对应测试：`LruAndMetricSemanticsTest.test_pool_selector_end_to_end_and_regret_are_separate`、`LruAndMetricSemanticsTest.test_any_hit_and_tie_coverage_are_distinct_numeric_metrics`。
-- 静态审查结果：构造样本精确断言四项覆盖率分别为 0.5、0.5、0.5、0.25，NRegret 为 0.5；未运行。
+- 实现方式：独立计算并写入 selector 参数 `PoolRecall@B`、`SelectorRecall@K`、`EndToEndRecall@K`、`TieCoverage@K`、`NRegret`。权重选择及正式 `SelectorRecall@K`、`NRegret` 只在 `R_t^y>epsilon_y` 的有效验证决策点集合上累计和归一化，无区分样本不进入二者分母；Pool、EndToEnd 和 TieCoverage 仍作为全部完整窗口上的覆盖诊断。result 以 `valid_trace` 为明确来源记录这些指标，避免伪装成 test 未来标签。
+- 对应测试：`LruAndMetricSemanticsTest.test_pool_selector_end_to_end_and_regret_are_separate`、`LruAndMetricSemanticsTest.test_any_hit_and_tie_coverage_are_distinct_numeric_metrics`、`SelectorWeightSearchTest.test_nondiscriminative_sample_is_excluded_from_selector_recall`。
+- 静态审查结果：原构造样本继续精确断言四项覆盖率分别为 0.5、0.5、0.5、0.25，NRegret 为 0.5；新增“一个有效样本+一个无区分样本”断言 `effective_decision_points=1`、`nondiscriminative_ratio=0.5`、`SelectorRecall@K=0.0`、`NRegret=1.0`，防止错误得到 0.5；未运行。
 - 待服务器验证：大 valid trace 上的批处理累计、无区分样本 fallback 和 JSON 序列化。
 
 ## 3. 工件合同与不兼容边界
@@ -109,7 +111,7 @@
 - Gate C1：LRU 方向、tie any-hit/TieCoverage、future guard、共享嵌入、冻结词表/OOV、正弦位置编码、ApproxNDCG 对角线与 padding 均有具体数值断言。
 - Gate C2：生成器/回放共享候选快照已有逐字段等价测试；当前请求进入精排 history 而不提前进入 selector 有独立测试；首次读写、命中、再次 NVM 访问、clean/dirty 降级有手算计数和总代价测试。
 - Gate C3：独立 trace 路径/内容指纹、official/smoke、schema/合同/配置/workload/selector/JSONL/checkpoint/result 硬失败及 v3 旧字段拒绝均有测试。
-- Gate C4：新增 server-only 微型端到端与两次固定种子测试，默认 skip，只有服务器显式设置 `CAPD_RUN_STAGE1_E2E=1` 才执行，所有工件写入 pytest 临时目录。
+- Gate C4：server-only 微型端到端 trace 已改为 440 次访问，包含 DRAM 填充、流式冷页、分层热页重访和写访问；除全链路与两次固定种子断言外，还要求 selector 不使用 uniform fallback、有效决策点大于 0、验证样本存在非零 relevance range，并在生产模型路径的一次优化步中断言 loss/梯度有限、梯度非零且至少一个参数改变。默认 skip，只有服务器显式设置 `CAPD_RUN_STAGE1_E2E=1` 才执行，所有工件写入 pytest 临时目录。
 
 新增或修改的主要测试文件：
 
@@ -118,18 +120,19 @@
 - `tests/test_capd_stage1_v3_end_to_end.py`
 - `tests/test_candidate_filter.py`
 - `tests/test_checkpoint_config_contract.py`
-- 复用现有 `tests/test_generator_replay_feature_equivalence.py`、`tests/test_dirty_accounting.py`、`tests/test_selector_weight_search.py`、cross-attention 测试。
+- `tests/test_selector_weight_search.py`
+- 复用现有 `tests/test_generator_replay_feature_equivalence.py`、`tests/test_dirty_accounting.py` 和 cross-attention 测试。
 
 ## 5. 静态无法确认及合同口径问题
 
 ### 5.1 必须由服务器确认
 
 - 所有 Python 文件的语法和导入关系；
-- NumPy selector 批处理的实际数值；
+- NumPy selector 有效集 Recall/NRegret 累计及混合样本回归的实际数值；
 - PyTorch Transformer mask API、共享 embedding 梯度与 state dict；
 - 冻结词表 checkpoint round-trip；
 - ApproxNDCG 前向/反向和数值稳定性；
-- 微型端到端链、固定种子确定性；
+- 非平凡微型端到端链、非 fallback selector、非零训练信号和固定种子确定性；
 - 全量 pytest 对旧 v2.1 路径的回归影响；
 - 真实 train/valid/test trace 的来源与时间范围是否确实不重叠。代码只能检查路径和内容指纹，无法仅凭文件静态证明采集时间边界。
 

@@ -51,6 +51,28 @@ class SelectorWeightSearchTest(unittest.TestCase):
     self.assertTrue(result["fallback_uniform"])
     self.assertEqual(0, result["effective_decision_points"])
 
+  def test_nondiscriminative_sample_is_excluded_from_selector_recall(self):
+    always_wrong_effective = {
+        "B_t": 2,
+        "retained_K": 1,
+        "selector_features": [[1.0] * 5, [0.0] * 5],
+        "relevance": [0.0, 1.0],
+    }
+    nondiscriminative_any_hit = {
+        "B_t": 2,
+        "retained_K": 1,
+        "selector_features": [[1.0] * 5, [0.0] * 5],
+        "relevance": [1.0, 1.0],
+    }
+    result = selector_search.search_selector_weights(
+        [always_wrong_effective, nondiscriminative_any_hit], epsilon_y=1e-8)
+    self.assertFalse(result["fallback_uniform"])
+    self.assertEqual(1, result["effective_decision_points"])
+    self.assertEqual(0.5, result["nondiscriminative_ratio"])
+    self.assertEqual(0.0, result["SelectorRecall@K"])
+    self.assertEqual(0.0, result["Recall@K"])
+    self.assertEqual(1.0, result["NRegret"])
+
 
 if __name__ == "__main__":
   unittest.main()

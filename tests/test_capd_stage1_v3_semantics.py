@@ -284,8 +284,8 @@ class ReplayAccountingTest(unittest.TestCase):
     self.assertEqual(3, stats.nvm_read_count)
     self.assertEqual(1, stats.nvm_write_count)
     self.assertEqual(2, stats.migration_count)
-    # 2 + 1 + 8 + (2+10) + (2+10) = 33. Dirty demotion adds no write.
-    self.assertEqual(33.0, stats.weighted_access_cost)
+    # 2 + 1 + 8 + (2+10) + (2+10) = 35. Dirty demotion adds no write.
+    self.assertEqual(35.0, stats.weighted_access_cost)
 
 
 class ArtifactIdentityTest(unittest.TestCase):
@@ -368,7 +368,7 @@ class ArtifactIdentityTest(unittest.TestCase):
         "nvm_reads": 3,
         "nvm_writes": 1,
         "migrations": 2,
-        "weighted_access_cost": 33.0,
+        "weighted_access_cost": 35.0,
         "test_trace_fingerprint": finals_config.fingerprint_file(
             config["data"]["test_trace"]),
         "cost_model": copy.deepcopy(config["cost_model"]),

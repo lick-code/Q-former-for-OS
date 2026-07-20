@@ -74,7 +74,7 @@ python -m pytest -q \
 
 - 工作目录：`$REPO`。
 - 环境要求：Python、NumPy、pytest；该组不应进入 torch 训练或模型前向路径。
-- 预期成功条件：退出码为 0，所有收集到的测试通过；不得出现把 v3 official 工件当作 holdout/smoke 工件接受的情况。
+- 预期成功条件：退出码为 0，所有收集到的测试通过；混合有效/无区分样本的 `SelectorRecall@K` 必须为 0.0 而非 0.5；不得出现把 v3 official 工件当作 holdout/smoke 工件接受的情况。
 - 失败时重点检查：`qmap/finals_config.py`、`qmap/finals_generator.py`、`qmap/selector_search.py`、`qmap/candidate_filter.py`、`qmap/qmap_eval.py`。
 - 临时文件：pytest 临时文件由 `$TMPDIR` 承载；测试中的 trace/JSONL 均使用 `tempfile.TemporaryDirectory()`，不得指定到正式目录。
 
@@ -117,9 +117,9 @@ CAPD_RUN_STAGE1_E2E=1 python -m pytest -q \
 
 - 工作目录：`$REPO`。
 - 环境要求：PyTorch CPU 环境；pytest；可通过 `sys.executable` 启动 `qmap.finals_generator`、`qmap.qmap_train` 和 `qmap.qmap_eval`。
-- 预期成功条件：临时 `train/valid/test trace -> selector -> v3 JSONL -> 1 epoch train -> QMAP replay -> result audit` 全链路退出码为 0；result 为 `capd_finals_v3_0`、`CAPD-MIC-1.0`、`official`，且手工记账恒等式成立。
+- 预期成功条件：临时 `train/valid/test trace -> selector -> v3 JSONL -> 1 epoch train -> QMAP replay -> result audit` 全链路退出码为 0；result 为 `capd_finals_v3_0`、`CAPD-MIC-1.0`、`official`；selector 的 `fallback_uniform=false`、有效决策点大于 0，验证数据存在非零 relevance range；受控优化步的 loss/梯度有限、梯度非零且至少一个参数改变。
 - 失败时重点检查：generator 的完整未来窗口过滤、selector 指纹、JSONL 元数据、冻结词表、checkpoint 身份、test result 身份及临时 trace 长度。
-- 临时文件：测试用 3 条 330-access 合成 trace、selector、JSONL、checkpoint 和 result 全部位于 pytest 的 `$TMPDIR` 子目录；测试结束自动删除。不得把路径改为 `dataset/` 或 `outputs/`。
+- 临时文件：测试用 3 条 440-access 冷热重访/写混合 trace、selector、JSONL、checkpoint 和 result 全部位于 pytest 的 `$TMPDIR` 子目录；测试结束自动删除。不得把路径改为 `dataset/` 或 `outputs/`。
 
 ### 3.6 两次固定种子确定性检查
 
