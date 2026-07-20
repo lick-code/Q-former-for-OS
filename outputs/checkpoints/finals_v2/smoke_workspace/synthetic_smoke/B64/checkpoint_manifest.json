@@ -1,0 +1,18 @@
+{
+  "best_epoch": 1,
+  "best_validation_loss": -0.02418967381119728,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "2d375fe14d70ff98c43a6b0988c82e413642a2fbe6fc4fdbc239155f0c3438a6",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2/smoke_workspace/synthetic_smoke/B64/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "3253ce6478924335f30f15945db708602583382f432a57d173f60e9c52b799b2",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2/smoke_workspace/synthetic_smoke/B64/qmap_last.pth"
+    }
+  },
+  "command": "/home/likc/Q-former-for-OS/qmap/qmap_train.py --config /home/likc/Q-former-for-OS/outputs/results/finals_v2/smoke_workspace/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v2/smoke_workspace/synthetic_smoke/B64/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v2/smoke_workspace/synthetic_smoke/B64/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v2/smoke_workspace/synthetic_smoke/B64/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v2/smoke_workspace/synthetic_smoke/B64 --device cpu",
+  "config_fingerprint": "7fdc22d53bcae3006494c636c67b5e0829f9bf520f4c2f4dc1d4d79c14f8a04a",
+  "git_commit": "bec027daa96fb48d8d58d50ebb8f67630810529e",
+  "schema_version": "capd_finals_v2"
+}
