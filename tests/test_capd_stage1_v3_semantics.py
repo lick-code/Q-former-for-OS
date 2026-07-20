@@ -325,6 +325,14 @@ class ArtifactIdentityTest(unittest.TestCase):
 
   def test_jsonl_metadata_and_result_mismatches_hard_fail(self):
     config = resolved_v3()
+    # Stage-1 contract tests must not depend on stage-2 official traces having
+    # already been materialized.  Use a local fixture for fingerprint checks.
+    trace_directory = tempfile.TemporaryDirectory()
+    self.addCleanup(trace_directory.cleanup)
+    test_trace = os.path.join(trace_directory.name, "test_trace.csv")
+    with open(test_trace, "w", encoding="utf-8") as output_file:
+      output_file.write("PC,Address,RW\n0x1,0x1000,R\n")
+    config["data"]["test_trace"] = test_trace
     selector = selector_for(config)
     with tempfile.TemporaryDirectory() as directory:
       jsonl_path = os.path.join(directory, "train.jsonl")
