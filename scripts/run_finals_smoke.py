@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Complete CPU smoke test for the frozen CAPD finals_v2 pipeline."""
+"""Complete CPU smoke test for the frozen CAPD finals_v2.1 pipeline."""
 
 from __future__ import print_function
 
@@ -22,6 +22,7 @@ from scripts import run_finals_v2
 TEST_FILES = (
     "tests/test_candidate_filter.py",
     "tests/test_selector_weight_search.py",
+    "tests/test_decision_holdout.py",
     "tests/test_generator_replay_feature_equivalence.py",
     "tests/test_dirty_accounting.py",
     "tests/test_checkpoint_config_contract.py",
@@ -58,7 +59,8 @@ def write_trace(path, rotation):
 def build_smoke_config(base_config_path, smoke_name):
   base = finals_config.load_config(base_config_path)
   trace_dir = os.path.join(
-      PROJECT_ROOT, "dataset", "jsonl", "finals_v2", smoke_name, "traces")
+      PROJECT_ROOT, "dataset", "jsonl", "finals_v2_decision_holdout",
+      smoke_name, "traces")
   traces = {
       "train_trace": os.path.join(trace_dir, "train.csv"),
       "valid_trace": os.path.join(trace_dir, "valid.csv"),
@@ -71,14 +73,18 @@ def build_smoke_config(base_config_path, smoke_name):
   base["run_profile"] = "smoke"
   base["candidate"]["selector_history_Hc"] = 32
   base["labels"]["future_lookahead_L"] = 32
+  base["validation"]["guard_accesses"] = 32
   base["training"].update({"epochs": 1, "batch_size": 16})
   base["outputs"] = {
       "jsonl_root": os.path.join(
-          PROJECT_ROOT, "dataset", "jsonl", "finals_v2", smoke_name),
+          PROJECT_ROOT, "dataset", "jsonl", "finals_v2_decision_holdout",
+          smoke_name),
       "checkpoint_root": os.path.join(
-          PROJECT_ROOT, "outputs", "checkpoints", "finals_v2", smoke_name),
+          PROJECT_ROOT, "outputs", "checkpoints",
+          "finals_v2_decision_holdout", smoke_name),
       "result_root": os.path.join(
-          PROJECT_ROOT, "outputs", "results", "finals_v2", smoke_name),
+          PROJECT_ROOT, "outputs", "results", "finals_v2_decision_holdout",
+          smoke_name),
   }
   resolved = finals_config.resolve_config(
       base, "synthetic_smoke", 64, project_root=PROJECT_ROOT)
@@ -93,6 +99,17 @@ def validate_outputs(config, paths):
   train_metadata = finals_config.load_jsonl_metadata(paths["train_jsonl"])
   valid_metadata = finals_config.load_jsonl_metadata(paths["valid_jsonl"])
   candidate_metrics = train_metadata["candidate_filter_metrics"]
+  if train_metadata["source_partition"] != "train_trace_decision_holdout":
+    raise AssertionError("Smoke train JSONL did not use decision holdout.")
+  if (train_metadata["decision_holdout_fingerprint"] !=
+      valid_metadata["decision_holdout_fingerprint"]):
+    raise AssertionError("Smoke train/valid split plans differ.")
+  holdout = train_metadata["decision_holdout"]
+  if holdout["guard_accesses"] != 32:
+    raise AssertionError("Smoke validation guard is not L=32.")
+  if (holdout["last_train_decision_index"] + holdout["guard_accesses"] >=
+      holdout["first_validation_decision_index"]):
+    raise AssertionError("Smoke training lookahead crosses validation.")
   if candidate_metrics["max_B_t"] != 64:
     raise AssertionError("Smoke test never reached B_t=64.")
   if candidate_metrics["max_K_t"] != 8:
@@ -138,6 +155,7 @@ def validate_outputs(config, paths):
       "jsonl_shape": shape,
       "train_samples": train_metadata["sample_count"],
       "valid_samples": valid_metadata["sample_count"],
+      "decision_holdout": holdout,
       "checkpoint_contract": checkpoint["experiment_contract"],
       "checkpoint_validation_loss": checkpoint["validation_loss"],
       "results": results,
@@ -148,7 +166,8 @@ def validate_outputs(config, paths):
 
 
 def main():
-  parser = argparse.ArgumentParser(description="Run CAPD finals_v2 smoke test.")
+  parser = argparse.ArgumentParser(
+      description="Run CAPD finals_v2.1 decision-holdout smoke test.")
   parser.add_argument(
       "--base-config", default="configs/finals/capd_direction1.json")
   parser.add_argument("--smoke-name", default="smoke_workspace")

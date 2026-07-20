@@ -1,5 +1,5 @@
 {
-  "schema_version": "capd_finals_v2",
+  "schema_version": "capd_finals_v2_1",
   "run_profile": "official",
   "memory": {
     "dram_capacity_pages": 64,
@@ -31,6 +31,13 @@
     "grid_step": 0.1,
     "epsilon_y": 1e-08,
     "behavior_policy": "lru"
+  },
+  "validation": {
+    "strategy": "train_trace_decision_holdout",
+    "holdout_fraction": 0.2,
+    "rounding": "ceil",
+    "guard_accesses": 256,
+    "external_valid_trace_role": "diagnostic_only"
   },
   "training": {
     "seed": 3136859,
@@ -69,8 +76,8 @@
     }
   },
   "outputs": {
-    "jsonl_root": "dataset/jsonl/finals_v2",
-    "checkpoint_root": "outputs/checkpoints/finals_v2",
-    "result_root": "outputs/results/finals_v2"
+    "jsonl_root": "dataset/jsonl/finals_v2_decision_holdout",
+    "checkpoint_root": "outputs/checkpoints/finals_v2_decision_holdout",
+    "result_root": "outputs/results/finals_v2_decision_holdout"
   }
 }

@@ -458,7 +458,7 @@ def build_arg_parser():
       description="Train lightweight learned replacement baselines.")
   parser.add_argument("--policy", choices=POLICY_CHOICES, required=True)
   parser.add_argument("--config", default=None,
-                      help="Resolved CAPD finals_v2 config.")
+                      help="Resolved CAPD finals_v2.1 config.")
   parser.add_argument("--train_trace", default=None)
   parser.add_argument("--model_output", required=True)
   parser.add_argument("--dram_capacity", type=int, default=16)

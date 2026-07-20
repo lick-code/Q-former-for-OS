@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Run one resolved CAPD finals_v2 workload/B pipeline on the server."""
+"""Run one resolved CAPD finals_v2.1 workload/B pipeline on the server."""
 
 from __future__ import print_function
 
@@ -128,7 +128,7 @@ def write_summary(config, paths, policies):
 
 
 def main():
-  parser = argparse.ArgumentParser(description="Run one CAPD finals_v2 job.")
+  parser = argparse.ArgumentParser(description="Run one CAPD finals_v2.1 job.")
   parser.add_argument("--config", required=True)
   parser.add_argument("--stage", choices=("generate", "train", "eval", "all"),
                       default="all")
@@ -177,7 +177,10 @@ def main():
             learned_model=model_path))
         evaluated_policies.append(policy)
 
-  manifest = {
+  stage_key = args.stage + ("_dry_run" if args.dry_run else "")
+  stage_manifest_path = os.path.join(
+      paths["result_dir"], "run_manifest_{}.json".format(stage_key))
+  stage_manifest = {
       "schema_version": finals_config.SCHEMA_VERSION,
       "config": config_path,
       "config_fingerprint": finals_config.config_fingerprint(config),
@@ -185,8 +188,27 @@ def main():
       "commands": [command_text(command) for command in commands],
       "stage": args.stage,
       "include_baselines": args.include_baselines,
+      "validation_strategy": config["validation"]["strategy"],
+      "dry_run": args.dry_run,
   }
-  finals_config.write_json(paths["manifest"], manifest)
+  finals_config.write_json(stage_manifest_path, stage_manifest)
+  manifest_index = {
+      "schema_version": finals_config.SCHEMA_VERSION,
+      "config": config_path,
+      "config_fingerprint": finals_config.config_fingerprint(config),
+      "git_commit": config.get("run", {}).get("git_commit", "unknown"),
+      "stage_manifests": {},
+  }
+  if os.path.exists(paths["manifest"]):
+    existing = finals_config.load_json(paths["manifest"])
+    if (existing.get("schema_version") == finals_config.SCHEMA_VERSION and
+        existing.get("config_fingerprint") ==
+        manifest_index["config_fingerprint"]):
+      manifest_index["stage_manifests"].update(
+          existing.get("stage_manifests", {}))
+  manifest_index["stage_manifests"][stage_key] = os.path.basename(
+      stage_manifest_path)
+  finals_config.write_json(paths["manifest"], manifest_index)
   for command in commands:
     execute(command, dry_run=args.dry_run)
   if evaluated_policies and not args.dry_run:

@@ -14,7 +14,8 @@ from qmap import finals_config
 
 
 def main():
-  parser = argparse.ArgumentParser(description="Resolve CAPD finals_v2 config.")
+  parser = argparse.ArgumentParser(
+      description="Resolve CAPD finals_v2.1 decision-holdout config.")
   parser.add_argument(
       "--base-config", default="configs/finals/capd_direction1.json")
   parser.add_argument(

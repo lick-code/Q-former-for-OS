@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Fit the CAPD selector and generate finals_v2 train/valid JSONL files."""
+"""Fit the CAPD selector and generate finals_v2.1 holdout JSONL files."""
 
 from __future__ import print_function
 
@@ -7,6 +7,7 @@ import argparse
 import bisect
 import collections
 import json
+import math
 import os
 import shlex
 import sys
@@ -120,13 +121,104 @@ class LRUBehaviorState(object):
     self.selector_history.observe(page, rw, access_index)
 
 
-def collect_training_observations(trace, config):
+def collect_decision_indices(trace, config):
+  """Returns chronological LRU victim-decision access indices."""
+  state = LRUBehaviorState(config)
+  decision_indices = []
+  for access_index, access in enumerate(trace):
+    if state.is_decision(access["page"]):
+      decision_indices.append(access_index)
+    state.advance(access, access_index)
+  return decision_indices
+
+
+def build_decision_holdout(trace, config):
+  """Builds the frozen chronological 80/20 decision split with an L guard."""
+  decision_indices = collect_decision_indices(trace, config)
+  total_decisions = len(decision_indices)
+  if total_decisions < 2:
+    raise ValueError(
+        "train_trace_decision_holdout needs at least two victim decisions; "
+        "found {}.".format(total_decisions))
+
+  validation = config["validation"]
+  fraction = float(validation["holdout_fraction"])
+  validation_decisions = int(math.ceil(total_decisions * fraction))
+  if validation_decisions <= 0 or validation_decisions >= total_decisions:
+    raise ValueError(
+        "Decision holdout leaves no train or validation decisions: "
+        "total={} validation={}.".format(
+            total_decisions, validation_decisions))
+
+  validation_start = decision_indices[-validation_decisions]
+  guard_accesses = int(validation["guard_accesses"])
+  train_end = max(0, validation_start - guard_accesses)
+  train_decisions = [
+      index for index in decision_indices if index < train_end]
+  guard_decisions = [
+      index for index in decision_indices
+      if train_end <= index < validation_start]
+  heldout_decisions = [
+      index for index in decision_indices if index >= validation_start]
+  if not train_decisions:
+    raise ValueError(
+        "The validation guard removes every training decision; "
+        "validation_start={} guard_accesses={}.".format(
+            validation_start, guard_accesses))
+  if len(heldout_decisions) != validation_decisions:
+    raise AssertionError("Decision holdout count is inconsistent.")
+  if train_decisions[-1] + guard_accesses >= validation_start:
+    raise AssertionError("Training lookahead can cross the validation boundary.")
+
+  plan = {
+      "strategy": validation["strategy"],
+      "basis": "lru_victim_decision_points",
+      "order": "chronological",
+      "holdout_fraction": fraction,
+      "rounding": validation["rounding"],
+      "guard_accesses": guard_accesses,
+      "trace_access_count": len(trace),
+      "total_decision_points": total_decisions,
+      "train_access_end_exclusive": train_end,
+      "validation_access_start_inclusive": validation_start,
+      "train_decision_points": len(train_decisions),
+      "guard_decision_points": len(guard_decisions),
+      "validation_decision_points": len(heldout_decisions),
+      "last_train_decision_index": train_decisions[-1],
+      "first_validation_decision_index": heldout_decisions[0],
+  }
+  plan["fingerprint"] = finals_config.decision_holdout_fingerprint(plan)
+  return finals_config.validate_decision_holdout(plan, config)
+
+
+def decision_belongs_to_split(access_index, split_name, holdout):
+  if holdout is None:
+    return True
+  if split_name == "train":
+    return access_index < int(holdout["train_access_end_exclusive"])
+  if split_name == "valid":
+    return access_index >= int(
+        holdout["validation_access_start_inclusive"])
+  raise ValueError("Unsupported reranker split: {}".format(split_name))
+
+
+def trace_diagnostics(trace, config):
+  return {
+      "access_count": len(trace),
+      "unique_page_count": len(set(item["page"] for item in trace)),
+      "lru_victim_decision_points": len(
+          collect_decision_indices(trace, config)),
+  }
+
+
+def collect_training_observations(trace, config, holdout=None):
   state = LRUBehaviorState(config)
   pool_size = int(config["candidate"]["pool_size_B"])
   observations = {"Delta": [], "A": [], "W": []}
   decision_count = 0
   for access_index, access in enumerate(trace):
-    if state.is_decision(access["page"]):
+    if (state.is_decision(access["page"]) and
+        decision_belongs_to_split(access_index, "train", holdout)):
       pool = candidate_filter.build_candidate_pool(state.dram_pages, pool_size)
       for rank, page in enumerate(pool):
         raw = candidate_filter.raw_selector_values(
@@ -140,7 +232,7 @@ def collect_training_observations(trace, config):
   return observations, decision_count
 
 
-def iter_validation_samples(trace, config, clipping):
+def iter_validation_samples(trace, config, clipping, holdout=None):
   state = LRUBehaviorState(config)
   params = dict(clipping)
   params.update({
@@ -155,7 +247,8 @@ def iter_validation_samples(trace, config, clipping):
   pool_size = int(config["candidate"]["pool_size_B"])
   retained = int(config["candidate"]["retained_K"])
   for access_index, access in enumerate(trace):
-    if state.is_decision(access["page"]):
+    if (state.is_decision(access["page"]) and
+        decision_belongs_to_split(access_index, "valid", holdout)):
       records = candidate_filter.build_pool_records(
           state.dram_pages, pool_size, access_index, state.selector_history,
           state.dirty_pages, params)
@@ -178,9 +271,9 @@ def iter_validation_samples(trace, config, clipping):
     state.advance(access, access_index)
 
 
-def build_validation_samples(trace, config, clipping):
+def build_validation_samples(trace, config, clipping, holdout=None):
   """Materializes samples only for small callers and focused unit tests."""
-  return list(iter_validation_samples(trace, config, clipping))
+  return list(iter_validation_samples(trace, config, clipping, holdout))
 
 
 def write_jsonl(path, rows):
@@ -233,7 +326,7 @@ def build_generator_decision_snapshot(state, access, access_index, config,
 
 def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
                             selector_params, resolved_config_path,
-                            command_text):
+                            command_text, holdout=None):
   state = LRUBehaviorState(config)
   lookahead = int(config["labels"]["future_lookahead_L"])
   retained = int(config["candidate"]["retained_K"])
@@ -250,7 +343,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
     os.makedirs(directory, exist_ok=True)
   with open(output_path, "w", encoding="utf-8") as output_file:
     for access_index, access in enumerate(trace):
-      if state.is_decision(access["page"]):
+      if (state.is_decision(access["page"]) and
+          decision_belongs_to_split(access_index, split_name, holdout)):
         decision_history = state.decision_history(access)
         snapshot = build_generator_decision_snapshot(
             state, access, access_index, config, selector_params)
@@ -293,6 +387,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
       "schema_version": finals_config.SCHEMA_VERSION,
       "workload": config["run"]["workload"],
       "split": split_name,
+      "source_partition": (
+          "train_trace_decision_holdout" if holdout else split_name),
       "source_trace": trace_path,
       "source_trace_fingerprint": finals_config.fingerprint_file(trace_path),
       "resolved_config": os.path.abspath(resolved_config_path),
@@ -303,6 +399,9 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
           selector_params),
       "data_fingerprint": data_fingerprint,
       "sample_count": decision_count,
+      "decision_holdout": holdout,
+      "decision_holdout_fingerprint": (
+          holdout.get("fingerprint") if holdout else None),
       "shape": {
           "H": history_length,
           "K": retained,
@@ -338,18 +437,28 @@ def fit_selector_and_generate(args):
     raise ValueError("--page-shift does not match the resolved config.")
   args.page_shift = configured_page_shift
   train_path = config["data"]["train_trace"]
-  valid_path = config["data"]["valid_trace"]
+  external_valid_path = config["data"]["valid_trace"]
   train_trace, train_rw_source = read_trace(train_path, args.page_shift)
-  valid_trace, valid_rw_source = read_trace(valid_path, args.page_shift)
+  external_valid_trace, external_valid_rw_source = read_trace(
+      external_valid_path, args.page_shift)
+
+  holdout = build_decision_holdout(train_trace, config)
 
   raw_observations, train_decisions = collect_training_observations(
-      train_trace, config)
+      train_trace, config, holdout)
+  if train_decisions != holdout["train_decision_points"]:
+    raise AssertionError("Training decision count does not match split plan.")
   clipping = selector_search.clipping_values(
       raw_observations,
       float(config["features"]["selector_clip_quantile"]))
   validation_fingerprint, validation_count = write_validation_samples(
       args.validation_samples_output,
-      iter_validation_samples(valid_trace, config, clipping))
+      iter_validation_samples(train_trace, config, clipping, holdout))
+  if validation_count <= 0:
+    raise ValueError(
+        "Decision holdout produced no selector/model validation samples.")
+  if validation_count != holdout["validation_decision_points"]:
+    raise AssertionError("Validation decision count does not match split plan.")
   search_result = selector_search.search_selector_weights_jsonl(
       args.validation_samples_output,
       epsilon_y=float(config["selector"]["epsilon_y"]))
@@ -361,7 +470,12 @@ def fit_selector_and_generate(args):
       "workload": config["run"]["workload"],
       "config_fingerprint": finals_config.config_fingerprint(config),
       "train_trace_fingerprint": finals_config.fingerprint_file(train_path),
-      "valid_trace_fingerprint": finals_config.fingerprint_file(valid_path),
+      "external_valid_trace_fingerprint": finals_config.fingerprint_file(
+          external_valid_path),
+      "external_valid_trace_role": config["validation"][
+          "external_valid_trace_role"],
+      "decision_holdout": holdout,
+      "decision_holdout_fingerprint": holdout["fingerprint"],
       "validation_samples_fingerprint": validation_fingerprint,
       "train_decision_points": train_decisions,
       "validation_decision_points": validation_count,
@@ -376,17 +490,30 @@ def fit_selector_and_generate(args):
 
   train_metadata = generate_reranker_jsonl(
       train_trace, train_path, "train", args.train_output, config,
-      selector_params, args.config, command_text)
+      selector_params, args.config, command_text, holdout=holdout)
   valid_metadata = generate_reranker_jsonl(
-      valid_trace, valid_path, "valid", args.valid_output, config,
-      selector_params, args.config, command_text)
+      train_trace, train_path, "valid", args.valid_output, config,
+      selector_params, args.config, command_text, holdout=holdout)
+  external_valid_diagnostics = trace_diagnostics(
+      external_valid_trace, config)
+  external_valid_diagnostics.update({
+      "path": external_valid_path,
+      "fingerprint": finals_config.fingerprint_file(external_valid_path),
+      "role": config["validation"]["external_valid_trace_role"],
+      "rw_source": external_valid_rw_source,
+  })
   result = {
       "selector_params": args.selector_output,
       "selector_fingerprint": finals_config.selector_fingerprint(
           selector_params),
+      "decision_holdout": holdout,
       "train_metadata": train_metadata,
       "valid_metadata": valid_metadata,
-      "rw_source": {"train": train_rw_source, "valid": valid_rw_source},
+      "external_valid_trace_diagnostics": external_valid_diagnostics,
+      "rw_source": {
+          "train_trace": train_rw_source,
+          "external_valid_trace": external_valid_rw_source,
+      },
   }
   finals_config.write_json(args.summary_output, result)
   print("[done] selector={}".format(args.selector_output))
@@ -397,9 +524,11 @@ def fit_selector_and_generate(args):
 
 def build_arg_parser():
   parser = argparse.ArgumentParser(
-      description="Fit CAPD finals_v2 selector and generate train/valid JSONL.")
+      description=(
+          "Fit CAPD finals_v2.1 selector and generate decision-holdout "
+          "train/valid JSONL."))
   parser.add_argument("--config", required=True,
-                      help="Resolved capd_finals_v2 config.")
+                      help="Resolved capd_finals_v2_1 config.")
   parser.add_argument("--selector-output", required=True)
   parser.add_argument("--validation-samples-output", required=True)
   parser.add_argument("--train-output", required=True)

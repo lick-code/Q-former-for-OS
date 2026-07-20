@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Train the QMAP reranker, including the strict CAPD finals_v2 path."""
+"""Train QMAP, including the strict CAPD finals_v2.1 holdout path."""
 
 from __future__ import print_function
 
@@ -129,7 +129,7 @@ class QMAPAccessSequenceDataset(Dataset):
                                              "JSONL line {}".format(
                                                  line_number))
       if sample.get("schema_version") != finals_config.SCHEMA_VERSION:
-        raise ValueError("Line {} is not a finals_v2 sample.".format(
+        raise ValueError("Line {} is not a finals_v2.1 sample.".format(
             line_number))
 
 
@@ -138,7 +138,7 @@ def build_arg_parser():
   parser.add_argument("--train_data", required=True)
   parser.add_argument("--valid_data", default=None)
   parser.add_argument("--config", default=None,
-                      help="Resolved CAPD finals_v2 config.")
+                      help="Resolved CAPD finals_v2.1 config.")
   parser.add_argument("--selector_params", default=None)
   parser.add_argument("--output_dir", default="qmap_checkpoints")
   parser.add_argument("--epochs", type=int, default=10)
@@ -221,6 +221,13 @@ def _validate_finals_artifacts(config, config_path, selector_path,
   if selector_params.get("workload") != config["run"]["workload"]:
     raise ValueError("selector_params/workload mismatch.")
   selector_fingerprint = finals_config.selector_fingerprint(selector_params)
+  selector_holdout = selector_params.get("decision_holdout")
+  if not selector_holdout:
+    raise ValueError("selector_params has no decision holdout plan.")
+  finals_config.validate_decision_holdout(selector_holdout, config)
+  holdout_fingerprint = selector_params.get("decision_holdout_fingerprint")
+  if holdout_fingerprint != selector_holdout["fingerprint"]:
+    raise ValueError("selector_params decision holdout fingerprint mismatch.")
   contract = finals_config.contract_from_config(config)
   expected_shape = {
       "H": contract["H"], "K": contract["K"],
@@ -237,6 +244,29 @@ def _validate_finals_artifacts(config, config_path, selector_path,
     if metadata.get("selector_fingerprint") != selector_fingerprint:
       raise ValueError("{} JSONL selector fingerprint mismatch.".format(
           split))
+    if metadata.get("source_partition") != "train_trace_decision_holdout":
+      raise ValueError("{} JSONL has the wrong source partition.".format(
+          split))
+    if metadata.get("decision_holdout_fingerprint") != holdout_fingerprint:
+      raise ValueError("{} JSONL decision holdout mismatch.".format(split))
+    finals_config.validate_decision_holdout(
+        metadata.get("decision_holdout", {}), config)
+    if metadata["decision_holdout"] != selector_holdout:
+      raise ValueError("{} JSONL decision holdout plan mismatch.".format(
+          split))
+    if metadata.get("source_trace_fingerprint") != selector_params.get(
+        "train_trace_fingerprint"):
+      raise ValueError("{} JSONL source trace mismatch.".format(split))
+    if int(metadata.get("sample_count", 0)) <= 0:
+      raise ValueError("{} JSONL must contain validation-ready samples.".format(
+          split))
+    expected_count_key = (
+        "train_decision_points" if split == "train"
+        else "validation_decision_points")
+    if int(metadata["sample_count"]) != int(
+        selector_params["decision_holdout"].get(expected_count_key, -1)):
+      raise ValueError("{} JSONL sample count/split plan mismatch.".format(
+          split))
     finals_config.assert_contract_matches(
         contract, metadata.get("experiment_contract", {}),
         "{} JSONL".format(split))
@@ -251,6 +281,8 @@ def _validate_finals_artifacts(config, config_path, selector_path,
       "contract": contract,
       "selector_params": selector_params,
       "selector_fingerprint": selector_fingerprint,
+      "decision_holdout": selector_holdout,
+      "decision_holdout_fingerprint": holdout_fingerprint,
       "metadata": metadata_by_split,
       "expected_shape": expected_shape,
   }
@@ -333,6 +365,9 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
         "config_fingerprint": finals_context["config_fingerprint"],
         "selector_params": finals_context["selector_params"],
         "selector_fingerprint": finals_context["selector_fingerprint"],
+        "decision_holdout": finals_context["decision_holdout"],
+        "decision_holdout_fingerprint": finals_context[
+            "decision_holdout_fingerprint"],
         "workload": finals_context["config"]["run"]["workload"],
         "seed": args.seed,
         "jsonl_fingerprints": {
@@ -451,7 +486,7 @@ def main():
     torch.save(payload, last_path)
     if finals_context is None:
       # Preserve historical experiment-script checkpoint names outside the
-      # isolated finals_v2 path.
+      # isolated finals_v2.1 path.
       torch.save(payload, os.path.join(
           args.output_dir, "qmap_epoch_{}.pth".format(epoch)))
     if validation_loss < best_loss:
@@ -474,6 +509,9 @@ def main():
       },
       "config_fingerprint": (finals_context["config_fingerprint"]
                              if finals_context else None),
+      "decision_holdout_fingerprint": (
+          finals_context["decision_holdout_fingerprint"]
+          if finals_context else None),
       "git_commit": (finals_context["config"].get("run", {}).get(
           "git_commit", "unknown") if finals_context else
                      finals_config.current_git_commit(PROJECT_ROOT)),

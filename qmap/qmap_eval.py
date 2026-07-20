@@ -261,7 +261,7 @@ def is_learned_policy(policy):
 def validate_checkpoint_config_contract(checkpoint, config, selector_params):
   """Rejects every frozen Generator/Trainer/Replay contract mismatch."""
   if checkpoint.get("schema_version") != finals_config.SCHEMA_VERSION:
-    raise ValueError("Checkpoint is not a CAPD finals_v2 checkpoint.")
+    raise ValueError("Checkpoint is not a CAPD finals_v2.1 checkpoint.")
   expected_contract = finals_config.contract_from_config(config)
   finals_config.assert_contract_matches(
       expected_contract, checkpoint.get("experiment_contract", {}),
@@ -273,6 +273,15 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
       selector_params)
   if checkpoint.get("selector_fingerprint") != expected_selector_fingerprint:
     raise ValueError("Checkpoint/selector fingerprint mismatch.")
+  expected_holdout_fingerprint = selector_params.get(
+      "decision_holdout_fingerprint")
+  selector_holdout = selector_params.get("decision_holdout", {})
+  finals_config.validate_decision_holdout(selector_holdout, config)
+  if expected_holdout_fingerprint != selector_holdout["fingerprint"]:
+    raise ValueError("Selector decision holdout fingerprint mismatch.")
+  if checkpoint.get(
+      "decision_holdout_fingerprint") != expected_holdout_fingerprint:
+    raise ValueError("Checkpoint/decision holdout fingerprint mismatch.")
   if checkpoint.get("workload") != config["run"]["workload"]:
     raise ValueError("Checkpoint/workload mismatch.")
   model_args = checkpoint.get("model_args", {})
@@ -538,6 +547,11 @@ def replay(args, finals_replay_config=None):
       if selector_params.get("workload") != finals_replay_config[
           "run"]["workload"]:
         raise ValueError("Replay selector/workload mismatch.")
+      finals_config.validate_decision_holdout(
+          selector_params.get("decision_holdout", {}), finals_replay_config)
+      if selector_params.get("decision_holdout_fingerprint") != (
+          selector_params["decision_holdout"]["fingerprint"]):
+        raise ValueError("Replay selector decision holdout mismatch.")
     qmap_policy = QMAPPolicy(
         args.checkpoint,
         torch.device(device),
@@ -562,7 +576,7 @@ def replay(args, finals_replay_config=None):
     learned_model = load_model(args.learned_model)
     if finals_replay_config is not None:
       if learned_model.get("schema_version") != finals_config.SCHEMA_VERSION:
-        raise ValueError("Learned baseline is not a finals_v2 model.")
+        raise ValueError("Learned baseline is not a finals_v2.1 model.")
       if learned_model.get("workload") != finals_replay_config[
           "run"]["workload"]:
         raise ValueError("Learned baseline workload mismatch.")
@@ -717,9 +731,11 @@ def main():
           "git_commit", "unknown")
       metrics["selector_params"] = args.selector_params
       if args.selector_params:
+        replay_selector = finals_config.load_json(args.selector_params)
         metrics["selector_fingerprint"] = (
-            finals_config.selector_fingerprint(
-                finals_config.load_json(args.selector_params)))
+            finals_config.selector_fingerprint(replay_selector))
+        metrics["decision_holdout_fingerprint"] = replay_selector.get(
+            "decision_holdout_fingerprint")
       finals_config.write_json(
           os.path.join(output_dir, "resolved_config.json"), replay_config)
     if args.checkpoint:
