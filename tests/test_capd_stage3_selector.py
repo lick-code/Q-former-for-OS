@@ -243,6 +243,73 @@ class Stage3AnalysisTest(unittest.TestCase):
           1.0, result[workload]["pool_recall_absolute_gain_B8_to_B64"])
       self.assertTrue(result[workload]["expanded_pool_improved_coverage"])
 
+  def test_atomic_output_bundle_is_complete_and_refuses_overwrite(self):
+    samples = [sample(
+        [[1, 0, 0, 0, 0], [0, 1, 0, 0, 0]], [1.0, -1.0])]
+    inputs = {
+        name: {"path": name, "sha256": name + "-sha256"}
+        for name in (
+            "resolved_config", "selector_params",
+            "selector_validation_samples", "generator_summary")
+    }
+    detail = stage3._analyze_pair({
+        "samples": samples,
+        "selector": frozen_selector(samples),
+        "identity": {
+            "schema_version": stage3.RESULT_SCHEMA,
+            "artifact_schema": finals_config.SCHEMA_VERSION,
+            "contract_id": finals_config.CONTRACT_ID,
+            "run_profile": "official",
+            "artifact_class": "official",
+            "workload": "canneal", "B": 2, "K": 8,
+            "config_fingerprint": "config-sha256",
+            "selector_fingerprint": "selector-sha256",
+            "validation_samples_fingerprint": "samples-sha256",
+            "inputs": inputs,
+        },
+    })
+    detail.update({"code_commit": "test-commit", "command": "test command"})
+    sweep_item = {
+        "decision_alignment_passed": True,
+        "decision_alignment_errors": [],
+        "pool_recall_nondecreasing": True,
+        "pool_recall_absolute_gain_B8_to_B64": 0.0,
+        "expanded_pool_improved_coverage": False,
+    }
+    selector_item = {
+        "exactly_stable_across_B": True,
+        "max_adjacent_B_weight_L1_distance": 0.0,
+        "fallback_uniform_B": [],
+        "leave_one_out_degradation_count": 0,
+    }
+    summary = {
+        "schema_version": stage3.RESULT_SCHEMA,
+        "artifact_schema": finals_config.SCHEMA_VERSION,
+        "contract_id": finals_config.CONTRACT_ID,
+        "code_commit": "test-commit",
+        "command": "test command",
+        "input_bindings": [{
+            "workload": "canneal", "B": 2, "inputs": inputs,
+        }],
+        "B_sweep_diagnostics": {
+            workload: dict(sweep_item) for workload in stage3.WORKLOADS
+        },
+        "selector_diagnostics": {
+            workload: dict(selector_item) for workload in stage3.WORKLOADS
+        },
+    }
+    with tempfile.TemporaryDirectory() as directory:
+      output = os.path.join(directory, "stage3_selector")
+      stage3._write_outputs(output, summary, [detail], {"status": "PASSED"})
+      for relative in (
+          "stage3_summary.json", "stage3_metrics.csv",
+          "stage3_ablation.csv", "stage3_report.md", "input_audit.json",
+          os.path.join("details", "canneal_B2.json")):
+        self.assertTrue(os.path.isfile(os.path.join(output, relative)))
+      with self.assertRaises(ValueError):
+        stage3._write_outputs(
+            output, summary, [detail], {"status": "PASSED"})
+
 
 class Stage3InputGateTest(unittest.TestCase):
 
@@ -259,6 +326,15 @@ class Stage3InputGateTest(unittest.TestCase):
       self._write_row(path, retained_K=7)
       with self.assertRaises(ValueError):
         stage3._load_and_validate_samples(path, "canneal", 8)
+
+  def test_negative_relevance_is_valid_under_frozen_proxy_formula(self):
+    with tempfile.TemporaryDirectory() as directory:
+      path = os.path.join(directory, "samples.jsonl")
+      self._write_row(path, relevance=[-8.0, -7.0, -6.0, -5.0,
+                                       -4.0, -3.0, -2.0, -1.0])
+      rows = stage3._load_and_validate_samples(path, "canneal", 8)
+      self.assertEqual(1, len(rows))
+      self.assertEqual(-8.0, min(rows[0]["relevance"]))
 
   def test_contract_schema_profile_workload_and_B_mismatch_hard_fail(self):
     cases = (

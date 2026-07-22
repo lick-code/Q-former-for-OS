@@ -143,8 +143,6 @@ def _load_and_validate_samples(path, workload, pool_size):
                      for value in feature_row),
                  "{} selector feature outside [0,1]".format(context))
       _finite_sequence(row["relevance"], context + " relevance")
-      _require(all(float(value) >= 0.0 for value in row["relevance"]),
-               "{} relevance must be nonnegative".format(context))
       _require(all(isinstance(value, bool)
                    for value in row["global_oracle_in_pool"]),
                "{} global oracle mask must be boolean".format(context))
