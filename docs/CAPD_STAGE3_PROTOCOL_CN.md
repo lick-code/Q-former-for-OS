@@ -8,7 +8,7 @@
 - 阶段0：`DONE_R1`
 - 阶段1：`STAGE1_R1_VERIFIED`
 - 阶段2：`VERIFIED_REUSABLE`
-- 当前阶段3：`STAGE3_IMPLEMENTED_UNVERIFIED`
+- 当前阶段3：`STAGE3_VERIFIED`（2026-07-22 Linux 服务器完整验收通过）
 
 阶段3只独立验证轻量候选筛选器的覆盖行为，不训练精排模型、不运行 QMAP/CAPD test replay、不生成 checkpoint、不比较 LRU、Random、LFU、CLOCK，不报告端到端命中率或加权代价结论。
 
