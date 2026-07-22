@@ -2,17 +2,19 @@
 
 ## 1. 报告状态
 
-阶段状态：`STAGE1_R1_IMPLEMENTED_UNVERIFIED`（原 G01--G10 服务器证据继续有效；R1 新增 G13 已完成代码与测试构造，尚待服务器验收）
+阶段状态：`STAGE1_R1_VERIFIED`（原 G01--G10 服务器证据继续有效；R1 新增 G13 已完成服务器验收）
 
-本地仍未执行 Python、pytest、数据生成、Trace Replay、训练、推理或实验。2026-07-20 Linux 服务器回填的 `STAGE1_VERIFIED` 是 R1 发布前 G01--G10 的历史验收结果；这些证据在 R1 下继续有效，但不覆盖新增的 G13“精排最高分并列时按决策前原始 LRU 顺序选择最老页面”。G13 的代码和测试现已完成静态构造，因此状态更新为 `STAGE1_R1_IMPLEMENTED_UNVERIFIED`；不得把该状态解释为服务器已经验证。
+本地没有执行 Python、pytest、数据生成、Trace Replay、训练、推理或实验。2026-07-20 Linux 服务器回填的 `STAGE1_VERIFIED` 覆盖 R1 发布前的 G01--G10；这些历史证据在 R1 下继续有效。2026-07-22 服务器复验进一步覆盖新增的 G13“精排最高分并列时按决策前原始 LRU 顺序选择最老页面”，用户确认全部验收组通过且真实退出码均为 0，因此阶段1更新为 `STAGE1_R1_VERIFIED`。
 
-R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`STAGE1_R1_IMPLEMENTED_UNVERIFIED`；阶段2=`VERIFIED_REUSABLE`；阶段3必须等待 `STAGE1_R1_VERIFIED`，此前不得启动正式运行或结论汇总。
+R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`STAGE1_R1_VERIFIED`；阶段2=`VERIFIED_REUSABLE`。阶段3的阶段0--2前置门禁现已满足，可以按冻结合同进入阶段3。
 
 服务器验收记录：selector 有效集合诊断得到 `SelectorRecall@K=0.0`、`effective_decision_points=1`、`nondiscriminative_ratio=0.5`、`fallback_uniform=false`；目标语义测试 `16 passed`；强化后的非平凡微型 E2E `2 passed`，覆盖非 uniform fallback、有效决策点、非零 relevance range、有限且非零梯度和参数更新；完整 pytest 为 `64 passed, 2 skipped`，两个 skip 均为 `CAPD_RUN_STAGE1_E2E=0` 时预期跳过的 server-only E2E；各组退出码均为 0，`git diff --check` 无错误。
 
+R1 G13 服务器验收回填：Python 语法检查、G13 针对性非 torch 测试、G13 针对性 torch 测试、原阶段1非 torch 语义回归、原阶段1 torch 模型回归、两个 `CAPD_RUN_STAGE1_E2E=1` 非平凡微型 E2E、`CAPD_RUN_STAGE1_E2E=0` 完整 pytest、`git diff --check`、禁止路径检查及测试前后工作区污染对比均通过；用户确认所有命令组真实退出码为 0。此次回填未提供各 pytest 命令的精确 collected/passed 数量，报告不臆造该数值，以服务器原始日志为准。
+
 仓库卫生收口：误跟踪的 `.capd_stage1_tmp/logs/semantics.log` 已不在当前索引中，`.gitignore` 已加入 `.capd_stage1_tmp/`。静态 `git ls-files` 复核为：stage1 临时文件 0、`__pycache__`/`.pyc` 0、`.pytest_cache` 0；同时发现既有历史 checkpoint 类文件 801、resolved config 35、log/result 路径文件 2071。后面三类是阶段1前已经受跟踪的历史实验工件，不作为 `capd_finals_v3_0` 输入；本次不做高风险、超出阶段1卫生问题范围的破坏性批量删除，阶段2通过目录和指纹门禁拒绝复用。
 
-唯一方法—实现依据：`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 中冻结的 `CAPD-MIC-1.0` 文档修订 R1。合同 ID 与 `capd_finals_v3_0` schema 均未改变；合同实现状态为 `STAGE1_REOPENED_G13`。
+唯一方法—实现依据：`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 中冻结的 `CAPD-MIC-1.0` 文档修订 R1。合同 ID 与 `capd_finals_v3_0` schema 均未改变；本次只回填阶段1验收状态，没有修改冻结合同正文。
 
 服务器验收命令：`docs/CAPD_STAGE1_SERVER_VALIDATION_CN.md`。
 
@@ -28,7 +30,7 @@ R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`STAGE1_R1_IMPLEMENTED_UNVER
 - 精排 train/valid 标签只为筛选后的有效候选集合 `C_t` 构造并保存；
 - selector valid 与精排 train/valid 两条标签路径都只使用具有完整 `L` 条未来访问的决策点。
 
-其中，决策快照、双历史写入边界、selector 并列顺序、两类标签域和完整未来窗口均由 G01--G10 的既有实现及服务器证据覆盖。R1 唯一新增实现缺口 G13 已完成代码与测试构造，尚待服务器验证；该修复只影响闭环推理的最终单值 victim 选择，不改变 selector、标签、JSONL 或阶段2数据工件语义。
+其中，决策快照、双历史写入边界、selector 并列顺序、两类标签域和完整未来窗口均由 G01--G10 的既有实现及服务器证据覆盖。R1 唯一新增实现缺口 G13 已完成代码、测试构造和服务器验证；该修复只影响闭环推理的最终单值 victim 选择，不改变 selector、标签、JSONL 或阶段2数据工件语义。
 
 ## 2. G01—G10 对齐记录（既有服务器证据继续有效）
 
@@ -122,8 +124,8 @@ R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`STAGE1_R1_IMPLEMENTED_UNVER
 - 非 torch 测试：`V3RerankerVictimSelectionTest.test_unique_highest_score_keeps_the_model_choice` 精确断言唯一最高页 202；`test_exact_tie_uses_oldest_original_rank_not_tensor_position` 断言张量首项 rank 4 与第二项 rank 0 同为 9.0 时选择第二项页面 100；`test_selector_score_cannot_break_a_reranker_tie` 断言 selector 高分首项不能击败 rank 更小者；`test_padding_with_extreme_placeholder_score_cannot_win` 断言 `1e30` padding 不胜出；`test_valid_nan_and_positive_or_negative_inf_hard_fail` 逐项拒绝 NaN、正 Inf、负 Inf；`test_invalid_mask_rank_and_shapes_hard_fail` 拒绝空有效 mask、0.5 mask、负/非整数/重复有效 rank 和 shape 不一致；`test_selector_topk_tie_is_rank_ordered_and_page_id_independent` 断言合法唯一 rank 下 selector 同分仍输出 rank `[0,1]`，替换 page ID 后不变。
 - torch 测试：`V3VictimSelectionTorchTest.test_final_corrected_tensor_score_tie_uses_original_pool_rank` 先对原始张量分数做修正得到精确并列，再断言选择 rank 0 页面且忽略极高 padding；`test_tensor_nonfinite_valid_scores_hard_fail` 使用 torch 张量逐项拒绝 NaN、正 Inf、负 Inf。
 - 既有回归：`GeneratorReplayFeatureEquivalenceTest.test_same_state_produces_identical_snapshot` 继续逐字段比较 generator/replay 的 `P_t/B_t/K_t/candidate_pages/candidate_state_features/candidate_mask/original_pool_ranks`；两个非平凡微型 E2E 继续覆盖正式 v3 全链路与固定种子确定性。
-- 静态审查结果：helper 不读取 selector score，精确相等判断未引入 epsilon；v3 分支读取共享 snapshot，调用发生在当前请求插入和 LRU 更新之前；未执行任何测试。
-- 待服务器验证：纯函数数值与错误分支、torch tensor 转换、official v3 全链路、legacy 回归和完整 pytest。
+- 静态审查结果：helper 不读取 selector score，精确相等判断未引入 epsilon；v3 分支读取共享 snapshot，调用发生在当前请求插入和 LRU 更新之前。
+- 服务器验收结果：纯函数数值与错误分支、torch tensor 转换、official v3 全链路、legacy 回归、两个非平凡微型 E2E 和完整 pytest 均通过；对应命令组真实退出码均为 0。
 
 ## 4. 工件合同与不兼容边界
 
@@ -164,6 +166,8 @@ R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`STAGE1_R1_IMPLEMENTED_UNVER
 - PyTorch 模型路径与强化后的非平凡微型端到端回归通过；
 - 完整 pytest 通过，只有两个受环境变量控制的预期 skip；
 - `git diff --check` 通过。
+- R1 G13 非 torch/torch 针对性测试通过；唯一最高分、精确并列、selector score 隔离、padding、NaN/Inf、非法 mask/rank/shape 和 snapshot 等价均已覆盖；
+- R1 两个非平凡微型 E2E、完整 pytest、禁止路径检查和测试前后工作区污染对比通过，所有命令组真实退出码为 0。
 
 真实 train/valid/test 的来源区间、真实 RW、压力和数据分布不属于阶段1语义门禁，必须由阶段2 manifest 与数据质量审计另行确认。
 
@@ -171,7 +175,7 @@ R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`STAGE1_R1_IMPLEMENTED_UNVER
 
 合同第 3.3 节规定 test 闭环回放不生成未来标签；因此正式 result 中汇总的四个候选覆盖指标与 NRegret 沿用已实现口径，来源为 `valid_trace`，并显式记录 `candidate_coverage_metric_source=valid_trace`。这些指标不是 test oracle 指标，test 回放不得读取未来信息。该来源标注消除了阶段文档中的歧义，不改变指标公式或数据工件。
 
-静态阅读未发现 G01--G10 与 R1 G13 之间的直接矛盾；当前未关闭项仅为 G13 的服务器验证。
+静态阅读未发现 G01--G10 与 R1 G13 之间的直接矛盾；G13 服务器验证已经关闭。
 
 G11（闭环分布偏移审计）和 G12（代理标签—反事实代价审计）仍按冻结合同属于后续阶段的正式实验/审计工作，本阶段未执行，也未声称实现验证。
 
@@ -179,10 +183,10 @@ G11（闭环分布偏移审计）和 G12（代理标签—反事实代价审计�
 
 阶段2已于 2026-07-22 完成独立服务器验收。R1 不改变 trace、split、selector valid 标签、精排 train/valid 标签、JSONL 或工件 schema，既有阶段2服务器验收和数据工件继续有效，不重采、不重切、不重生成。阶段2仍须保持以下边界：不得复用 v2.1 JSONL、selector、checkpoint 或 result；不得把阶段1微型 E2E 工件提升为正式数据；不得把阶段2审计解释为候选筛选器效果、精排模型效果或系统性能结论。
 
-阶段3当前不得启动正式运行或结论汇总。只有 G13 修复完成、针对性测试与完整服务器验收通过，并把阶段1状态更新为 `STAGE1_R1_VERIFIED` 后，才满足阶段3启动门槛。
+G13 修复、针对性测试与完整服务器验收均已通过，阶段1已更新为 `STAGE1_R1_VERIFIED`；阶段2继续保持 `VERIFIED_REUSABLE`，因此阶段3的阶段0--2启动门槛已经满足。
 
 ## 8. 结论
 
-当前阶段状态：`STAGE1_R1_IMPLEMENTED_UNVERIFIED`
+当前阶段状态：`STAGE1_R1_VERIFIED`
 
-状态解释：G01--G10 的原服务器验收事实和结果继续有效；G13 已完成代码与测试构造，但尚未经过服务器验收，因此阶段1尚未按 R1 关闭。阶段2及其 trace、manifest、selector、JSONL 和审计工件保持 `VERIFIED_REUSABLE` 且未改动；只有服务器全部通过并将阶段1更新为 `STAGE1_R1_VERIFIED` 后，才能进入阶段3。
+状态解释：G01--G10 的原服务器验收事实和结果继续有效；G13 已完成服务器验收，所有验收命令组真实退出码均为 0。阶段2及其 trace、manifest、selector、JSONL 和审计工件保持 `VERIFIED_REUSABLE` 且未改动。阶段0--2门禁已经满足，可以进入阶段3；本状态只证明实现符合冻结合同，不代表正式实验已经完成或方法性能已经得到证明。

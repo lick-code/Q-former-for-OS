@@ -2,11 +2,11 @@
 
 ## 1. 当前状态与边界
 
-当前阶段状态：`STAGE1_R1_IMPLEMENTED_UNVERIFIED`。
+当前阶段状态：`STAGE1_R1_VERIFIED`。
 
-2026-07-20 的原阶段1 Linux 服务器验收覆盖 G01--G10，既有测试数量、退出码和仓库卫生证据继续有效。2026-07-22 的 `CAPD-MIC-1.0` 文档修订 R1 只新增 G13；本地已完成代码、测试和本交接文档的静态构造，但没有执行 Python、pytest、数据生成、Trace Replay、训练、推理或实验。
+2026-07-20 的原阶段1 Linux 服务器验收覆盖 G01--G10，既有测试数量、退出码和仓库卫生证据继续有效。2026-07-22 的 `CAPD-MIC-1.0` 文档修订 R1 只新增 G13；本地只完成代码和测试的静态构造，随后已在服务器完成本文件规定的全部验收组。
 
-R1 不改变 `CAPD-MIC-1.0` 合同 ID、`capd_finals_v3_0` schema、配置、selector、标签、损失、JSONL、trace/split、manifest 或阶段2审计工件。阶段2保持 `VERIFIED_REUSABLE`。只有本文件全部服务器验收通过并回填证据后，阶段1才可更新为 `STAGE1_R1_VERIFIED`，随后才能进入阶段3。
+R1 不改变 `CAPD-MIC-1.0` 合同 ID、`capd_finals_v3_0` schema、配置、selector、标签、损失、JSONL、trace/split、manifest 或阶段2审计工件。阶段2保持 `VERIFIED_REUSABLE`。本文件全部服务器验收已经通过，阶段1已更新为 `STAGE1_R1_VERIFIED`，阶段3的阶段0--2前置门禁已经满足。
 
 G13 验收口径：
 
@@ -261,16 +261,17 @@ capd_run 13_review_target_diff git diff -- \
 - 失败时重点检查：尾随空白、冲突标记、源码目录 `__pycache__`、pytest cache、E2E 输出路径和正式工件污染。若服务器基线本身有改动，必须以 00/11 的差异为准，不得 reset 或覆盖队友改动。
 - 临时文件：状态快照和所有日志位于 `$CAPD_STAGE1_TMP`；Git 命令只读。
 
-## 4. 验收结果回填规则
+## 4. 验收结果回填
 
-必须保存每个 `[CAPD][label] exit_code=...`、pytest 汇总数量、两个 E2E 结果、`git diff --check` 和工作区前后快照差异。任一组非零即保持 `STAGE1_R1_IMPLEMENTED_UNVERIFIED`，不得改写为 verified，也不得进入阶段3。
+2026-07-22 服务器验收已执行完成。用户回填确认：01--13 全部命令组均满足预期，所有真实退出码均为 0；Python 语法检查、G13 非 torch/torch 针对性测试、原阶段1语义/模型回归、两个非平凡微型 E2E、完整 pytest、`git diff --check`、禁止路径检查和测试前后工作区污染对比全部通过。
 
-仅当 01--13 全部满足预期，才可：
+本次验收结果支持以下状态转换：
 
-1. 把阶段1符合性报告状态更新为 `STAGE1_R1_VERIFIED`；
-2. 在报告中回填服务器环境、测试数量、每组真实退出码和仓库卫生证据；
-3. 保持阶段2为 `VERIFIED_REUSABLE`，不重采、不重切、不重生成；
-4. 解除阶段3启动门禁。
+1. 阶段1符合性报告状态更新为 `STAGE1_R1_VERIFIED`；
+2. 阶段2保持 `VERIFIED_REUSABLE`，不重采、不重切、不重生成；
+3. 阶段3启动门禁解除。
+
+本次用户回填没有提供各 pytest 命令的精确 collected/passed 数量，因此本文不臆造数量，以服务器 `$CAPD_STAGE1_TMP/logs/` 中的原始日志为准。若后续需要归档审计包，应从服务器日志补录这些精确数量，而不是重新解释本次退出码。
 
 ## 5. 原 G01--G10 与阶段2历史证据（继续有效）
 
