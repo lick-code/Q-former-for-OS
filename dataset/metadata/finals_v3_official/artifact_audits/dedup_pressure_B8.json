@@ -1,0 +1,38 @@
+{
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "artifacts": {
+    "train": {
+      "fingerprint_sha256": "6b97e970fa1f6589891ba4b915f888ac0733651a1b29193ffe53e2552b5263bd",
+      "metadata_fingerprint_sha256": "5c1ba042b1535e9d83dc4c310d8e32983d1164067ef288904d524cdd2a14fad0",
+      "path": "dataset/jsonl/finals_v3_official/dedup_pressure/B8/train.jsonl",
+      "sample_count": 4607
+    },
+    "valid": {
+      "fingerprint_sha256": "57f40ca1ba7ddad07840cb49836f73d60ab438fbc42b54d40b0b1e3ea9f4d504",
+      "metadata_fingerprint_sha256": "236aafcf9864e04947b999c2af688a1a5776396ccc0d4e8618c4a261992e579c",
+      "path": "dataset/jsonl/finals_v3_official/dedup_pressure/B8/valid.jsonl",
+      "sample_count": 2654
+    }
+  },
+  "audit_fingerprint": "89269527cdac976509fb6c9cd77681bcba9b753f3d93cb431ce74c5a78124ad8",
+  "config_fingerprint": "c737825fae0a92f76bc6b9fc48d661e8d75b6bbc0e1c0c154def6f47a9f711f4",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "d42012b4222091383fc3dfd7eb084dfe4c714512f067aaf7620d37dc844f4fa8",
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "a75b809e3fd6eec9f8274b482ee57e3f2442fccb1cb2a72ef0e8e84f4357dd02",
+  "source_manifest_fingerprint": "1c04935e3188eed4d2e7d6217b2e156253448b2967c26905353476190dd8f439",
+  "split_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "status": "PASSED",
+  "validation_samples_fingerprint": "a34b9e87412b2cf72e2cf8b60b77c2a2e918679f2a9d0fb3d97333346a02af65",
+  "verification_status": "VERIFIED",
+  "workload_id": "dedup_pressure"
+}

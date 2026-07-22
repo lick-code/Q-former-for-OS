@@ -1,0 +1,38 @@
+{
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "artifacts": {
+    "train": {
+      "fingerprint_sha256": "eee9b1f5922c71f855be49ee6787153d1811e393ffc72608841dc8bf873b9168",
+      "metadata_fingerprint_sha256": "ac3ca55582dd1299e7830d001b7647aa3cb3a8343dfbe255817210399f4a8661",
+      "path": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B8/train.jsonl",
+      "sample_count": 8694
+    },
+    "valid": {
+      "fingerprint_sha256": "80f96ac96d434410393325f1ec0d02883378869428f0c0bd6167fca4e939e5d3",
+      "metadata_fingerprint_sha256": "a75f765ca073fcee547a30f943dffcd3c8f1f080b395a03b2f4ddb35cb4ccf70",
+      "path": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B8/valid.jsonl",
+      "sample_count": 2839
+    }
+  },
+  "audit_fingerprint": "acdb58dc2844b831b27fa72659ebd641d1c50dfbebd172e44395d92ef0c1283f",
+  "config_fingerprint": "d3242730e7eb3c0b6c459b45a3bcd5aa08a4a848bde9eeaca1fc396c29db2336",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "2b31c00b19945884a09cc6fc8f3d451aad73f0d03b98a350ef540960609ea2c4",
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "20f6904e49c8b209ff3653f7631e1710da402460ddc43dd9f2b5b898bb1c158f",
+  "source_manifest_fingerprint": "d12c5e2507c333421709ab37c1d555e50426674e3853c88759c2d44237c70235",
+  "split_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "status": "PASSED",
+  "validation_samples_fingerprint": "f33c5560242cd77295273c9ac6aeadca62575cfd865a9870bf8c430548428a47",
+  "verification_status": "VERIFIED",
+  "workload_id": "streamcluster_pressure"
+}

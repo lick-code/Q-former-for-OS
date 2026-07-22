@@ -1,0 +1,38 @@
+{
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "artifacts": {
+    "train": {
+      "fingerprint_sha256": "42a1a1671b741cca0571942b5b9c44bd71775c418aa6bf8c846b582275c2fd38",
+      "metadata_fingerprint_sha256": "7451f43b68cfa01829fb6c818346df537b7621ce42ca03ef190c69dba01ccc43",
+      "path": "dataset/jsonl/finals_v3_official/canneal/B16/train.jsonl",
+      "sample_count": 7215
+    },
+    "valid": {
+      "fingerprint_sha256": "af0218c3c88b9a701c2b30793f083acb813d6b0e58323cfb4ec9148336e211d9",
+      "metadata_fingerprint_sha256": "1d03c962705fa6806a8cecac98dd3da51c121d90012b5e3961e64d803fd70728",
+      "path": "dataset/jsonl/finals_v3_official/canneal/B16/valid.jsonl",
+      "sample_count": 2377
+    }
+  },
+  "audit_fingerprint": "cb3f078241697f29143c13113f980aeab01752f09d558fda80f43308a27c89b6",
+  "config_fingerprint": "c09904e6ec23727fb0610a2c113595c3fff7934bcc06f34f7cca5605521e2b1e",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "5986f7d63d4b81da33feb24a9c6a7d3db51c339d421e1322d4f80b7bc3249bdb",
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "ab261cae040b4ae118199db091ad26e42cde7e547be5dd562cd690d3235808c4",
+  "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
+  "split_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "status": "PASSED",
+  "validation_samples_fingerprint": "f062b2d885f5d970cc20d9a1447f3de3889242ddab553cb4237d1cb215a17347",
+  "verification_status": "VERIFIED",
+  "workload_id": "canneal"
+}
