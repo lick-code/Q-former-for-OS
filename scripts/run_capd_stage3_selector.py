@@ -842,8 +842,8 @@ def main(argv=None):
       repo_root, args.output) if not os.path.isabs(args.output)
       else args.output)
   _validate_cli_scope(args, repo_root, artifact_root, output_dir)
-  command = shlex.join(sys.argv if argv is None else
-                       [sys.argv[0]] + list(argv))
+  command_args = sys.argv if argv is None else [sys.argv[0]] + list(argv)
+  command = " ".join(shlex.quote(str(argument)) for argument in command_args)
   code_commit = _current_commit(repo_root)
   audits = []
   for workload in WORKLOADS:
