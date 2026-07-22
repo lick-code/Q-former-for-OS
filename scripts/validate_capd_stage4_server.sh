@@ -33,6 +33,10 @@ run_group() {
 run_required() {
   run_group "$@"
   if [ "$LAST_CODE" -ne 0 ]; then
+    failed_log="$LOG_ROOT/$1.log"
+    printf '[ERROR] %s failed; last 80 log lines follow: %s\n' \
+      "$1" "$failed_log"
+    tail -n 80 "$failed_log" || true
     printf '[EVIDENCE] %s\n' "$EVIDENCE_ROOT"
     printf '[FINAL] STAGE4_NOT_VERIFIED\n'
     exit 1

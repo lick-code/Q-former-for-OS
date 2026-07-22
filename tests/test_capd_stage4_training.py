@@ -104,9 +104,10 @@ class MultiSeedTrainingTest(unittest.TestCase):
         stage4.stage4_common.assert_jsonl_semantically_equal(
             left, right, "content regression")
 
-  def test_stage4_uses_immutable_manifest_identity_not_file_sha(self):
+  def test_stage4_preserves_frozen_manifest_binding_and_records_raw_sha(self):
     source = inspect.getsource(stage4.audit_inputs)
     self.assertIn("manifest_source_identity", source)
+    self.assertIn("source_manifest_provenance_identity", source)
     self.assertIn("source_manifest_file_sha256", source)
 
   def test_stage4_training_has_no_test_argument_or_path(self):

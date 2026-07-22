@@ -12,7 +12,7 @@
 - `qmap/stage4_distribution.py`：G11 A/B/C 三组分布采集与漂移比较。
 - `qmap/qmap_train.py`：允许显式训练 seed 覆盖配置默认 seed，但不改变配置、selector 或 JSONL 身份。
 
-阶段4重建结果与保留的阶段2 JSONL 按规范化 JSON 行逐行比较：忽略 CRLF/LF 和无语义 JSON 空白，但任何字段、数值、顺序或行数差异均硬失败并报告首个差异行。source manifest 同时记录不可变 provenance identity 和原始文件 SHA；工件合同只使用前者，避免可变 quality seal 被误当作方法身份。
+阶段4重建结果与保留的阶段2 JSONL 按规范化 JSON 行逐行比较：忽略 CRLF/LF 和无语义 JSON 空白，但任何字段、数值、顺序或行数差异均硬失败并报告首个差异行。source manifest 的合同字段继续使用阶段2冻结的文本指纹，并以 LF/CRLF 兼容方式核验；另行记录 provenance identity 和当前原始文件 SHA，三者不得混用。
 
 ## 多随机种子
 

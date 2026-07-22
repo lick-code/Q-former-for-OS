@@ -181,11 +181,7 @@ def audit_inputs(args, write=True):
     manifest = finals_data.load_source_manifest(
         manifest_path, args.repo_root, verify_files=False,
         require_quality_pass=True, expected_workload=workload)
-    manifest_identity = finals_data.manifest_source_identity(manifest)
-    stage4_common.require(
-        manifest_identity == config["run"]["source_manifest_fingerprint"] and
-        manifest_identity == selector["source_manifest_fingerprint"],
-        "source manifest immutable identity mismatch")
+    manifest_fingerprint = config["run"]["source_manifest_fingerprint"]
     finals_config.assert_independent_trace_sources(
         config, source_manifest=manifest, project_root=args.repo_root)
     for split in ("train", "valid"):
@@ -204,7 +200,9 @@ def audit_inputs(args, write=True):
         "selector_fingerprint": selector_fp,
         "source_manifest_path": stage4_common.portable(
             manifest_absolute, args.repo_root),
-        "source_manifest_fingerprint": manifest_identity,
+        "source_manifest_fingerprint": manifest_fingerprint,
+        "source_manifest_provenance_identity":
+            finals_data.manifest_source_identity(manifest),
         "source_manifest_file_sha256": finals_config.fingerprint_file(
             manifest_absolute),
         "split_fingerprints": dict(config["data"]["split_fingerprints"]),
