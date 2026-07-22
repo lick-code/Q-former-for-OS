@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 
+import hashlib
+import itertools
 import json
 import math
 import os
@@ -32,6 +34,52 @@ def require(condition, message):
 def load_json(path):
   with open(path, "r", encoding="utf-8") as input_file:
     return json.load(input_file)
+
+
+def _canonical_jsonl_rows(path):
+  with open(path, "r", encoding="utf-8", newline=None) as input_file:
+    for line_number, line in enumerate(input_file, start=1):
+      if not line.strip():
+        continue
+      try:
+        row = json.loads(line)
+      except ValueError as error:
+        raise ValueError("{}:{} is not valid JSON".format(
+            path, line_number)) from error
+      yield line_number, json.dumps(
+          row, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def normalized_jsonl_fingerprint(path):
+  """Hashes JSON rows canonically, independent of CRLF/LF and whitespace."""
+  digest = hashlib.sha256()
+  count = 0
+  for _, canonical in _canonical_jsonl_rows(path):
+    digest.update(canonical.encode("utf-8"))
+    digest.update(b"\n")
+    count += 1
+  return {"sha256": digest.hexdigest(), "row_count": count}
+
+
+def assert_jsonl_semantically_equal(left_path, right_path, context):
+  """Hard-fails at the first semantic row difference, not byte newlines."""
+  left_identity = normalized_jsonl_fingerprint(left_path)
+  right_identity = normalized_jsonl_fingerprint(right_path)
+  if left_identity == right_identity:
+    return left_identity
+  missing = object()
+  for left, right in itertools.zip_longest(
+      _canonical_jsonl_rows(left_path), _canonical_jsonl_rows(right_path),
+      fillvalue=missing):
+    if left is missing or right is missing:
+      raise ValueError(
+          "{} row-count mismatch: {} != {}".format(
+              context, left_identity["row_count"],
+              right_identity["row_count"]))
+    if left[1] != right[1]:
+      raise ValueError(
+          "{} semantic mismatch at JSONL row {}".format(context, left[0]))
+  raise ValueError("{} normalized fingerprint mismatch".format(context))
 
 
 def portable(path, root):

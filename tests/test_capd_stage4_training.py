@@ -2,8 +2,10 @@
 """Server tests for stage-4 multi-seed and artifact binding."""
 
 import inspect
+import json
 import os
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -71,6 +73,41 @@ class MultiSeedTrainingTest(unittest.TestCase):
     self.assertNotIn("search_selector", source)
     self.assertNotIn("fit_selector", source)
     self.assertIn("generate_reranker_jsonl", source)
+
+  def test_jsonl_semantic_fingerprint_ignores_crlf_and_json_whitespace(self):
+    rows = [{"b": 2, "a": 1}, {"x": [1, 2]}]
+    with tempfile.TemporaryDirectory() as directory:
+      left = os.path.join(directory, "left.jsonl")
+      right = os.path.join(directory, "right.jsonl")
+      with open(left, "wb") as output:
+        output.write((json.dumps(rows[0]) + "\r\n" +
+                      json.dumps(rows[1]) + "\r\n").encode("utf-8"))
+      with open(right, "wb") as output:
+        output.write((json.dumps(rows[0], sort_keys=True,
+                                 separators=(",", ":")) + "\n" +
+                      json.dumps(rows[1], sort_keys=True,
+                                 separators=(",", ":")) + "\n").encode(
+                                     "utf-8"))
+      identity = stage4.stage4_common.assert_jsonl_semantically_equal(
+          left, right, "newline regression")
+      self.assertEqual(2, identity["row_count"])
+
+  def test_jsonl_semantic_comparison_rejects_content_change(self):
+    with tempfile.TemporaryDirectory() as directory:
+      left = os.path.join(directory, "left.jsonl")
+      right = os.path.join(directory, "right.jsonl")
+      with open(left, "w", encoding="utf-8", newline="\n") as output:
+        output.write('{"value":1}\n')
+      with open(right, "w", encoding="utf-8", newline="\n") as output:
+        output.write('{"value":2}\n')
+      with self.assertRaisesRegex(ValueError, "semantic mismatch.*row 1"):
+        stage4.stage4_common.assert_jsonl_semantically_equal(
+            left, right, "content regression")
+
+  def test_stage4_uses_immutable_manifest_identity_not_file_sha(self):
+    source = inspect.getsource(stage4.audit_inputs)
+    self.assertIn("manifest_source_identity", source)
+    self.assertIn("source_manifest_file_sha256", source)
 
   def test_stage4_training_has_no_test_argument_or_path(self):
     source = inspect.getsource(stage4.train)

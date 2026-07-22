@@ -181,6 +181,11 @@ def audit_inputs(args, write=True):
     manifest = finals_data.load_source_manifest(
         manifest_path, args.repo_root, verify_files=False,
         require_quality_pass=True, expected_workload=workload)
+    manifest_identity = finals_data.manifest_source_identity(manifest)
+    stage4_common.require(
+        manifest_identity == config["run"]["source_manifest_fingerprint"] and
+        manifest_identity == selector["source_manifest_fingerprint"],
+        "source manifest immutable identity mismatch")
     finals_config.assert_independent_trace_sources(
         config, source_manifest=manifest, project_root=args.repo_root)
     for split in ("train", "valid"):
@@ -199,7 +204,8 @@ def audit_inputs(args, write=True):
         "selector_fingerprint": selector_fp,
         "source_manifest_path": stage4_common.portable(
             manifest_absolute, args.repo_root),
-        "source_manifest_fingerprint": finals_config.fingerprint_file(
+        "source_manifest_fingerprint": manifest_identity,
+        "source_manifest_file_sha256": finals_config.fingerprint_file(
             manifest_absolute),
         "split_fingerprints": dict(config["data"]["split_fingerprints"]),
         "stage2_generator_summary_fingerprint": finals_config.fingerprint_file(
@@ -224,8 +230,6 @@ def audit_inputs(args, write=True):
   }
   if write:
     path = os.path.join(args.output_root, "input_audit.json")
-    stage4_common.require(not os.path.exists(path),
-                          "input audit already exists; refusing overwrite")
     _write_json(path, audit)
   return audit
 
@@ -235,9 +239,6 @@ def generate(args):
   for workload in args.workloads:
     paths = _paths(args, workload)
     os.makedirs(paths["generated"], exist_ok=True)
-    for output in (paths["train_jsonl"], paths["valid_jsonl"]):
-      stage4_common.require(not os.path.exists(output),
-                            "refusing to overwrite stage4 JSONL: {}".format(output))
     config = finals_config.load_config(
         paths["config"], require_resolved=True, project_root=args.repo_root,
         verify_manifest_files=False)
@@ -250,9 +251,16 @@ def generate(args):
     for split, trace, trace_path, output in (
         ("train", train_trace, train_path, paths["train_jsonl"]),
         ("valid", valid_trace, valid_path, paths["valid_jsonl"])):
+      temporary_output = output + ".building.{}".format(os.getpid())
+      stage4_common.require(
+          not os.path.exists(temporary_output) and
+          not os.path.exists(finals_config.metadata_path(temporary_output)),
+          "stale stage4 build temporary exists: {}".format(temporary_output))
       item = generate_reranker_jsonl(
-          trace, trace_path, split, output, config, selector,
+          trace, trace_path, split, temporary_output, config, selector,
           paths["config"], _command(), holdout=None)
+      normalized_identity = stage4_common.normalized_jsonl_fingerprint(
+          temporary_output)
       item.update({
           "stage4_schema": stage4_common.STAGE4_SCHEMA,
           "stage2_selector_path": stage4_common.portable(
@@ -267,14 +275,26 @@ def generate(args):
           "generator_code_fingerprint": _code_fingerprint(args.repo_root),
           "complete_future_window": "t+L<N; drop incomplete tail",
           "behavior_policy": "lru", "test_trace_opened": False,
+          "normalized_data_fingerprint": normalized_identity["sha256"],
+          "normalized_row_count": normalized_identity["row_count"],
       })
-      _write_json(finals_config.metadata_path(output), item)
-      metadata[split] = item
       old = os.path.join(paths["stage2"], split + ".jsonl")
       if os.path.isfile(old):
-        stage4_common.require(
-            finals_config.fingerprint_file(old) == item["data_fingerprint"],
-            "stage4 rebuild differs from retained stage2 {} JSONL".format(split))
+        comparison = stage4_common.assert_jsonl_semantically_equal(
+            old, temporary_output,
+            "stage2/stage4 {} {}".format(workload, split))
+        item["stage2_semantic_comparison"] = {
+            "status": "IDENTICAL", "method": "canonical_json_rows",
+            "normalized_sha256": comparison["sha256"],
+            "row_count": comparison["row_count"],
+            "stage2_byte_sha256": finals_config.fingerprint_file(old),
+            "stage4_byte_sha256": item["data_fingerprint"],
+        }
+      _write_json(finals_config.metadata_path(temporary_output), item)
+      os.replace(temporary_output, output)
+      os.replace(finals_config.metadata_path(temporary_output),
+                 finals_config.metadata_path(output))
+      metadata[split] = item
     summary = {
         "schema_version": stage4_common.STAGE4_SCHEMA,
         "contract_id": finals_config.CONTRACT_ID, "workload": workload,
@@ -301,9 +321,40 @@ def train(args):
     for seed in args.seeds:
       output = os.path.join(args.checkpoint_root, workload,
                             "seed_{}".format(seed))
-      stage4_common.require(not os.path.exists(output),
-                            "refusing to overwrite checkpoint directory")
-      os.makedirs(output)
+      manifest_path = os.path.join(output, "checkpoint_manifest.json")
+      if os.path.isfile(manifest_path):
+        existing = stage4_common.load_json(manifest_path)
+        expected_jsonl = {
+            "train": finals_config.fingerprint_file(paths["train_jsonl"]),
+            "valid": finals_config.fingerprint_file(paths["valid_jsonl"])}
+        expected_config = finals_config.config_fingerprint(
+            finals_config.load_json(paths["config"]))
+        if (int(existing.get("seed", -1)) == seed and
+            existing.get("jsonl_fingerprints") == expected_jsonl and
+            existing.get("config_fingerprint") == expected_config and
+            existing.get("selector_fingerprint") ==
+            finals_config.selector_fingerprint(
+                finals_config.load_json(paths["selector"])) and
+            existing.get("selection_criterion") ==
+            "minimum_valid_loss_only" and
+            existing.get("nan_or_inf_detected") is False and
+            os.path.isfile(os.path.join(output, "qmap_best.pth")) and
+            existing.get("checkpoints", {}).get("best", {}).get(
+                "fingerprint") == finals_config.fingerprint_file(
+                    os.path.join(output, "qmap_best.pth"))):
+          print("[reuse] workload={} seed={} checkpoint={}".format(
+              workload, seed, output))
+          continue
+        raise ValueError(
+            "existing checkpoint directory is incomplete or identity-mismatched: "
+            "{}".format(output))
+      if os.path.isdir(output):
+        stage4_common.require(
+            not os.listdir(output),
+            "non-empty failed checkpoint directory requires inspection: {}".format(
+                output))
+      else:
+        os.makedirs(output)
       command = [
           args.python, "-m", "qmap.qmap_train",
           "--config", paths["config"],

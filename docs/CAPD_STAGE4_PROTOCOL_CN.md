@@ -12,6 +12,8 @@
 - `qmap/stage4_distribution.py`：G11 A/B/C 三组分布采集与漂移比较。
 - `qmap/qmap_train.py`：允许显式训练 seed 覆盖配置默认 seed，但不改变配置、selector 或 JSONL 身份。
 
+阶段4重建结果与保留的阶段2 JSONL 按规范化 JSON 行逐行比较：忽略 CRLF/LF 和无语义 JSON 空白，但任何字段、数值、顺序或行数差异均硬失败并报告首个差异行。source manifest 同时记录不可变 provenance identity 和原始文件 SHA；工件合同只使用前者，避免可变 quality seal 被误当作方法身份。
+
 ## 多随机种子
 
 每个 workload 独立训练 `3136859、42、2026` 三个 seed，共 9 个模型。所有 seed 使用完全相同的阶段4 train/valid JSONL、epochs、batch size、learning rate、结构和损失。每个 epoch 记录 train/valid loss，只以最小 valid loss选择 best checkpoint；NaN/Inf 硬失败。汇总报告均值、样本标准差、最小值和最大值。

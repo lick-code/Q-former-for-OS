@@ -12,6 +12,7 @@ export PYTEST_ADDOPTS="-o cache_dir=$PYTEST_ROOT/cache"
 export CAPD_STAGE4_LOG_ROOT="$LOG_ROOT/training"
 
 FAILURES=0
+LAST_CODE=0
 run_group() {
   name="$1"
   timeout_value="$2"
@@ -20,6 +21,7 @@ run_group() {
   printf '[START] %s %s\n' "$name" "$(date -Is)" | tee "$log"
   timeout "$timeout_value" "$@" >>"$log" 2>&1
   code=$?
+  LAST_CODE=$code
   printf '[END] %s %s exit=%s log=%s\n' \
     "$name" "$(date -Is)" "$code" "$log" | tee -a "$log"
   if [ "$code" -ne 0 ]; then
@@ -28,32 +30,41 @@ run_group() {
   return 0
 }
 
+run_required() {
+  run_group "$@"
+  if [ "$LAST_CODE" -ne 0 ]; then
+    printf '[EVIDENCE] %s\n' "$EVIDENCE_ROOT"
+    printf '[FINAL] STAGE4_NOT_VERIFIED\n'
+    exit 1
+  fi
+}
+
 cd "$REPO" || {
   printf '[FINAL] STAGE4_NOT_VERIFIED\n'
   exit 2
 }
 
-run_group input_audit 10m python3 scripts/run_capd_stage4.py \
+run_required input_audit 10m python3 scripts/run_capd_stage4.py \
   --stage audit-inputs --repo-root "$REPO"
-run_group targeted_tests 20m python3 -m pytest -q \
+run_required targeted_tests 20m python3 -m pytest -q \
   tests/test_capd_stage4_counterfactual.py \
   tests/test_capd_stage4_distribution.py \
   tests/test_capd_stage4_training.py
-run_group full_pytest 60m python3 -m pytest -q
-run_group mini_e2e 60m env CAPD_STAGE4_E2E=1 python3 -m pytest -q \
+run_required full_pytest 60m python3 -m pytest -q
+run_required mini_e2e 60m env CAPD_STAGE4_E2E=1 python3 -m pytest -q \
   tests/test_capd_stage4_end_to_end.py
-run_group generate 60m python3 scripts/run_capd_stage4.py \
+run_required generate 60m python3 scripts/run_capd_stage4.py \
   --stage generate --repo-root "$REPO"
-run_group train_9 18h python3 scripts/run_capd_stage4.py \
+run_required train_9 18h python3 scripts/run_capd_stage4.py \
   --stage train --repo-root "$REPO" --log-root "$CAPD_STAGE4_LOG_ROOT" \
   --training-timeout 21600
-run_group counterfactual_g12 6h python3 scripts/run_capd_stage4.py \
+run_required counterfactual_g12 6h python3 scripts/run_capd_stage4.py \
   --stage counterfactual-audit --repo-root "$REPO"
-run_group distribution_g11 6h python3 scripts/run_capd_stage4.py \
+run_required distribution_g11 6h python3 scripts/run_capd_stage4.py \
   --stage distribution-audit --repo-root "$REPO"
-run_group summarize 20m python3 scripts/run_capd_stage4.py \
+run_required summarize 20m python3 scripts/run_capd_stage4.py \
   --stage summarize --repo-root "$REPO"
-run_group pollution_check 10m python3 -c \
+run_required pollution_check 10m python3 -c \
   'import os; bad=[]
 for root in ("dataset/jsonl/finals_v3_official", "outputs/results/finals_v3_official"):
   for path, _, files in os.walk(root):
@@ -61,7 +72,7 @@ for root in ("dataset/jsonl/finals_v3_official", "outputs/results/finals_v3_offi
       full=os.path.join(path,name).replace(os.sep,"/")
       if "stage4" not in full and ("stage4_audit" in name or "stage4_reranker" in name): bad.append(full)
 raise SystemExit("pollution: "+str(bad) if bad else 0)'
-run_group diff_check 10m git diff --check
+run_required diff_check 10m git diff --check
 
 printf '[EVIDENCE] %s\n' "$EVIDENCE_ROOT"
 if [ "$FAILURES" -eq 0 ]; then
