@@ -10,6 +10,7 @@ import os
 import random
 import shlex
 import sys
+import time
 
 import torch
 from torch import optim
@@ -268,6 +269,17 @@ def _command_text():
   return " ".join(shlex.quote(value) for value in sys.argv)
 
 
+def _training_code_fingerprint():
+  paths = (
+      "qmap/qmap_train.py", "qmap/candidate_filter.py",
+      "qmap/finals_generator.py", "policy_learning/cache_model/embed.py",
+      "policy_learning/cache_model/model.py",
+      "policy_learning/cache_model/qmap_loss.py")
+  return finals_config.fingerprint_value({
+      path: finals_config.fingerprint_file(os.path.join(PROJECT_ROOT, path))
+      for path in paths})
+
+
 def _validate_finals_artifacts(config, config_path, selector_path,
                                train_path, valid_path):
   if not selector_path or not valid_path:
@@ -355,14 +367,20 @@ def _validate_finals_artifacts(config, config_path, selector_path,
   }
 
 
-def apply_finals_config(args):
+def apply_finals_config(args, explicit_seed=None):
   if not args.config:
     return None
   config = finals_config.load_config(
-      args.config, require_resolved=True, project_root=PROJECT_ROOT)
+      args.config, require_resolved=True, project_root=PROJECT_ROOT,
+      verify_manifest_files=False)
   training = config["training"]
   labels = config["labels"]
-  args.seed = int(training["seed"])
+  if explicit_seed is None:
+    args.seed = int(training["seed"])
+    args.training_seed_source = "config_default"
+  else:
+    args.seed = int(explicit_seed)
+    args.training_seed_source = "explicit_cli"
   args.epochs = int(training.get("epochs", args.epochs))
   args.batch_size = int(training.get("batch_size", args.batch_size))
   args.lr = float(training.get("learning_rate", args.lr))
@@ -462,12 +480,15 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
         "workload": config["run"]["workload"],
         "workload_id": config["run"]["workload"],
         "seed": args.seed,
+        "training_seed_source": args.training_seed_source,
         "jsonl_fingerprints": {
             split: metadata["data_fingerprint"]
             for split, metadata in finals_context["metadata"].items()
         },
-        "git_commit": config.get(
+        "git_commit": finals_config.current_git_commit(PROJECT_ROOT),
+        "config_generation_commit": config.get(
             "run", {}).get("git_commit", "unknown"),
+        "code_fingerprint": _training_code_fingerprint(),
         "command": _command_text(),
     })
     if config["schema_version"] == finals_config.SCHEMA_VERSION:
@@ -493,7 +514,13 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
 
 def main():
   args = build_arg_parser().parse_args()
-  finals_context = apply_finals_config(args)
+  seed_was_explicit = any(
+      value == "--seed" or value.startswith("--seed=")
+      for value in sys.argv[1:])
+  explicit_seed = args.seed if seed_was_explicit else None
+  args.training_seed_source = (
+      "explicit_cli" if explicit_seed is not None else "parser_default")
+  finals_context = apply_finals_config(args, explicit_seed=explicit_seed)
   os.makedirs(args.output_dir, exist_ok=True)
   if finals_context:
     finals_config.write_json(
@@ -590,8 +617,10 @@ def main():
   optimizer = optim.AdamW(
       parameters, lr=args.lr, weight_decay=args.weight_decay)
 
+  training_started = time.time()
   best_loss = float("inf")
   best_epoch = None
+  loss_curve = []
   global_iteration = 0
   last_path = os.path.join(args.output_dir, "qmap_last.pth")
   best_path = os.path.join(args.output_dir, "qmap_best.pth")
@@ -605,6 +634,8 @@ def main():
       batch = move_batch_to_device(batch, device)
       loss = _forward_loss(
           batch, feature_embedder, extractor, scorer, loss_fn, args.ablation)
+      if not math.isfinite(float(loss.item())):
+        raise ValueError("Non-finite batch training loss detected.")
       optimizer.zero_grad()
       loss.backward()
       torch.nn.utils.clip_grad_norm_(parameters, max_norm=10.0)
@@ -621,6 +652,11 @@ def main():
         args.ablation) if valid_loader else train_loss)
     if not math.isfinite(train_loss) or not math.isfinite(validation_loss):
       raise ValueError("Non-finite training or validation loss detected.")
+    loss_curve.append({
+        "epoch": epoch,
+        "train_loss": train_loss,
+        "valid_loss": validation_loss,
+    })
     is_best = validation_loss < best_loss
     if is_best:
       best_loss = validation_loss
@@ -645,6 +681,15 @@ def main():
                          if finals_context else "legacy_qmap"),
       "best_epoch": best_epoch,
       "best_validation_loss": best_loss,
+      "final_train_loss": loss_curve[-1]["train_loss"],
+      "loss_curve": loss_curve,
+      "seed": args.seed,
+      "training_seed_source": args.training_seed_source,
+      "selection_criterion": (
+          "minimum_valid_loss_only" if valid_loader else
+          "minimum_train_loss_no_validation"),
+      "training_duration_seconds": time.time() - training_started,
+      "nan_or_inf_detected": False,
       "checkpoints": {
           "last": {"path": os.path.abspath(last_path),
                    "fingerprint": finals_config.fingerprint_file(last_path)},
@@ -656,9 +701,10 @@ def main():
       "decision_holdout_fingerprint": (
           finals_context["decision_holdout_fingerprint"]
           if finals_context else None),
-      "git_commit": (finals_context["config"].get("run", {}).get(
-          "git_commit", "unknown") if finals_context else
-                     finals_config.current_git_commit(PROJECT_ROOT)),
+      "git_commit": finals_config.current_git_commit(PROJECT_ROOT),
+      "config_generation_commit": (finals_context["config"].get(
+          "run", {}).get("git_commit", "unknown") if finals_context else None),
+      "code_fingerprint": _training_code_fingerprint(),
       "command": _command_text(),
   }
   if is_v3:
@@ -670,6 +716,14 @@ def main():
         split: metadata["data_fingerprint"]
         for split, metadata in finals_context["metadata"].items()
     }
+    manifest["source_manifest"] = finals_context["config"]["data"].get(
+        "source_manifest")
+    manifest["source_manifest_fingerprint"] = finals_context[
+        "selector_params"].get("source_manifest_fingerprint")
+    manifest["split_fingerprints"] = dict(
+        finals_context["config"]["data"].get("split_fingerprints", {}))
+    manifest["audit_input_scope"] = "train_jsonl_and_valid_jsonl_only"
+    manifest["test_trace_opened"] = False
   finals_config.write_json(
       os.path.join(args.output_dir, "checkpoint_manifest.json"), manifest)
   print("Training finished. best={} last={}".format(

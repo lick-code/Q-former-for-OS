@@ -280,7 +280,8 @@ def _requires_data_manifest(config):
       config.get("validation", {}).get("require_data_manifest") is True)
 
 
-def _bind_resolved_data_manifest(config, project_root=None):
+def _bind_resolved_data_manifest(config, project_root=None,
+                                 verify_manifest_files=True):
   """Verifies and binds a PASSED source manifest into a resolved config."""
   if not _requires_data_manifest(config):
     return config
@@ -291,7 +292,8 @@ def _bind_resolved_data_manifest(config, project_root=None):
   if not manifest_path:
     raise ValueError("Official v3 requires data.source_manifest.")
   manifest = finals_data.load_source_manifest(
-      manifest_path, root, verify_files=True, require_quality_pass=True,
+      manifest_path, root, verify_files=verify_manifest_files,
+      require_quality_pass=True,
       expected_workload=config.get("run", {}).get("workload"))
   recorded_commit = config.get("run", {}).get("git_commit")
   if (not recorded_commit or
@@ -474,10 +476,13 @@ def validate_config(config, require_resolved=False):
   raise ValueError("Unsupported schema_version: {}".format(schema))
 
 
-def load_config(path, require_resolved=False, project_root=None):
+def load_config(path, require_resolved=False, project_root=None,
+                verify_manifest_files=True):
   config = load_json(path)
   if require_resolved:
-    _bind_resolved_data_manifest(config, project_root=project_root)
+    _bind_resolved_data_manifest(
+        config, project_root=project_root,
+        verify_manifest_files=verify_manifest_files)
   validate_config(config, require_resolved=require_resolved)
   if require_resolved:
     recorded = config.get("run", {}).get("resolved_config_fingerprint")

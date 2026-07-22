@@ -391,8 +391,12 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
       raise ValueError("Checkpoint does not use the shared page embedding.")
     if model_args.get("position_encoding") != "sinusoidal":
       raise ValueError("Checkpoint position encoding mismatch.")
-    if int(checkpoint["seed"]) != int(config["training"]["seed"]):
-      raise ValueError("Checkpoint training seed mismatch.")
+    seed_source = checkpoint.get("training_seed_source", "config_default")
+    if seed_source not in ("config_default", "explicit_cli"):
+      raise ValueError("Checkpoint training_seed_source is invalid.")
+    if (seed_source == "config_default" and
+        int(checkpoint["seed"]) != int(config["training"]["seed"])):
+      raise ValueError("Checkpoint default training seed mismatch.")
     if int(checkpoint["best_epoch"]) <= 0:
       raise ValueError("Checkpoint best_epoch must be positive.")
     jsonl_fingerprints = checkpoint.get("jsonl_fingerprints", {})
