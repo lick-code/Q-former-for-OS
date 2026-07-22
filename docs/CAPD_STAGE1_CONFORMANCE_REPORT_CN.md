@@ -2,19 +2,35 @@
 
 ## 1. 报告状态
 
-阶段状态：`STAGE1_VERIFIED`
+阶段状态：`REOPENED_G13`（原 G01--G10 服务器证据继续有效；R1 新增 G13 尚待实现与服务器验收）
 
-本地仍未执行 Python、pytest、数据生成、Trace Replay、训练、推理或实验；`STAGE1_VERIFIED` 来自 2026-07-20 Linux 服务器验收结果的回填，而不是本地执行。该状态只表示 `CAPD-MIC-1.0` 阶段1语义、实现门禁和非平凡微型回归已通过，不表示正式数据已经可接受，不表示阶段2已经验证，也不产生任何性能结论。
+本地仍未执行 Python、pytest、数据生成、Trace Replay、训练、推理或实验。2026-07-20 Linux 服务器回填的 `STAGE1_VERIFIED` 是 R1 发布前 G01--G10 的历史验收结果；这些证据在 R1 下继续有效，但不覆盖新增的 G13“精排最高分并列时按决策前原始 LRU 顺序选择最老页面”。因此当前阶段1暂时重开为 `REOPENED_G13`，不得把原验收状态解释为当前 R1 已完整符合。
+
+R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`REOPENED_G13`；阶段2=`VERIFIED_REUSABLE`；阶段3必须等待 `STAGE1_R1_VERIFIED`，此前不得启动正式运行或结论汇总。
 
 服务器验收记录：selector 有效集合诊断得到 `SelectorRecall@K=0.0`、`effective_decision_points=1`、`nondiscriminative_ratio=0.5`、`fallback_uniform=false`；目标语义测试 `16 passed`；强化后的非平凡微型 E2E `2 passed`，覆盖非 uniform fallback、有效决策点、非零 relevance range、有限且非零梯度和参数更新；完整 pytest 为 `64 passed, 2 skipped`，两个 skip 均为 `CAPD_RUN_STAGE1_E2E=0` 时预期跳过的 server-only E2E；各组退出码均为 0，`git diff --check` 无错误。
 
 仓库卫生收口：误跟踪的 `.capd_stage1_tmp/logs/semantics.log` 已不在当前索引中，`.gitignore` 已加入 `.capd_stage1_tmp/`。静态 `git ls-files` 复核为：stage1 临时文件 0、`__pycache__`/`.pyc` 0、`.pytest_cache` 0；同时发现既有历史 checkpoint 类文件 801、resolved config 35、log/result 路径文件 2071。后面三类是阶段1前已经受跟踪的历史实验工件，不作为 `capd_finals_v3_0` 输入；本次不做高风险、超出阶段1卫生问题范围的破坏性批量删除，阶段2通过目录和指纹门禁拒绝复用。
 
-唯一方法—实现依据：`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 中冻结的 `CAPD-MIC-1.0`。冻结合同的“实现状态”未被修改。
+唯一方法—实现依据：`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 中冻结的 `CAPD-MIC-1.0` 文档修订 R1。合同 ID 与 `capd_finals_v3_0` schema 均未改变；合同实现状态为 `STAGE1_REOPENED_G13`。
 
 服务器验收命令：`docs/CAPD_STAGE1_SERVER_VALIDATION_CN.md`。
 
-## 2. G01—G10 对齐记录
+### 1.1 R1 差异分类与影响
+
+新版方法稿与 R1 合同对以下口径一致：
+
+- 决策快照发生在当前请求已经到达、但该请求尚未引起页面迁移、LRU、驻留或修改状态更新时；
+- 当前触发请求进入精排历史窗口，且不进入 selector 的历史统计；
+- selector 分数并列时，按决策前扩展候选池的原始 LRU 顺序优先保留最老页面；
+- 精排最高分并列时，按 `original_pool_rank` 选择决策前原始 LRU 顺序中最老的有效候选；
+- selector 的 valid 标签覆盖扩展候选池 `P_t` 全部页面；
+- 精排 train/valid 标签只为筛选后的有效候选集合 `C_t` 构造并保存；
+- selector valid 与精排 train/valid 两条标签路径都只使用具有完整 `L` 条未来访问的决策点。
+
+其中，决策快照、双历史写入边界、selector 并列顺序、两类标签域和完整未来窗口均由 G01--G10 的既有实现及服务器证据覆盖。R1 唯一新增实现缺口是 G13；该缺口只影响闭环推理的最终单值 victim 选择，不改变 selector、标签、JSONL 或阶段2数据工件语义。
+
+## 2. G01—G10 对齐记录（既有服务器证据继续有效）
 
 ### G01：official 独立 train/valid/test
 
@@ -28,6 +44,7 @@
 
 - 修改文件：`qmap/finals_generator.py`。
 - 实现方式：新增 `has_complete_future_window(t,L,N)`；v3 的 FutureOracle、selector 验证样本和 train/valid 精排 JSONL 只在 `t+L<N` 时生成标签，窗口末端固定为 `t+L`，不采用截断窗口或较短分母。
+- 标签域：selector valid 在扩展候选池 `P_t` 的全部页面上构造参考相关性；精排 train/valid 只为筛选后的有效候选集合 `C_t` 构造并保存标签。两条路径共用上述完整未来窗口门禁。
 - 对应测试：`FutureSplitAndSnapshotTest.test_future_window_boundary_and_exact_label`。
 - 静态审查结果：`t+L=N-1` 接受、`t+L>=N` 拒绝的代码分支和数值标签断言已写入；未运行。
 - 待服务器验证：真实 trace 尾部样本数及 FutureOracle 与朴素实现的一致性。
@@ -108,12 +125,14 @@
 
 对应测试：`ArtifactIdentityTest.test_checkpoint_contract_config_workload_selector_mismatches_hard_fail`、`ArtifactIdentityTest.test_jsonl_metadata_and_result_mismatches_hard_fail`、`ArtifactIdentityTest.test_v2_and_v3_artifacts_are_mutually_incompatible`、`V3JsonlSchemaTest.test_v3_accepts_history_page_ids_and_rejects_old_field`。
 
-## 4. Gate C1—C3 测试构造覆盖
+## 4. Gate C1—C4 测试构造覆盖与 R1 补强
 
 - Gate C1：LRU 方向、tie any-hit/TieCoverage、future guard、共享嵌入、冻结词表/OOV、正弦位置编码、ApproxNDCG 对角线与 padding 均有具体数值断言。
 - Gate C2：生成器/回放共享候选快照已有逐字段等价测试；当前请求进入精排 history 而不提前进入 selector 有独立测试；首次读写、命中、再次 NVM 访问、clean/dirty 降级有手算计数和总代价测试。
 - Gate C3：独立 trace 路径/内容指纹、official/smoke、schema/合同/配置/workload/selector/JSONL/checkpoint/result 硬失败及 v3 旧字段拒绝均有测试。
 - Gate C4：server-only 微型端到端 trace 已改为 440 次访问，包含 DRAM 填充、流式冷页、分层热页重访和写访问；除全链路与两次固定种子断言外，还要求 selector 不使用 uniform fallback、有效决策点大于 0、验证样本存在非零 relevance range，并在生产模型路径的一次优化步中断言 loss/梯度有限、梯度非零且至少一个参数改变。默认 skip，只有服务器显式设置 `CAPD_RUN_STAGE1_E2E=1` 才执行，所有工件写入 pytest 临时目录。
+
+上述 2026-07-20 覆盖和结果不包含 R1 的 G13。阶段1再次关闭前必须补充以下针对性断言：候选张量首项不是原始 LRU 最老页、多个有效候选精排最高分精确并列时仍选择 `original_pool_rank` 最小者；`candidate_mask=0` 的 padding 不得胜出；任一有效候选精排分数为 NaN/Inf 时硬失败。随后必须重新执行针对性测试、完整 pytest 和非平凡微型 E2E，并在服务器验收记录中保留新数量与退出码。
 
 新增或修改的主要测试文件：
 
@@ -136,20 +155,22 @@
 
 真实 train/valid/test 的来源区间、真实 RW、压力和数据分布不属于阶段1语义门禁，必须由阶段2 manifest 与数据质量审计另行确认。
 
-### 5.2 合同内部张力
+### 5.2 覆盖指标来源口径
 
-发现一处需要合同维护者确认的报告口径张力：第 3.3 节规定 test 闭环回放不生成未来标签，而第 5.5 节又要求正式结果报告四个候选覆盖指标与 NRegret。当前实现不在 test 偷看未来访问；result 明确记录来自 `valid_trace` 的 selector 覆盖指标并标注 `candidate_coverage_metric_source=valid_trace`。如果合同原意是要求 test 上的 oracle 覆盖率，则会与“test 不生成未来标签/不读取未来信息”的冻结语义冲突，需要提升或澄清合同后再改，不能静默推断。
+合同第 3.3 节规定 test 闭环回放不生成未来标签；因此正式 result 中汇总的四个候选覆盖指标与 NRegret 沿用已实现口径，来源为 `valid_trace`，并显式记录 `candidate_coverage_metric_source=valid_trace`。这些指标不是 test oracle 指标，test 回放不得读取未来信息。该来源标注消除了阶段文档中的歧义，不改变指标公式或数据工件。
 
-除该报告来源口径外，静态阅读未发现 G01—G10 公式之间的直接矛盾。
+静态阅读未发现 G01--G10 公式之间的直接矛盾；当前未关闭项仅为 G13。
 
 G11（闭环分布偏移审计）和 G12（代理标签—反事实代价审计）仍按冻结合同属于后续阶段的正式实验/审计工作，本阶段未执行，也未声称实现验证。
 
-## 6. 阶段2启动记录
+## 6. 阶段2验收与复用记录
 
-阶段1服务器门禁已满足，允许进入阶段2“重新构造正式数据”。阶段2必须继续保持以下边界：不得复用 v2.1 JSONL、selector、checkpoint 或 result；不得把阶段1微型 E2E 工件提升为正式数据；不得把阶段2审计解释为候选筛选器效果、精排模型效果或系统性能结论。
+阶段2已于 2026-07-22 完成独立服务器验收。R1 不改变 trace、split、selector valid 标签、精排 train/valid 标签、JSONL 或工件 schema，既有阶段2服务器验收和数据工件继续有效，不重采、不重切、不重生成。阶段2仍须保持以下边界：不得复用 v2.1 JSONL、selector、checkpoint 或 result；不得把阶段1微型 E2E 工件提升为正式数据；不得把阶段2审计解释为候选筛选器效果、精排模型效果或系统性能结论。
+
+阶段3当前不得启动正式运行或结论汇总。只有 G13 修复完成、针对性测试与完整服务器验收通过，并把阶段1状态更新为 `STAGE1_R1_VERIFIED` 后，才满足阶段3启动门槛。
 
 ## 7. 结论
 
-当前阶段状态：`STAGE1_VERIFIED`
+当前阶段状态：`REOPENED_G13`
 
-状态解释：语义与实现门禁已通过；正式数据、正式实验与性能结论均仍未验证。
+状态解释：G01--G10 的原服务器验收事实和结果继续有效；G13 尚未实现及验收，因此阶段1尚未按 R1 关闭。阶段2保持 `VERIFIED_REUSABLE`，阶段3等待 `STAGE1_R1_VERIFIED`。

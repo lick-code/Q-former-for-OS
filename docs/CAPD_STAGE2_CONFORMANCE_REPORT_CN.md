@@ -2,7 +2,9 @@
 
 ## 1. 最终状态
 
-状态：`VERIFIED`
+状态：`VERIFIED_REUSABLE`（原服务器验收结论保持有效，R1 不要求重采、重切或重生成）
+
+R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`REOPENED_G13`；阶段2=`VERIFIED_REUSABLE`；阶段3必须等待 `STAGE1_R1_VERIFIED`，此前不得启动正式运行或结论汇总。
 
 - 完成日期：2026-07-22
 - 验收环境：Linux 服务器，仓库 `/home/likc/Q-former-for-OS`
@@ -12,7 +14,7 @@
 - 最终标志：`[FINAL] STAGE2_VERIFIED`
 - 服务器证据目录：`/tmp/capd-stage2-acceptance-r6i_xzg8`
 
-本报告依据 `CAPD-MIC-1.0` 和 `capd_finals_v3_0` 合同确认阶段2已经完成。该结论只覆盖正式数据来源、切分、质量审计、selector 机械性样本、train/valid JSONL 及其制品绑定，不包含精排训练或性能结论。
+本报告依据 `CAPD-MIC-1.0` 文档修订 R1 和 `capd_finals_v3_0` 合同确认阶段2已经完成且工件可继续使用。R1 只新增闭环推理的 G13 精排最高分并列规则，不改变 trace、split、selector valid 标签域、精排 train/valid 标签域、完整未来窗口门禁、JSONL 内容或工件 schema，因此既有服务器验收和数据工件不重采、不重切、不重生成。该结论只覆盖正式数据来源、切分、质量审计、selector 机械性样本、train/valid JSONL 及其制品绑定，不包含精排训练或性能结论。
 
 ## 2. 正式数据验收结果
 
@@ -68,4 +70,4 @@
 - train/valid reranker JSONL 与 metadata；
 - generator summary 与 `PASSED` 制品审计报告。
 
-因此阶段2正式关闭，可以进入阶段3。阶段3开始前仍应保持阶段边界：在候选页筛选方案最终确认前，不启动该方案的实现或实验。
+因此阶段2保持正式关闭并标记为 `VERIFIED_REUSABLE`，上述前置工件继续有效。但当前阶段1因 G13 暂时重开；在 G13 修复、针对性测试和服务器验收完成并将阶段1更新为 `STAGE1_R1_VERIFIED` 前，不得启动阶段3正式运行或结论汇总。该门禁不要求重做阶段2。

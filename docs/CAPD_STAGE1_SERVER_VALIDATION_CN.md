@@ -2,11 +2,27 @@
 
 ## 1. 当前状态与边界
 
-最终阶段状态：`STAGE1_VERIFIED`。
+当前阶段状态：`REOPENED_G13`。
+
+2026-07-20 的原阶段1服务器验收结论为 `STAGE1_VERIFIED`，覆盖 G01--G10；原测试数量、结果、退出码和仓库卫生证据继续有效。2026-07-22 的 `CAPD-MIC-1.0` 文档修订 R1 新增 G13 后，当前状态暂时重开，原验收结论不得解释为 G13 已通过。
+
+R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`REOPENED_G13`；阶段2=`VERIFIED_REUSABLE`；阶段3必须等待 `STAGE1_R1_VERIFIED`，此前不得启动正式运行或结论汇总。
 
 本文件中的命令仅供以后在具备 Python/PyTorch 环境的服务器执行。本地未执行任何语法检查、单元测试、数据生成、Trace Replay、训练、推理、网格搜索、smoke test 或端到端实验。
 
-服务器验收仍只验证 `CAPD-MIC-1.0` 的阶段1实现一致性，不得把结果解释为方法性能结论，也不得把测试产生的临时工件复制到 `dataset/`、`outputs/`、`results/`、`logs/` 或正式 checkpoint 目录。
+服务器验收只验证 `CAPD-MIC-1.0` 的阶段1实现一致性，不得把结果解释为方法性能结论，也不得把测试产生的临时工件复制到 `dataset/`、`outputs/`、`results/`、`logs/` 或正式 checkpoint 目录。下文第2--4节保留 2026-07-20 的原验收流程；R1 的 G13 补充验收要求见第1.1节。
+
+### 1.1 R1 G13 精确实现与验收交接
+
+实现范围严格限定为 `qmap/qmap_eval.py::QMAPPolicy.choose_victim` 及对应测试，不得修改配置、selector、JSONL、manifest、checkpoint、result 或 `capd_finals_v3_0` schema：
+
+1. 从冻结决策快照读取精排分数、`original_pool_ranks` 和 `candidate_mask`；先排除 `candidate_mask=0` 的 padding。
+2. 对全部有效候选的最终精排分数执行有限性检查；任一 NaN/Inf 必须硬失败。
+3. 取有效候选中的最高精排分数；“并列”按最终实际分数精确相等判定，不新增 epsilon。
+4. 若最高分唯一，选择该候选；若最高分并列，选择 `original_pool_rank` 最小者，即决策前原始 LRU 顺序中最老的页面。
+5. 不得依赖 selector 排序后的候选张量位置，不得用 selector 分数二次破并列，也不得读取请求状态更新后的 LRU。
+
+必须新增确定性单元/微型回归：候选张量首项不是最老页且最高分并列时仍选择最老页；padding 不得胜出；NaN/Inf 硬失败；非并列路径保持原选择。随后在服务器依次执行针对性测试、完整 pytest 和 `CAPD_RUN_STAGE1_E2E=1` 的非平凡微型 E2E，记录测试数量、退出码和 `git diff --check`。全部通过后才可把阶段1更新为 `STAGE1_R1_VERIFIED`；在此之前阶段3不得启动正式运行或结论汇总。
 
 ## 2. 统一环境与临时目录
 
@@ -166,7 +182,7 @@ git diff -- \
 - 失败时重点检查：尾随空白、冲突标记、意外生成工件、源码目录中的 `__pycache__` 和旧 v2.1 工件修改。
 - 临时文件：无。该组命令只读。
 
-## 4. 验收完成后的状态转换记录
+## 4. 原验收完成后的状态转换记录与 R1 重开
 
 2026-07-20 已完成服务器验收并由阶段报告回填状态。记录如下：
 
@@ -177,6 +193,8 @@ git diff -- \
 - `git diff --check`：无错误；
 - 仓库卫生：`.capd_stage1_tmp/logs/semantics.log` 已不再受跟踪，`.capd_stage1_tmp/` 已进入 `.gitignore`。
 
-状态由 `IMPLEMENTED_UNVERIFIED` 转换为 `STAGE1_VERIFIED`。该转换只确认阶段1语义与实现门禁，不确认正式数据、正式实验或性能结论；阶段2仍必须从 `IMPLEMENTED_UNVERIFIED` 开始并单独验收。
+当时状态由 `IMPLEMENTED_UNVERIFIED` 转换为 `STAGE1_VERIFIED`。该历史转换只确认 G01--G10 的语义与实现门禁，不确认正式数据、正式实验或性能结论。阶段2此后已独立完成服务器验收，其 3 个 workload、12 组工件及 `78 passed, 2 skipped` 证据不受 G13 影响，保持 `VERIFIED_REUSABLE`。
+
+R1 发布后阶段1已重开为 `REOPENED_G13`。只有第1.1节的 G13 实现、针对性测试、完整 pytest 和非平凡微型 E2E 均在服务器通过，才能转换为 `STAGE1_R1_VERIFIED`。
 
 服务器临时目录确认不再需要后，可在人工核对绝对路径确实指向仓库外 `/tmp/capd-stage1-v3-*` 后删除；删除操作不应写入自动化脚本，避免误删正式数据。

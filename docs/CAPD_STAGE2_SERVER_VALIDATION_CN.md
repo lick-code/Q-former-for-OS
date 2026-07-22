@@ -2,7 +2,8 @@
 
 ## 最终验收记录
 
-- 状态：`VERIFIED`
+- 当前状态：`VERIFIED_REUSABLE`
+- 原服务器最终状态：`VERIFIED`（最终标志 `[FINAL] STAGE2_VERIFIED`，事实保持不变）
 - 日期：2026-07-22
 - 仓库：`/home/likc/Q-former-for-OS`
 - 最终入口：`python scripts/verify_finals_v3_stage2.py`
@@ -13,7 +14,11 @@
 - 最终标志：`[FINAL] STAGE2_VERIFIED`
 - 证据目录：`/tmp/capd-stage2-acceptance-r6i_xzg8`
 
+R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`REOPENED_G13`；阶段2=`VERIFIED_REUSABLE`；阶段3必须等待 `STAGE1_R1_VERIFIED`，此前不得启动正式运行或结论汇总。
+
 下文保留原始分步验收流程作为审计说明。当前推荐使用一次性入口，以确保所有失败在同一轮汇总并处理跨平台文本换行与仓库根目录差异。
+
+`CAPD-MIC-1.0` 文档修订 R1 只新增阶段1 G13 的闭环精排最高分并列规则，不改变本次验收覆盖的 3 个 workload、12 组工件、trace/split/manifest、selector valid 标签、精排 train/valid JSONL、采集来源、commit 或审计指纹。因此本文件记录的阶段2服务器验收继续有效，不重采、不重切、不重生成，也不需要仅因 G13 重跑本流程。在阶段1达到 `STAGE1_R1_VERIFIED` 前，阶段3不得启动正式运行或结论汇总。
 
 ## 1. 状态与边界
 
@@ -333,4 +338,4 @@ printf '[INFO] evidence retained at %s\n' "$CAPD_STAGE2_TMP"
 - v2 路径无修改，未产生训练 checkpoint 或正式 result；
 - 日志中没有被忽略的 `BLOCKED`、`SKIP`、`INSUFFICIENT` 或 `REJECTED` workload。
 
-本次验收已满足以上全部条件，阶段2状态已从 `IMPLEMENTED_UNVERIFIED` 更新为 `VERIFIED`。服务器证据目录不自动删除；确认不再需要后，只能人工核对其绝对路径确实匹配 `/tmp/capd-stage2-acceptance-*` 再处理。
+本次验收已满足以上全部条件，阶段2状态已从 `IMPLEMENTED_UNVERIFIED` 更新为 `VERIFIED`；R1 收口后对外状态为 `VERIFIED_REUSABLE`。原验收的测试数量、结果、commit、trace 指纹、采集来源和审计状态均保持不变。服务器证据目录不自动删除；确认不再需要后，只能人工核对其绝对路径确实匹配 `/tmp/capd-stage2-acceptance-*` 再处理。

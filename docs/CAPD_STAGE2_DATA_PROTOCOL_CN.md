@@ -6,12 +6,16 @@
 - 目标 schema：`capd_finals_v3_0`
 - 数据 manifest schema：`capd_finals_v3_data_manifest_1`
 - 数据审计 schema：`capd_finals_v3_data_audit_1`
-- 当前实现状态：`VERIFIED`（2026-07-22 Linux 服务器验收通过）
+- 当前实现状态：`VERIFIED_REUSABLE`（2026-07-22 Linux 服务器验收通过；R1 下继续有效）
 - 适用范围：正式 train/valid/test trace、selector 验证样本和精排 JSONL
+
+R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`REOPENED_G13`；阶段2=`VERIFIED_REUSABLE`；阶段3必须等待 `STAGE1_R1_VERIFIED`，此前不得启动正式运行或结论汇总。
 
 ## 1. 阶段边界
 
 阶段2只完成正式数据来源证明、切分、质量审计以及生成 selector 验证样本和精排 JSONL 所必需的机械性 selector 搜索。阶段2不训练精排模型，不运行 QMAP 正式测试，不比较 selector 方案，不执行 `B` sweep/消融，不输出性能结论。
+
+`CAPD-MIC-1.0` 文档修订 R1 不改变本协议的数据语义：selector valid 标签仍覆盖扩展候选池 `P_t` 全部页面，精排 train/valid 标签仍只为筛选后的有效候选集合 `C_t` 构造并保存，两条路径仍只接收具有完整 `L` 条未来访问的决策点。R1 新增 G13 只影响闭环推理的最终 victim 单值选择，不影响已封存 trace、split、manifest、selector、JSONL 或审计指纹；既有工件不重采、不重切、不重生成。
 
 以下工件不得读取、改写或迁移为 v3 official：
 
@@ -121,7 +125,9 @@ selector、验证样本、JSONL metadata、generator summary、后续 checkpoint
 
 正式 trace、manifest、JSONL、checkpoint 和 result 的目录均带 `finals_v3_official`，不得在原位置覆盖 legacy/v2 文件。旧 processed trace 只能作为静态候选或来源线索；通过重新物化、来源验证和审计之前，不是 official 输入。
 
-## 6. 当前候选数据静态初判
+## 6. 验收前候选数据静态初判（历史记录）
+
+本节保留阶段2实施前对 legacy 候选数据的静态判断，用于解释为何需要后续正式采集、切分和审计；它不表示 2026-07-22 已封存的 official 数据当前仍为 `REJECTED/INSUFFICIENT`。最终 official 状态以三份 `PASSED` source manifest、数据审计报告和阶段2符合性报告为准。
 
 | workload | 静态状态 | 依据 |
 |---|---|---|
@@ -133,7 +139,7 @@ selector、验证样本、JSONL metadata、generator summary、后续 checkpoint
 
 ## 7. 状态门禁
 
-阶段2仅在以下条件全部满足时进入 `VERIFIED`：
+阶段2仅在以下条件全部满足时进入 `VERIFIED`；R1 收口后对外状态记为 `VERIFIED_REUSABLE`：
 
 1. 来源 manifest 结构、真实 RW、源区间和全部指纹验证通过；
 2. 三个 split 的审计状态均汇总为 `PASSED`，无硬失败或充分性失败；
@@ -144,4 +150,4 @@ selector、验证样本、JSONL metadata、generator summary、后续 checkpoint
 7. 仓库没有 v2 工件改写或意外运行工件污染；
 8. 阶段2符合性报告根据服务器证据由 `IMPLEMENTED_UNVERIFIED` 人工更新为 `VERIFIED`。
 
-以上门禁已由 `python scripts/verify_finals_v3_stage2.py` 一次性验收全部通过；最终标志为 `[FINAL] STAGE2_VERIFIED`，完整回归结果为 `78 passed, 2 skipped`。
+以上门禁已由 `python scripts/verify_finals_v3_stage2.py` 一次性验收全部通过；最终标志为 `[FINAL] STAGE2_VERIFIED`，完整回归结果为 `78 passed, 2 skipped`。这些既有服务器事实保持不变。当前阶段2状态为 `VERIFIED_REUSABLE`；在阶段1 G13 修复并达到 `STAGE1_R1_VERIFIED` 前，不得启动阶段3正式运行或结论汇总，但无需重新执行本协议的数据采集、切分或生成步骤。
