@@ -160,6 +160,19 @@ def _selector_weights(selector):
   return tuple(float(selector[name]) for name in selector_search.WEIGHT_NAMES)
 
 
+def _validate_summary_validation_sample_fingerprint(
+    summary, valid_metadata, expected_fingerprint):
+  train_selector = summary.get("train_metadata", {}).get(
+      "selector_params", {})
+  valid_selector = valid_metadata.get("selector_params", {})
+  _require(
+      train_selector.get("validation_samples_fingerprint") ==
+      expected_fingerprint and
+      valid_selector.get("validation_samples_fingerprint") ==
+      expected_fingerprint,
+      "generator summary/validation sample fingerprint mismatch")
+
+
 def _weights_dict(weights):
   return {feature: float(value) for feature, value in zip(FEATURES, weights)}
 
@@ -393,8 +406,8 @@ def _audit_pair(repo_root, artifact_root, workload, pool_size):
   _require(valid_metadata.get("source_trace_fingerprint") ==
            valid_fingerprint,
            "generator summary/valid trace fingerprint mismatch")
-  _require(summary.get("validation_samples_fingerprint") == sample_hash,
-           "generator summary/validation sample fingerprint mismatch")
+  _validate_summary_validation_sample_fingerprint(
+      summary, valid_metadata, sample_hash)
 
   samples = _load_and_validate_samples(
       paths["selector_validation_samples"], workload, pool_size)

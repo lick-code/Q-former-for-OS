@@ -341,6 +341,31 @@ class Stage3InputGateTest(unittest.TestCase):
           stage3._audit_pair(repo, os.path.join(repo, "artifacts"),
                              "canneal", 8)
 
+  def test_generator_summary_uses_nested_validation_sample_fingerprints(self):
+    expected = "sample-sha256"
+    summary = {
+        "train_metadata": {
+            "selector_params": {
+                "validation_samples_fingerprint": expected,
+            },
+        },
+    }
+    valid_metadata = {
+        "selector_params": {
+            "validation_samples_fingerprint": expected,
+        },
+    }
+    stage3._validate_summary_validation_sample_fingerprint(
+        summary, valid_metadata, expected)
+    broken = {
+        "selector_params": {
+            "validation_samples_fingerprint": "wrong",
+        },
+    }
+    with self.assertRaises(ValueError):
+      stage3._validate_summary_validation_sample_fingerprint(
+          summary, broken, expected)
+
   def test_audit_only_does_not_write_results(self):
     with tempfile.TemporaryDirectory() as repo:
       artifact_root = os.path.join(repo, "artifacts")
