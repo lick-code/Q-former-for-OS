@@ -61,7 +61,8 @@ def build_arg_parser():
 
 def main():
   args = build_arg_parser().parse_args()
-  config = finals_config.load_config(args.config, require_resolved=True)
+  config = finals_config.load_config(
+      args.config, require_resolved=True, project_root=PROJECT_ROOT)
   selector = finals_config.load_json(args.selector)
   finals_config.validate_selector_params(config, selector)
   if (selector.get("validation_samples_fingerprint") !=

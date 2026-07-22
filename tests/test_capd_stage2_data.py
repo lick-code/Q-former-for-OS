@@ -239,6 +239,53 @@ class SourceManifestTest(unittest.TestCase):
             manifest_path, directory, verify_files=True,
             require_quality_pass=True)
 
+  def test_quality_seal_survives_git_lf_normalization(self):
+    train = [(10 + i, page, i % 2)
+             for i, page in enumerate((1, 2, 3, 1, 2, 3))]
+    valid = [(20 + i, page, i % 2)
+             for i, page in enumerate((2, 4, 5, 2, 4, 5))]
+    test = [(30 + i, page, i % 2)
+            for i, page in enumerate((1, 6, 7, 1, 6, 7))]
+    rows = train + valid + test
+    intervals = {"train": (0, 6), "valid": (6, 12), "test": (12, 18)}
+    with tempfile.TemporaryDirectory() as directory:
+      manifest_path, manifest = build_fixture(directory, rows, intervals)
+      report = finals_data.audit_source_manifest(
+          manifest_path, directory, audit_config(manifest=manifest),
+          audit_profile())
+      report_path = os.path.join(directory, "audit.json")
+      finals_data.write_json(report_path, report)
+      with open(report_path, "rb") as input_file:
+        lf_bytes = input_file.read()
+      crlf_bytes = lf_bytes.replace(b"\n", b"\r\n")
+      with open(report_path, "wb") as output_file:
+        output_file.write(crlf_bytes)
+      finals_data.update_manifest_quality_gate(
+          manifest_path, report_path, directory, report)
+      with open(report_path, "wb") as output_file:
+        output_file.write(lf_bytes)
+      finals_data.load_source_manifest(
+          manifest_path, directory, verify_files=True,
+          require_quality_pass=True)
+
+  def test_manifest_binding_preserves_recorded_crlf_fingerprint(self):
+    rows = [(index, (index % 4) + 1, index % 2) for index in range(18)]
+    intervals = {"train": (0, 6), "valid": (6, 12), "test": (12, 18)}
+    with tempfile.TemporaryDirectory() as directory:
+      manifest_path, manifest = build_fixture(directory, rows, intervals)
+      with open(manifest_path, "rb") as input_file:
+        lf_bytes = input_file.read()
+      crlf_bytes = lf_bytes.replace(b"\n", b"\r\n")
+      with open(manifest_path, "wb") as output_file:
+        output_file.write(crlf_bytes)
+      recorded = finals_data.fingerprint_file(manifest_path)
+      with open(manifest_path, "wb") as output_file:
+        output_file.write(lf_bytes)
+      binding = finals_data.manifest_binding(
+          manifest_path, manifest, directory,
+          expected_source_fingerprint=recorded)
+      self.assertEqual(recorded, binding["source_manifest_fingerprint"])
+
 
 class AuditMetricsTest(unittest.TestCase):
 

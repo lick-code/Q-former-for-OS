@@ -105,7 +105,7 @@ def write_json(path, value):
   directory = os.path.dirname(os.path.abspath(path))
   if directory:
     os.makedirs(directory, exist_ok=True)
-  with open(path, "w", encoding="utf-8") as output_file:
+  with open(path, "w", encoding="utf-8", newline="\n") as output_file:
     json.dump(value, output_file, indent=2, sort_keys=True,
               ensure_ascii=False)
     output_file.write("\n")
@@ -293,11 +293,11 @@ def _bind_resolved_data_manifest(config, project_root=None):
   manifest = finals_data.load_source_manifest(
       manifest_path, root, verify_files=True, require_quality_pass=True,
       expected_workload=config.get("run", {}).get("workload"))
-  current_commit = current_git_commit(root)
-  if (current_commit == "unknown" or
-      manifest.get("git_commit") != current_commit):
+  recorded_commit = config.get("run", {}).get("git_commit")
+  if (not recorded_commit or
+      manifest.get("git_commit") != recorded_commit):
     raise ValueError(
-        "Data manifest git_commit does not match the current checkout.")
+        "Data manifest git_commit does not match the resolved artifact.")
   assert_independent_trace_sources(
       config, source_manifest=manifest, project_root=root)
   profile_path = config.get("validation", {}).get("data_quality_profile")
@@ -308,7 +308,10 @@ def _bind_resolved_data_manifest(config, project_root=None):
       quality.get("profile_fingerprint") !=
       profile_identity["profile_fingerprint"]):
     raise ValueError("Resolved config/data quality profile binding mismatch.")
-  binding = finals_data.manifest_binding(manifest_path, manifest, root)
+  binding = finals_data.manifest_binding(
+      manifest_path, manifest, root,
+      expected_source_fingerprint=config.get("run", {}).get(
+          "source_manifest_fingerprint"))
   config.setdefault("run", {}).update(binding)
   config["data"]["split_fingerprints"] = copy.deepcopy(
       binding["split_fingerprints"])
@@ -471,10 +474,10 @@ def validate_config(config, require_resolved=False):
   raise ValueError("Unsupported schema_version: {}".format(schema))
 
 
-def load_config(path, require_resolved=False):
+def load_config(path, require_resolved=False, project_root=None):
   config = load_json(path)
   if require_resolved:
-    _bind_resolved_data_manifest(config)
+    _bind_resolved_data_manifest(config, project_root=project_root)
   validate_config(config, require_resolved=require_resolved)
   if require_resolved:
     recorded = config.get("run", {}).get("resolved_config_fingerprint")

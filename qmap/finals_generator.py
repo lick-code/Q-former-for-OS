@@ -326,7 +326,7 @@ def write_jsonl(path, rows):
   directory = os.path.dirname(os.path.abspath(path))
   if directory:
     os.makedirs(directory, exist_ok=True)
-  with open(path, "w", encoding="utf-8") as output_file:
+  with open(path, "w", encoding="utf-8", newline="\n") as output_file:
     for row in rows:
       output_file.write(json.dumps(row, sort_keys=True) + "\n")
 
@@ -336,7 +336,7 @@ def write_validation_samples(path, samples):
   if directory:
     os.makedirs(directory, exist_ok=True)
   count = 0
-  with open(path, "w", encoding="utf-8") as output_file:
+  with open(path, "w", encoding="utf-8", newline="\n") as output_file:
     for sample in samples:
       output_file.write(json.dumps(sample, sort_keys=True) + "\n")
       count += 1
@@ -389,7 +389,7 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
   directory = os.path.dirname(os.path.abspath(output_path))
   if directory:
     os.makedirs(directory, exist_ok=True)
-  with open(output_path, "w", encoding="utf-8") as output_file:
+  with open(output_path, "w", encoding="utf-8", newline="\n") as output_file:
     for access_index, access in enumerate(trace):
       complete_window = has_complete_future_window(
           access_index, lookahead, len(trace))
@@ -505,7 +505,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
 
 
 def fit_selector_and_generate(args):
-  config = finals_config.load_config(args.config, require_resolved=True)
+  config = finals_config.load_config(
+      args.config, require_resolved=True, project_root=PROJECT_ROOT)
   is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
   configured_page_shift = int(config.get("trace", {}).get("page_shift", 12))
   if args.page_shift is not None and args.page_shift != configured_page_shift:

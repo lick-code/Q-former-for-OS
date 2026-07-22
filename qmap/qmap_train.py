@@ -358,7 +358,8 @@ def _validate_finals_artifacts(config, config_path, selector_path,
 def apply_finals_config(args):
   if not args.config:
     return None
-  config = finals_config.load_config(args.config, require_resolved=True)
+  config = finals_config.load_config(
+      args.config, require_resolved=True, project_root=PROJECT_ROOT)
   training = config["training"]
   labels = config["labels"]
   args.seed = int(training["seed"])

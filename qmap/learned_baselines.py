@@ -479,7 +479,8 @@ def build_arg_parser():
 def apply_finals_config(args):
   if not args.config:
     return None
-  config = finals_config.load_config(args.config, require_resolved=True)
+  config = finals_config.load_config(
+      args.config, require_resolved=True, project_root=PROJECT_ROOT)
   args.train_trace = config["data"]["train_trace"]
   args.dram_capacity = int(config["memory"]["dram_capacity_pages"])
   args.page_shift = int(config.get("trace", {}).get("page_shift", 12))

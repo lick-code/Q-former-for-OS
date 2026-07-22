@@ -348,7 +348,8 @@ def apply_replay_finals_config(args):
     if not getattr(args, "trace_path", None):
       raise ValueError("--trace_path is required when --config is omitted.")
     return None
-  config = finals_config.load_config(config_path, require_resolved=True)
+  config = finals_config.load_config(
+      config_path, require_resolved=True, project_root=PROJECT_ROOT)
   configured_trace = config["data"]["test_trace"]
   supplied_trace = getattr(args, "trace_path", None)
   if (supplied_trace and

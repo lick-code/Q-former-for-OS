@@ -49,6 +49,30 @@ def fingerprint_file(path, chunk_size=1024 * 1024):
   return digest.hexdigest()
 
 
+def text_fingerprint_variants(path):
+  """Returns raw/LF/CRLF SHA-256 variants for UTF-8 text artifacts.
+
+  Git may normalize line endings when a JSON report or manifest moves from a
+  Windows generation checkout to a Linux validation checkout.  The content is
+  unchanged, so transport-only newline conversion must not invalidate a
+  sealed artifact.  Binary trace fingerprints remain byte-exact and never use
+  this helper.
+  """
+  with open(path, "rb") as input_file:
+    raw = input_file.read()
+  text = raw.decode("utf-8")
+  lf = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+  crlf = lf.replace(b"\n", b"\r\n")
+  return {
+      hashlib.sha256(value).hexdigest() for value in (raw, lf, crlf)
+  }
+
+
+def text_fingerprint_matches(path, expected):
+  """Checks a UTF-8 text fingerprint independent of LF/CRLF transport."""
+  return expected in text_fingerprint_variants(path)
+
+
 def load_json(path):
   with open(path, "r", encoding="utf-8") as input_file:
     return json.load(input_file)
@@ -58,7 +82,7 @@ def write_json(path, value):
   directory = os.path.dirname(os.path.abspath(path))
   if directory:
     os.makedirs(directory, exist_ok=True)
-  with open(path, "w", encoding="utf-8") as output_file:
+  with open(path, "w", encoding="utf-8", newline="\n") as output_file:
     json.dump(value, output_file, indent=2, sort_keys=True,
               ensure_ascii=False)
     output_file.write("\n")
@@ -651,7 +675,8 @@ def validate_source_manifest(manifest, repo_root, verify_files=True,
     if quality.get("status") != "PASSED":
       raise ValueError("Data quality gate has not passed.")
     report_path = resolve_path(quality["report_path"], repo_root)
-    if fingerprint_file(report_path) != quality["report_fingerprint_sha256"]:
+    if not text_fingerprint_matches(
+        report_path, quality["report_fingerprint_sha256"]):
       raise ValueError("Data quality report fingerprint mismatch.")
     report = load_json(report_path)
     recorded_audit = report.get("audit_fingerprint")
@@ -741,12 +766,19 @@ def load_source_manifest(path, repo_root, verify_files=True,
   return manifest
 
 
-def manifest_binding(path, manifest, repo_root):
+def manifest_binding(path, manifest, repo_root,
+                     expected_source_fingerprint=None):
   quality = manifest.get("quality_gate", {})
+  resolved_manifest = resolve_path(path, repo_root)
+  source_fingerprint = fingerprint_file(resolved_manifest)
+  if expected_source_fingerprint is not None:
+    if not text_fingerprint_matches(
+        resolved_manifest, expected_source_fingerprint):
+      raise ValueError("Resolved config/source manifest fingerprint mismatch.")
+    source_fingerprint = expected_source_fingerprint
   return {
-      "source_manifest": portable_path(resolve_path(path, repo_root), repo_root),
-      "source_manifest_fingerprint": fingerprint_file(
-          resolve_path(path, repo_root)),
+      "source_manifest": portable_path(resolved_manifest, repo_root),
+      "source_manifest_fingerprint": source_fingerprint,
       "split_fingerprints": {
           split: manifest["splits"][split]["fingerprint_sha256"]
           for split in REQUIRED_SPLITS
