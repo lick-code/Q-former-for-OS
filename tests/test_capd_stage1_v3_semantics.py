@@ -184,6 +184,76 @@ class LruAndMetricSemanticsTest(unittest.TestCase):
     self.assertEqual(0.5, metrics["NRegret"])
 
 
+class V3RerankerVictimSelectionTest(unittest.TestCase):
+
+  def test_unique_highest_score_keeps_the_model_choice(self):
+    victim = qmap_eval.select_v3_reranker_victim(
+        [101, 202, 303], [1.0, 9.0, 3.0], [1, 1, 1], [0, 5, 2])
+    self.assertEqual(202, victim)
+
+  def test_exact_tie_uses_oldest_original_rank_not_tensor_position(self):
+    victim = qmap_eval.select_v3_reranker_victim(
+        [300, 100, 200], [9.0, 9.0, 1.0], [1, 1, 1], [4, 0, 2])
+    self.assertEqual(100, victim)
+
+  def test_selector_score_cannot_break_a_reranker_tie(self):
+    # Candidate 700 is first because its selector score was higher. Final
+    # reranker scores tie, so only frozen original_pool_rank may decide.
+    selector_scores = [0.99, 0.01]
+    self.assertGreater(selector_scores[0], selector_scores[1])
+    victim = qmap_eval.select_v3_reranker_victim(
+        [700, 800], [5.0, 5.0], [1, 1], [6, 1])
+    self.assertEqual(800, victim)
+
+  def test_padding_with_extreme_placeholder_score_cannot_win(self):
+    victim = qmap_eval.select_v3_reranker_victim(
+        [11, 0], [1.0, 1.0e30], [1, 0], [3, -1])
+    self.assertEqual(11, victim)
+
+  def test_valid_nan_and_positive_or_negative_inf_hard_fail(self):
+    for invalid_score in (float("nan"), float("inf"), float("-inf")):
+      with self.subTest(invalid_score=invalid_score):
+        with self.assertRaises(ValueError):
+          qmap_eval.select_v3_reranker_victim(
+              [10, 20], [1.0, invalid_score], [1, 1], [0, 1])
+
+  def test_invalid_mask_rank_and_shapes_hard_fail(self):
+    invalid_inputs = (
+        ([], [], [], []),
+        ([10], [1.0], [0], [-1]),
+        ([10], [1.0], [0.5], [0]),
+        ([10], [1.0], [1], [-1]),
+        ([10], [1.0], [1], [0.5]),
+        ([10, 20], [1.0, 2.0], [1, 1], [0, 0]),
+        ([10, 20], [1.0], [1, 1], [0, 1]),
+        ([10, 20], [1.0, 2.0], [1], [0, 1]),
+        ([10, 20], [1.0, 2.0], [1, 1], [0]),
+    )
+    for pages, scores, mask, ranks in invalid_inputs:
+      with self.subTest(
+          pages=pages, scores=scores, mask=mask, ranks=ranks):
+        with self.assertRaises(ValueError):
+          qmap_eval.select_v3_reranker_victim(
+              pages, scores, mask, ranks)
+
+  def test_selector_topk_tie_is_rank_ordered_and_page_id_independent(self):
+    records = [
+        {"page": 900, "original_pool_rank": 2, "selector_score": 0.5},
+        {"page": 800, "original_pool_rank": 0, "selector_score": 0.5},
+        {"page": 700, "original_pool_rank": 1, "selector_score": 0.5},
+    ]
+    renamed = [
+        dict(record, page=new_page)
+        for record, new_page in zip(records, (1, 9999, 42))
+    ]
+    selected = candidate_filter.select_from_pool_records(records, 2)
+    selected_renamed = candidate_filter.select_from_pool_records(renamed, 2)
+    self.assertEqual([0, 1], [
+        item["original_pool_rank"] for item in selected])
+    self.assertEqual([0, 1], [
+        item["original_pool_rank"] for item in selected_renamed])
+
+
 class FutureSplitAndSnapshotTest(unittest.TestCase):
 
   def test_future_window_boundary_and_exact_label(self):

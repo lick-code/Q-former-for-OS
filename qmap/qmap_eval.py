@@ -17,6 +17,7 @@ the same lightweight feature construction as qmap_generator.py.
 
 import argparse
 import json
+import math
 import os
 import random
 import shlex
@@ -200,6 +201,83 @@ def rank_score_penalty_values(candidate_count, penalty):
     return [0.0 for _ in range(candidate_count)]
   normalizer = float(candidate_count - 1)
   return [penalty * rank / normalizer for rank in range(candidate_count)]
+
+
+def _flat_sequence(values, name):
+  """Converts a one-dimensional list/tensor-like value to a Python list."""
+  if hasattr(values, "detach"):
+    values = values.detach()
+  if hasattr(values, "cpu"):
+    values = values.cpu()
+  if hasattr(values, "tolist"):
+    values = values.tolist()
+  else:
+    try:
+      values = list(values)
+    except TypeError as error:
+      raise ValueError("{} must be a one-dimensional sequence.".format(
+          name)) from error
+  if not isinstance(values, list) or any(
+      isinstance(value, (list, tuple)) for value in values):
+    raise ValueError("{} must be a one-dimensional sequence.".format(name))
+  return values
+
+
+def select_v3_reranker_victim(candidate_pages, reranker_scores,
+                               candidate_mask, original_pool_ranks):
+  """Selects the deterministic CAPD v3 victim from a frozen snapshot.
+
+  Highest final reranker score wins. Exact score ties are broken only by the
+  smallest pre-decision original_pool_rank (the oldest LRU page). Selector
+  scores and candidate tensor positions are deliberately absent.
+  """
+  pages = _flat_sequence(candidate_pages, "candidate_pages")
+  scores = _flat_sequence(reranker_scores, "reranker_scores")
+  mask = _flat_sequence(candidate_mask, "candidate_mask")
+  ranks = _flat_sequence(original_pool_ranks, "original_pool_ranks")
+  size = len(pages)
+  if size == 0:
+    raise ValueError("Victim selection requires at least one candidate.")
+  if not (len(scores) == size and len(mask) == size and len(ranks) == size):
+    raise ValueError(
+        "candidate_pages, reranker_scores, candidate_mask and "
+        "original_pool_ranks must have identical shapes.")
+
+  valid = []
+  seen_ranks = set()
+  for index, (score, mask_value, rank) in enumerate(
+      zip(scores, mask, ranks)):
+    if mask_value not in (0, 1):
+      raise ValueError("candidate_mask values must be exactly 0 or 1.")
+    if mask_value == 0:
+      continue
+    try:
+      score = float(score)
+    except (TypeError, ValueError) as error:
+      raise ValueError("Valid reranker scores must be numeric.") from error
+    if not math.isfinite(score):
+      raise ValueError("Valid reranker scores must be finite.")
+    if isinstance(rank, bool):
+      raise ValueError("Valid original_pool_ranks must be integers.")
+    try:
+      integer_rank = int(rank)
+    except (TypeError, ValueError, OverflowError) as error:
+      raise ValueError(
+          "Valid original_pool_ranks must be non-negative integers.") from error
+    if integer_rank != rank or integer_rank < 0:
+      raise ValueError(
+          "Valid original_pool_ranks must be non-negative integers.")
+    if integer_rank in seen_ranks:
+      raise ValueError("Valid original_pool_ranks must be unique.")
+    seen_ranks.add(integer_rank)
+    valid.append((index, score, integer_rank))
+
+  if not valid:
+    raise ValueError("candidate_mask must contain at least one valid candidate.")
+  maximum_score = max(item[1] for item in valid)
+  tied = [item for item in valid if item[1] == maximum_score]
+  victim_index = min(tied, key=lambda item: item[2])[0]
+  return pages[victim_index]
 
 
 def uses_qformer(ablation):
@@ -591,9 +669,18 @@ class QMAPPolicy(object):
                 eviction_scores.shape[1], self._rank_score_penalty)],
             dtype=eviction_scores.dtype, device=self._device)
         eviction_scores = eviction_scores - rank_penalties
-      victim_index = int(torch.argmax(eviction_scores, dim=1).item())
+      if self._is_v3:
+        # v3 candidates are selector-ordered, not LRU-ordered. Resolve exact
+        # final-score ties only from the frozen pre-decision snapshot ranks.
+        victim = select_v3_reranker_victim(
+            candidates, eviction_scores[0], candidate_mask,
+            snapshot["original_pool_ranks"])
+      else:
+        # Preserve the historical v2.1/legacy first-argmax behavior.
+        victim_index = int(torch.argmax(eviction_scores, dim=1).item())
+        victim = candidates[victim_index]
     self.last_selector_snapshot = snapshot
-    return candidates[victim_index]
+    return victim
 
 
 def replay(args, finals_replay_config=None):

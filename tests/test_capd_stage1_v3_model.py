@@ -22,6 +22,7 @@ if torch is not None:
   from policy_learning.cache_model import model
   from policy_learning.cache_model import qmap_loss
   from qmap import finals_config
+  from qmap import qmap_eval
   from qmap.qmap_train import QMAPAccessSequenceDataset
 
 
@@ -161,6 +162,29 @@ class PositionAndLossTest(unittest.TestCase):
         three_scores, inactivity_three, zeros_three, zeros_three, zeros_three,
         three_mask)
     self.assertAlmostEqual(loss_two.item(), loss_three.item(), places=6)
+
+
+@unittest.skipIf(torch is None, "PyTorch is required on the validation server.")
+class V3VictimSelectionTorchTest(unittest.TestCase):
+
+  def test_final_corrected_tensor_score_tie_uses_original_pool_rank(self):
+    raw_scores = torch.tensor([3.0, 3.5, 1000.0])
+    rank_penalties = torch.tensor(
+        qmap_eval.rank_score_penalty_values(3, 1.0))
+    final_scores = raw_scores - rank_penalties
+    victim = qmap_eval.select_v3_reranker_victim(
+        torch.tensor([111, 222, 0]), final_scores,
+        torch.tensor([1.0, 1.0, 0.0]), torch.tensor([4, 0, -1]))
+    self.assertEqual(222, victim)
+
+  def test_tensor_nonfinite_valid_scores_hard_fail(self):
+    for invalid_score in (float("nan"), float("inf"), float("-inf")):
+      with self.subTest(invalid_score=invalid_score):
+        with self.assertRaises(ValueError):
+          qmap_eval.select_v3_reranker_victim(
+              torch.tensor([11, 22]),
+              torch.tensor([1.0, invalid_score]),
+              torch.tensor([1.0, 1.0]), torch.tensor([0, 1]))
 
 
 @unittest.skipIf(torch is None, "PyTorch is required on the validation server.")
