@@ -1,0 +1,75 @@
+{
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "code_commit": "5da0b709047bacb46778b07f87e4edfbca050a74",
+  "code_fingerprint": "50562a058f33c2f810d7de7490683694c504a3de8391859bc71eeb8da04cb526",
+  "command": "scripts/run_capd_stage4.py --stage audit-inputs --repo-root /home/likc/Q-former-for-OS",
+  "contract_id": "CAPD-MIC-1.0",
+  "forbidden_inputs": [
+    "test trace",
+    "v2",
+    "smoke",
+    "B!=64"
+  ],
+  "inputs": [
+    {
+      "B": 64,
+      "K": 8,
+      "config_fingerprint": "fc42c1a0a7575301beb59e1bb9f65ece8034be5033b5733022c6547000b89322",
+      "selector_fingerprint": "48e4758012a2987ecf8a5dc7ea8c1b477eed1aed079f74f7205e7a576b430d97",
+      "selector_path": "dataset/jsonl/finals_v3_official/canneal/B64/selector_params.json",
+      "source_manifest_fingerprint": "d823034568a7c9ff5978c50ff92a228a05ee05c3caf9d7b8e5453b5c2a632c73",
+      "source_manifest_path": "dataset/metadata/finals_v3_official/canneal.json",
+      "split_fingerprints": {
+        "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+        "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+        "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+      },
+      "stage2_generator_summary_fingerprint": "1b18e12fcf8d742ccdfee918f92740e3861163f1d1e21e156ae2423bb219ca20",
+      "workload": "canneal"
+    },
+    {
+      "B": 64,
+      "K": 8,
+      "config_fingerprint": "44a24bbe43a14f19162882f7251adae9ef4f4a920781bb1cad567814035f4b40",
+      "selector_fingerprint": "243d0494246e8a1dd9ef36cf5e1d290b2772c2ee0b919b20d7d86ea0d43925b8",
+      "selector_path": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/selector_params.json",
+      "source_manifest_fingerprint": "be2f22cda95984d5fb3795b1a796bde6aea7f29f3b63267fbb033aee373a5038",
+      "source_manifest_path": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+      "split_fingerprints": {
+        "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+        "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+        "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+      },
+      "stage2_generator_summary_fingerprint": "b6c23d624e76cdc783ab0717b30b17c4c3dc5e630a8a5a7467406c1677da8f0b",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "B": 64,
+      "K": 8,
+      "config_fingerprint": "bb1f255f64fee0706bff0dbbdb45f712f1754d82f76b2f895663ea32ad62a816",
+      "selector_fingerprint": "7fe88114f67649e6810039d39682ccfa6ffd54ab5b28e2677b710d7a1b8298b2",
+      "selector_path": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/selector_params.json",
+      "source_manifest_fingerprint": "8d677878dd5121009581b824172d06a1b7854351afef04c7aeec9186dc63c632",
+      "source_manifest_path": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+      "split_fingerprints": {
+        "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+        "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+        "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+      },
+      "stage2_generator_summary_fingerprint": "4a7e1b17330ba5edc86de7cc0a1b7144bd2ab0391959967bfb2762308578a842",
+      "workload": "dedup_pressure"
+    }
+  ],
+  "opened_trace_roles": [
+    "train",
+    "valid"
+  ],
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_stage4_audit_1",
+  "stage3_conformance_fingerprint": "8aabb49d4bed8de1f3a6a4cde03cc2264e0813ae1372bae38304e3a23a80904f",
+  "stage3_status": "STAGE3_VERIFIED",
+  "stage3_summary_fingerprint": "87c9eaa06b52ca677cb492a23cf39471be438ba2c2fe5de92946bfe84fba003f",
+  "status": "PASSED",
+  "test_trace_opened": false
+}
