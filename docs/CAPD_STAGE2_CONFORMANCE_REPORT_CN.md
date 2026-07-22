@@ -4,7 +4,7 @@
 
 状态：`VERIFIED_REUSABLE`（原服务器验收结论保持有效，R1 不要求重采、重切或重生成）
 
-R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`REOPENED_G13`；阶段2=`VERIFIED_REUSABLE`；阶段3必须等待 `STAGE1_R1_VERIFIED`，此前不得启动正式运行或结论汇总。
+R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`STAGE1_R1_VERIFIED`；阶段2=`VERIFIED_REUSABLE`；阶段3启动门槛已经满足。
 
 - 完成日期：2026-07-22
 - 验收环境：Linux 服务器，仓库 `/home/likc/Q-former-for-OS`
@@ -70,4 +70,4 @@ R1 统一阶段门禁：阶段0=`DONE_R1`；阶段1=`REOPENED_G13`；阶段2=`VE
 - train/valid reranker JSONL 与 metadata；
 - generator summary 与 `PASSED` 制品审计报告。
 
-因此阶段2保持正式关闭并标记为 `VERIFIED_REUSABLE`，上述前置工件继续有效。但当前阶段1因 G13 暂时重开；在 G13 修复、针对性测试和服务器验收完成并将阶段1更新为 `STAGE1_R1_VERIFIED` 前，不得启动阶段3正式运行或结论汇总。该门禁不要求重做阶段2。
+因此阶段2保持正式关闭并标记为 `VERIFIED_REUSABLE`，上述前置工件继续有效。阶段1的 G13 已完成修复、针对性测试和服务器验收，阶段1状态为 `STAGE1_R1_VERIFIED`，阶段3启动门槛已经满足；该状态同步不要求重做阶段2。
