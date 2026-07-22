@@ -3,19 +3,24 @@
 ## Material Passport
 
 - 合同编号：`CAPD-MIC-1.0`
+- 文档修订：`R1`（兼容性勘误修订）
 - 目标实现模式：`official`
 - 目标工件模式：`capd_finals_v3_0`
 - 冻结日期：2026-07-20
+- 修订日期：2026-07-22
 - 合同状态：`FROZEN`
-- 实现状态：`NONCONFORMANT`（现有代码尚未完全满足本合同）
+- 实现状态：`STAGE1_REOPENED_G13`（G01--G10 已验收；新增的确定性精排并列规则尚待代码补齐）
+- 数据状态：`STAGE2_VERIFIED_REUSABLE`（R1 不改变 trace、split、标签、selector 或 JSONL 内容语义）
 - 实证状态：`UNVERIFIED`（本合同冻结方法与验收口径，不代表实验已经证明方法有效）
-- 来源：2026-07-20 中文 CAPD 完整方法稿、当前仓库代码与配置审查
+- 来源：2026-07-20 中文 CAPD 完整方法稿、2026-07-22 更新稿、当前仓库代码与配置审查
 
 ## 1. 合同地位与适用范围
 
 本合同把当前 CAPD 方法转换为可以落实到配置、代码、数据工件和测试断言的实现规范。正式代码、正式数据和正式实验必须遵守本合同。
 
 若中文方法稿、配置默认值和代码行为之间发生冲突，在中文方法稿完成同步修订前，以本合同中标记为“冻结”的定义为准。任何改变冻结语义的修改都必须提升合同版本，并重新生成受影响的数据、检查点和实验结果。
+
+R1 的修订分类为“兼容性勘误”，不提升合同编号或工件 schema。2026-07-22 更新稿没有改变特征、标签、损失、数据切分、未来窗口、候选预算或工件字段，只进一步明确了决策快照时序、候选筛选并列顺序、精排输出并列顺序以及完整未来窗口的适用集合。其中前述快照时序、候选筛选顺序和完整窗口规则已经由原合同冻结并由现有实现覆盖；R1 新增的唯一实现缺口是 G13“精排最高分并列时按决策前原始 LRU 顺序选择最老页面”。该缺口不改变阶段2 已生成 selector/JSONL 的内容，因此阶段2数据与工件可继续使用；在 G13 修复并验收之前不得启动阶段3正式分析。
 
 本合同仅覆盖当前 CAPD 方法：
 
@@ -39,8 +44,8 @@
    - 候选筛选特征只使用 `t` 之前已经完成状态更新的历史；
    - 候选页驻留状态和 LRU 位置均为请求页插入前状态；
    - 当前请求进入精排模型的长度为 `H` 的上下文窗口，但不进入候选筛选历史统计；
-   - 从当前 DRAM LRU 最久未访问端构造 `P_t`，完成 `B_t -> K_t` 筛选和精排；
-   - 将精排得分最高的页面降级至 NVM，记录一次固定迁移代价；dirty 状态不额外增加一次 NVM 写入；
+   - 从当前 DRAM LRU 最久未访问端构造 `P_t`，完成 `B_t -> K_t` 筛选和精排；筛选得分并列时保留原始 LRU 顺序中更靠近最久未访问端的页面；
+   - 将精排得分最高的页面降级至 NVM；若最高分并列，选择决策前原始 LRU 顺序中最久未访问的页面，不得依赖筛选得分排序后的候选张量位置；随后记录一次固定迁移代价，dirty 状态不额外增加一次 NVM 写入；
    - 将当前请求页插入 DRAM，然后更新驻留状态、修改状态、LRU 顺序和两个历史窗口。
 6. 训练样本生成、验证样本生成、测试回放和在线模拟必须复用同一决策快照构造函数，禁止复制出语义不同的第二套实现。
 
@@ -82,6 +87,8 @@ t + L < N
 也就是必须真实存在完整的 `L` 条未来访问。尾部不足 `L` 的决策点直接丢弃，不得截断窗口后仍使用固定分母 `L` 计算标签，也不得改用较短分母。
 
 该规则适用于 train 和 valid 的所有标签生成。test 闭环回放不生成未来标签，因此保留全部访问和全部实际降级决策。
+
+在 selector 权重搜索的 valid 决策点上，必须为扩展候选池 `P_t` 中的全部页面构造 `y_t(i)`，以定义池内最优集合、筛选覆盖率和 NRegret；在精排 train/valid JSONL 中，只需为筛选后的有效候选集合 `C_t` 构造并保存训练标签。两条路径都必须服从相同的完整未来窗口门禁。
 
 ### 3.4 初始驻留与首次访问记账
 
@@ -141,6 +148,24 @@ TieCoverage@K
 其中 `SelectorRecall@K` 采用“任意命中”语义：只要 `K_t` 个保留页面中包含任意一个并列最优页面，该决策点就记为 `1`，否则为 `0`。当前实现采用的“命中的并列最优页数量除以并列集合大小”属于 `TieCoverage@K`，不得再命名为 `Recall@K`。
 
 `NRegret` 仍按扩展候选池最佳相关性与筛选后最佳相关性之差计算，并只在 `R_t^y > epsilon_y` 的有效决策点上统计。
+
+#### 3.6.1 候选筛选与最终精排的确定性并列顺序
+
+候选筛选和最终 victim 选择采用两套相互独立的并列规则：
+
+```text
+selector TopK:
+  selector_score 降序 -> original_pool_rank 升序
+
+reranker victim:
+  reranker_score 降序 -> original_pool_rank 升序
+```
+
+- `original_pool_rank=0` 表示决策前扩展候选池中最久未访问的页面；同一候选池内该排名唯一，因此足以确定单值结果。
+- selector 的并列规则只决定哪些页面进入 `C_t`，不得作为精排分数并列时的隐式次序。
+- 精排必须先排除 `candidate_mask=0` 的 padding，再在所有取得相同最高精排分数的有效候选中选择 `original_pool_rank` 最小者。
+- “相同最高分”按模型完成全部正式分数修正后的实际数值精确相等判定，不额外引入未写入配置的 epsilon；任何有效候选分数为 NaN/Inf 时必须硬失败。
+- 实现不得直接假设 `torch.argmax` 返回的首个候选就是 LRU 最老页面，因为正式候选张量按 selector 排序，未按原始 LRU 排序。
 
 ### 3.7 页面标识嵌入
 
@@ -221,7 +246,7 @@ alpha = 10
 
 | 合同项 | 方法符号/取值 | 目标配置字段 | 主要代码落点 | 必须存在的测试断言 |
 |---|---|---|---|---|
-| 合同版本 | `CAPD-MIC-1.0` | `contract.id` | `qmap/finals_config.py` | 配置、JSONL、检查点、结果的合同ID一致 |
+| 合同版本 | `CAPD-MIC-1.0`，文档修订 `R1` | `contract.id` | `qmap/finals_config.py` | 配置、JSONL、检查点、结果的合同ID一致；R1不改变工件ID |
 | DRAM容量 | `D=64`（当前正式配置） | `memory.dram_capacity_pages` | replay/generator | 超容量时才触发victim |
 | NVM容量 | 无界 | `memory.nvm_capacity_pages=null` | `qmap/qmap_eval.py` | 不因NVM容量触发淘汰 |
 | 初始驻留 | 全部页面NVM后备 | `replay.initial_residency=all_trace_pages_in_nvm` | `qmap/qmap_eval.py` | 首次读/写分别计NVM读/写 |
@@ -235,6 +260,7 @@ alpha = 10
 | 筛选权重 | 五维非负、和为1、步长0.1，共1001组 | `selector.grid_step=0.1` | `selector_search.weight_grid` | 精确1001组且可复现 |
 | 无区分样本 | `R_t^y <= epsilon_y` 排除 | `selector.epsilon_y` | selector search | 全部无区分时退化为均匀权重 |
 | 权重选择 | Recall降序、NRegret升序、距均匀向量、字典序 | 固定规则 | `weight_choice_key` | 四级确定性顺序 |
+| selector并列 | 筛选分数降序、原始LRU rank升序 | `candidate.selector_tie_break=lru_oldest`（代码冻结值） | `select_from_pool_records` | 同分时选原始rank更小页面，page ID不改变结果 |
 | 并列Recall | any oracle hit | `metrics.selector_recall_tie=any_hit` | `evaluate_weight_batch` | 命中任意并列最优页即为1 |
 | LRU位置 | `1-rank/max(B_t-1,1)` | `features.lru_direction=oldest_is_one` | selector + candidate state | rank 0为1，rank `B_t-1`为0 |
 | 页面嵌入 | history/candidate共享 | `embedding.page.shared=true` | `embed.py`、train/eval/model | 相同page_id查到同一嵌入 |
@@ -248,6 +274,7 @@ alpha = 10
 | 开发备用 | train内部决策holdout | `validation.development_fallback=train_trace_decision_holdout` | dev runner | 工件强制标记`smoke_only` |
 | 首次记账 | NVM access | `replay.first_touch_accounting=nvm_access` | evaluator | 三条手算trace总成本精确匹配 |
 | 工作负载边界 | per-workload | `training.scope=per_workload` | config/checkpoint/eval | workload不一致拒绝加载 |
+| 精排并列 | 最高精排分数并列时原始LRU rank最小者胜出 | `model.victim_tie_break=lru_oldest`（代码冻结值） | `QMAPPolicy.choose_victim` | 候选张量首项不是最老页且最高分并列时仍选择最老页；NaN/Inf硬失败 |
 
 ## 5. 正式工件合同
 
@@ -270,7 +297,7 @@ alpha = 10
 - `w_Delta/w_A/w_W/w_C/w_R`；
 - `PoolRecall@B`、`SelectorRecall@K`、`EndToEndRecall@K`、`TieCoverage@K`、`NRegret`；
 - 有效决策点数、无区分样本比例、并列最优集合统计；
-- LRU行为策略、完整未来窗口策略和选择规则；
+- LRU行为策略、完整未来窗口策略、selector TopK 并列规则和权重选择规则；
 - 配置、代码提交和验证样本指纹。
 
 ### 5.3 精排 JSONL
@@ -318,24 +345,16 @@ padding 位置的 `candidate_mask=0`，不得参与 Cross-Attention victim 选�
 - 合同、配置、selector、检查点、test trace和代码提交指纹；
 - 运行类型必须为 `official`，smoke结果不能被汇总器读取为正式结果。
 
-## 6. 当前代码与合同的已知不一致
+## 6. 当前实现符合性与剩余缺口
 
 | 编号 | 当前证据 | 合同要求 | 当前状态 |
 |---|---|---|---|
-| G01 | `qmap/finals_config.py` 强制 `train_trace_decision_holdout`，external valid为diagnostic-only | 正式模式使用独立valid trace | 不符合 |
-| G02 | `qmap/finals_generator.py::FutureOracle` 在trace尾部截断未来窗口，生成器仍接受这些决策点 | 不完整的L窗口不生成标签 | 不符合 |
-| G03 | `qmap/selector_search.py::evaluate_weight_batch` 计算“命中并列页比例” | Recall采用any-hit；比例另名TieCoverage | 不符合 |
-| G04 | `qmap/candidate_filter.py::build_candidate_state_features` 使用 `rank/(B_t-1)` | 精排状态使用 `1-rank/(B_t-1)` | 不符合 |
-| G05 | `qmap/qmap_train.py` 分别创建历史地址DynamicVocab和候选页DynamicVocab | history/candidate共享页面词表与嵌入 | 不符合 |
-| G06 | `DynamicVocabEmbedder.forward` 会给未见输入分配新索引 | train后冻结；valid/test OOV到UNK | 不符合 |
-| G07 | `QMAPMacroscopicPatternExtractor` 直接把访问嵌入送入Transformer | 先加入固定正弦位置编码 | 不符合 |
-| G08 | `qmap_loss.py` 的pair mask包含对角线，`sigmoid(0)=0.5`被计入位置 | 排除 `j=i` | 不符合 |
-| G09 | evaluator对任何DRAM miss都按NVM访问计费，但未显式声明全页NVM后备 | 固化初始状态并增加首次访问测试 | 行为基本符合，合同与测试缺失 |
-| G10 | 当前selector输出只含池内Recall/NRegret | 增加Pool、Selector、EndToEnd、TieCoverage分层指标 | 不符合 |
-| G11 | 当前正式结果没有LRU离线状态与CAPD闭环状态分布审计 | 正式实验必须报告分布偏移 | 不符合 |
-| G12 | 当前标签没有与窗口内反事实加权代价进行一致性审计 | 正式实验必须完成代理标签审计 | 不符合 |
+| G01--G10 | 阶段1服务器验收：目标语义、非平凡微型E2E和完整回归均通过 | 独立valid、完整未来窗口、分层覆盖指标、统一LRU方向、共享冻结词表、位置编码、ApproxNDCG及首次访问记账 | `VERIFIED` |
+| G11 | 尚未形成正式LRU离线状态与CAPD闭环状态分布审计 | 正式实验必须报告分布偏移 | 阶段4待完成 |
+| G12 | 尚未形成代理标签与窗口内反事实加权代价一致性审计 | 正式实验必须完成代理标签审计 | 阶段4待完成 |
+| G13 | `qmap/qmap_eval.py::QMAPPolicy.choose_victim` 对候选张量直接执行 `torch.argmax`；候选张量按selector得分排序，首项不保证是原始LRU最老页 | 最高精排分数并列时，在有效候选中选择 `original_pool_rank` 最小者；NaN/Inf硬失败 | `NONCONFORMANT`，阶段1补强项 |
 
-在 G01–G12 完成前，现有 `capd_finals_v2_1` 工件只能视为原型/烟雾测试证据，不能宣称已经实现本文方法的完整正式流程。
+`capd_finals_v2_1` 工件仍只能视为原型/烟雾测试证据，不能进入当前正式流程。`capd_finals_v3_0` 阶段2 trace、selector 和 JSONL 不受 G13 影响，可以保留；在 G13 关闭前不得训练正式精排检查点、产生正式结果或启动阶段3结论汇总。
 
 ## 7. 代码验收门槛
 
@@ -344,6 +363,8 @@ padding 位置的 `candidate_mask=0`，不得参与 Cross-Attention victim 选�
 必须增加或修正以下单元测试：
 
 - `R_LRU`：`B_t>1` 时rank 0严格为1、末位严格为0；筛选器与精排状态完全一致；
+- selector TopK并列：同分时选择原始LRU rank更小的页面，改变page ID不得改变结果；
+- 精排输出并列：候选张量首项不是最老页面且多个有效候选取得相同最高分时，选择原始LRU rank最小者；padding不得胜出，NaN/Inf硬失败；
 - Recall并列：两个并列最优页中命中一个时`SelectorRecall@K=1`、`TieCoverage@K=0.5`；
 - future guard：`t+L=N-1`可生成，`t+L>=N`拒绝生成；
 - ApproxNDCG：对角线和padding不改变近似排名；
@@ -355,6 +376,7 @@ padding 位置的 `candidate_mask=0`，不得参与 Cross-Attention victim 选�
 
 - 生成器和评测器对同一状态产生完全相同的 `P_t/B_t/K_t`、五维筛选特征、候选集合、四维精排状态和mask；
 - 当前触发请求只进入精排历史，不提前改变筛选统计或候选页状态；
+- 精排并列决策只读取冻结快照中的 `original_pool_ranks/candidate_mask`，不读取更新后的LRU或selector分数；
 - 首次读、首次写、DRAM命中、NVM再次访问、clean/dirty降级的手算计数和总代价精确匹配；
 - test回放不读取任何未来访问或标签字段。
 
@@ -380,23 +402,30 @@ trace -> selector fit -> JSONL -> train -> CAPD replay -> result audit
 
 ### 阶段0：冻结合同
 
-- 状态：本文件完成后为 `DONE`。
-- 验收物：`CAPD-MIC-1.0`。
-- 说明：只确定方法与验收标准，不代表代码已经符合。
+- 状态：`DONE_R1`。
+- 验收物：`CAPD-MIC-1.0` 文档修订 R1，以及新旧方法差异与影响分级。
+- R1不改变工件schema、特征、标签、损失和阶段2数据语义，因此不提升合同ID；以后若改变这些冻结项，仍必须按第10节升版。
+- 说明：阶段0只确定方法与验收标准，不代表新增G13已经由代码满足。
 
 ### 阶段1：语义对齐与测试
 
-依次修复 G01–G10，并先完成 Gate C1–C3。该阶段必须更新schema并使旧工件显式失效，不兼容的数据和检查点不迁移复用。
+- 原 G01--G10 与 Gate C1--C4 已通过服务器验收，其证据继续有效。
+- R1 将本阶段重新打开为 `REOPENED_G13`：只补齐最终精排并列规则、NaN/Inf拒绝和对应的确定性单元/微型回归测试。
+- G13 修复不得改变候选池、selector排序、特征、标签、损失、JSONL字段或阶段2工件指纹；如实现过程中发现必须改变其中任一项，应停止并按第10节升级合同，而不是扩大本次兼容性勘误范围。
+- 通过针对性测试、完整pytest和非平凡微型E2E后，状态更新为 `STAGE1_R1_VERIFIED`。
 
 ### 阶段2：重新构造正式数据
 
+- 状态：`VERIFIED_REUSABLE`（2026-07-22服务器验收通过）。
 - 重新选择或采集互不重叠、压力充分的train/valid/test trace；
 - 以完整未来窗口规则重新生成selector验证样本和精排JSONL；
 - 生成数据质量报告：访问数、唯一页数、降级决策数、有效标签决策数、无区分比例、读写比例、热点/长尾统计；
 - 不再使用旧 `finals_v2_decision_holdout` JSONL作为正式输入。
+- R1只影响闭环推理中精排最高分并列时的单值选择，不影响本阶段已封存的trace、split、selector验证样本、selector参数或train/valid JSONL；因此不重新采集、不重新切分、不重新生成阶段2工件。若G13修复越界改变上述任一内容，则本结论自动失效并重新打开阶段2。
 
 ### 阶段3：候选筛选器独立验证
 
+- 启动门槛：阶段0为 `DONE_R1`、阶段1为 `STAGE1_R1_VERIFIED`、阶段2保持 `VERIFIED_REUSABLE`；任一未满足时不得开始正式阶段3运行或结论汇总。
 - 按工作负载搜索1001组权重；
 - 报告 `B in {8,16,32,64}` 下的PoolRecall、SelectorRecall、EndToEndRecall、TieCoverage和NRegret；
 - 报告五个特征权重和单特征/去特征消融；
@@ -453,6 +482,7 @@ trace -> selector fit -> JSONL -> train -> CAPD replay -> result audit
 - 改变train/valid/test职责或未来窗口尾部处理；
 - 改变首次访问、迁移或dirty页面记账；
 - 改变五个筛选特征、方向、权重约束、Recall或NRegret定义；
+- 改变selector TopK或精排最高分的确定性并列规则；
 - 改变页面ID、词表、共享嵌入或OOV策略；
 - 改变代理标签、权重或ApproxNDCG公式；
 - 改变LRU行为策略或按工作负载独立训练边界。

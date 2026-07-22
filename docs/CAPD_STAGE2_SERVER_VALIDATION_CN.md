@@ -1,5 +1,20 @@
 # CAPD 阶段2 Linux 服务器验收说明
 
+## 最终验收记录
+
+- 状态：`VERIFIED`
+- 日期：2026-07-22
+- 仓库：`/home/likc/Q-former-for-OS`
+- 最终入口：`python scripts/verify_finals_v3_stage2.py`
+- 数据审计：3/3 通过
+- 制品审计：12/12 通过
+- 完整回归：`78 passed, 2 skipped in 1.96s`
+- Git 差异、工作区清洁与无训练输出检查：全部通过
+- 最终标志：`[FINAL] STAGE2_VERIFIED`
+- 证据目录：`/tmp/capd-stage2-acceptance-r6i_xzg8`
+
+下文保留原始分步验收流程作为审计说明。当前推荐使用一次性入口，以确保所有失败在同一轮汇总并处理跨平台文本换行与仓库根目录差异。
+
 ## 1. 状态与边界
 
 执行前状态必须为 `IMPLEMENTED_UNVERIFIED`。以下命令只验收正式数据、机械性 selector 样本和 reranker JSONL；不训练精排模型，不运行 QMAP 正式测试，不执行性能比较，不把 selector 数值解释为阶段3结论。
@@ -318,4 +333,4 @@ printf '[INFO] evidence retained at %s\n' "$CAPD_STAGE2_TMP"
 - v2 路径无修改，未产生训练 checkpoint 或正式 result；
 - 日志中没有被忽略的 `BLOCKED`、`SKIP`、`INSUFFICIENT` 或 `REJECTED` workload。
 
-若任一项未满足，保持 `IMPLEMENTED_UNVERIFIED`。服务器证据目录暂不自动删除；确认不再需要后，只能人工核对其绝对路径确实匹配 `/tmp/capd-stage2-v3-*` 再处理。
+本次验收已满足以上全部条件，阶段2状态已从 `IMPLEMENTED_UNVERIFIED` 更新为 `VERIFIED`。服务器证据目录不自动删除；确认不再需要后，只能人工核对其绝对路径确实匹配 `/tmp/capd-stage2-acceptance-*` 再处理。

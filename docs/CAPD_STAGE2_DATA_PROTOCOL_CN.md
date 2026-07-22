@@ -6,7 +6,7 @@
 - 目标 schema：`capd_finals_v3_0`
 - 数据 manifest schema：`capd_finals_v3_data_manifest_1`
 - 数据审计 schema：`capd_finals_v3_data_audit_1`
-- 当前实现状态：`IMPLEMENTED_UNVERIFIED`
+- 当前实现状态：`VERIFIED`（2026-07-22 Linux 服务器验收通过）
 - 适用范围：正式 train/valid/test trace、selector 验证样本和精排 JSONL
 
 ## 1. 阶段边界
@@ -143,3 +143,5 @@ selector、验证样本、JSONL metadata、generator summary、后续 checkpoint
 6. `verify_finals_v3_artifacts.py` 通过，重新计算的指纹与所有 metadata 一致；
 7. 仓库没有 v2 工件改写或意外运行工件污染；
 8. 阶段2符合性报告根据服务器证据由 `IMPLEMENTED_UNVERIFIED` 人工更新为 `VERIFIED`。
+
+以上门禁已由 `python scripts/verify_finals_v3_stage2.py` 一次性验收全部通过；最终标志为 `[FINAL] STAGE2_VERIFIED`，完整回归结果为 `78 passed, 2 skipped`。
