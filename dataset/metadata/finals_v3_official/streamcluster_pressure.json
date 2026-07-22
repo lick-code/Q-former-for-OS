@@ -1,0 +1,169 @@
+{
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "collections": [
+    {
+      "collected_at": "2026-07-22T04:39:21.777648+00:00",
+      "collection_id": "streamcluster_pressure-20260722T133000",
+      "command": "/usr/bin/python3 /root/qmap-work/cache_replacement/scripts/collect_trace_drmemtrace.py --drrun /root/qmap-work/tools/extern/DynamoRIO-Linux-11.91.20581/bin64/drrun --output /root/qmap-work/cache_replacement/dataset/raw_traces/finals_v3_recollect/candidate_5b_1m/streamcluster_native_pilot.csv --work-dir /root/qmap-work/drmemtrace/finals_v3_recollect/candidate_5b_1m/streamcluster_native_pilot_20260722T133000 --max-records 1000000 --skip-records 0 --trace-ref-multiplier 100 --view-log /root/qmap-work/cache_replacement/outputs/results/finals_v3_recollect/candidate_5b_1m/streamcluster_native_pilot/drmemtrace.view.log --trace-after-instrs 5000000000 -- /root/qmap-work/parsec-3.0/pkgs/kernels/streamcluster/inst/amd64-linux.gcc-pthreads/bin/streamcluster 10 20 128 1000000 200000 5000 none /root/qmap-work/parsec-runs/finals_v3_recollect/candidate_5b_1m/streamcluster_native_pilot/streamcluster_output.txt 1",
+      "environment": {
+        "binary": {
+          "fingerprint_sha256": "c99784c7efebb279d196aeaf679b5ebb7861317892a990951c1c8b8669052e23",
+          "path": "/root/qmap-work/parsec-3.0/pkgs/kernels/streamcluster/inst/amd64-linux.gcc-pthreads/bin/streamcluster"
+        },
+        "collector": {
+          "fingerprint_sha256": "d31a02329651ed8b1adbb7cc8fe217cfaf383145a8bfc9499c8a4cc0b4f46d57",
+          "path": "/root/qmap-work/cache_replacement/scripts/collect_trace_drmemtrace.py"
+        },
+        "host": {
+          "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+          "processors": 32,
+          "python": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+          "uname": "Linux LAPTOP-E4RLHP8B 6.6.114.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Mon Dec  1 20:46:23 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux"
+        },
+        "input": {
+          "class": "PARSEC 3.0 native synthetic generator",
+          "fingerprint_sha256": null,
+          "path": null,
+          "source_archive": null,
+          "source_archive_fingerprint_sha256": null,
+          "source_image": "spirals/parsec-3.0:source",
+          "source_layer_sha256": "97c8f691638a5154690d307e18fcd33b557b47204ae4cf5641b6103a770a26d5"
+        },
+        "parsec_git": {
+          "commit": "e43bb8a2c5807dd43cd7fe94c433331774150c5f",
+          "git_available": true,
+          "root": "/root/qmap-work/parsec-3.0",
+          "status_short": "M pkgs/kernels/dedup/parsec/gcc-pthreads.bldconf"
+        },
+        "project_git": {
+          "error": "fatal: not a git repository (or any of the parent directories): .git",
+          "git_available": false,
+          "root": "/root/qmap-work/cache_replacement",
+          "source_workspace_commit": "9d1cc4742f49088c5a9be67f48d34c8b478b5b26"
+        },
+        "recollect_source_spec": "dataset/metadata/finals_v3_recollect/candidate_5b_1m/streamcluster_native_pilot.json",
+        "recollect_source_spec_sha256": "8cd384e4c94f995f539ee463c5773f88643cc358324c6010a4e6874c7a73c91b",
+        "runconf": {
+          "fingerprint_sha256": "09be69750df9dff76f14b0968f086826915f7e411035696f3065aee89881557d",
+          "path": "/root/qmap-work/parsec-3.0/pkgs/kernels/streamcluster/parsec/native.runconf"
+        }
+      },
+      "provenance_complete": true,
+      "source_label": "finals_v3_recollect/candidate_5b_1m",
+      "source_trace": {
+        "access_count": 1000000,
+        "file_size_bytes": 33000015,
+        "fingerprint_sha256": "ca6ea6cf3da47adfe6d0b3e198619f6bde63f0ffeb17a232acb592dafd75f8d6",
+        "path": "dataset/raw_traces/finals_v3_recollect/candidate_5b_1m/streamcluster_native_pilot.csv",
+        "record_fingerprint_sha256": "dcec0e8a74e22851275543ef379ad38424cc5d780fbce83a189851b33a46391f"
+      },
+      "tool": "DynamoRIO drmemtrace drrun version 11.91.20581 -- build 0"
+    }
+  ],
+  "content_fingerprint": "5d33b9c235d1e963de3c5e8c97c5948c166361f3237d4300ad802698a1ba7383",
+  "contract_id": "CAPD-MIC-1.0",
+  "git_commit": "9d1cc4742f49088c5a9be67f48d34c8b478b5b26",
+  "page_shift": 12,
+  "quality_gate": {
+    "profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+    "profile_id": "capd_finals_v3_official_data_v1",
+    "report_fingerprint_sha256": "914e0006d337094e4964eeebdb34166c150c3a1511e45c89bf643345a39f2922",
+    "report_path": "dataset/metadata/finals_v3_official/reports/streamcluster_pressure.json",
+    "status": "PASSED"
+  },
+  "run_profile": "official",
+  "rw_source": {
+    "column": "RW",
+    "kind": "trace_column",
+    "verified_real": true
+  },
+  "schema_version": "capd_finals_v3_data_manifest_1",
+  "source_independence": {
+    "basis": "collection_identity_and_half_open_source_intervals",
+    "evidence": [
+      {
+        "collection_id": "streamcluster_pressure-20260722T133000",
+        "left": "train",
+        "left_interval": {
+          "end_exclusive": 600000,
+          "start_inclusive": 0
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "valid",
+        "right_interval": {
+          "end_exclusive": 800000,
+          "start_inclusive": 600000
+        }
+      },
+      {
+        "collection_id": "streamcluster_pressure-20260722T133000",
+        "left": "train",
+        "left_interval": {
+          "end_exclusive": 600000,
+          "start_inclusive": 0
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "test",
+        "right_interval": {
+          "end_exclusive": 1000000,
+          "start_inclusive": 800000
+        }
+      },
+      {
+        "collection_id": "streamcluster_pressure-20260722T133000",
+        "left": "valid",
+        "left_interval": {
+          "end_exclusive": 800000,
+          "start_inclusive": 600000
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "test",
+        "right_interval": {
+          "end_exclusive": 1000000,
+          "start_inclusive": 800000
+        }
+      }
+    ]
+  },
+  "split_strategy": "explicit chronological non-overlapping half-open intervals from one verified real-RW recollection",
+  "splits": {
+    "test": {
+      "access_count": 200000,
+      "collection_id": "streamcluster_pressure-20260722T133000",
+      "file_size_bytes": 6600015,
+      "fingerprint_sha256": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+      "path": "dataset/processed/finals_v3_official/streamcluster_pressure/test.csv",
+      "record_fingerprint_sha256": "b7196f99fa3898d83275bc66758373716d22b31d72f9308527b7cd2caddcd6d5",
+      "source_access_interval": {
+        "end_exclusive": 1000000,
+        "start_inclusive": 800000
+      }
+    },
+    "train": {
+      "access_count": 600000,
+      "collection_id": "streamcluster_pressure-20260722T133000",
+      "file_size_bytes": 19800015,
+      "fingerprint_sha256": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+      "path": "dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "record_fingerprint_sha256": "caf08bdbf3c2b270b99d6ab478d4cc2298259c983d91d4697f9bd8f37367392b",
+      "source_access_interval": {
+        "end_exclusive": 600000,
+        "start_inclusive": 0
+      }
+    },
+    "valid": {
+      "access_count": 200000,
+      "collection_id": "streamcluster_pressure-20260722T133000",
+      "file_size_bytes": 6600015,
+      "fingerprint_sha256": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774",
+      "path": "dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv",
+      "record_fingerprint_sha256": "7e624063c76e10b2509417c745594387a32a3b830be61ef4a1b4f2eaf0117c1c",
+      "source_access_interval": {
+        "end_exclusive": 800000,
+        "start_inclusive": 600000
+      }
+    }
+  },
+  "workload_id": "streamcluster_pressure"
+}

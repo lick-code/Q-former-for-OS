@@ -6,6 +6,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .capd_stage1_tmp/
+.capd_downloads/
 .venv/
 venv/
 env/
@@ -25,7 +26,9 @@ tools/trace_collectors/**/build/
 # Large/local datasets
 dataset/jsonl/
 dataset/raw_traces/finals_v3_official/
+dataset/raw_traces/finals_v3_recollect/
 dataset/processed/finals_v3_official/
+outputs/results/finals_v3_recollect/
 
 # OS/editor noise
 .DS_Store

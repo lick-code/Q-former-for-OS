@@ -1,0 +1,169 @@
+{
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "collections": [
+    {
+      "collected_at": "2026-07-22T04:31:55.774561+00:00",
+      "collection_id": "canneal-20260722T125000",
+      "command": "/usr/bin/python3 /root/qmap-work/cache_replacement/scripts/collect_trace_drmemtrace.py --drrun /root/qmap-work/tools/extern/DynamoRIO-Linux-11.91.20581/bin64/drrun --output /root/qmap-work/cache_replacement/dataset/raw_traces/finals_v3_recollect/candidate_500m_1m/canneal_native_pilot.csv --work-dir /root/qmap-work/drmemtrace/finals_v3_recollect/candidate_500m_1m/canneal_native_pilot_20260722T125000 --max-records 1000000 --skip-records 0 --trace-ref-multiplier 100 --view-log /root/qmap-work/cache_replacement/outputs/results/finals_v3_recollect/candidate_500m_1m/canneal_native_pilot/drmemtrace.view.log --trace-after-instrs 500000000 -- /root/qmap-work/parsec-3.0/pkgs/kernels/canneal/inst/amd64-linux.gcc-serial/bin/canneal 1 15000 2000 /root/qmap-work/parsec-inputs/finals_v3_recollect/canneal_native/2500000.nets 6000",
+      "environment": {
+        "binary": {
+          "fingerprint_sha256": "157304b8a14349ee54ee04f5cfcbe9a1c4205d9d68fcc9da5c1f53ceecfea90e",
+          "path": "/root/qmap-work/parsec-3.0/pkgs/kernels/canneal/inst/amd64-linux.gcc-serial/bin/canneal"
+        },
+        "collector": {
+          "fingerprint_sha256": "d31a02329651ed8b1adbb7cc8fe217cfaf383145a8bfc9499c8a4cc0b4f46d57",
+          "path": "/root/qmap-work/cache_replacement/scripts/collect_trace_drmemtrace.py"
+        },
+        "host": {
+          "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+          "processors": 32,
+          "python": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+          "uname": "Linux LAPTOP-E4RLHP8B 6.6.114.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Mon Dec  1 20:46:23 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux"
+        },
+        "input": {
+          "class": "PARSEC 3.0 native",
+          "fingerprint_sha256": "c10e609981e47f8e3d7b28d7e35611cd2f361d4260755dcc1926ab47cb387dcc",
+          "path": "/root/qmap-work/parsec-inputs/finals_v3_recollect/canneal_native/2500000.nets",
+          "source_archive": "/root/qmap-work/parsec-inputs/finals_v3_recollect/archives/canneal_input_native.tar.xz",
+          "source_archive_fingerprint_sha256": "1aa6b1797c3c12efbd8591d26af752557fc5b44b75e89787401a1840db78e418",
+          "source_image": "spirals/parsec-3.0:source",
+          "source_layer_sha256": "97c8f691638a5154690d307e18fcd33b557b47204ae4cf5641b6103a770a26d5"
+        },
+        "parsec_git": {
+          "commit": "e43bb8a2c5807dd43cd7fe94c433331774150c5f",
+          "git_available": true,
+          "root": "/root/qmap-work/parsec-3.0",
+          "status_short": "M pkgs/kernels/dedup/parsec/gcc-pthreads.bldconf"
+        },
+        "project_git": {
+          "error": "fatal: not a git repository (or any of the parent directories): .git",
+          "git_available": false,
+          "root": "/root/qmap-work/cache_replacement",
+          "source_workspace_commit": "9d1cc4742f49088c5a9be67f48d34c8b478b5b26"
+        },
+        "recollect_source_spec": "dataset/metadata/finals_v3_recollect/candidate_500m_1m/canneal_native_pilot.json",
+        "recollect_source_spec_sha256": "683027d8ee9c35b3bd9326ba76783c77a8a2b3613f91e46a8e7dc3162a761283",
+        "runconf": {
+          "fingerprint_sha256": "0c317a9176edd140a4e530d4a6ba1bbd4c0193cafa992527dde74668efbefdb3",
+          "path": "/root/qmap-work/parsec-3.0/pkgs/kernels/canneal/parsec/native.runconf"
+        }
+      },
+      "provenance_complete": true,
+      "source_label": "finals_v3_recollect/candidate_500m_1m",
+      "source_trace": {
+        "access_count": 1000000,
+        "file_size_bytes": 33000015,
+        "fingerprint_sha256": "f8dba14d3ca4271526b124f653917f0e874395b046fb0dc8a19df7da5e513efd",
+        "path": "dataset/raw_traces/finals_v3_recollect/candidate_500m_1m/canneal_native_pilot.csv",
+        "record_fingerprint_sha256": "a872c1d77e2b05fb8fb37b377bee3448b0b494f825a73effb9b5767f4b4c7f3e"
+      },
+      "tool": "DynamoRIO drmemtrace drrun version 11.91.20581 -- build 0"
+    }
+  ],
+  "content_fingerprint": "8baf4e63cd15e0cbb314d3a8ca26ca53314602db91b5455039e291178406022e",
+  "contract_id": "CAPD-MIC-1.0",
+  "git_commit": "9d1cc4742f49088c5a9be67f48d34c8b478b5b26",
+  "page_shift": 12,
+  "quality_gate": {
+    "profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+    "profile_id": "capd_finals_v3_official_data_v1",
+    "report_fingerprint_sha256": "ad0914a3421492a3a38ea51e7d47f821814f5fcf155c131cc9f62cc6b6a97a3d",
+    "report_path": "dataset/metadata/finals_v3_official/reports/canneal.json",
+    "status": "PASSED"
+  },
+  "run_profile": "official",
+  "rw_source": {
+    "column": "RW",
+    "kind": "trace_column",
+    "verified_real": true
+  },
+  "schema_version": "capd_finals_v3_data_manifest_1",
+  "source_independence": {
+    "basis": "collection_identity_and_half_open_source_intervals",
+    "evidence": [
+      {
+        "collection_id": "canneal-20260722T125000",
+        "left": "train",
+        "left_interval": {
+          "end_exclusive": 600000,
+          "start_inclusive": 0
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "valid",
+        "right_interval": {
+          "end_exclusive": 800000,
+          "start_inclusive": 600000
+        }
+      },
+      {
+        "collection_id": "canneal-20260722T125000",
+        "left": "train",
+        "left_interval": {
+          "end_exclusive": 600000,
+          "start_inclusive": 0
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "test",
+        "right_interval": {
+          "end_exclusive": 1000000,
+          "start_inclusive": 800000
+        }
+      },
+      {
+        "collection_id": "canneal-20260722T125000",
+        "left": "valid",
+        "left_interval": {
+          "end_exclusive": 800000,
+          "start_inclusive": 600000
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "test",
+        "right_interval": {
+          "end_exclusive": 1000000,
+          "start_inclusive": 800000
+        }
+      }
+    ]
+  },
+  "split_strategy": "explicit chronological non-overlapping half-open intervals from one verified real-RW recollection",
+  "splits": {
+    "test": {
+      "access_count": 200000,
+      "collection_id": "canneal-20260722T125000",
+      "file_size_bytes": 6600015,
+      "fingerprint_sha256": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+      "path": "dataset/processed/finals_v3_official/canneal/test.csv",
+      "record_fingerprint_sha256": "fe3a36608b1b6392fac02c0d78296204e74a704483ce1fec14826bf80938efb8",
+      "source_access_interval": {
+        "end_exclusive": 1000000,
+        "start_inclusive": 800000
+      }
+    },
+    "train": {
+      "access_count": 600000,
+      "collection_id": "canneal-20260722T125000",
+      "file_size_bytes": 19800015,
+      "fingerprint_sha256": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+      "path": "dataset/processed/finals_v3_official/canneal/train.csv",
+      "record_fingerprint_sha256": "1dd088a8b8c753bd699d18c6687df6121e7e7451e1e40d3b52139414d479400f",
+      "source_access_interval": {
+        "end_exclusive": 600000,
+        "start_inclusive": 0
+      }
+    },
+    "valid": {
+      "access_count": 200000,
+      "collection_id": "canneal-20260722T125000",
+      "file_size_bytes": 6600015,
+      "fingerprint_sha256": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142",
+      "path": "dataset/processed/finals_v3_official/canneal/valid.csv",
+      "record_fingerprint_sha256": "233fca0758bc3a2f12070800ba29761ae39584aebfc4656c010196c391256de0",
+      "source_access_interval": {
+        "end_exclusive": 800000,
+        "start_inclusive": 600000
+      }
+    }
+  },
+  "workload_id": "canneal"
+}

@@ -1,0 +1,169 @@
+{
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "collections": [
+    {
+      "collected_at": "2026-07-22T05:14:03.937640+00:00",
+      "collection_id": "dedup_pressure-20260722T131403",
+      "command": "/usr/bin/python3 /root/qmap-work/cache_replacement/scripts/collect_trace_drmemtrace.py --drrun /root/qmap-work/tools/extern/DynamoRIO-Linux-11.91.20581/bin64/drrun --output /root/qmap-work/cache_replacement/dataset/raw_traces/finals_v3_recollect/candidate_native_100m_3m/dedup_native_pilot.csv --work-dir /root/qmap-work/drmemtrace/finals_v3_recollect/candidate_native_100m_3m/dedup_native_pilot_20260722T131403 --max-records 3000000 --skip-records 100000 --trace-ref-multiplier 100 --view-log /root/qmap-work/cache_replacement/outputs/results/finals_v3_recollect/candidate_native_100m_3m/dedup_native_pilot/drmemtrace.view.log --trace-after-instrs 100000000 -- /root/qmap-work/parsec-3.0/pkgs/kernels/dedup/inst/amd64-linux.gcc-pthreads/bin/dedup -c -p -v -t 1 -i /root/qmap-work/parsec-inputs/finals_v3_recollect/dedup_native/FC-6-x86_64-disc1.iso -o /root/qmap-work/parsec-runs/finals_v3_recollect/candidate_native_100m_3m/dedup_native_pilot/dedup_output.dat.ddp",
+      "environment": {
+        "binary": {
+          "fingerprint_sha256": "c24f71f5c752ed0fac96988b0728ccc77c7380d579fe97be54ebd09013493957",
+          "path": "/root/qmap-work/parsec-3.0/pkgs/kernels/dedup/inst/amd64-linux.gcc-pthreads/bin/dedup"
+        },
+        "collector": {
+          "fingerprint_sha256": "d31a02329651ed8b1adbb7cc8fe217cfaf383145a8bfc9499c8a4cc0b4f46d57",
+          "path": "/root/qmap-work/cache_replacement/scripts/collect_trace_drmemtrace.py"
+        },
+        "host": {
+          "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+          "processors": 32,
+          "python": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+          "uname": "Linux LAPTOP-E4RLHP8B 6.6.114.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Mon Dec  1 20:46:23 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux"
+        },
+        "input": {
+          "class": "PARSEC 3.0 native",
+          "fingerprint_sha256": "fcdd05b12aca8170605ad58afc1c5b938d3052203d0d9ef495ce5e73a2ce23b4",
+          "path": "/root/qmap-work/parsec-inputs/finals_v3_recollect/dedup_native/FC-6-x86_64-disc1.iso",
+          "source_archive": "/root/qmap-work/parsec-inputs/finals_v3_recollect/archives/dedup_input_native.tar.xz",
+          "source_archive_fingerprint_sha256": "b99eabba399e8e425b73dc5d6d5217958d48d202b6b826fd1a8110b45d90ff8a",
+          "source_image": "spirals/parsec-3.0:source",
+          "source_layer_sha256": "97c8f691638a5154690d307e18fcd33b557b47204ae4cf5641b6103a770a26d5"
+        },
+        "parsec_git": {
+          "commit": "e43bb8a2c5807dd43cd7fe94c433331774150c5f",
+          "git_available": true,
+          "root": "/root/qmap-work/parsec-3.0",
+          "status_short": "M pkgs/kernels/dedup/parsec/gcc-pthreads.bldconf"
+        },
+        "project_git": {
+          "error": "fatal: not a git repository (or any of the parent directories): .git",
+          "git_available": false,
+          "root": "/root/qmap-work/cache_replacement",
+          "source_workspace_commit": "9d1cc4742f49088c5a9be67f48d34c8b478b5b26"
+        },
+        "recollect_source_spec": "dataset/metadata/finals_v3_recollect/candidate_native_100m_3m/dedup_native_pilot.json",
+        "recollect_source_spec_sha256": "02cfd11f45a0228f804e394ad4c348bc7f3938a696792de4bb09438c26c1fba0",
+        "runconf": {
+          "fingerprint_sha256": "c9011c0a3f50940a91fc048f6d0636e73453102e407ee77299e0d12cb57872eb",
+          "path": "/root/qmap-work/parsec-3.0/pkgs/kernels/dedup/parsec/native.runconf"
+        }
+      },
+      "provenance_complete": true,
+      "source_label": "finals_v3_recollect/candidate_native_100m_3m",
+      "source_trace": {
+        "access_count": 3000000,
+        "file_size_bytes": 99000015,
+        "fingerprint_sha256": "5ab03f12ca848ab5e3621af607229cebf6017ab514f3c38d5854574a7754ff32",
+        "path": "dataset/raw_traces/finals_v3_recollect/candidate_native_100m_3m/dedup_native_pilot.csv",
+        "record_fingerprint_sha256": "9a63748b50e7c4a59385f03f607690dac9aa62288b8e12f2d4c6c96d456f12f3"
+      },
+      "tool": "DynamoRIO drmemtrace drrun version 11.91.20581 -- build 0"
+    }
+  ],
+  "content_fingerprint": "137cf0626e1b944fa5f3445cee6649399e6e397f7853c251763a88465cc1524c",
+  "contract_id": "CAPD-MIC-1.0",
+  "git_commit": "9d1cc4742f49088c5a9be67f48d34c8b478b5b26",
+  "page_shift": 12,
+  "quality_gate": {
+    "profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+    "profile_id": "capd_finals_v3_official_data_v1",
+    "report_fingerprint_sha256": "2aeafbf49e0c278c03e1ca6ea80c576555d75fb9bb91ea542ad83543c1930027",
+    "report_path": "dataset/metadata/finals_v3_official/reports/dedup_pressure.json",
+    "status": "PASSED"
+  },
+  "run_profile": "official",
+  "rw_source": {
+    "column": "RW",
+    "kind": "trace_column",
+    "verified_real": true
+  },
+  "schema_version": "capd_finals_v3_data_manifest_1",
+  "source_independence": {
+    "basis": "collection_identity_and_half_open_source_intervals",
+    "evidence": [
+      {
+        "collection_id": "dedup_pressure-20260722T131403",
+        "left": "train",
+        "left_interval": {
+          "end_exclusive": 1000000,
+          "start_inclusive": 0
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "valid",
+        "right_interval": {
+          "end_exclusive": 2000000,
+          "start_inclusive": 1000000
+        }
+      },
+      {
+        "collection_id": "dedup_pressure-20260722T131403",
+        "left": "train",
+        "left_interval": {
+          "end_exclusive": 1000000,
+          "start_inclusive": 0
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "test",
+        "right_interval": {
+          "end_exclusive": 3000000,
+          "start_inclusive": 2000000
+        }
+      },
+      {
+        "collection_id": "dedup_pressure-20260722T131403",
+        "left": "valid",
+        "left_interval": {
+          "end_exclusive": 2000000,
+          "start_inclusive": 1000000
+        },
+        "proof": "non_overlapping_half_open_intervals",
+        "right": "test",
+        "right_interval": {
+          "end_exclusive": 3000000,
+          "start_inclusive": 2000000
+        }
+      }
+    ]
+  },
+  "split_strategy": "explicit chronological non-overlapping half-open intervals from one verified real-RW recollection",
+  "splits": {
+    "test": {
+      "access_count": 1000000,
+      "collection_id": "dedup_pressure-20260722T131403",
+      "file_size_bytes": 33000015,
+      "fingerprint_sha256": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+      "path": "dataset/processed/finals_v3_official/dedup_pressure/test.csv",
+      "record_fingerprint_sha256": "a1b73a9dbb3faafdd52477bf629d68f239711c8110a7a354a5ab708417351c1f",
+      "source_access_interval": {
+        "end_exclusive": 3000000,
+        "start_inclusive": 2000000
+      }
+    },
+    "train": {
+      "access_count": 1000000,
+      "collection_id": "dedup_pressure-20260722T131403",
+      "file_size_bytes": 33000015,
+      "fingerprint_sha256": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+      "path": "dataset/processed/finals_v3_official/dedup_pressure/train.csv",
+      "record_fingerprint_sha256": "84a66f67fcdbf3ceeef2d2afb2c39959f437c43fada2bcefb4988333e0d01585",
+      "source_access_interval": {
+        "end_exclusive": 1000000,
+        "start_inclusive": 0
+      }
+    },
+    "valid": {
+      "access_count": 1000000,
+      "collection_id": "dedup_pressure-20260722T131403",
+      "file_size_bytes": 33000015,
+      "fingerprint_sha256": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8",
+      "path": "dataset/processed/finals_v3_official/dedup_pressure/valid.csv",
+      "record_fingerprint_sha256": "d3935fff2cebff3a588eefda52db742ca03594b3b392674ebf46a5c0ec69a0b1",
+      "source_access_interval": {
+        "end_exclusive": 2000000,
+        "start_inclusive": 1000000
+      }
+    }
+  },
+  "workload_id": "dedup_pressure"
+}

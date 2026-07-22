@@ -1,0 +1,606 @@
+{
+  "artifact_schema": "capd_finals_v3_0",
+  "audit_fingerprint": "e698d96a72fa7ee82e67d312d6634f3fcd72881e541362a2f7398bb116fb4de9",
+  "contract_id": "CAPD-MIC-1.0",
+  "cross_split": {
+    "distribution_drift": {
+      "spans": {
+        "decision_ratio_span": 0.00028500000000000053,
+        "top_1_percent_page_share_span": 0.005026666666666735,
+        "write_ratio_span": 6.666666666666973e-06
+      },
+      "warnings": []
+    },
+    "source_independence": {
+      "basis": "collection_identity_and_half_open_source_intervals",
+      "evidence": [
+        {
+          "collection_id": "streamcluster_pressure-20260722T133000",
+          "left": "train",
+          "left_interval": {
+            "end_exclusive": 600000,
+            "start_inclusive": 0
+          },
+          "proof": "non_overlapping_half_open_intervals",
+          "right": "valid",
+          "right_interval": {
+            "end_exclusive": 800000,
+            "start_inclusive": 600000
+          }
+        },
+        {
+          "collection_id": "streamcluster_pressure-20260722T133000",
+          "left": "train",
+          "left_interval": {
+            "end_exclusive": 600000,
+            "start_inclusive": 0
+          },
+          "proof": "non_overlapping_half_open_intervals",
+          "right": "test",
+          "right_interval": {
+            "end_exclusive": 1000000,
+            "start_inclusive": 800000
+          }
+        },
+        {
+          "collection_id": "streamcluster_pressure-20260722T133000",
+          "left": "valid",
+          "left_interval": {
+            "end_exclusive": 800000,
+            "start_inclusive": 600000
+          },
+          "proof": "non_overlapping_half_open_intervals",
+          "right": "test",
+          "right_interval": {
+            "end_exclusive": 1000000,
+            "start_inclusive": 800000
+          }
+        }
+      ]
+    },
+    "vocabulary_risk": {
+      "oov": {
+        "test": {
+          "page": {
+            "access_oov_count": 68944,
+            "access_oov_ratio": 0.34472,
+            "unique_oov_count": 2016,
+            "unique_oov_ratio": 0.7433628318584071
+          },
+          "pc": {
+            "access_oov_count": 0,
+            "access_oov_ratio": 0.0,
+            "unique_oov_count": 0,
+            "unique_oov_ratio": 0.0
+          }
+        },
+        "valid": {
+          "page": {
+            "access_oov_count": 68273,
+            "access_oov_ratio": 0.341365,
+            "unique_oov_count": 1987,
+            "unique_oov_ratio": 0.7400372439478585
+          },
+          "pc": {
+            "access_oov_count": 0,
+            "access_oov_ratio": 0.0,
+            "unique_oov_count": 0,
+            "unique_oov_ratio": 0.0
+          }
+        }
+      },
+      "page_vocab_capacity": 100000,
+      "pc_vocab_capacity": 50000,
+      "train_page_vocab_exceeds_capacity": false,
+      "train_page_vocab_size": 7316,
+      "train_pc_vocab_exceeds_capacity": false,
+      "train_pc_vocab_size": 28,
+      "vocab_fit_policy": "train_only_valid_test_do_not_extend"
+    }
+  },
+  "git_commit": "9d1cc4742f49088c5a9be67f48d34c8b478b5b26",
+  "hard_failures": [],
+  "method_constants": {
+    "D": 64,
+    "H": 10,
+    "Hc": 256,
+    "K": 8,
+    "L": 256,
+    "epsilon_y": 1e-08,
+    "pool_sizes_B": [
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "profile_id": "capd_finals_v3_official_data_v1",
+  "schema_version": "capd_finals_v3_data_audit_1",
+  "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+  "source_manifest_fingerprint": "253a107fd41ffc20be8ebbfad2aa3a2353b7a108d369a3513229ccaf7f427fc9",
+  "splits": {
+    "test": {
+      "basic": {
+        "access_count": 200000,
+        "file_size_bytes": 6600015,
+        "fingerprint_sha256": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+        "record_fingerprint_sha256": "b7196f99fa3898d83275bc66758373716d22b31d72f9308527b7cd2caddcd6d5",
+        "unique_page_count": 2712,
+        "unique_pc_count": 28
+      },
+      "diagnostics": {
+        "extreme_write_ratio": false,
+        "fully_streaming_or_no_reuse": false,
+        "low_pressure": false,
+        "sufficiency_failures": [],
+        "warnings": []
+      },
+      "dram_pressure_and_labels": {
+        "candidate_pool_B_t": {
+          "16": {
+            "max": 16,
+            "mean": 16.0,
+            "min": 16,
+            "p25": 16.0,
+            "p50": 16.0,
+            "p75": 16.0,
+            "p90": 16.0,
+            "p95": 16.0,
+            "p99": 16.0
+          },
+          "32": {
+            "max": 32,
+            "mean": 32.0,
+            "min": 32,
+            "p25": 32.0,
+            "p50": 32.0,
+            "p75": 32.0,
+            "p90": 32.0,
+            "p95": 32.0,
+            "p99": 32.0
+          },
+          "64": {
+            "max": 64,
+            "mean": 64.0,
+            "min": 64,
+            "p25": 64.0,
+            "p50": 64.0,
+            "p75": 64.0,
+            "p90": 64.0,
+            "p95": 64.0,
+            "p99": 64.0
+          },
+          "8": {
+            "max": 8,
+            "mean": 8.0,
+            "min": 8,
+            "p25": 8.0,
+            "p50": 8.0,
+            "p75": 8.0,
+            "p90": 8.0,
+            "p95": 8.0,
+            "p99": 8.0
+          }
+        },
+        "complete_future_window_decision_count": 2896,
+        "decision_ratio": 0.0145,
+        "dram_capacity_pages": 64,
+        "effective_relevance_decision_count": 2896,
+        "first_dram_full_index": 3260,
+        "lru_hits": 197036,
+        "lru_misses": 2964,
+        "miss_ratio": 0.01482,
+        "nondiscriminative_ratio": 0.0,
+        "relevance_range_distribution": {
+          "max": 1.53125,
+          "mean": 1.3930245921098066,
+          "min": 1.34765625,
+          "p25": 1.39453125,
+          "p50": 1.39453125,
+          "p75": 1.39453125,
+          "p90": 1.39453125,
+          "p95": 1.40625,
+          "p99": 1.40625
+        },
+        "retained_K_t": {
+          "max": 8,
+          "mean": 8.0,
+          "min": 8,
+          "p25": 8.0,
+          "p50": 8.0,
+          "p75": 8.0,
+          "p90": 8.0,
+          "p95": 8.0,
+          "p99": 8.0
+        },
+        "tail_dropped_decision_count": 4,
+        "tail_dropped_ratio": 0.001379310344827586,
+        "tied_best_set_size_distribution": {
+          "max": 59,
+          "mean": 57.454765193370164,
+          "min": 55,
+          "p25": 57.0,
+          "p50": 57.0,
+          "p75": 58.0,
+          "p90": 58.0,
+          "p95": 59.0,
+          "p99": 59.0
+        },
+        "valid_label_decision_count": 2896,
+        "victim_decision_count": 2900
+      },
+      "hotspot_and_tail": {
+        "page_access_count_distribution": {
+          "max": 79260,
+          "mean": 73.74631268436578,
+          "min": 1,
+          "p25": 32.0,
+          "p50": 32.0,
+          "p75": 32.0,
+          "p90": 32.0,
+          "p95": 33.0,
+          "p99": 182.68999999999733
+        },
+        "reuse_event_count": 197288,
+        "reuse_event_ratio": 0.98644,
+        "reuse_interval_distribution": {
+          "max": 189842,
+          "mean": 58.548984226106,
+          "min": 1,
+          "p25": 2.0,
+          "p50": 3.0,
+          "p75": 3.0,
+          "p90": 9.0,
+          "p95": 12.0,
+          "p99": 243.0
+        },
+        "single_access_page_ratio": 0.1109882005899705,
+        "top_10_percent_page_share": 0.657985,
+        "top_1_percent_page_share": 0.599905,
+        "top_5_percent_page_share": 0.63608
+      },
+      "read_write": {
+        "per_page_write_count_distribution": {
+          "max": 2385,
+          "mean": 0.9129793510324484,
+          "min": 0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 0.0,
+          "p90": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "read_count": 197524,
+        "read_ratio": 0.98762,
+        "rw_source": "real_trace_column",
+        "write_count": 2476,
+        "write_ratio": 0.01238
+      }
+    },
+    "train": {
+      "basic": {
+        "access_count": 600000,
+        "file_size_bytes": 19800015,
+        "fingerprint_sha256": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+        "record_fingerprint_sha256": "caf08bdbf3c2b270b99d6ab478d4cc2298259c983d91d4697f9bd8f37367392b",
+        "unique_page_count": 7316,
+        "unique_pc_count": 28
+      },
+      "diagnostics": {
+        "extreme_write_ratio": false,
+        "fully_streaming_or_no_reuse": false,
+        "low_pressure": false,
+        "sufficiency_failures": [],
+        "warnings": []
+      },
+      "dram_pressure_and_labels": {
+        "candidate_pool_B_t": {
+          "16": {
+            "max": 16,
+            "mean": 16.0,
+            "min": 16,
+            "p25": 16.0,
+            "p50": 16.0,
+            "p75": 16.0,
+            "p90": 16.0,
+            "p95": 16.0,
+            "p99": 16.0
+          },
+          "32": {
+            "max": 32,
+            "mean": 32.0,
+            "min": 32,
+            "p25": 32.0,
+            "p50": 32.0,
+            "p75": 32.0,
+            "p90": 32.0,
+            "p95": 32.0,
+            "p99": 32.0
+          },
+          "64": {
+            "max": 64,
+            "mean": 64.0,
+            "min": 64,
+            "p25": 64.0,
+            "p50": 64.0,
+            "p75": 64.0,
+            "p90": 64.0,
+            "p95": 64.0,
+            "p99": 64.0
+          },
+          "8": {
+            "max": 8,
+            "mean": 8.0,
+            "min": 8,
+            "p25": 8.0,
+            "p50": 8.0,
+            "p75": 8.0,
+            "p90": 8.0,
+            "p95": 8.0,
+            "p99": 8.0
+          }
+        },
+        "complete_future_window_decision_count": 8694,
+        "decision_ratio": 0.014496666666666666,
+        "dram_capacity_pages": 64,
+        "effective_relevance_decision_count": 8694,
+        "first_dram_full_index": 3241,
+        "lru_hits": 591238,
+        "lru_misses": 8762,
+        "miss_ratio": 0.014603333333333333,
+        "nondiscriminative_ratio": 0.0,
+        "relevance_range_distribution": {
+          "max": 1.51953125,
+          "mean": 1.3934093376178973,
+          "min": 1.34765625,
+          "p25": 1.39453125,
+          "p50": 1.39453125,
+          "p75": 1.39453125,
+          "p90": 1.40625,
+          "p95": 1.40625,
+          "p99": 1.40625
+        },
+        "retained_K_t": {
+          "max": 8,
+          "mean": 8.0,
+          "min": 8,
+          "p25": 8.0,
+          "p50": 8.0,
+          "p75": 8.0,
+          "p90": 8.0,
+          "p95": 8.0,
+          "p99": 8.0
+        },
+        "tail_dropped_decision_count": 4,
+        "tail_dropped_ratio": 0.0004598758335249483,
+        "tied_best_set_size_distribution": {
+          "max": 61,
+          "mean": 57.42891649413389,
+          "min": 55,
+          "p25": 57.0,
+          "p50": 57.0,
+          "p75": 58.0,
+          "p90": 58.0,
+          "p95": 59.0,
+          "p99": 59.0
+        },
+        "valid_label_decision_count": 8694,
+        "victim_decision_count": 8698
+      },
+      "hotspot_and_tail": {
+        "page_access_count_distribution": {
+          "max": 237854,
+          "mean": 82.01202843083652,
+          "min": 1,
+          "p25": 32.0,
+          "p50": 32.0,
+          "p75": 32.0,
+          "p90": 63.0,
+          "p95": 64.0,
+          "p99": 125.80000000000291
+        },
+        "reuse_event_count": 592684,
+        "reuse_event_ratio": 0.9878066666666667,
+        "reuse_interval_distribution": {
+          "max": 589353,
+          "mean": 383.11876818000826,
+          "min": 1,
+          "p25": 2.0,
+          "p50": 3.0,
+          "p75": 3.0,
+          "p90": 9.0,
+          "p95": 12.0,
+          "p99": 324.0
+        },
+        "single_access_page_ratio": 0.09745762711864407,
+        "top_10_percent_page_share": 0.6765233333333334,
+        "top_1_percent_page_share": 0.6034666666666667,
+        "top_5_percent_page_share": 0.6374916666666667
+      },
+      "read_write": {
+        "per_page_write_count_distribution": {
+          "max": 7101,
+          "mean": 1.0158556588299616,
+          "min": 0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 0.0,
+          "p90": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "read_count": 592568,
+        "read_ratio": 0.9876133333333333,
+        "rw_source": "real_trace_column",
+        "write_count": 7432,
+        "write_ratio": 0.012386666666666667
+      }
+    },
+    "valid": {
+      "basic": {
+        "access_count": 200000,
+        "file_size_bytes": 6600015,
+        "fingerprint_sha256": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774",
+        "record_fingerprint_sha256": "7e624063c76e10b2509417c745594387a32a3b830be61ef4a1b4f2eaf0117c1c",
+        "unique_page_count": 2685,
+        "unique_pc_count": 28
+      },
+      "diagnostics": {
+        "extreme_write_ratio": false,
+        "fully_streaming_or_no_reuse": false,
+        "low_pressure": false,
+        "sufficiency_failures": [],
+        "warnings": []
+      },
+      "dram_pressure_and_labels": {
+        "candidate_pool_B_t": {
+          "16": {
+            "max": 16,
+            "mean": 16.0,
+            "min": 16,
+            "p25": 16.0,
+            "p50": 16.0,
+            "p75": 16.0,
+            "p90": 16.0,
+            "p95": 16.0,
+            "p99": 16.0
+          },
+          "32": {
+            "max": 32,
+            "mean": 32.0,
+            "min": 32,
+            "p25": 32.0,
+            "p50": 32.0,
+            "p75": 32.0,
+            "p90": 32.0,
+            "p95": 32.0,
+            "p99": 32.0
+          },
+          "64": {
+            "max": 64,
+            "mean": 64.0,
+            "min": 64,
+            "p25": 64.0,
+            "p50": 64.0,
+            "p75": 64.0,
+            "p90": 64.0,
+            "p95": 64.0,
+            "p99": 64.0
+          },
+          "8": {
+            "max": 8,
+            "mean": 8.0,
+            "min": 8,
+            "p25": 8.0,
+            "p50": 8.0,
+            "p75": 8.0,
+            "p90": 8.0,
+            "p95": 8.0,
+            "p99": 8.0
+          }
+        },
+        "complete_future_window_decision_count": 2839,
+        "decision_ratio": 0.014215,
+        "dram_capacity_pages": 64,
+        "effective_relevance_decision_count": 2839,
+        "first_dram_full_index": 3253,
+        "lru_hits": 197093,
+        "lru_misses": 2907,
+        "miss_ratio": 0.014535,
+        "nondiscriminative_ratio": 0.0,
+        "relevance_range_distribution": {
+          "max": 1.42578125,
+          "mean": 1.3934332621521663,
+          "min": 1.34765625,
+          "p25": 1.39453125,
+          "p50": 1.39453125,
+          "p75": 1.39453125,
+          "p90": 1.40625,
+          "p95": 1.40625,
+          "p99": 1.40625
+        },
+        "retained_K_t": {
+          "max": 8,
+          "mean": 8.0,
+          "min": 8,
+          "p25": 8.0,
+          "p50": 8.0,
+          "p75": 8.0,
+          "p90": 8.0,
+          "p95": 8.0,
+          "p99": 8.0
+        },
+        "tail_dropped_decision_count": 4,
+        "tail_dropped_ratio": 0.0014069644741470278,
+        "tied_best_set_size_distribution": {
+          "max": 60,
+          "mean": 57.42972877773864,
+          "min": 55,
+          "p25": 57.0,
+          "p50": 57.0,
+          "p75": 58.0,
+          "p90": 58.0,
+          "p95": 59.0,
+          "p99": 59.0
+        },
+        "valid_label_decision_count": 2839,
+        "victim_decision_count": 2843
+      },
+      "hotspot_and_tail": {
+        "page_access_count_distribution": {
+          "max": 79260,
+          "mean": 74.487895716946,
+          "min": 1,
+          "p25": 32.0,
+          "p50": 32.0,
+          "p75": 32.0,
+          "p90": 32.0,
+          "p95": 33.0,
+          "p99": 208.15999999999622
+        },
+        "reuse_event_count": 197315,
+        "reuse_event_ratio": 0.986575,
+        "reuse_interval_distribution": {
+          "max": 194437,
+          "mean": 59.96445784659048,
+          "min": 1,
+          "p25": 2.0,
+          "p50": 3.0,
+          "p75": 3.0,
+          "p90": 9.0,
+          "p95": 12.0,
+          "p99": 243.0
+        },
+        "single_access_page_ratio": 0.10018621973929237,
+        "top_10_percent_page_share": 0.65661,
+        "top_1_percent_page_share": 0.59844,
+        "top_5_percent_page_share": 0.63507
+      },
+      "read_write": {
+        "per_page_write_count_distribution": {
+          "max": 2372,
+          "mean": 0.9225325884543761,
+          "min": 0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 0.0,
+          "p90": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "read_count": 197523,
+        "read_ratio": 0.987615,
+        "rw_source": "real_trace_column",
+        "write_count": 2477,
+        "write_ratio": 0.012385
+      }
+    }
+  },
+  "status": "PASSED",
+  "sufficiency_failures": [],
+  "verification_status": "ANALYZED",
+  "warnings": [],
+  "workload_id": "streamcluster_pressure"
+}
