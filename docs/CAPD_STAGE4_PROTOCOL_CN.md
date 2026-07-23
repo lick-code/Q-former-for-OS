@@ -34,6 +34,8 @@
 
 主比较为 A/C；同时报告 A/B 和 B/C。selector 特征按 `P_t` 有效页展开，精排状态按 `C_t` 有效候选展开，B/K、dirty ratio、decision interval 按决策点统计；padding 永不进入统计。KS>=0.1/0.2 只标记工程诊断 moderate/large，不是显著性检验或自动再训练触发器。明显偏移原样报告并标记 `REVIEW_REQUIRED`，不修改方法。
 
+G11 的九个 workload/seed 组合拆成独立进程作业，Linux 服务器默认并发6个；每个进程限制为一个 PyTorch CPU线程，并可共享同一CUDA设备执行独立的小批推理。每个组合完成后原子写入 `distribution_partials/`，其中绑定代码、配置、selector、trace和checkpoint指纹；重跑时只复用身份完全一致的已完成组合，身份变化则重新计算并原子替换。并行度只改变调度，不改变trace、checkpoint、状态推进或统计定义。
+
 ## 正式路径
 
 - JSONL：`dataset/jsonl/finals_v3_official/stage4_reranker/<workload>/B64/`

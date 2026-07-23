@@ -1,8 +1,10 @@
 # coding=utf-8
 """Server tests for CAPD stage-4 G11 distribution identities."""
 
+import inspect
 import os
 import sys
+import tempfile
 import unittest
 
 
@@ -12,6 +14,7 @@ if PROJECT_ROOT not in sys.path:
 
 from qmap import stage4_common
 from qmap import stage4_distribution
+from scripts import run_capd_stage4 as stage4
 
 
 class DistributionMetricTest(unittest.TestCase):
@@ -54,6 +57,40 @@ class DistributionMetricTest(unittest.TestCase):
     stage4_distribution._record(
         distribution, snapshot, set(), 10, 14)
     self.assertEqual([4], distribution["values"]["decision_interval"])
+
+  def test_g11_uses_spawned_processes_and_resumable_seed_partials(self):
+    source = inspect.getsource(stage4.distribution_audit)
+    self.assertIn("ProcessPoolExecutor", source)
+    self.assertIn("multiprocessing.get_context(\"spawn\")", source)
+    worker_source = inspect.getsource(stage4._distribution_seed_job)
+    self.assertIn("_write_json_atomic", worker_source)
+    self.assertIn("[G11 END]", worker_source)
+
+  def test_distribution_worker_count_is_configurable(self):
+    args = stage4.build_parser().parse_args([
+        "--stage", "distribution-audit", "--distribution-workers", "6"])
+    self.assertEqual(6, args.distribution_workers)
+
+  def test_resume_identity_ignores_command_and_commit_only(self):
+    base = {key: "same" for key in stage4._DISTRIBUTION_RESUME_KEYS}
+    left = dict(base, command="first", code_commit="one")
+    right = dict(base, command="second", code_commit="two")
+    self.assertEqual(stage4._distribution_resume_identity(left),
+                     stage4._distribution_resume_identity(right))
+
+  def test_partial_reuse_rejects_changed_checkpoint_identity(self):
+    binding = {key: "same" for key in stage4._DISTRIBUTION_RESUME_KEYS}
+    binding["test_trace_opened"] = False
+    with tempfile.TemporaryDirectory() as directory:
+      path = os.path.join(directory, "seed.json")
+      stage4.finals_config.write_json(path, {
+          "status": "COMPLETED", "test_trace_opened": False,
+          "input_binding": binding, "comparisons": {"complete": True}})
+      job = {"partial_path": path, "input_binding": binding}
+      self.assertTrue(stage4._distribution_partial_matches(job))
+      changed = dict(binding, checkpoint_fingerprint="changed")
+      self.assertFalse(stage4._distribution_partial_matches({
+          "partial_path": path, "input_binding": changed}))
 
 
 if __name__ == "__main__":

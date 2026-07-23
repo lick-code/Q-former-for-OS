@@ -10,6 +10,8 @@ mkdir -p "$LOG_ROOT" "$PYTEST_ROOT" "$PYCACHE_ROOT"
 export PYTHONPYCACHEPREFIX="$PYCACHE_ROOT"
 export PYTEST_ADDOPTS="-o cache_dir=$PYTEST_ROOT/cache"
 export CAPD_STAGE4_LOG_ROOT="$LOG_ROOT/training"
+export CAPD_STAGE4_DISTRIBUTION_WORKERS="${CAPD_STAGE4_DISTRIBUTION_WORKERS:-6}"
+export CAPD_STAGE4_DISTRIBUTION_DEVICE="${CAPD_STAGE4_DISTRIBUTION_DEVICE:-cuda}"
 
 FAILURES=0
 LAST_CODE=0
@@ -30,8 +32,38 @@ run_group() {
   return 0
 }
 
+run_group_live() {
+  name="$1"
+  timeout_value="$2"
+  shift 2
+  log="$LOG_ROOT/${name}.log"
+  printf '[START] %s %s\n' "$name" "$(date -Is)" | tee "$log"
+  timeout "$timeout_value" "$@" 2>&1 | tee -a "$log"
+  code=${PIPESTATUS[0]}
+  LAST_CODE=$code
+  printf '[END] %s %s exit=%s log=%s\n' \
+    "$name" "$(date -Is)" "$code" "$log" | tee -a "$log"
+  if [ "$code" -ne 0 ]; then
+    FAILURES=$((FAILURES + 1))
+  fi
+  return 0
+}
+
 run_required() {
   run_group "$@"
+  if [ "$LAST_CODE" -ne 0 ]; then
+    failed_log="$LOG_ROOT/$1.log"
+    printf '[ERROR] %s failed; last 80 log lines follow: %s\n' \
+      "$1" "$failed_log"
+    tail -n 80 "$failed_log" || true
+    printf '[EVIDENCE] %s\n' "$EVIDENCE_ROOT"
+    printf '[FINAL] STAGE4_NOT_VERIFIED\n'
+    exit 1
+  fi
+}
+
+run_required_live() {
+  run_group_live "$@"
   if [ "$LAST_CODE" -ne 0 ]; then
     failed_log="$LOG_ROOT/$1.log"
     printf '[ERROR] %s failed; last 80 log lines follow: %s\n' \
@@ -64,8 +96,10 @@ run_required train_9 18h python3 scripts/run_capd_stage4.py \
   --training-timeout 21600
 run_required counterfactual_g12 6h python3 scripts/run_capd_stage4.py \
   --stage counterfactual-audit --repo-root "$REPO"
-run_required distribution_g11 6h python3 scripts/run_capd_stage4.py \
-  --stage distribution-audit --repo-root "$REPO"
+run_required_live distribution_g11 12h python3 scripts/run_capd_stage4.py \
+  --stage distribution-audit --repo-root "$REPO" \
+  --distribution-workers "$CAPD_STAGE4_DISTRIBUTION_WORKERS" \
+  --device "$CAPD_STAGE4_DISTRIBUTION_DEVICE"
 run_required summarize 20m python3 scripts/run_capd_stage4.py \
   --stage summarize --repo-root "$REPO"
 run_required pollution_check 10m python3 -c \

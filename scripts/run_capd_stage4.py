@@ -8,8 +8,11 @@ all generated data, checkpoints, and audit results use stage-4 directories.
 from __future__ import print_function
 
 import argparse
+from concurrent.futures import as_completed
+from concurrent.futures import ProcessPoolExecutor
 import csv
 import json
+import multiprocessing
 import os
 import shlex
 import subprocess
@@ -37,6 +40,12 @@ STAGES = ("audit-inputs", "generate", "train", "counterfactual-audit",
 def _write_json(path, value):
   os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
   finals_config.write_json(path, value)
+
+
+def _write_json_atomic(path, value):
+  temporary = "{}.tmp.{}".format(path, os.getpid())
+  _write_json(temporary, value)
+  os.replace(temporary, path)
 
 
 def _command():
@@ -475,74 +484,195 @@ def counterfactual_audit(args):
             row["cost_indistinguishable_ratio"]))
 
 
+_DISTRIBUTION_RESUME_KEYS = (
+    "workload", "seed", "B", "K", "selector_fingerprint",
+    "train_trace_fingerprint", "valid_trace_fingerprint",
+    "source_manifest_fingerprint", "config_fingerprint",
+    "checkpoint_fingerprint", "code_fingerprint", "audit_input_scope",
+    "test_trace_opened")
+
+
+def _distribution_resume_identity(binding):
+  return {key: binding.get(key) for key in _DISTRIBUTION_RESUME_KEYS}
+
+
+def _distribution_job_spec(args, workload, seed, code_commit,
+                           code_fingerprint, command):
+  paths = _paths(args, workload)
+  config = finals_config.load_config(
+      paths["config"], require_resolved=True, project_root=args.repo_root,
+      verify_manifest_files=False)
+  selector = finals_config.load_json(paths["selector"])
+  checkpoint_directory = os.path.join(
+      args.checkpoint_root, workload, "seed_{}".format(seed))
+  checkpoint = os.path.join(checkpoint_directory, "qmap_best.pth")
+  checkpoint_manifest = stage4_common.load_json(os.path.join(
+      checkpoint_directory, "checkpoint_manifest.json"))
+  checkpoint_fingerprint = finals_config.fingerprint_file(checkpoint)
+  stage4_common.require(
+      int(checkpoint_manifest["seed"]) == seed and
+      checkpoint_manifest["checkpoints"]["best"]["fingerprint"] ==
+      checkpoint_fingerprint,
+      "distribution checkpoint seed/fingerprint mismatch")
+  selector_fingerprint = finals_config.selector_fingerprint(selector)
+  config_fingerprint = finals_config.config_fingerprint(config)
+  stage4_common.require(
+      checkpoint_manifest["selector_fingerprint"] == selector_fingerprint and
+      checkpoint_manifest["config_fingerprint"] == config_fingerprint and
+      checkpoint_manifest["jsonl_fingerprints"] == {
+          "train": finals_config.fingerprint_file(paths["train_jsonl"]),
+          "valid": finals_config.fingerprint_file(paths["valid_jsonl"])},
+      "distribution checkpoint artifact binding mismatch")
+  binding = {
+      "workload": workload, "seed": seed, "B": 64, "K": 8,
+      "selector_path": stage4_common.portable(paths["selector"], args.repo_root),
+      "selector_fingerprint": selector_fingerprint,
+      "train_trace_fingerprint": config["data"]["split_fingerprints"]["train"],
+      "valid_trace_fingerprint": config["data"]["split_fingerprints"]["valid"],
+      "source_manifest_fingerprint": selector.get(
+          "source_manifest_fingerprint"),
+      "config_fingerprint": config_fingerprint,
+      "checkpoint_path": stage4_common.portable(checkpoint, args.repo_root),
+      "checkpoint_fingerprint": checkpoint_fingerprint,
+      "code_commit": code_commit, "command": command,
+      "code_fingerprint": code_fingerprint,
+      "audit_input_scope": "train_and_valid_trace_only",
+      "test_trace_opened": False,
+  }
+  partial_path = os.path.join(
+      args.output_root, "distribution_partials", workload,
+      "seed_{}.json".format(seed))
+  return {
+      "repo_root": args.repo_root, "workload": workload, "seed": seed,
+      "device": args.device, "config_path": paths["config"],
+      "selector_path": paths["selector"], "checkpoint": checkpoint,
+      "partial_path": partial_path, "input_binding": binding,
+  }
+
+
+def _distribution_partial_matches(job):
+  path = job["partial_path"]
+  if not os.path.isfile(path):
+    return False
+  try:
+    partial = stage4_common.load_json(path)
+  except (OSError, ValueError):
+    return False
+  return (
+      partial.get("status") == "COMPLETED" and
+      partial.get("test_trace_opened") is False and
+      _distribution_resume_identity(partial.get("input_binding", {})) ==
+      _distribution_resume_identity(job["input_binding"]) and
+      isinstance(partial.get("comparisons"), dict))
+
+
+def _distribution_seed_job(job):
+  started = time.time()
+  workload = job["workload"]
+  seed = int(job["seed"])
+  os.environ.setdefault("OMP_NUM_THREADS", "1")
+  os.environ.setdefault("MKL_NUM_THREADS", "1")
+  import torch
+  torch.set_num_threads(1)
+  try:
+    torch.set_num_interop_threads(1)
+  except RuntimeError:
+    pass
+  device = job["device"] or (
+      "cuda" if torch.cuda.is_available() else "cpu")
+  print("[G11 START] workload={} seed={} pid={} device={}".format(
+      workload, seed, os.getpid(), device), flush=True)
+  config = finals_config.load_config(
+      job["config_path"], require_resolved=True,
+      project_root=job["repo_root"], verify_manifest_files=False)
+  selector = finals_config.load_json(job["selector_path"])
+  train_trace, _ = read_trace(
+      config["data"]["train_trace"], int(config["trace"]["page_shift"]))
+  valid_trace, _ = read_trace(
+      config["data"]["valid_trace"], int(config["trace"]["page_shift"]))
+  dist_a = stage4_distribution.collect_lru(
+      train_trace, config, selector, "A")
+  dist_b = stage4_distribution.collect_lru(
+      valid_trace, config, selector, "B")
+  dist_c = stage4_distribution.collect_capd(
+      valid_trace, config, selector, job["checkpoint"], seed, device)
+  comparisons = stage4_distribution.audit_triplet(dist_a, dist_b, dist_c)
+  partial = {
+      "schema_version": stage4_common.STAGE4_SCHEMA,
+      "contract_id": finals_config.CONTRACT_ID,
+      "status": "COMPLETED", "workload": workload, "seed": seed,
+      "input_binding": job["input_binding"], "comparisons": comparisons,
+      "duration_seconds": time.time() - started,
+      "test_trace_opened": False,
+  }
+  _write_json_atomic(job["partial_path"], partial)
+  print("[G11 END] workload={} seed={} seconds={:.1f} partial={}".format(
+      workload, seed, partial["duration_seconds"], job["partial_path"]),
+        flush=True)
+  return job["partial_path"]
+
+
 def distribution_audit(args):
-  details = {}
+  total_jobs = len(args.workloads) * len(args.seeds)
+  stage4_common.require(1 <= args.distribution_workers <= total_jobs,
+                        "distribution workers must be in [1, {}]".format(
+                            total_jobs))
+  code_commit = _git_commit(args.repo_root)
+  code_fingerprint = _code_fingerprint(args.repo_root)
+  command = _command()
+  jobs = [
+      _distribution_job_spec(
+          args, workload, seed, code_commit, code_fingerprint, command)
+      for workload in args.workloads for seed in args.seeds]
+  pending = [job for job in jobs if not _distribution_partial_matches(job)]
+  reused = total_jobs - len(pending)
+  print("[G11 PLAN] jobs={} workers={} reused={} pending={} device={}".format(
+      total_jobs, args.distribution_workers, reused, len(pending),
+      args.device or "auto"), flush=True)
+  completed = reused
+  if pending and args.distribution_workers == 1:
+    for job in pending:
+      _distribution_seed_job(job)
+      completed += 1
+      print("[G11 PROGRESS] completed={}/{}".format(
+          completed, total_jobs), flush=True)
+  elif pending:
+    context = multiprocessing.get_context("spawn")
+    worker_count = min(args.distribution_workers, len(pending))
+    with ProcessPoolExecutor(
+        max_workers=worker_count, mp_context=context) as executor:
+      futures = {executor.submit(_distribution_seed_job, job): job
+                 for job in pending}
+      for future in as_completed(futures):
+        future.result()
+        completed += 1
+        job = futures[future]
+        print("[G11 PROGRESS] completed={}/{} workload={} seed={}".format(
+            completed, total_jobs, job["workload"], job["seed"]), flush=True)
+
+  details = {workload: {} for workload in args.workloads}
   metric_rows = []
   input_bindings = []
-  for workload in args.workloads:
-    paths = _paths(args, workload)
-    config = finals_config.load_config(
-        paths["config"], require_resolved=True, project_root=args.repo_root,
-        verify_manifest_files=False)
-    selector = finals_config.load_json(paths["selector"])
-    train_trace, _ = read_trace(
-        config["data"]["train_trace"], int(config["trace"]["page_shift"]))
-    valid_trace, _ = read_trace(
-        config["data"]["valid_trace"], int(config["trace"]["page_shift"]))
-    dist_a = stage4_distribution.collect_lru(train_trace, config, selector, "A")
-    dist_b = stage4_distribution.collect_lru(valid_trace, config, selector, "B")
-    details[workload] = {}
-    for seed in args.seeds:
-      checkpoint = os.path.join(
-          args.checkpoint_root, workload, "seed_{}".format(seed),
-          "qmap_best.pth")
-      checkpoint_manifest = stage4_common.load_json(os.path.join(
-          args.checkpoint_root, workload, "seed_{}".format(seed),
-          "checkpoint_manifest.json"))
-      stage4_common.require(
-          int(checkpoint_manifest["seed"]) == seed and
-          checkpoint_manifest["checkpoints"]["best"]["fingerprint"] ==
-          finals_config.fingerprint_file(checkpoint),
-          "distribution checkpoint seed/fingerprint mismatch")
-      stage4_common.require(
-          checkpoint_manifest["selector_fingerprint"] ==
-          finals_config.selector_fingerprint(selector) and
-          checkpoint_manifest["config_fingerprint"] ==
-          finals_config.config_fingerprint(config) and
-          checkpoint_manifest["jsonl_fingerprints"] == {
-              "train": finals_config.fingerprint_file(paths["train_jsonl"]),
-              "valid": finals_config.fingerprint_file(paths["valid_jsonl"])},
-          "distribution checkpoint artifact binding mismatch")
-      dist_c = stage4_distribution.collect_capd(
-          valid_trace, config, selector, checkpoint, seed, args.device)
-      comparisons = stage4_distribution.audit_triplet(dist_a, dist_b, dist_c)
-      details[workload][str(seed)] = comparisons
-      input_bindings.append({
-          "workload": workload, "seed": seed, "B": 64, "K": 8,
-          "selector_path": stage4_common.portable(paths["selector"], args.repo_root),
-          "selector_fingerprint": finals_config.selector_fingerprint(selector),
-          "train_trace_fingerprint": config["data"]["split_fingerprints"]["train"],
-          "valid_trace_fingerprint": config["data"]["split_fingerprints"]["valid"],
-          "source_manifest_fingerprint": selector.get(
-              "source_manifest_fingerprint"),
-          "config_fingerprint": finals_config.config_fingerprint(config),
-          "checkpoint_path": stage4_common.portable(checkpoint, args.repo_root),
-          "checkpoint_fingerprint": finals_config.fingerprint_file(checkpoint),
-          "code_commit": _git_commit(args.repo_root), "command": _command(),
-          "code_fingerprint": _code_fingerprint(args.repo_root),
-          "audit_input_scope": "train_and_valid_trace_only",
-          "test_trace_opened": False,
-      })
-      for comparison, features in comparisons.items():
-        for feature, metrics in features.items():
-          metric_rows.append({
-              "workload": workload, "seed": seed,
-              "comparison": comparison, "feature": feature,
-              "ks": metrics["ks"],
-              "warning": metrics.get("warning", "binary"),
-              "outside_train_range_ratio": metrics.get(
-                  "outside_reference_range_ratio"),
-          })
+  for job in jobs:
+    stage4_common.require(
+        _distribution_partial_matches(job),
+        "missing or stale G11 partial: {}".format(job["partial_path"]))
+    partial = stage4_common.load_json(job["partial_path"])
+    workload = job["workload"]
+    seed = int(job["seed"])
+    comparisons = partial["comparisons"]
+    details[workload][str(seed)] = comparisons
+    input_bindings.append(partial["input_binding"])
+    for comparison, features in comparisons.items():
+      for feature, metrics in features.items():
+        metric_rows.append({
+            "workload": workload, "seed": seed,
+            "comparison": comparison, "feature": feature,
+            "ks": metrics["ks"],
+            "warning": metrics.get("warning", "binary"),
+            "outside_train_range_ratio": metrics.get(
+                "outside_reference_range_ratio"),
+        })
   aggregates = {}
   for workload in args.workloads:
     aggregates[workload] = {}
@@ -572,6 +702,9 @@ def distribution_audit(args):
           "decision_features": "decision points"},
       "test_trace_opened": False, "workloads": details,
       "seed_aggregates": aggregates, "input_bindings": input_bindings,
+      "distribution_workers": args.distribution_workers,
+      "code_commit": code_commit, "command": command,
+      "code_fingerprint": code_fingerprint,
       "review_required": review_required,
       "status": "COMPUTED_UNVERIFIED",
   }
@@ -745,6 +878,8 @@ def build_parser():
   parser.add_argument("--log-root", default=os.environ.get(
       "CAPD_STAGE4_LOG_ROOT"))
   parser.add_argument("--training-timeout", type=int, default=21600)
+  parser.add_argument("--distribution-workers", type=int, default=int(
+      os.environ.get("CAPD_STAGE4_DISTRIBUTION_WORKERS", "3")))
   return parser
 
 

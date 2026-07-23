@@ -10,6 +10,18 @@ cd "$REPO"
 bash scripts/validate_capd_stage4_server.sh
 ```
 
+G11 默认使用6个spawn进程并发，实时打印每个workload/seed的开始、结束和总进度，最长12小时；每个完成组合独立原子落盘，超时或断线后可续跑。可通过 `CAPD_STAGE4_DISTRIBUTION_WORKERS` 调整并行度。
+
+只重跑G11并生成汇总时使用：
+
+```bash
+cd "$REPO"
+CAPD_STAGE4_DISTRIBUTION_WORKERS=6 python3 scripts/run_capd_stage4.py \
+  --stage distribution-audit --repo-root "$REPO" \
+  --distribution-workers 6 --device cuda
+python3 scripts/run_capd_stage4.py --stage summarize --repo-root "$REPO"
+```
+
 脚本把日志、pytest cache、pycache 和临时证据写到仓库外 `mktemp` 目录；无全局 `set -e`；每组命令记录开始、结束、真实退出码和日志路径；失败不自动重试，也不删除现场。任一必需阶段失败后立即停止依赖阶段，并把失败日志最后 80 行直接打印到终端，避免生成级联失败噪声或隐藏首个 traceback。顺序为输入身份审计、阶段4针对性测试、完整 pytest、微型 E2E、三个 workload 的 JSONL 重建、9 个模型串行训练、G12、G11、汇总和污染检查。训练单进程最长 21600 秒，整体训练组最长 18 小时。输入审计可安全刷新；完整且身份一致的 checkpoint 可复用；上次失败留下的空 checkpoint 目录可直接续跑。
 
 验收脚本只有在所有命令退出码均为 0 时打印：
