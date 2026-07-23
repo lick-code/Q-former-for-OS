@@ -1,6 +1,6 @@
 # CAPD 阶段4：精排模型与闭环审计协议
 
-状态：`STAGE4_IMPLEMENTED_UNVERIFIED`
+状态：`STAGE4_VERIFIED`
 
 本阶段严格绑定 `CAPD-MIC-1.0`、R1、`capd_finals_v3_0`、official、B=64、K=8。只使用 train/valid；不打开 test，不进行基线性能比较，不形成端到端性能结论，也不进入阶段5。
 
@@ -34,7 +34,7 @@
 
 主比较为 A/C；同时报告 A/B 和 B/C。selector 特征按 `P_t` 有效页展开，精排状态按 `C_t` 有效候选展开，B/K、dirty ratio、decision interval 按决策点统计；padding 永不进入统计。KS>=0.1/0.2 只标记工程诊断 moderate/large，不是显著性检验或自动再训练触发器。明显偏移原样报告并标记 `REVIEW_REQUIRED`，不修改方法。
 
-G11 的九个 workload/seed 组合拆成独立进程作业，Linux 服务器默认并发6个；每个进程限制为一个 PyTorch CPU线程，并可共享同一CUDA设备执行独立的小批推理。每个组合完成后原子写入 `distribution_partials/`，其中绑定代码、配置、selector、trace和checkpoint指纹；重跑时只复用身份完全一致的已完成组合，身份变化则重新计算并原子替换。并行度只改变调度，不改变trace、checkpoint、状态推进或统计定义。
+G11 的九个 workload/seed 组合拆成独立进程作业，Linux 服务器默认并发3个；每个组合使用全新spawn进程，先完成train分布并释放train trace，再加载valid trace，完成后立即退出，从而避免PyTorch原生状态和大trace内存跨任务累积。每个进程限制为一个 PyTorch CPU线程，并可共享同一CUDA设备执行独立的小批推理。每个组合完成后原子写入 `distribution_partials/`，其中绑定配置、selector、trace、checkpoint指纹和G11数值语义版本；重跑时只复用数值语义与输入身份一致的已完成组合，身份变化则重新计算并原子替换。并行度只改变调度，不改变trace、checkpoint、状态推进或统计定义。
 
 ## 正式路径
 
@@ -42,4 +42,6 @@ G11 的九个 workload/seed 组合拆成独立进程作业，Linux 服务器默�
 - checkpoint：`outputs/checkpoints/finals_v3_official/stage4_reranker/<workload>/seed_<seed>/`
 - 审计：`outputs/results/finals_v3_official/stage4_audits/`
 
-服务器未完成全部门禁前，状态只能是 `STAGE4_IMPLEMENTED_UNVERIFIED`。
+2026-07-23 Linux服务器全部门禁通过，验收脚本最终打印
+`[FINAL] STAGE4_VERIFIED`。阶段4正式状态为 `STAGE4_VERIFIED`；
+G11的 `REVIEW_REQUIRED` 诊断保留，但不阻止阶段完成。

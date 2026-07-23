@@ -1,6 +1,6 @@
 # CAPD 阶段4 Linux 服务器验收
 
-当前状态：`STAGE4_IMPLEMENTED_UNVERIFIED`。本地未运行 Python、pytest、JSONL 生成、训练、模型推理、Trace Replay 或正式实验。
+当前状态：`STAGE4_VERIFIED`。2026-07-23 Linux服务器已完成正式验收；本地仅核对同步工件和更新状态，未运行 Python、pytest、JSONL 生成、训练、模型推理、Trace Replay 或正式实验。
 
 在 Linux 服务器执行：
 
@@ -31,3 +31,16 @@ python3 scripts/run_capd_stage4.py --stage summarize --repo-root "$REPO"
 ```
 
 否则打印 `[FINAL] STAGE4_NOT_VERIFIED`。审计数值不理想不是实现失败；数值边界应标为 `REVIEW_REQUIRED`。人工确认 9/9 checkpoint、三个 workload 的 G12、三 workload×三 seed 的 G11、指纹链、无 test 读取和无阶段2/3污染后，才可更新阶段状态。
+
+## 2026-07-23服务器验收回填
+
+服务器证据目录：`/tmp/capd-stage4.pDQyrs`。
+
+- `input_audit`、`targeted_tests`、`full_pytest`、`mini_e2e`、`generate`、
+  `train_9`、`counterfactual_g12`、`distribution_g11`、`summarize`、
+  `pollution_check`、`diff_check`均退出0。
+- `train_9`复用9/9完整且身份一致的checkpoint。
+- G11计划为 `jobs=9 workers=3 reused=9 pending=0 device=cuda`。
+- 验收脚本最终打印 `[FINAL] STAGE4_VERIFIED`。
+- 本次截图未给出pytest的精确passed/collected数量，报告只记录真实退出码，
+  不臆造测试数量。
