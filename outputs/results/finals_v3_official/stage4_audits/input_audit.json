@@ -1,8 +1,8 @@
 {
   "artifact_class": "official",
   "artifact_schema": "capd_finals_v3_0",
-  "code_commit": "5da0b709047bacb46778b07f87e4edfbca050a74",
-  "code_fingerprint": "50562a058f33c2f810d7de7490683694c504a3de8391859bc71eeb8da04cb526",
+  "code_commit": "656743eee5eb6fcdc78658ceec375ac4cd006a19",
+  "code_fingerprint": "3e30e6c00a33caaeb0351358ae2db9ead38c3fffc66e470e8ac19dffc2529fa3",
   "command": "scripts/run_capd_stage4.py --stage audit-inputs --repo-root /home/likc/Q-former-for-OS",
   "contract_id": "CAPD-MIC-1.0",
   "forbidden_inputs": [
@@ -18,8 +18,10 @@
       "config_fingerprint": "fc42c1a0a7575301beb59e1bb9f65ece8034be5033b5733022c6547000b89322",
       "selector_fingerprint": "48e4758012a2987ecf8a5dc7ea8c1b477eed1aed079f74f7205e7a576b430d97",
       "selector_path": "dataset/jsonl/finals_v3_official/canneal/B64/selector_params.json",
-      "source_manifest_fingerprint": "d823034568a7c9ff5978c50ff92a228a05ee05c3caf9d7b8e5453b5c2a632c73",
+      "source_manifest_file_sha256": "d823034568a7c9ff5978c50ff92a228a05ee05c3caf9d7b8e5453b5c2a632c73",
+      "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
       "source_manifest_path": "dataset/metadata/finals_v3_official/canneal.json",
+      "source_manifest_provenance_identity": "b834b9a9ea8319e9c1d9c3ef294308955ec12390fb42061c3b1a108a4dd4ed2b",
       "split_fingerprints": {
         "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
         "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
@@ -34,8 +36,10 @@
       "config_fingerprint": "44a24bbe43a14f19162882f7251adae9ef4f4a920781bb1cad567814035f4b40",
       "selector_fingerprint": "243d0494246e8a1dd9ef36cf5e1d290b2772c2ee0b919b20d7d86ea0d43925b8",
       "selector_path": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/selector_params.json",
-      "source_manifest_fingerprint": "be2f22cda95984d5fb3795b1a796bde6aea7f29f3b63267fbb033aee373a5038",
+      "source_manifest_file_sha256": "be2f22cda95984d5fb3795b1a796bde6aea7f29f3b63267fbb033aee373a5038",
+      "source_manifest_fingerprint": "d12c5e2507c333421709ab37c1d555e50426674e3853c88759c2d44237c70235",
       "source_manifest_path": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+      "source_manifest_provenance_identity": "e39c088f03f0e0591be32e1d5df38a74f4fb2c842077894a4ba9b8727876854e",
       "split_fingerprints": {
         "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
         "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
@@ -50,8 +54,10 @@
       "config_fingerprint": "bb1f255f64fee0706bff0dbbdb45f712f1754d82f76b2f895663ea32ad62a816",
       "selector_fingerprint": "7fe88114f67649e6810039d39682ccfa6ffd54ab5b28e2677b710d7a1b8298b2",
       "selector_path": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/selector_params.json",
-      "source_manifest_fingerprint": "8d677878dd5121009581b824172d06a1b7854351afef04c7aeec9186dc63c632",
+      "source_manifest_file_sha256": "8d677878dd5121009581b824172d06a1b7854351afef04c7aeec9186dc63c632",
+      "source_manifest_fingerprint": "1c04935e3188eed4d2e7d6217b2e156253448b2967c26905353476190dd8f439",
       "source_manifest_path": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+      "source_manifest_provenance_identity": "8ba330e8ce0c2c2f445ad937189263c52de0a5c57c8a8c6a02e2cead906a2ed8",
       "split_fingerprints": {
         "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
         "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
