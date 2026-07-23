@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_C/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_C/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_C/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_C/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_C/canneal/seed_2026 --seed 2026",
+  "ended_unix": 1784805165.9289262,
+  "exit_code": 0,
+  "job_fingerprint": "d9a146681fb08e6ac60bfed6c5c99c945ca11671ee2ff51a0d15f26dd248bbe0",
+  "job_id": "ablation:train:selector_drop_C:canneal:2026",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_C/canneal/seed_2026/checkpoint_manifest.json.log",
+  "result_fingerprint": "3a8da2c8df8fabd41378de87a6ea1d0621187571f9ba159ce55bc17159c0cc75",
+  "retry_count": 0,
+  "started_unix": 1784805109.5011075,
+  "status": "COMPLETED"
+}

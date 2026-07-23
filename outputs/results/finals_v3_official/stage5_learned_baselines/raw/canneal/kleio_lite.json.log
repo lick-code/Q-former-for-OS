@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json --policy kleio_lite --learned_model /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/canneal/kleio_lite.json --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/raw/canneal/kleio_lite.json
+started_unix=1784800521.1663563
+Policy: kleio_lite
+Total accesses: 200000
+Hits: 197625
+Misses: 2375
+Hit rate: 98.81%
+Migrations: 2311
+NVM reads: 2359
+NVM writes: 16
+Weighted access cost: 225581.00
+Policy decisions: 2311
+Total decision time: 0.154647s
+Avg decision time: 0.066918 ms
+ended_unix=1784800531.4220378
+exit_code=0

@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json --policy random --stage5_replay_seed 0 --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_main/raw/canneal/random/seed_0.json
+started_unix=1784799980.8307142
+Policy: random
+Total accesses: 200000
+Hits: 195883
+Misses: 4117
+Hit rate: 97.94%
+Migrations: 4053
+NVM reads: 4019
+NVM writes: 98
+Weighted access cost: 245235.00
+Policy decisions: 4053
+Total decision time: 0.005093s
+Avg decision time: 0.001257 ms
+ended_unix=1784799991.003943
+exit_code=0

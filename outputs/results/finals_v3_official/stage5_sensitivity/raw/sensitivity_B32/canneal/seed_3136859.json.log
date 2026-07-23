@@ -1,0 +1,20 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/seed_3136859/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_B32/canneal/seed_3136859.json
+started_unix=1784811873.418011
+Policy: qmap
+Total accesses: 200000
+Hits: 197615
+Misses: 2385
+Hit rate: 98.81%
+Migrations: 2321
+NVM reads: 2369
+NVM writes: 16
+Weighted access cost: 225691.00
+Policy decisions: 2321
+Total decision time: 7.425952s
+Avg decision time: 3.199462 ms
+Candidate filter decisions: 2321
+Candidate B_t range: 32..32
+Retained K_t range: 8..8
+Avg candidate filter time: 0.218310 ms
+ended_unix=1784811894.0067565
+exit_code=0

@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_W/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_W/dedup_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_W/dedup_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_W/dedup_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_W/dedup_pressure/seed_2026 --seed 2026",
+  "ended_unix": 1784804837.509193,
+  "exit_code": 0,
+  "job_fingerprint": "93534f7f72c9322ba2f9f0a75f9490c13beca47e36b23c3db6af24c474bf2cf3",
+  "job_id": "ablation:train:selector_drop_W:dedup_pressure:2026",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_W/dedup_pressure/seed_2026/checkpoint_manifest.json.log",
+  "result_fingerprint": "052f9ec977c22d1e6c45792b1a4ab3980c52d33cb174941da7bc87a2f23ee4c9",
+  "retry_count": 0,
+  "started_unix": 1784804794.5986075,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,115 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.035275756741563476,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "3c3f089c8bdbfb5014cca7f52f4f73e45ce1c6f25cf04e509552ae580768e839",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/canneal/seed_42/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "8744c807e1389361896cc8e44c3e27c198a325c5bf4b846116177f9f724cf36f",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/canneal/seed_42/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "c0d516531462c4badd45da3c3ffd85804e17457ac729dd7d63158318aa04d79a",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/canneal/seed_42 --seed 42",
+  "config_fingerprint": "b4e7dd7517e9f6ec0e72550658a66e25f60edde7fa1db4e51e6c177e1006641d",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "5986f7d63d4b81da33feb24a9c6a7d3db51c339d421e1322d4f80b7bc3249bdb",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.05638005347938928,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "67aafa5ac90b15039921b9365e5d8d968f74f407d61caf2fc4f55cd6cd6fa363",
+    "valid": "160d30a8a9ad8aeb8967190b8f8df601b95ddccd85627de740e49cce197734cd"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.04454672183281025,
+      "valid_loss": -0.029204060857494673
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.04447969961581768,
+      "valid_loss": -0.029289766028523446
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.05186751026627237,
+      "valid_loss": -0.034453303689757984
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.055976255211682445,
+      "valid_loss": -0.034892241433262826
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.05633391931125548,
+      "valid_loss": -0.03500372032324473
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.05630379177596981,
+      "valid_loss": -0.035045855442682905
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.056375915283518555,
+      "valid_loss": -0.03511892922222614
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.05674652318445455,
+      "valid_loss": -0.03519158902267615
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.05645816557241225,
+      "valid_loss": -0.03526249937713146
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.05638005347938928,
+      "valid_loss": -0.035275756741563476
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "history_mean_pool",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 42,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "02e9563ab8d551eccba71352975a939319718bda1b111f735b86ee20bfe89cdb",
+  "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+  "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
+  "split_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "stage5_variant": {
+    "family": "ablation",
+    "only_difference": "masked mean of Transformer history; no candidate-history attention",
+    "retrain_required": true,
+    "source_stage": "stage5",
+    "test_used_for_selection": false,
+    "variant_id": "history_mean_pool"
+  },
+  "test_trace_opened": false,
+  "training_duration_seconds": 42.98547410964966,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "canneal"
+}

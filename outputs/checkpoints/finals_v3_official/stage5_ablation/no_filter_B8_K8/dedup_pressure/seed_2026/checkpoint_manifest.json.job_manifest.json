@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/no_filter_B8_K8/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/no_filter_B8_K8/dedup_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/no_filter_B8_K8/dedup_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/no_filter_B8_K8/dedup_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/no_filter_B8_K8/dedup_pressure/seed_2026 --seed 2026",
+  "ended_unix": 1784801658.4248257,
+  "exit_code": 0,
+  "job_fingerprint": "6f7f98b89a540d4ae60bf845852e07185c83e67c812aed0c1a014603577acca5",
+  "job_id": "ablation:train:no_filter_B8_K8:dedup_pressure:2026",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/no_filter_B8_K8/dedup_pressure/seed_2026/checkpoint_manifest.json.log",
+  "result_fingerprint": "4f5d3a521a1c3f673d2b0a4ec120e880360e6ada617f4ccad58d6360e57c3e49",
+  "retry_count": 0,
+  "started_unix": 1784801615.698862,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/learned_baselines.py --policy kleio_lite --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json --train_trace dataset/processed/finals_v3_official/canneal/train.csv --model_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/canneal/kleio_lite.json",
+  "ended_unix": 1784800521.1648383,
+  "exit_code": 0,
+  "job_fingerprint": "740556108c76c849d22cc1305e8160b1c095fc3844f0bd45efda4ce30f5ab062",
+  "job_id": "learned:train:canneal:kleio_lite",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/canneal/kleio_lite.json.log",
+  "result_fingerprint": "499bec28216059b3c5d4b8ee8bb64ef1792b05625ee4be45502934b1aee42010",
+  "retry_count": 0,
+  "started_unix": 1784800507.181498,
+  "status": "COMPLETED"
+}

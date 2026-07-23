@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/learned_baselines.py --policy kleio_lite --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json --train_trace dataset/processed/finals_v3_official/dedup_pressure/train.csv --model_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/dedup_pressure/kleio_lite.json",
+  "ended_unix": 1784800642.9969938,
+  "exit_code": 0,
+  "job_fingerprint": "783a48c5ea725518265b964af56bb7224871adb26e590218cc1b99b3d32b0fe8",
+  "job_id": "learned:train:dedup_pressure:kleio_lite",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/dedup_pressure/kleio_lite.json.log",
+  "result_fingerprint": "facc30729af50f7893e91f6c88846c723e176f430bbd00d12d10b049cb899d93",
+  "retry_count": 0,
+  "started_unix": 1784800610.2481146,
+  "status": "COMPLETED"
+}

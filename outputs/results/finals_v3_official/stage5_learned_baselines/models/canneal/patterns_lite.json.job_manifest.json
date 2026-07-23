@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/learned_baselines.py --policy patterns_lite --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json --train_trace dataset/processed/finals_v3_official/canneal/train.csv --model_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/canneal/patterns_lite.json",
+  "ended_unix": 1784800546.8190935,
+  "exit_code": 0,
+  "job_fingerprint": "8d6f6c136e0607e23bd014a9e7ca753df3a05e9b0f36857651cd21d0c876d90f",
+  "job_id": "learned:train:canneal:patterns_lite",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/canneal/patterns_lite.json.log",
+  "result_fingerprint": "a2554073e1328aedab75eb34cc0be1d54b6eed79b209a695100856f1d5a29386",
+  "retry_count": 0,
+  "started_unix": 1784800531.4238245,
+  "status": "COMPLETED"
+}

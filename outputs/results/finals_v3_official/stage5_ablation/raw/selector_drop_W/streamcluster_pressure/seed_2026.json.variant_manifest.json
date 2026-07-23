@@ -1,0 +1,49 @@
+{
+  "artifact_class": "official",
+  "checkpoint_fingerprint": "f4246b89a16f6cddbb0f9909389cf824057bf6cff4f63efc24bad1bb180214ba",
+  "checkpoint_manifest_fingerprint": "c29a96780d363daa1a76f78b4c83758a6443a6af70a4f7f63c370d4903870393",
+  "checkpoint_path": "outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_W/streamcluster_pressure/seed_2026/qmap_best.pth",
+  "code_commit": "9972579b9145a16e6ba5a8162b9e8e91ee27030c",
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_W/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_W/streamcluster_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_W/streamcluster_pressure/seed_2026/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_ablation/raw/selector_drop_W/streamcluster_pressure/seed_2026.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "evidence_tier": "three_seed_official",
+  "jsonl_fingerprints": {
+    "train": "3e9c751a7ff614be83d88cff875c65562a9689ce0754578b6206058e7470b001",
+    "valid": "351ec523bd201e2a3e872930ff1262fcced6d67c83c1e422998696f80bca6eed"
+  },
+  "model_seed": 2026,
+  "only_difference": "stage3 B64 leave-one-out selector fixes W weight to zero",
+  "parameters": {
+    "B": 64,
+    "D": 64,
+    "H": 10,
+    "Hc": 256,
+    "K": 8,
+    "L": 256,
+    "Lres": 256
+  },
+  "replay_seed": null,
+  "result_fingerprint": "1291337614988fafa9167b55bd9ad0be73128f0bbf6d486bfbfa86bcb7f001b7",
+  "result_path": "outputs/results/finals_v3_official/stage5_ablation/raw/selector_drop_W/streamcluster_pressure/seed_2026.json",
+  "run_status": "COMPLETED",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "182d6574692b53bf33735bd472539546ea82ebe5513b4b344f6476f4ca4a2c36",
+  "selector_path": "dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_W/streamcluster_pressure/selector_params.json",
+  "test_trace_opened": true,
+  "test_used_for_selection": false,
+  "trace_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "training_source": "stage3_B64_leave_one_out",
+  "variant_id": "selector_drop_W",
+  "workload": "streamcluster_pressure"
+}

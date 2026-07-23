@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_3136859/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_main/raw/dedup_pressure/qmap/seed_3136859.json",
+  "ended_unix": 1784800217.9947975,
+  "exit_code": 0,
+  "job_fingerprint": "28a69294e598502be7afc15ebcf2faf230d66edc8222c26064d4d6fede1c12a7",
+  "job_id": "main:dedup_pressure:qmap:3136859",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_main/raw/dedup_pressure/qmap/seed_3136859.json.log",
+  "result_fingerprint": "d361e7ed4a9fd6a3afcb4efad9d831cb77da8c89b7f0a6280e58582713ee350d",
+  "retry_count": 0,
+  "started_unix": 1784800170.7304392,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/learned_baselines.py --policy kleio_lite --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json --train_trace dataset/processed/finals_v3_official/streamcluster_pressure/train.csv --model_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/streamcluster_pressure/kleio_lite.json",
+  "ended_unix": 1784800571.974016,
+  "exit_code": 0,
+  "job_fingerprint": "89b591e22a4129e694e5ca85f85da1aaf9987b700b0089dc937bb98fe0045935",
+  "job_id": "learned:train:streamcluster_pressure:kleio_lite",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/streamcluster_pressure/kleio_lite.json.log",
+  "result_fingerprint": "5bc50477b82f461622291f15e6e89bb7fad27e47fb748fd2c86f8d5e23e805cb",
+  "retry_count": 0,
+  "started_unix": 1784800557.3525603,
+  "status": "COMPLETED"
+}

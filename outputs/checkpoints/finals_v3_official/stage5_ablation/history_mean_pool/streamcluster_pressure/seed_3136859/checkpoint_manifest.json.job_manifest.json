@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/streamcluster_pressure/seed_3136859 --seed 3136859",
+  "ended_unix": 1784809520.0613496,
+  "exit_code": 0,
+  "job_fingerprint": "c55ad57cce8c87bc24a3ea094ab2b1eac01cdb5f7123e7d95c6a0c6739172520",
+  "job_id": "ablation:train:history_mean_pool:streamcluster_pressure:3136859",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/streamcluster_pressure/seed_3136859/checkpoint_manifest.json.log",
+  "result_fingerprint": "4601995b7d4aa9bce15a6235185cac430efd82be8b833de40104dbfc29375bf6",
+  "retry_count": 0,
+  "started_unix": 1784809461.2079067,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,49 @@
+{
+  "artifact_class": "official",
+  "checkpoint_fingerprint": "e4ab9e02920d0c98e84b3e53f1baba788d4aa578bf1b3e36265ced9ddccf15a5",
+  "checkpoint_manifest_fingerprint": "a9086df06cefab6307be9ddd496c0e545084c5f6cd067f081c719d50086a07dc",
+  "checkpoint_path": "outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/seed_42/qmap_best.pth",
+  "code_commit": "9972579b9145a16e6ba5a8162b9e8e91ee27030c",
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/seed_42/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_ablation/raw/history_mean_pool/dedup_pressure/seed_42.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "evidence_tier": "three_seed_official",
+  "jsonl_fingerprints": {
+    "train": "5b3868793f55526c67eeef8733d5950678914276f8b995491c2a2af3a0e90a0e",
+    "valid": "605d5c71fe59be38f23386409ea94a65e6daef382a31c9f29562ad71ad33adf7"
+  },
+  "model_seed": 42,
+  "only_difference": "masked mean of Transformer history; no candidate-history attention",
+  "parameters": {
+    "B": 64,
+    "D": 64,
+    "H": 10,
+    "Hc": 256,
+    "K": 8,
+    "L": 256,
+    "Lres": 256
+  },
+  "replay_seed": null,
+  "result_fingerprint": "0abad870ef52c0d9f749c984a86c3fd666f051d244758fe4c26c8da6ff0edc4a",
+  "result_path": "outputs/results/finals_v3_official/stage5_ablation/raw/history_mean_pool/dedup_pressure/seed_42.json",
+  "run_status": "COMPLETED",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "210297e5a4412bd52e346be5f150c91f25f9df1154151684e7c5ca83e62e98b2",
+  "selector_path": "dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/selector_params.json",
+  "test_trace_opened": true,
+  "test_used_for_selection": false,
+  "trace_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "training_source": "stage5_train_valid_regeneration",
+  "variant_id": "history_mean_pool",
+  "workload": "dedup_pressure"
+}

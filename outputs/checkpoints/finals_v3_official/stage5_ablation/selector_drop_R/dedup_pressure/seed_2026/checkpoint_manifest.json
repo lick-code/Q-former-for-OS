@@ -1,0 +1,115 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 1,
+  "best_validation_loss": -0.0011781742684094302,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "1357b03d70e653a0b4e25c94a073f66ce71985f0a5f05e8e0febb30f74604436",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_R/dedup_pressure/seed_2026/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "8b031805352bd4e0a57f921f05bdaf7c3368a751d239f91118b691d9b4e69110",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_R/dedup_pressure/seed_2026/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "c0d516531462c4badd45da3c3ffd85804e17457ac729dd7d63158318aa04d79a",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_R/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_R/dedup_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_R/dedup_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_R/dedup_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_R/dedup_pressure/seed_2026 --seed 2026",
+  "config_fingerprint": "f88ea212c5fb71ce19c503acbce32803bb4c1cdcbf9b2ef38fd0edb53fa976ba",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "d42012b4222091383fc3dfd7eb084dfe4c714512f067aaf7620d37dc844f4fa8",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": 0.0,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "f5d691e3eaac630438aa64eefcd8d37650e4df45c6f8276e98b0c0829feb354c",
+    "valid": "d631ab1ae435832ae618cc347ec14037f95d2e4666caf33dea653860ad261068"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781742684094302
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 2026,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "479dcb444f43798d42a1452e15af26628be86b688c2d43bc892ef9e6602cc9be",
+  "source_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+  "source_manifest_fingerprint": "1c04935e3188eed4d2e7d6217b2e156253448b2967c26905353476190dd8f439",
+  "split_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "stage5_variant": {
+    "family": "ablation",
+    "only_difference": "stage3 B64 leave-one-out selector fixes R weight to zero",
+    "retrain_required": true,
+    "source_stage": "stage5",
+    "test_used_for_selection": false,
+    "variant_id": "selector_drop_R"
+  },
+  "test_trace_opened": false,
+  "training_duration_seconds": 34.34997749328613,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "dedup_pressure"
+}

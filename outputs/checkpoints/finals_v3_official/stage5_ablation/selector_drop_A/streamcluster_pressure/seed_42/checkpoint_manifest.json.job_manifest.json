@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_A/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_A/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_A/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_A/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_A/streamcluster_pressure/seed_42 --seed 42",
+  "ended_unix": 1784803356.4584408,
+  "exit_code": 0,
+  "job_fingerprint": "848be1001210c425b8c0efda66ff29b79d61a5d7ba6d3e32335f111bef251b1e",
+  "job_id": "ablation:train:selector_drop_A:streamcluster_pressure:42",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_A/streamcluster_pressure/seed_42/checkpoint_manifest.json.log",
+  "result_fingerprint": "b94da49e6d739500209005e26327b9c65f1c8edea07acdfeec916ea5334d87f0",
+  "retry_count": 0,
+  "started_unix": 1784803292.4166589,
+  "status": "COMPLETED"
+}

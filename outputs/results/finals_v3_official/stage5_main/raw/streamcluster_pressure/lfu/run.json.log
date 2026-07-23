@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json --policy lfu --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/lfu/run.json
+started_unix=1784800149.7109141
+Policy: lfu
+Total accesses: 200000
+Hits: 196526
+Misses: 3474
+Hit rate: 98.26%
+Migrations: 3410
+NVM reads: 3429
+NVM writes: 45
+Weighted access cost: 237844.00
+Policy decisions: 3410
+Total decision time: 0.079041s
+Avg decision time: 0.023179 ms
+ended_unix=1784800160.3777127
+exit_code=0

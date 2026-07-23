@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json --policy kleio_lite --learned_model /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/streamcluster_pressure/kleio_lite.json --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/raw/streamcluster_pressure/kleio_lite.json
+started_unix=1784800571.9766052
+Policy: kleio_lite
+Total accesses: 200000
+Hits: 197046
+Misses: 2954
+Hit rate: 98.52%
+Migrations: 2890
+NVM reads: 2953
+NVM writes: 1
+Weighted access cost: 231860.00
+Policy decisions: 2890
+Total decision time: 0.201780s
+Avg decision time: 0.069820 ms
+ended_unix=1784800582.337555
+exit_code=0

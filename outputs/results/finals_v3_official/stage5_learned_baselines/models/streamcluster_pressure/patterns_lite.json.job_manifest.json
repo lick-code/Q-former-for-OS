@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/learned_baselines.py --policy patterns_lite --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json --train_trace dataset/processed/finals_v3_official/streamcluster_pressure/train.csv --model_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/streamcluster_pressure/patterns_lite.json",
+  "ended_unix": 1784800599.7567089,
+  "exit_code": 0,
+  "job_fingerprint": "7de1412753a3da911661c8f61c68a9459775bb0e01493ba5fa6932062afb084e",
+  "job_id": "learned:train:streamcluster_pressure:patterns_lite",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/streamcluster_pressure/patterns_lite.json.log",
+  "result_fingerprint": "2b4bc884e5150840f393ff790abb54b57dc3b795b6f8735e4000a99b1dbbe27c",
+  "retry_count": 0,
+  "started_unix": 1784800582.340666,
+  "status": "COMPLETED"
+}

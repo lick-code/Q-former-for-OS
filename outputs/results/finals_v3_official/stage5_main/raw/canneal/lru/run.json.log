@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_main/raw/canneal/lru/run.json
+started_unix=1784800011.2888598
+Policy: lru
+Total accesses: 200000
+Hits: 197474
+Misses: 2526
+Hit rate: 98.74%
+Migrations: 2462
+NVM reads: 2510
+NVM writes: 16
+Weighted access cost: 227242.00
+Policy decisions: 2462
+Total decision time: 0.000748s
+Avg decision time: 0.000304 ms
+ended_unix=1784800021.0068548
+exit_code=0

@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json --policy random --stage5_replay_seed 0 --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_main/raw/dedup_pressure/random/seed_0.json
+started_unix=1784800313.428504
+Policy: random
+Total accesses: 1000000
+Hits: 996392
+Misses: 3608
+Hit rate: 99.64%
+Migrations: 3544
+NVM reads: 1955
+NVM writes: 1653
+Weighted access cost: 1048966.00
+Policy decisions: 3544
+Total decision time: 0.004686s
+Avg decision time: 0.001322 ms
+ended_unix=1784800345.8989415
+exit_code=0

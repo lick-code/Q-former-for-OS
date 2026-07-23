@@ -1,0 +1,49 @@
+{
+  "artifact_class": "official",
+  "checkpoint_fingerprint": "5fbe929854318d2e2b8ab1162e34fe40cf3891d057f8ef474059df96471379a7",
+  "checkpoint_manifest_fingerprint": "e8628027ca9f1856d1cedff130d94d37659c5820db844047a84d991627fbe3b7",
+  "checkpoint_path": "outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_A/dedup_pressure/seed_2026/qmap_best.pth",
+  "code_commit": "9972579b9145a16e6ba5a8162b9e8e91ee27030c",
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_A/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_A/dedup_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_A/dedup_pressure/seed_2026/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_ablation/raw/selector_drop_A/dedup_pressure/seed_2026.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "evidence_tier": "three_seed_official",
+  "jsonl_fingerprints": {
+    "train": "9726bad57865ac92492f8019bf0034b5855ae088abac839774ac8d0d8033d4a3",
+    "valid": "806d3cd9a74b08c22e9d674b730bd46a9dfbc3ec0ba9a4dd2cedade6dd8be5d5"
+  },
+  "model_seed": 2026,
+  "only_difference": "stage3 B64 leave-one-out selector fixes A weight to zero",
+  "parameters": {
+    "B": 64,
+    "D": 64,
+    "H": 10,
+    "Hc": 256,
+    "K": 8,
+    "L": 256,
+    "Lres": 256
+  },
+  "replay_seed": null,
+  "result_fingerprint": "9dd48eb12be71ea5df7a8f3c40527b75edb5fae4b3f4c81674245cc98ad2bb70",
+  "result_path": "outputs/results/finals_v3_official/stage5_ablation/raw/selector_drop_A/dedup_pressure/seed_2026.json",
+  "run_status": "COMPLETED",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "ecbc546d859fc0125c338497acf127c558be7195bc687c5a3b2dee96a55d0ec0",
+  "selector_path": "dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_A/dedup_pressure/selector_params.json",
+  "test_trace_opened": true,
+  "test_used_for_selection": false,
+  "trace_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "training_source": "stage3_B64_leave_one_out",
+  "variant_id": "selector_drop_A",
+  "workload": "dedup_pressure"
+}

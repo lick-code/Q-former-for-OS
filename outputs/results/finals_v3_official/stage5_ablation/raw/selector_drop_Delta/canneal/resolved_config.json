@@ -1,0 +1,168 @@
+{
+  "candidate": {
+    "pool_size_B": 64,
+    "retained_K": 8,
+    "selector_history_Hc": 256
+  },
+  "contract": {
+    "id": "CAPD-MIC-1.0"
+  },
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "data": {
+    "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+    "split_fingerprints": {
+      "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+      "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+      "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+    },
+    "test_trace": "dataset/processed/finals_v3_official/canneal/test.csv",
+    "train_trace": "dataset/processed/finals_v3_official/canneal/train.csv",
+    "valid_trace": "dataset/processed/finals_v3_official/canneal/valid.csv"
+  },
+  "embedding": {
+    "page": {
+      "max_vocab_size": 100000,
+      "oov": "unk",
+      "shared": true,
+      "unk_index": 0,
+      "vocab_fit": "train_only"
+    },
+    "pc": {
+      "max_vocab_size": 50000,
+      "oov": "unk",
+      "unk_index": 0,
+      "vocab_fit": "train_only"
+    }
+  },
+  "evaluation": {
+    "random_seed": 0
+  },
+  "features": {
+    "lru_direction": "oldest_is_one",
+    "page_state_dim": 4,
+    "residency_scale_Lres": 256,
+    "selector_clip_quantile": 0.99
+  },
+  "history": {
+    "transformer_H": 10
+  },
+  "labels": {
+    "future_lookahead_L": 256,
+    "lambda_d": 1.0,
+    "lambda_q": 1.0,
+    "lambda_w": 4.0,
+    "tail_policy": "drop_incomplete_window"
+  },
+  "loss": {
+    "approx_ndcg_alpha": 10.0
+  },
+  "memory": {
+    "dram_capacity_pages": 64,
+    "nvm_capacity_pages": null
+  },
+  "metrics": {
+    "selector_recall_tie": "any_hit"
+  },
+  "model": {
+    "position_encoding": "sinusoidal"
+  },
+  "outputs": {
+    "checkpoint_root": "outputs/checkpoints/finals_v3_official",
+    "data_audit_root": "dataset/metadata/finals_v3_official/reports",
+    "jsonl_root": "dataset/jsonl/finals_v3_official",
+    "result_root": "outputs/results/finals_v3_official"
+  },
+  "replay": {
+    "dirty_demotion_nvm_write": "none",
+    "dram_initial_state": "empty",
+    "first_touch_accounting": "nvm_access",
+    "initial_residency": "all_trace_pages_in_nvm",
+    "trace_page_backing": "all_trace_pages"
+  },
+  "run": {
+    "base_config_fingerprint": "10b69ec3053c7695d75851adfda69476eaeb8a531d57bb0c8aff7dfaba13b4cd",
+    "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+    "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+    "data_quality_report_fingerprint": "5986f7d63d4b81da33feb24a9c6a7d3db51c339d421e1322d4f80b7bc3249bdb",
+    "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+    "project_root": "D:\\计算机系统大赛\\功能赛道\\cache_replacement",
+    "resolved_config_fingerprint": "4e0eeacc5d76a8532dc6fd5dc83ece22304840ab874694012f41d87aa43d6eae",
+    "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+    "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
+    "split_fingerprints": {
+      "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+      "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+      "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+    },
+    "workload": "canneal"
+  },
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "selector": {
+    "behavior_policy": "lru",
+    "epsilon_y": 1e-08,
+    "grid_step": 0.1
+  },
+  "stage5_variant": {
+    "family": "ablation",
+    "only_difference": "stage3 B64 leave-one-out selector fixes Delta weight to zero",
+    "retrain_required": true,
+    "source_stage": "stage5",
+    "test_used_for_selection": false,
+    "variant_id": "selector_drop_Delta"
+  },
+  "sweep": {
+    "pool_sizes_B": [
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "trace": {
+    "page_shift": 12
+  },
+  "training": {
+    "batch_size": 32,
+    "epochs": 10,
+    "learning_rate": 0.0001,
+    "scope": "per_workload",
+    "seed": 3136859
+  },
+  "validation": {
+    "artifact_class": "official",
+    "data_quality_profile": "configs/finals/capd_stage2_data_profile.json",
+    "development_fallback": "train_trace_decision_holdout",
+    "guard_accesses": 256,
+    "holdout_fraction": 0.2,
+    "require_data_manifest": true,
+    "rounding": "ceil",
+    "strategy": "independent_valid_trace"
+  },
+  "workloads": {
+    "canneal": {
+      "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+      "test_trace": "dataset/processed/finals_v3_official/canneal/test.csv",
+      "train_trace": "dataset/processed/finals_v3_official/canneal/train.csv",
+      "valid_trace": "dataset/processed/finals_v3_official/canneal/valid.csv"
+    },
+    "dedup_pressure": {
+      "source_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+      "test_trace": "dataset/processed/finals_v3_official/dedup_pressure/test.csv",
+      "train_trace": "dataset/processed/finals_v3_official/dedup_pressure/train.csv",
+      "valid_trace": "dataset/processed/finals_v3_official/dedup_pressure/valid.csv"
+    },
+    "streamcluster_pressure": {
+      "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+      "test_trace": "dataset/processed/finals_v3_official/streamcluster_pressure/test.csv",
+      "train_trace": "dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "valid_trace": "dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "artifact_class": "official",
+  "checkpoint_fingerprint": "2132b14252f052b97df5ebd46a804222c38e0e48d00961a4cb147df4889ba226",
+  "checkpoint_manifest_fingerprint": "e66bcf2359cc8b610e4aac861252371df7fbb46cb89632913d60ca847821f03c",
+  "checkpoint_path": "outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_Delta/canneal/seed_42/qmap_best.pth",
+  "code_commit": "9972579b9145a16e6ba5a8162b9e8e91ee27030c",
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_Delta/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_Delta/canneal/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/selector_drop_Delta/canneal/seed_42/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_ablation/raw/selector_drop_Delta/canneal/seed_42.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "evidence_tier": "three_seed_official",
+  "jsonl_fingerprints": {
+    "train": "4d2591132777d577e376672e2dcb6bbb0138029edd04545097cf0db13b743dda",
+    "valid": "13e9477a64fd37b0b2649ccb723214082e82a176444aef90a026e07262d3c11f"
+  },
+  "model_seed": 42,
+  "only_difference": "stage3 B64 leave-one-out selector fixes Delta weight to zero",
+  "parameters": {
+    "B": 64,
+    "D": 64,
+    "H": 10,
+    "Hc": 256,
+    "K": 8,
+    "L": 256,
+    "Lres": 256
+  },
+  "replay_seed": null,
+  "result_fingerprint": "38636ca62062aa2bc1546bb7f8f49ae0a33189dc5059ac81044a718a89dd5638",
+  "result_path": "outputs/results/finals_v3_official/stage5_ablation/raw/selector_drop_Delta/canneal/seed_42.json",
+  "run_status": "COMPLETED",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "5c6e8338d633033ace9fe180997f8036c2de1a6e6fa1156d843f9119db01e056",
+  "selector_path": "dataset/jsonl/finals_v3_official/stage5_ablation/selector_drop_Delta/canneal/selector_params.json",
+  "test_trace_opened": true,
+  "test_used_for_selection": false,
+  "trace_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "training_source": "stage3_B64_leave_one_out",
+  "variant_id": "selector_drop_Delta",
+  "workload": "canneal"
+}

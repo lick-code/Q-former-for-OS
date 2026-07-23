@@ -1,0 +1,115 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.0357319342593352,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "24778652ce71f3285d9de9d12b284c259bc4367ab37a9f9a59b8ea756c898ec1",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "e012c5340967fd4a60e0ec3c2bb21cd798f22045b67819236168e6894ba63e1d",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/seed_3136859/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "c0d516531462c4badd45da3c3ffd85804e17457ac729dd7d63158318aa04d79a",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_B32/canneal/seed_3136859 --seed 3136859",
+  "config_fingerprint": "0ecab1a3e5d19c8b808dbee8c3fe0d6b92d892884d5ceda7594aeeaeb0768ce3",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "5986f7d63d4b81da33feb24a9c6a7d3db51c339d421e1322d4f80b7bc3249bdb",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.05609952278468197,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "4150b67f78fafdaa11923434fac705d29f4f2f53d239f3f94ba4f31166be99bd",
+    "valid": "a5bd1b38305f9f45a907d20fd853a0de44820a7d020fd1522feb11e0da60826b"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.04445306740008888,
+      "valid_loss": -0.029250417376557987
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.048358832172785714,
+      "valid_loss": -0.03434153708318869
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.05452254732691609,
+      "valid_loss": -0.035158365269502
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.055317231758901506,
+      "valid_loss": -0.03535930884381135
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.05583829718716113,
+      "valid_loss": -0.03557228408753872
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.055822089866660866,
+      "valid_loss": -0.035593095049262044
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.05611084649685474,
+      "valid_loss": -0.03561680453519026
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.05604242323279644,
+      "valid_loss": -0.03568709626793862
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.05622412701986269,
+      "valid_loss": -0.03564850956201553
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.05609952278468197,
+      "valid_loss": -0.0357319342593352
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "9518e2649ff83e186d8e3efce4635d98001989c5620297e472cdb6cfd6ac687e",
+  "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+  "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
+  "split_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "stage5_variant": {
+    "family": "sensitivity",
+    "only_difference": "only B changes from 64 to 32",
+    "retrain_required": true,
+    "source_stage": "stage5",
+    "test_used_for_selection": false,
+    "variant_id": "sensitivity_B32"
+  },
+  "test_trace_opened": false,
+  "training_duration_seconds": 52.55948352813721,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "canneal"
+}

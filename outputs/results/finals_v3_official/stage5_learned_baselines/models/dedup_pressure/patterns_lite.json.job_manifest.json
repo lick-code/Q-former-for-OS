@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/learned_baselines.py --policy patterns_lite --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json --train_trace dataset/processed/finals_v3_official/dedup_pressure/train.csv --model_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/dedup_pressure/patterns_lite.json",
+  "ended_unix": 1784800710.3392718,
+  "exit_code": 0,
+  "job_fingerprint": "44049d945ff4cb6dcb91c9bec71c766066303510fb19a18769787fdfb58a2c07",
+  "job_id": "learned:train:dedup_pressure:patterns_lite",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/dedup_pressure/patterns_lite.json.log",
+  "result_fingerprint": "2c73923aa52334e9c91a1313bfd2ca4dbe2ceb9724b064612134a108f2d8c637",
+  "retry_count": 0,
+  "started_unix": 1784800675.2245753,
+  "status": "COMPLETED"
+}

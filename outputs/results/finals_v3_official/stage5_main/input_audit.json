@@ -1,0 +1,147 @@
+{
+  "checkpoint_count": 9,
+  "checks": [
+    {
+      "detail": "outputs/results/finals_v3_official/stage4_audits/stage4_summary.json",
+      "name": "stage4_summary_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "STAGE4_VERIFIED",
+      "name": "stage4_verified",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage4_audits/distribution_summary.json",
+      "name": "g11_distribution_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "REVIEW_REQUIRED=True",
+      "name": "g11_review_required",
+      "status": "PASS"
+    },
+    {
+      "detail": "large=36 moderate=9",
+      "name": "g11_warning_counts",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage4_audits/counterfactual_summary.json",
+      "name": "g12_counterfactual_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json",
+      "name": "canneal_config_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/selector_params.json",
+      "name": "canneal_selector_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/train.jsonl",
+      "name": "canneal_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/valid.jsonl",
+      "name": "canneal_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/canneal/seed_3136859",
+      "name": "checkpoint_canneal_3136859",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/canneal/seed_42",
+      "name": "checkpoint_canneal_42",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/canneal/seed_2026",
+      "name": "checkpoint_canneal_2026",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json",
+      "name": "streamcluster_pressure_config_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/selector_params.json",
+      "name": "streamcluster_pressure_selector_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/train.jsonl",
+      "name": "streamcluster_pressure_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/valid.jsonl",
+      "name": "streamcluster_pressure_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/streamcluster_pressure/seed_3136859",
+      "name": "checkpoint_streamcluster_pressure_3136859",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/streamcluster_pressure/seed_42",
+      "name": "checkpoint_streamcluster_pressure_42",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/streamcluster_pressure/seed_2026",
+      "name": "checkpoint_streamcluster_pressure_2026",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json",
+      "name": "dedup_pressure_config_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/selector_params.json",
+      "name": "dedup_pressure_selector_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/train.jsonl",
+      "name": "dedup_pressure_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/valid.jsonl",
+      "name": "dedup_pressure_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_3136859",
+      "name": "checkpoint_dedup_pressure_3136859",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_42",
+      "name": "checkpoint_dedup_pressure_42",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_2026",
+      "name": "checkpoint_dedup_pressure_2026",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "CAPD-MIC-1.0",
+  "expected_checkpoint_count": 9,
+  "schema_version": "capd_finals_v3_stage5_input_audit_1",
+  "stage_status": "STAGE5_IMPLEMENTED_UNVERIFIED",
+  "status": "PASSED",
+  "test_trace_role": "fingerprint_only_until_final_replay",
+  "test_used_for_selection": false
+}

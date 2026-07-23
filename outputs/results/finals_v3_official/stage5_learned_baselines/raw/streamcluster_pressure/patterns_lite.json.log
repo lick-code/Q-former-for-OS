@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json --policy patterns_lite --learned_model /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/streamcluster_pressure/patterns_lite.json --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/raw/streamcluster_pressure/patterns_lite.json
+started_unix=1784800599.7618394
+Policy: patterns_lite
+Total accesses: 200000
+Hits: 197071
+Misses: 2929
+Hit rate: 98.54%
+Migrations: 2865
+NVM reads: 2910
+NVM writes: 19
+Weighted access cost: 231693.00
+Policy decisions: 2865
+Total decision time: 0.437520s
+Avg decision time: 0.152712 ms
+ended_unix=1784800610.2446878
+exit_code=0

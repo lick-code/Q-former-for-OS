@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/canneal/seed_42 --seed 42",
+  "ended_unix": 1784809328.7818954,
+  "exit_code": 0,
+  "job_fingerprint": "387d4d6a742798d1f86ba0118c20ff079149c6802f56cf441b8cca9ef404fddb",
+  "job_id": "ablation:train:history_mean_pool:canneal:42",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/canneal/seed_42/checkpoint_manifest.json.log",
+  "result_fingerprint": "fb94a69921984fe856e2737accf3baa38a841d667ec5ed847cf3eb236ee59e6c",
+  "retry_count": 0,
+  "started_unix": 1784809280.323592,
+  "status": "COMPLETED"
+}

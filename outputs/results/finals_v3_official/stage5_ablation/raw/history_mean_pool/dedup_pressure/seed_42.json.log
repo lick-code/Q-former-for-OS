@@ -1,0 +1,20 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_ablation/history_mean_pool/dedup_pressure/seed_42/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_ablation/raw/history_mean_pool/dedup_pressure/seed_42.json
+started_unix=1784809927.0831156
+Policy: qmap
+Total accesses: 1000000
+Hits: 996638
+Misses: 3362
+Hit rate: 99.66%
+Migrations: 3298
+NVM reads: 1821
+NVM writes: 1541
+Weighted access cost: 1045588.00
+Policy decisions: 3298
+Total decision time: 9.670943s
+Avg decision time: 2.932366 ms
+Candidate filter decisions: 3298
+Candidate B_t range: 64..64
+Retained K_t range: 8..8
+Avg candidate filter time: 0.412955 ms
+ended_unix=1784809973.7581646
+exit_code=0

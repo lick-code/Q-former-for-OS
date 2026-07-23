@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json --policy patterns_lite --learned_model /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/dedup_pressure/patterns_lite.json --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/raw/dedup_pressure/patterns_lite.json
+started_unix=1784800710.3433812
+Policy: patterns_lite
+Total accesses: 1000000
+Hits: 996677
+Misses: 3323
+Hit rate: 99.67%
+Migrations: 3259
+NVM reads: 1777
+NVM writes: 1546
+Weighted access cost: 1045189.00
+Policy decisions: 3259
+Total decision time: 0.695831s
+Avg decision time: 0.213511 ms
+ended_unix=1784800743.0952013
+exit_code=0

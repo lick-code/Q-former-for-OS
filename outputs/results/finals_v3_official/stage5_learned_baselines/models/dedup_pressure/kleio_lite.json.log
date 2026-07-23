@@ -1,0 +1,5 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/learned_baselines.py --policy kleio_lite --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json --train_trace dataset/processed/finals_v3_official/dedup_pressure/train.csv --model_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/dedup_pressure/kleio_lite.json
+started_unix=1784800610.2488005
+[done] policy=kleio_lite samples=36856 model=/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/dedup_pressure/kleio_lite.json
+ended_unix=1784800642.9967873
+exit_code=0

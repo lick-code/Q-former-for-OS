@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json --policy random --stage5_replay_seed 1 --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/random/seed_1.json
+started_unix=1784800118.5275362
+Policy: random
+Total accesses: 200000
+Hits: 196504
+Misses: 3496
+Hit rate: 98.25%
+Migrations: 3432
+NVM reads: 3461
+NVM writes: 35
+Weighted access cost: 238026.00
+Policy decisions: 3432
+Total decision time: 0.004398s
+Avg decision time: 0.001282 ms
+ended_unix=1784800128.6011586
+exit_code=0

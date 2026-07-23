@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json --policy patterns_lite --learned_model /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/models/canneal/patterns_lite.json --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_learned_baselines/raw/canneal/patterns_lite.json
+started_unix=1784800546.822099
+Policy: patterns_lite
+Total accesses: 200000
+Hits: 197586
+Misses: 2414
+Hit rate: 98.79%
+Migrations: 2350
+NVM reads: 2398
+NVM writes: 16
+Weighted access cost: 226010.00
+Policy decisions: 2350
+Total decision time: 0.298818s
+Avg decision time: 0.127157 ms
+ended_unix=1784800557.3495293
+exit_code=0
