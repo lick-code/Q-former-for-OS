@@ -10,13 +10,13 @@ cd "$REPO"
 bash scripts/validate_capd_stage4_server.sh
 ```
 
-G11 默认使用6个spawn进程并发，实时打印每个workload/seed的开始、结束和总进度，最长12小时；每个完成组合独立原子落盘，超时或断线后可续跑。可通过 `CAPD_STAGE4_DISTRIBUTION_WORKERS` 调整并行度。
+G11 默认使用6个spawn进程并发，实时打印trace加载、LRU分布、CAPD闭环回放、分布统计、每500个闭环决策以及每个workload/seed的完成进度，最长3小时；每个完成组合独立原子落盘，超时或断线后可续跑。连续特征统计只对每列排序一次，再线性计算KS、Wasserstein-1和越界比例，禁止在分位点或样本循环内重复排序、重复扫描参考分布。可通过 `CAPD_STAGE4_DISTRIBUTION_WORKERS` 调整并行度。
 
 只重跑G11并生成汇总时使用：
 
 ```bash
 cd "$REPO"
-CAPD_STAGE4_DISTRIBUTION_WORKERS=6 python3 scripts/run_capd_stage4.py \
+CAPD_STAGE4_DISTRIBUTION_WORKERS=6 timeout 3h python3 scripts/run_capd_stage4.py \
   --stage distribution-audit --repo-root "$REPO" \
   --distribution-workers 6 --device cuda
 python3 scripts/run_capd_stage4.py --stage summarize --repo-root "$REPO"

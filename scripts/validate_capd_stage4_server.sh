@@ -96,7 +96,7 @@ run_required train_9 18h python3 scripts/run_capd_stage4.py \
   --training-timeout 21600
 run_required counterfactual_g12 6h python3 scripts/run_capd_stage4.py \
   --stage counterfactual-audit --repo-root "$REPO"
-run_required_live distribution_g11 12h python3 scripts/run_capd_stage4.py \
+run_required_live distribution_g11 3h python3 scripts/run_capd_stage4.py \
   --stage distribution-audit --repo-root "$REPO" \
   --distribution-workers "$CAPD_STAGE4_DISTRIBUTION_WORKERS" \
   --device "$CAPD_STAGE4_DISTRIBUTION_DEVICE"

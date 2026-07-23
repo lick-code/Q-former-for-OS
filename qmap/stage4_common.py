@@ -95,8 +95,8 @@ def finite(values, context):
           "{} contains NaN/Inf".format(context))
 
 
-def quantile(values, probability):
-  values = sorted(float(value) for value in values)
+def _quantile_sorted(values, probability):
+  """Linear-interpolation quantile for an already sorted float sequence."""
   require(values, "quantile requires non-empty values")
   position = (len(values) - 1) * float(probability)
   lower = int(math.floor(position))
@@ -105,6 +105,11 @@ def quantile(values, probability):
     return values[lower]
   fraction = position - lower
   return values[lower] * (1.0 - fraction) + values[upper] * fraction
+
+
+def quantile(values, probability):
+  return _quantile_sorted(
+      sorted(float(value) for value in values), probability)
 
 
 def mean(values):
@@ -124,12 +129,16 @@ def describe(values):
   finite(values, "distribution")
   if not values:
     return {"count": 0}
+  values.sort()
   return {
-      "count": len(values), "min": min(values), "max": max(values),
-      "P01": quantile(values, .01), "P05": quantile(values, .05),
-      "P25": quantile(values, .25), "P50": quantile(values, .50),
-      "P75": quantile(values, .75), "P95": quantile(values, .95),
-      "P99": quantile(values, .99), "mean": mean(values),
+      "count": len(values), "min": values[0], "max": values[-1],
+      "P01": _quantile_sorted(values, .01),
+      "P05": _quantile_sorted(values, .05),
+      "P25": _quantile_sorted(values, .25),
+      "P50": _quantile_sorted(values, .50),
+      "P75": _quantile_sorted(values, .75),
+      "P95": _quantile_sorted(values, .95),
+      "P99": _quantile_sorted(values, .99), "mean": mean(values),
       "std": sample_std(values),
   }
 
@@ -173,10 +182,13 @@ def ks_statistic(left, right):
   require(left and right, "KS requires two non-empty samples")
   finite(left, "KS left")
   finite(right, "KS right")
-  values = sorted(set(left + right))
   i = j = 0
   maximum = 0.0
-  for value in values:
+  while i < len(left) or j < len(right):
+    if j >= len(right) or (i < len(left) and left[i] <= right[j]):
+      value = left[i]
+    else:
+      value = right[j]
     while i < len(left) and left[i] <= value:
       i += 1
     while j < len(right) and right[j] <= value:
@@ -187,19 +199,26 @@ def ks_statistic(left, right):
 
 def wasserstein_1(left, right):
   require(left and right, "Wasserstein-1 requires two non-empty samples")
+  left = sorted(float(value) for value in left)
+  right = sorted(float(value) for value in right)
   count = max(len(left), len(right), 2)
-  probabilities = [index / float(count - 1) for index in range(count)]
-  return mean([abs(quantile(left, p) - quantile(right, p))
-               for p in probabilities])
+  total = 0.0
+  for index in range(count):
+    probability = index / float(count - 1)
+    total += abs(_quantile_sorted(left, probability) -
+                 _quantile_sorted(right, probability))
+  return total / float(count)
 
 
 def distribution_distance(reference, observed):
+  reference_min = min(reference)
+  reference_max = max(reference)
   summary = {
       "reference": describe(reference), "observed": describe(observed),
       "ks": ks_statistic(reference, observed),
       "wasserstein_1": wasserstein_1(reference, observed),
       "outside_reference_range_ratio": mean([
-          float(value < min(reference) or value > max(reference))
+          float(value < reference_min or value > reference_max)
           for value in observed]),
   }
   summary["warning"] = (

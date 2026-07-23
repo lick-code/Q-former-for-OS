@@ -90,6 +90,7 @@ def collect_capd(trace, config, selector_params, checkpoint_path, seed,
   insert_time = {}
   history = []
   previous = None
+  decision_count = 0
   max_page = max((row["page"] for row in trace), default=1)
   capacity = int(config["memory"]["dram_capacity_pages"])
   for access_index, access in enumerate(trace):
@@ -111,6 +112,10 @@ def collect_capd(trace, config, selector_params, checkpoint_path, seed,
                               "closed-loop decision has no selector snapshot")
         _record(distribution, snapshot, dirty, previous, access_index)
         previous = access_index
+        decision_count += 1
+        if decision_count % 500 == 0:
+          print("[G11 REPLAY] seed={} decisions={} accesses={}/{}".format(
+              seed, decision_count, access_index + 1, len(trace)), flush=True)
         dram.remove(victim)
         dirty.discard(victim)
         insert_time.pop(victim, None)

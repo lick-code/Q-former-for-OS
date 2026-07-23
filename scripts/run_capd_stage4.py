@@ -582,6 +582,7 @@ def _distribution_seed_job(job):
       "cuda" if torch.cuda.is_available() else "cpu")
   print("[G11 START] workload={} seed={} pid={} device={}".format(
       workload, seed, os.getpid(), device), flush=True)
+  phase_started = time.time()
   config = finals_config.load_config(
       job["config_path"], require_resolved=True,
       project_root=job["repo_root"], verify_manifest_files=False)
@@ -590,13 +591,32 @@ def _distribution_seed_job(job):
       config["data"]["train_trace"], int(config["trace"]["page_shift"]))
   valid_trace, _ = read_trace(
       config["data"]["valid_trace"], int(config["trace"]["page_shift"]))
+  print("[G11 PHASE] workload={} seed={} phase=load_traces seconds={:.1f} "
+        "train_accesses={} valid_accesses={}".format(
+            workload, seed, time.time() - phase_started,
+            len(train_trace), len(valid_trace)), flush=True)
+  phase_started = time.time()
   dist_a = stage4_distribution.collect_lru(
       train_trace, config, selector, "A")
   dist_b = stage4_distribution.collect_lru(
       valid_trace, config, selector, "B")
+  print("[G11 PHASE] workload={} seed={} phase=lru_distributions "
+        "seconds={:.1f} train_decisions={} valid_decisions={}".format(
+            workload, seed, time.time() - phase_started,
+            len(dist_a["values"]["B_t"]), len(dist_b["values"]["B_t"])),
+        flush=True)
+  phase_started = time.time()
   dist_c = stage4_distribution.collect_capd(
       valid_trace, config, selector, job["checkpoint"], seed, device)
+  print("[G11 PHASE] workload={} seed={} phase=capd_closed_loop "
+        "seconds={:.1f} decisions={}".format(
+            workload, seed, time.time() - phase_started,
+            len(dist_c["values"]["B_t"])), flush=True)
+  phase_started = time.time()
   comparisons = stage4_distribution.audit_triplet(dist_a, dist_b, dist_c)
+  print("[G11 PHASE] workload={} seed={} phase=distribution_metrics "
+        "seconds={:.1f}".format(
+            workload, seed, time.time() - phase_started), flush=True)
   partial = {
       "schema_version": stage4_common.STAGE4_SCHEMA,
       "contract_id": finals_config.CONTRACT_ID,

@@ -28,6 +28,36 @@ class DistributionMetricTest(unittest.TestCase):
     result = stage4_common.distribution_distance([0, 1], [-1, .5, 2])
     self.assertAlmostEqual(2 / 3.0, result["outside_reference_range_ratio"])
 
+  def test_wasserstein_matches_reference_quantile_sampling(self):
+    left = [3, 0, 0, 9]
+    right = [-1, 2, 2, 4, 10]
+    count = max(len(left), len(right), 2)
+    expected = sum(
+        abs(stage4_common.quantile(left, index / float(count - 1)) -
+            stage4_common.quantile(right, index / float(count - 1)))
+        for index in range(count)) / float(count)
+    self.assertAlmostEqual(
+        expected, stage4_common.wasserstein_1(left, right), places=12)
+
+  def test_distribution_metrics_are_linear_after_sorting(self):
+    wasserstein_source = inspect.getsource(stage4_common.wasserstein_1)
+    self.assertNotIn("quantile(left", wasserstein_source)
+    self.assertNotIn("quantile(right", wasserstein_source)
+    distance_source = inspect.getsource(stage4_common.distribution_distance)
+    self.assertEqual(1, distance_source.count("min(reference)"))
+    self.assertEqual(1, distance_source.count("max(reference)"))
+
+  def test_ks_matches_simple_empirical_cdf_reference(self):
+    left = [0, 0, 2, 4, 4]
+    right = [-1, 0, 1, 4, 5, 5]
+    points = sorted(set(left + right))
+    expected = max(abs(
+        sum(value <= point for value in left) / float(len(left)) -
+        sum(value <= point for value in right) / float(len(right)))
+                   for point in points)
+    self.assertAlmostEqual(
+        expected, stage4_common.ks_statistic(left, right), places=12)
+
   def test_binary_counts_and_ratio_difference(self):
     result = stage4_common.binary_distance([0, 1], [1, 1])
     self.assertEqual(1, result["reference"]["zero"])
