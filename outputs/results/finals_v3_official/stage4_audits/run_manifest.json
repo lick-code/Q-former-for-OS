@@ -4,22 +4,22 @@
   "artifact_class": "official",
   "artifact_schema": "capd_finals_v3_0",
   "audit_input_scope": "train_and_valid_only",
-  "code_commit": "3d7b01a4955f43644b81ef34de57c2737dacb2f3",
+  "code_commit": "b939ba006a84b524e7f794cd2a8d4e5c77763b89",
   "code_fingerprint": "2dee2f76e17c956043f95108de70e16f8968f635dce16c22c503f2396d5db132",
   "command": "scripts/run_capd_stage4.py --stage summarize --repo-root /home/likc/Q-former-for-OS",
   "contract_id": "CAPD-MIC-1.0",
   "outputs": [
     {
       "path": "counterfactual_details/canneal.jsonl",
-      "sha256": "8bc0c31bd9c442e989ddfadcc393a3a672dd792352cb9c01e2c6a4a6ca3aa098"
+      "sha256": "00daf804a6c0c3a9dcaa6ca7929b3494a6ec9c969af658352e446fdc3bf165be"
     },
     {
       "path": "counterfactual_details/dedup_pressure.jsonl",
-      "sha256": "a0bc8d9172dccb8947d900dc51121fa31dd9442c4cbbac2130696b974a662b26"
+      "sha256": "3aac39736203d2301fde36164e45cc65024b905aadf6b1daa0c2a02c091e9d4f"
     },
     {
       "path": "counterfactual_details/streamcluster_pressure.jsonl",
-      "sha256": "96849d25f7c5ac3c732d1a849f3d628adabe257c0d5e87f6704632f8203e009c"
+      "sha256": "ce123b3769eb25234fe2a3dc18746ddbc5d7e3249a7f9801a943f661e8116eab"
     },
     {
       "path": "counterfactual_report.md",
@@ -27,7 +27,7 @@
     },
     {
       "path": "counterfactual_summary.json",
-      "sha256": "0b8133bc39edac06cbb03fb742cc2aaa9c401e3e325c57b9f6a0b37d352fa844"
+      "sha256": "a1e0222a3bba0b5658261b46494ad842223c6b0bd6087f5672a381639e95cf08"
     },
     {
       "path": "distribution_metrics.csv",
@@ -75,15 +75,15 @@
     },
     {
       "path": "distribution_summary.json",
-      "sha256": "acee04bf51c33cf229e34d15eebd8beb15dc0097919db358ddaa7e6d8bc4c541"
+      "sha256": "17bb9b2731b26bac3d17a9a378110bdbd15e4a1bd356f05be3968346eb5485c4"
     },
     {
       "path": "input_audit.json",
-      "sha256": "205711f830236bc682ed6a3ebe534c382f01b6f10c6d4cce51b7151b82d14366"
+      "sha256": "aca5f0c4d61e7d3420346b213f3010e78eff94805c1da3cd69c30e5ec63e4c5c"
     },
     {
       "path": "stage4_summary.json",
-      "sha256": "8de184a6b724433be635abb7a03331b876435aff82baf3b2eb3e633e0eefda1e"
+      "sha256": "17e49dcdde8108ca8be0b5805f027cb76b6b282b68a677a9cdc5ab8192e2e297"
     },
     {
       "path": "stage4_training.csv",
