@@ -21,6 +21,7 @@ LEGACY_SCHEMA_VERSION = "capd_finals_v2_1"
 CONTRACT_ID = "CAPD-MIC-1.0"
 OFFICIAL_PROFILE = "official"
 SMOKE_PROFILE = "smoke"
+STAGE5_VARIANT_FAMILIES = ("ablation", "sensitivity")
 LEGACY_CONTRACT_FIELDS = (
     ("schema_version",),
     ("memory", "dram_capacity_pages"),
@@ -340,6 +341,7 @@ def _validate_v3_config(config, require_resolved=False):
   lookahead = int(config["labels"]["future_lookahead_L"])
   residency_scale = int(config["features"]["residency_scale_Lres"])
   page_state_dim = int(config["features"]["page_state_dim"])
+  stage5_variant = config.get("stage5_variant")
   if dram_capacity <= 0 or pool_size <= 0 or retained <= 0:
     raise ValueError("D, B and K must be positive.")
   if pool_size > dram_capacity or retained > pool_size:
@@ -406,8 +408,6 @@ def _validate_v3_config(config, require_resolved=False):
        "embedding.pc.vocab_fit"),
       (config["embedding"]["pc"]["oov"], "unk",
        "embedding.pc.oov"),
-      (config["model"]["position_encoding"], "sinusoidal",
-       "model.position_encoding"),
       (config["training"]["scope"], "per_workload",
        "training.scope"),
   )
@@ -424,9 +424,8 @@ def _validate_v3_config(config, require_resolved=False):
     raise ValueError("CAPD v3 requires selector grid_step=0.1.")
   labels = config["labels"]
   if (float(labels.get("lambda_d", -1)) != 1.0 or
-      float(labels.get("lambda_q", -1)) != 1.0 or
-      float(labels.get("lambda_w", -1)) != 4.0):
-    raise ValueError("CAPD v3 requires label weights 1,1,4.")
+      float(labels.get("lambda_q", -1)) != 1.0):
+    raise ValueError("CAPD v3 requires lambda_d=lambda_q=1.")
   expected_costs = {
       "dram_read_cost": 1.0, "dram_write_cost": 1.0,
       "nvm_read_cost": 2.0, "nvm_write_cost": 8.0,
@@ -435,12 +434,26 @@ def _validate_v3_config(config, require_resolved=False):
          for key, value in expected_costs.items()):
     raise ValueError("CAPD v3 cost model does not match CAPD-MIC-1.0.")
   if profile == OFFICIAL_PROFILE:
-    if (dram_capacity != 64 or retained != 8 or transformer_history != 10 or
-        selector_history != 256 or lookahead != 256 or
-        residency_scale != 256):
-      raise ValueError("Official v3 freezes D/K/H/Hc/L/Lres.")
+    if stage5_variant is None:
+      if (dram_capacity != 64 or retained != 8 or
+          transformer_history != 10 or selector_history != 256 or
+          lookahead != 256 or residency_scale != 256):
+        raise ValueError("Official v3 freezes D/K/H/Hc/L/Lres.")
+      if config["model"]["position_encoding"] != "sinusoidal":
+        raise ValueError(
+            "Official Full v3 requires model.position_encoding=sinusoidal.")
+      if float(labels.get("lambda_w", -1)) != 4.0:
+        raise ValueError("Official Full v3 requires label weights 1,1,4.")
+    else:
+      _validate_stage5_variant_config(
+          config, dram_capacity, pool_size, retained, transformer_history,
+          selector_history, lookahead, residency_scale)
     if sorted(config.get("sweep", {}).get("pool_sizes_B", [])) != [8, 16, 32, 64]:
       raise ValueError("Official v3 sweep must be B={8,16,32,64}.")
+  elif config["model"]["position_encoding"] != "sinusoidal":
+    raise ValueError("Smoke v3 requires sinusoidal position encoding.")
+  elif float(labels.get("lambda_w", -1)) != 4.0:
+    raise ValueError("Smoke v3 requires label weights 1,1,4.")
   if pool_size not in config.get("sweep", {}).get("pool_sizes_B", [pool_size]):
     raise ValueError("pool_size_B is outside the configured sweep.")
 
@@ -465,6 +478,79 @@ def _validate_v3_config(config, require_resolved=False):
             "Resolved official v3 config lacks data binding: {}".format(
                 missing_binding))
   return config
+
+
+def _validate_stage5_variant_config(
+    config, dram_capacity, pool_size, retained, transformer_history,
+    selector_history, lookahead, residency_scale):
+  """Allows only the preregistered stage-5 deviations from frozen Full."""
+  variant = config.get("stage5_variant")
+  required = (
+      "variant_id", "family", "only_difference", "source_stage",
+      "test_used_for_selection", "retrain_required")
+  missing = [key for key in required if key not in variant]
+  if missing:
+    raise ValueError("stage5_variant missing fields: {}".format(missing))
+  if variant["family"] not in STAGE5_VARIANT_FAMILIES:
+    raise ValueError("Unsupported stage5_variant family.")
+  if variant["source_stage"] != "stage5":
+    raise ValueError("stage5_variant source_stage must be stage5.")
+  if variant["test_used_for_selection"] is not False:
+    raise ValueError("Stage-5 variants must never use test for selection.")
+  if not variant["only_difference"]:
+    raise ValueError("stage5_variant.only_difference must be explicit.")
+  if dram_capacity != 64 or residency_scale != 256:
+    raise ValueError("Stage-5 variants freeze D=64 and Lres=256.")
+
+  variant_id = variant["variant_id"]
+  expected = {
+      "B": 64, "K": 8, "H": 10, "Hc": 256, "L": 256,
+      "position_encoding": "sinusoidal", "lambda_w": 4.0}
+  if variant_id == "no_filter_B8_K8":
+    expected["B"] = 8
+  elif variant_id.startswith("selector_drop_"):
+    feature = variant_id[len("selector_drop_"):]
+    if feature not in ("Delta", "A", "W", "C", "R"):
+      raise ValueError("Unknown selector drop feature: {}".format(feature))
+  elif variant_id == "no_position_encoding":
+    expected["position_encoding"] = "none"
+  elif variant_id in ("no_candidate_state", "history_mean_pool"):
+    pass
+  elif variant_id == "no_future_write":
+    expected["lambda_w"] = 0.0
+  elif variant_id.startswith("sensitivity_B"):
+    expected["B"] = int(variant_id[len("sensitivity_B"):])
+    if expected["B"] not in (8, 16, 32):
+      raise ValueError("Unsupported stage-5 B sensitivity point.")
+  elif variant_id.startswith("sensitivity_K"):
+    expected["K"] = int(variant_id[len("sensitivity_K"):])
+    if expected["K"] not in (4, 16):
+      raise ValueError("Unsupported stage-5 K sensitivity point.")
+  elif variant_id.startswith("sensitivity_Hc"):
+    expected["Hc"] = int(variant_id[len("sensitivity_Hc"):])
+    if expected["Hc"] not in (64, 128, 512):
+      raise ValueError("Unsupported stage-5 Hc sensitivity point.")
+  elif variant_id.startswith("sensitivity_H"):
+    expected["H"] = int(variant_id[len("sensitivity_H"):])
+    if expected["H"] not in (5, 20):
+      raise ValueError("Unsupported stage-5 H sensitivity point.")
+  elif variant_id.startswith("sensitivity_L"):
+    expected["L"] = int(variant_id[len("sensitivity_L"):])
+    if expected["L"] not in (64, 128, 512):
+      raise ValueError("Unsupported stage-5 L sensitivity point.")
+  else:
+    raise ValueError("Unknown stage5_variant.variant_id: {}".format(
+        variant_id))
+
+  actual = {
+      "B": pool_size, "K": retained, "H": transformer_history,
+      "Hc": selector_history, "L": lookahead,
+      "position_encoding": config["model"]["position_encoding"],
+      "lambda_w": float(config["labels"].get("lambda_w", -1))}
+  if actual != expected:
+    raise ValueError(
+        "Stage-5 variant {} has undeclared differences: expected={} "
+        "actual={}.".format(variant_id, expected, actual))
 
 
 def validate_config(config, require_resolved=False):
@@ -538,6 +624,12 @@ def contract_from_config(config):
         "dirty_demotion_nvm_write": config["replay"][
             "dirty_demotion_nvm_write"],
     })
+    if config.get("stage5_variant") is not None:
+      contract.update({
+          "stage5_variant_id": config["stage5_variant"]["variant_id"],
+          "stage5_variant_family": config["stage5_variant"]["family"],
+          "lambda_w": float(config["labels"]["lambda_w"]),
+      })
   return contract
 
 

@@ -214,14 +214,31 @@ def build_candidate_state_features(selected_records, transformer_history,
 def build_filtered_candidate_snapshot(
     dram_pages, transformer_history, access_index, dram_insert_time,
     dirty_pages, selector_history, config, selector_params):
-  selection = select_candidates(
-      dram_pages,
-      int(config["candidate"]["pool_size_B"]),
-      int(config["candidate"]["retained_K"]),
-      access_index,
-      selector_history,
-      dirty_pages,
-      selector_params)
+  variant_id = config.get("stage5_variant", {}).get("variant_id")
+  if variant_id == "no_filter_B8_K8":
+    start = time.perf_counter()
+    pool_records = build_pool_records(
+        dram_pages, 8, access_index, selector_history, dirty_pages,
+        selector_params)
+    selection = {
+        "P_t": [item["page"] for item in pool_records],
+        "B_t": len(pool_records),
+        "K_t": len(pool_records),
+        "pool_records": pool_records,
+        "selected_records": list(pool_records),
+        "selector_time_seconds": time.perf_counter() - start,
+        "selection_mode": "identity_P_t_equals_C_t",
+    }
+  else:
+    selection = select_candidates(
+        dram_pages,
+        int(config["candidate"]["pool_size_B"]),
+        int(config["candidate"]["retained_K"]),
+        access_index,
+        selector_history,
+        dirty_pages,
+        selector_params)
+    selection["selection_mode"] = "selector_B_to_K"
   for item in selection["selected_records"]:
     item["B_t"] = selection["B_t"]
   reranker = build_candidate_state_features(

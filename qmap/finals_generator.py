@@ -69,7 +69,8 @@ def has_complete_future_window(current_index, lookahead, trace_length):
 
 
 def reference_labels(trace, current_index, page, lookahead,
-                     future_oracle=None, require_complete=True):
+                     future_oracle=None, require_complete=True,
+                     lambda_w=4.0):
   if (require_complete and
       not has_complete_future_window(current_index, lookahead, len(trace))):
     raise ValueError("Cannot generate labels from an incomplete future window.")
@@ -85,7 +86,7 @@ def reference_labels(trace, current_index, page, lookahead,
     inactivity = min(next_distance, lookahead) / float(lookahead)
   coldness = 1.0 - min(frequency / float(lookahead), 1.0)
   write_intensity = min(write_frequency / float(lookahead), 1.0)
-  relevance = inactivity + coldness - 4.0 * write_intensity
+  relevance = inactivity + coldness - float(lambda_w) * write_intensity
   return {
       "inactivity": inactivity,
       "coldness": coldness,
@@ -263,6 +264,7 @@ def iter_validation_samples(trace, config, clipping, holdout=None):
       trace, lookahead, require_complete=is_v3)
   pool_size = int(config["candidate"]["pool_size_B"])
   retained = int(config["candidate"]["retained_K"])
+  lambda_w = float(config["labels"].get("lambda_w", 4.0))
   for access_index, access in enumerate(trace):
     complete_window = has_complete_future_window(
         access_index, lookahead, len(trace))
@@ -275,13 +277,13 @@ def iter_validation_samples(trace, config, clipping, holdout=None):
       labels = [
           reference_labels(
               trace, access_index, item["page"], lookahead, future_oracle,
-              require_complete=is_v3)
+              require_complete=is_v3, lambda_w=lambda_w)
           for item in records
       ]
       all_dram_labels = {
           page: reference_labels(
               trace, access_index, page, lookahead, future_oracle,
-              require_complete=is_v3)["relevance"]
+              require_complete=is_v3, lambda_w=lambda_w)["relevance"]
           for page in state.dram_pages
       }
       global_maximum = max(all_dram_labels.values())
@@ -378,6 +380,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
   retained = int(config["candidate"]["retained_K"])
   history_length = int(config["history"]["transformer_H"])
   is_v3 = config.get("schema_version") == finals_config.SCHEMA_VERSION
+  variant_id = config.get("stage5_variant", {}).get("variant_id")
+  lambda_w = float(config["labels"].get("lambda_w", 4.0))
   future_oracle = FutureOracle(
       trace, lookahead, require_complete=is_v3)
   decision_count = 0
@@ -404,7 +408,7 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
         labels = [
             reference_labels(
                 trace, access_index, page, lookahead, future_oracle,
-                require_complete=is_v3)
+                require_complete=is_v3, lambda_w=lambda_w)
             for page in selected_pages
         ]
         padded_labels = _pad_labels(labels, retained)
@@ -413,18 +417,24 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
             ablation="cross_attention")
         history_mask = ([0] * (history_length - len(decision_history)) +
                         [1] * len(decision_history))
+        candidate_state_features = snapshot["candidate_state_features"]
+        if variant_id == "no_candidate_state":
+          candidate_state_features = [
+              [0.0, 0.0, 0.0, 0.0] for _ in candidate_state_features]
+        write_sensitivity = padded_labels["write_sensitivity"]
+        if variant_id == "no_future_write":
+          write_sensitivity = [0.0 for _ in write_sensitivity]
         sample = {
             "schema_version": config["schema_version"],
             "pc": pc,
             "rw": rw,
             "candidate_pages": snapshot["candidate_pages"],
-            "candidate_state_features": snapshot[
-                "candidate_state_features"],
+            "candidate_state_features": candidate_state_features,
             "candidate_mask": snapshot["candidate_mask"],
             "original_pool_ranks": snapshot["original_pool_ranks"],
             "inactivity": padded_labels["inactivity"],
             "coldness": padded_labels["coldness"],
-            "write_sensitivity": padded_labels["write_sensitivity"],
+            "write_sensitivity": write_sensitivity,
             # Constant and excluded by finals_v2 loss (lambda_4=0).
             "migration_cost": padded_labels["migration_cost"],
         }
@@ -436,6 +446,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
               "history_page_ids": history_page_ids,
               "history_mask": history_mask,
           })
+          if variant_id is not None:
+            sample["stage5_variant_id"] = variant_id
         else:
           sample["physical_address"] = history_page_ids
         output_file.write(json.dumps(sample, sort_keys=True) + "\n")
@@ -500,6 +512,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
         "history_page_field": "history_page_ids",
     })
     metadata.update(finals_config.artifact_identity_from_config(config))
+    if variant_id is not None:
+      metadata["stage5_variant"] = dict(config["stage5_variant"])
   finals_config.write_json(finals_config.metadata_path(output_path), metadata)
   return metadata
 

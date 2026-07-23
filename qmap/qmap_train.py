@@ -405,6 +405,11 @@ def apply_finals_config(args, explicit_seed=None):
           "Shared history/candidate page embedding requires equal dimensions.")
   if args.ablation != "cross_attention":
     raise ValueError("Finals direction-1 training requires cross_attention.")
+  variant_id = config.get("stage5_variant", {}).get("variant_id")
+  args.context_mode = (
+      "history_mean_pool" if variant_id == "history_mean_pool"
+      else "cross_attention")
+  args.stage5_variant_id = variant_id
   return _validate_finals_artifacts(
       config, args.config, args.selector_params, args.train_data,
       args.valid_data)
@@ -603,7 +608,8 @@ def main():
       dropout=args.dropout, page_dim=args.page_dim,
       scoring_input=args.scoring_input,
       shared_page_embedding=getattr(
-          args, "shared_page_embedding", False)).to(device)
+          args, "shared_page_embedding", False),
+      context_mode=getattr(args, "context_mode", "cross_attention")).to(device)
   loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
       lambda_1=args.inactivity_weight,
       lambda_2=args.coldness_weight,
@@ -724,6 +730,19 @@ def main():
         finals_context["config"]["data"].get("split_fingerprints", {}))
     manifest["audit_input_scope"] = "train_jsonl_and_valid_jsonl_only"
     manifest["test_trace_opened"] = False
+    manifest["stage5_variant"] = finals_context["config"].get(
+        "stage5_variant")
+    manifest["model_contract"] = {
+        "position_encoding": getattr(
+            args, "position_encoding", "sinusoidal"),
+        "context_mode": getattr(args, "context_mode", "cross_attention"),
+        "candidate_state_mode": (
+            "zeros_4d" if getattr(
+                args, "stage5_variant_id", None) == "no_candidate_state"
+            else "observed_4d"),
+        "page_embedding_retained": True,
+        "write_sensitivity_weight": args.write_sensitivity_weight,
+    }
   finals_config.write_json(
       os.path.join(args.output_dir, "checkpoint_manifest.json"), manifest)
   print("Training finished. best={} last={}".format(

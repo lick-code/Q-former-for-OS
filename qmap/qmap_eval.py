@@ -88,6 +88,10 @@ def build_arg_parser():
                       help=("Scale used for DRAM residency features. Match "
                             "the generator lookahead used for training."))
   parser.add_argument("--random_seed", type=int, default=0)
+  parser.add_argument(
+      "--stage5_replay_seed", type=int, default=None,
+      help=("Explicit Random replay seed for the preregistered stage-5 "
+            "multi-seed baseline. Invalid for every other policy."))
   parser.add_argument("--device", default=None,
                       help="cpu, cuda, or omitted for auto selection.")
   parser.add_argument("--dram_read_cost", type=float, default=DRAM_READ_COST)
@@ -389,8 +393,16 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
     model_args = checkpoint.get("model_args", {})
     if model_args.get("shared_page_embedding") is not True:
       raise ValueError("Checkpoint does not use the shared page embedding.")
-    if model_args.get("position_encoding") != "sinusoidal":
+    expected_position = config["model"]["position_encoding"]
+    if model_args.get("position_encoding") != expected_position:
       raise ValueError("Checkpoint position encoding mismatch.")
+    expected_context_mode = (
+        "history_mean_pool"
+        if config.get("stage5_variant", {}).get("variant_id") ==
+        "history_mean_pool" else "cross_attention")
+    if model_args.get("context_mode", "cross_attention") != (
+        expected_context_mode):
+      raise ValueError("Checkpoint stage-5 context mode mismatch.")
     seed_source = checkpoint.get("training_seed_source", "config_default")
     if seed_source not in ("config_default", "explicit_cli"):
       raise ValueError("Checkpoint training_seed_source is invalid.")
@@ -443,6 +455,12 @@ def apply_replay_finals_config(args):
   args.lookahead = int(config["features"]["residency_scale_Lres"])
   args.page_shift = int(config.get("trace", {}).get("page_shift", 12))
   args.random_seed = int(config["evaluation"]["random_seed"])
+  if getattr(args, "stage5_replay_seed", None) is not None:
+    if args.policy != "random":
+      raise ValueError("--stage5_replay_seed is valid only for Random.")
+    if args.stage5_replay_seed < 0:
+      raise ValueError("--stage5_replay_seed must be non-negative.")
+    args.random_seed = int(args.stage5_replay_seed)
   for name, value in config["cost_model"].items():
     setattr(args, name, float(value))
   if getattr(args, "rank_guard", 0) != 0:
@@ -578,7 +596,9 @@ class QMAPPolicy(object):
         page_dim=model_args.get("page_dim", 21),
         scoring_input=scoring_input,
         shared_page_embedding=model_args.get(
-            "shared_page_embedding", False)).to(device)
+            "shared_page_embedding", False),
+        context_mode=model_args.get(
+            "context_mode", "cross_attention")).to(device)
     self._feature_embedder.load_state_dict(checkpoint["feature_embedder"])
     self._extractor.load_state_dict(extractor_state)
     self._scorer.load_state_dict(scorer_state)
@@ -618,6 +638,11 @@ class QMAPPolicy(object):
       candidates = snapshot["candidate_pages"]
       candidate_mask = snapshot["candidate_mask"]
       candidate_state_features = snapshot["candidate_state_features"]
+      if self._config.get("stage5_variant", {}).get(
+          "variant_id") == "no_candidate_state":
+        candidate_state_features = [
+            [0.0, 0.0, 0.0, 0.0]
+            for _ in candidate_state_features]
     else:
       candidates, candidate_mask = get_lru_tail_candidates_and_mask(
           dram_pages, self._effective_candidate_count)
@@ -904,6 +929,7 @@ def main():
               else "capd_selector_B_to_K"))
     metrics["rank_guard"] = args.rank_guard
     metrics["rank_score_penalty"] = args.rank_score_penalty
+    metrics["replay_seed"] = args.random_seed
     metrics["command"] = " ".join(
         shlex.quote(value) for value in sys.argv)
     if replay_config is not None:
@@ -933,6 +959,8 @@ def main():
       if replay_config["schema_version"] == finals_config.SCHEMA_VERSION:
         metrics.update(finals_config.artifact_identity_from_config(
             replay_config))
+      if replay_config.get("stage5_variant") is not None:
+        metrics["stage5_variant"] = dict(replay_config["stage5_variant"])
       metrics["selector_params"] = args.selector_params
       if args.selector_params:
         replay_selector = finals_config.load_json(args.selector_params)

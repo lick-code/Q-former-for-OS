@@ -11,6 +11,7 @@
 - 合同状态：`FROZEN`
 - 实现状态：`STAGE1_R1_VERIFIED`（G01--G10、G13 均已完成服务器验收）
 - 数据状态：`STAGE2_VERIFIED_REUSABLE`（R1 不改变 trace、split、标签、selector 或 JSONL 内容语义）
+- 阶段状态：阶段3 `STAGE3_VERIFIED`；阶段4 `STAGE4_VERIFIED`；阶段5启动门槛已满足
 - 实证状态：`UNVERIFIED`（本合同冻结方法与验收口径，不代表实验已经证明方法有效）
 - 来源：2026-07-20 中文 CAPD 完整方法稿、2026-07-22 更新稿、当前仓库代码与配置审查
 
@@ -350,8 +351,8 @@ padding 位置的 `candidate_mask=0`，不得参与 Cross-Attention victim 选�
 | 编号 | 当前证据 | 合同要求 | 当前状态 |
 |---|---|---|---|
 | G01--G10 | 阶段1服务器验收：目标语义、非平凡微型E2E和完整回归均通过 | 独立valid、完整未来窗口、分层覆盖指标、统一LRU方向、共享冻结词表、位置编码、ApproxNDCG及首次访问记账 | `VERIFIED` |
-| G11 | 尚未形成正式LRU离线状态与CAPD闭环状态分布审计 | 正式实验必须报告分布偏移 | 阶段4待完成 |
-| G12 | 尚未形成代理标签与窗口内反事实加权代价一致性审计 | 正式实验必须完成代理标签审计 | 阶段4待完成 |
+| G11 | 阶段4已完成3 workload × 3 seed的正式LRU离线状态与CAPD闭环状态分布审计；保留36项large、9项moderate工程告警 | 正式实验必须报告分布偏移 | `VERIFIED`，保留 `REVIEW_REQUIRED` |
+| G12 | 阶段4已完成三个workload的代理标签与窗口内反事实加权代价一致性审计 | 正式实验必须完成代理标签审计 | `VERIFIED` |
 | G13 | `qmap/qmap_eval.py::QMAPPolicy.choose_victim` 已按冻结快照中的原始LRU rank处理精排最高分并列并拒绝NaN/Inf | 最高精排分数并列时，在有效候选中选择 `original_pool_rank` 最小者；NaN/Inf硬失败 | `VERIFIED`，阶段1 R1服务器验收通过 |
 
 `capd_finals_v2_1` 工件仍只能视为原型/烟雾测试证据，不能进入当前正式流程。`capd_finals_v3_0` 阶段2 trace、selector 和 JSONL 不受 G13 影响，可以保留；G13 已关闭，阶段3启动门槛已满足。
@@ -433,6 +434,7 @@ trace -> selector fit -> JSONL -> train -> CAPD replay -> result audit
 
 ### 阶段4：精排模型与闭环审计
 
+- 状态：`STAGE4_VERIFIED`；G11的 `REVIEW_REQUIRED` 不阻塞阶段5启动，但必须作为阶段5结果的适用边界披露。
 - 使用冻结selector重建训练/验证样本；
 - 至少使用3个模型随机种子报告均值和波动；
 - 完成代理标签—反事实窗口代价一致性审计；
@@ -440,6 +442,8 @@ trace -> selector fit -> JSONL -> train -> CAPD replay -> result audit
 - 若偏移明显且伴随性能退化，先记录为方法适用边界；任何迭代式数据聚合都属于新方法版本，不能静默加入本合同。
 
 ### 阶段5：端到端主实验与组件消融
+
+启动门槛：已满足。阶段5开发完成但服务器正式矩阵尚未验收时，状态只能为 `STAGE5_IMPLEMENTED_UNVERIFIED`。
 
 主对比使用统一trace、容量、初始状态和代价模型，对比外部策略：
 

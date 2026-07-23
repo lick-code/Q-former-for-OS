@@ -362,14 +362,19 @@ class QMAPCandidateScorer(nn.Module):
   def __init__(self, hidden_dim=18, page_state_dim=4, page_embed_dim=8,
                page_vocab_size=100000, num_heads=2, mlp_hidden_dim=None,
                dropout=0.0, page_dim=None, scoring_input="concat",
-               shared_page_embedding=False):
+               shared_page_embedding=False,
+               context_mode="cross_attention"):
     super(QMAPCandidateScorer, self).__init__()
     if hidden_dim % num_heads != 0:
       raise ValueError("hidden_dim must be divisible by num_heads.")
     if scoring_input not in ("concat", "context"):
       raise ValueError("scoring_input must be 'concat' or 'context'.")
+    if context_mode not in ("cross_attention", "history_mean_pool"):
+      raise ValueError(
+          "context_mode must be cross_attention or history_mean_pool.")
 
     self._scoring_input = scoring_input
+    self._context_mode = context_mode
     self._shared_page_embedding = bool(shared_page_embedding)
     self._page_embedder = None
     if not self._shared_page_embedding:
@@ -383,8 +388,10 @@ class QMAPCandidateScorer(nn.Module):
           nn.Identity() if page_dim == hidden_dim else
           nn.Linear(page_dim, hidden_dim))
 
-    self._cross_attention = nn.MultiheadAttention(
-        embed_dim=hidden_dim, num_heads=num_heads, dropout=dropout)
+    self._cross_attention = (
+        nn.MultiheadAttention(
+            embed_dim=hidden_dim, num_heads=num_heads, dropout=dropout)
+        if context_mode == "cross_attention" else None)
     self._context_norm = nn.LayerNorm(hidden_dim)
 
     if mlp_hidden_dim is None:
@@ -438,15 +445,24 @@ class QMAPCandidateScorer(nn.Module):
           (page_embeddings, candidate_state_features), dim=-1)
       u = self._candidate_projector(candidate_inputs)
 
-    query_seq = u.transpose(0, 1)
-    key_value_seq = z.transpose(0, 1)
-    key_padding_mask = None
-    if history_mask is not None and z.shape[1] == history_mask.shape[1]:
-      key_padding_mask = history_mask <= 0
-    g, _ = self._cross_attention(
-        query=query_seq, key=key_value_seq, value=key_value_seq,
-        key_padding_mask=key_padding_mask)
-    g = g.transpose(0, 1)
+    if self._context_mode == "history_mean_pool":
+      if history_mask is None:
+        pooled = z.mean(dim=1, keepdim=True)
+      else:
+        weights = history_mask.to(z.dtype).unsqueeze(-1)
+        pooled = ((z * weights).sum(dim=1, keepdim=True) /
+                  weights.sum(dim=1, keepdim=True).clamp_min(1.0))
+      g = pooled.expand(-1, u.shape[1], -1)
+    else:
+      query_seq = u.transpose(0, 1)
+      key_value_seq = z.transpose(0, 1)
+      key_padding_mask = None
+      if history_mask is not None and z.shape[1] == history_mask.shape[1]:
+        key_padding_mask = history_mask <= 0
+      g, _ = self._cross_attention(
+          query=query_seq, key=key_value_seq, value=key_value_seq,
+          key_padding_mask=key_padding_mask)
+      g = g.transpose(0, 1)
     g = self._context_norm(g + u)
 
     if self._scoring_input == "context":
