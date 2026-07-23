@@ -14,6 +14,7 @@ CANDIDATE_FEATURES = (
     "original_r_lru")
 DECISION_FEATURES = ("B_t", "K_t", "dirty_ratio", "decision_interval")
 BINARY_FEATURES = {"selector_clean", "dirty_state"}
+NUMERIC_SEMANTICS_VERSION = "capd_g11_distribution_numeric_v1"
 
 
 def _empty_distribution(identity):

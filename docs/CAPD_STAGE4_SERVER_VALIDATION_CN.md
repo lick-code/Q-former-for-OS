@@ -10,15 +10,15 @@ cd "$REPO"
 bash scripts/validate_capd_stage4_server.sh
 ```
 
-G11 默认使用6个spawn进程并发，实时打印trace加载、LRU分布、CAPD闭环回放、分布统计、每500个闭环决策以及每个workload/seed的完成进度，最长3小时；每个完成组合独立原子落盘，超时或断线后可续跑。连续特征统计只对每列排序一次，再线性计算KS、Wasserstein-1和越界比例，禁止在分位点或样本循环内重复排序、重复扫描参考分布。可通过 `CAPD_STAGE4_DISTRIBUTION_WORKERS` 调整并行度。
+G11 默认使用3个spawn进程并发；每个workload/seed使用全新进程，完成后立即退出，避免PyTorch原生状态和大trace内存跨任务累积。worker先完成train分布并释放train trace，再加载valid trace。实时打印trace加载、LRU分布、CAPD闭环回放、分布统计、每500个闭环决策以及每个workload/seed的完成进度，最长3小时；每个完成组合独立原子落盘，超时或断线后可续跑。连续特征统计只对每列排序一次，再线性计算KS、Wasserstein-1和越界比例，禁止在分位点或样本循环内重复排序、重复扫描参考分布。可通过 `CAPD_STAGE4_DISTRIBUTION_WORKERS` 调整并行度；正式验收建议保持3。
 
 只重跑G11并生成汇总时使用：
 
 ```bash
 cd "$REPO"
-CAPD_STAGE4_DISTRIBUTION_WORKERS=6 timeout 3h python3 scripts/run_capd_stage4.py \
+CAPD_STAGE4_DISTRIBUTION_WORKERS=3 timeout 3h python3 scripts/run_capd_stage4.py \
   --stage distribution-audit --repo-root "$REPO" \
-  --distribution-workers 6 --device cuda
+  --distribution-workers 3 --device cuda
 python3 scripts/run_capd_stage4.py --stage summarize --repo-root "$REPO"
 ```
 

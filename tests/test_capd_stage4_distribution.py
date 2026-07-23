@@ -88,25 +88,54 @@ class DistributionMetricTest(unittest.TestCase):
         distribution, snapshot, set(), 10, 14)
     self.assertEqual([4], distribution["values"]["decision_interval"])
 
-  def test_g11_uses_spawned_processes_and_resumable_seed_partials(self):
+  def test_g11_uses_fresh_spawned_processes_and_resumable_seed_partials(self):
     source = inspect.getsource(stage4.distribution_audit)
-    self.assertIn("ProcessPoolExecutor", source)
-    self.assertIn("multiprocessing.get_context(\"spawn\")", source)
+    self.assertIn("_run_distribution_processes", source)
+    supervisor_source = inspect.getsource(stage4._run_distribution_processes)
+    self.assertIn("multiprocessing.get_context(\"spawn\")", supervisor_source)
+    self.assertIn("context.Process(", supervisor_source)
+    self.assertIn("process.exitcode", supervisor_source)
+    self.assertIn("process.terminate()", supervisor_source)
+    self.assertNotIn("ProcessPoolExecutor", supervisor_source)
     worker_source = inspect.getsource(stage4._distribution_seed_job)
     self.assertIn("_write_json_atomic", worker_source)
     self.assertIn("[G11 END]", worker_source)
+
+  def test_g11_releases_train_before_loading_valid(self):
+    worker_source = inspect.getsource(stage4._distribution_seed_job)
+    release = worker_source.index("del train_trace")
+    valid_load = worker_source.index("valid_trace, _ = read_trace")
+    self.assertLess(release, valid_load)
+    self.assertIn("del valid_trace", worker_source)
+    self.assertIn("gc.collect()", worker_source)
 
   def test_distribution_worker_count_is_configurable(self):
     args = stage4.build_parser().parse_args([
         "--stage", "distribution-audit", "--distribution-workers", "6"])
     self.assertEqual(6, args.distribution_workers)
 
-  def test_resume_identity_ignores_command_and_commit_only(self):
+  def test_resume_identity_ignores_orchestration_provenance(self):
     base = {key: "same" for key in stage4._DISTRIBUTION_RESUME_KEYS}
     left = dict(base, command="first", code_commit="one")
     right = dict(base, command="second", code_commit="two")
+    left["code_fingerprint"] = "old-orchestrator"
+    right["code_fingerprint"] = "new-orchestrator"
     self.assertEqual(stage4._distribution_resume_identity(left),
                      stage4._distribution_resume_identity(right))
+
+  def test_legacy_partial_defaults_to_current_numeric_semantics(self):
+    legacy = {key: "same" for key in stage4._DISTRIBUTION_RESUME_KEYS
+              if key != "distribution_semantics_version"}
+    current = dict(legacy, distribution_semantics_version=
+                   stage4_distribution.NUMERIC_SEMANTICS_VERSION)
+    self.assertEqual(stage4._distribution_resume_identity(legacy),
+                     stage4._distribution_resume_identity(current))
+
+  def test_changed_numeric_semantics_invalidates_partial(self):
+    base = {key: "same" for key in stage4._DISTRIBUTION_RESUME_KEYS}
+    changed = dict(base, distribution_semantics_version="future-v2")
+    self.assertNotEqual(stage4._distribution_resume_identity(base),
+                        stage4._distribution_resume_identity(changed))
 
   def test_partial_reuse_rejects_changed_checkpoint_identity(self):
     binding = {key: "same" for key in stage4._DISTRIBUTION_RESUME_KEYS}

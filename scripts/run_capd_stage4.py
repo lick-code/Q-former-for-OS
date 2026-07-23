@@ -8,9 +8,8 @@ all generated data, checkpoints, and audit results use stage-4 directories.
 from __future__ import print_function
 
 import argparse
-from concurrent.futures import as_completed
-from concurrent.futures import ProcessPoolExecutor
 import csv
+import gc
 import json
 import multiprocessing
 import os
@@ -488,12 +487,18 @@ _DISTRIBUTION_RESUME_KEYS = (
     "workload", "seed", "B", "K", "selector_fingerprint",
     "train_trace_fingerprint", "valid_trace_fingerprint",
     "source_manifest_fingerprint", "config_fingerprint",
-    "checkpoint_fingerprint", "code_fingerprint", "audit_input_scope",
-    "test_trace_opened")
+    "checkpoint_fingerprint", "distribution_semantics_version",
+    "audit_input_scope", "test_trace_opened")
 
 
 def _distribution_resume_identity(binding):
-  return {key: binding.get(key) for key in _DISTRIBUTION_RESUME_KEYS}
+  identity = {key: binding.get(key) for key in _DISTRIBUTION_RESUME_KEYS}
+  # Partials written before process-isolation support used the same numeric
+  # formulas but did not carry an explicit semantic version.
+  if identity["distribution_semantics_version"] is None:
+    identity["distribution_semantics_version"] = (
+        stage4_distribution.NUMERIC_SEMANTICS_VERSION)
+  return identity
 
 
 def _distribution_job_spec(args, workload, seed, code_commit,
@@ -536,6 +541,8 @@ def _distribution_job_spec(args, workload, seed, code_commit,
       "checkpoint_fingerprint": checkpoint_fingerprint,
       "code_commit": code_commit, "command": command,
       "code_fingerprint": code_fingerprint,
+      "distribution_semantics_version":
+          stage4_distribution.NUMERIC_SEMANTICS_VERSION,
       "audit_input_scope": "train_and_valid_trace_only",
       "test_trace_opened": False,
   }
@@ -582,29 +589,41 @@ def _distribution_seed_job(job):
       "cuda" if torch.cuda.is_available() else "cpu")
   print("[G11 START] workload={} seed={} pid={} device={}".format(
       workload, seed, os.getpid(), device), flush=True)
-  phase_started = time.time()
   config = finals_config.load_config(
       job["config_path"], require_resolved=True,
       project_root=job["repo_root"], verify_manifest_files=False)
   selector = finals_config.load_json(job["selector_path"])
+  phase_started = time.time()
   train_trace, _ = read_trace(
       config["data"]["train_trace"], int(config["trace"]["page_shift"]))
-  valid_trace, _ = read_trace(
-      config["data"]["valid_trace"], int(config["trace"]["page_shift"]))
-  print("[G11 PHASE] workload={} seed={} phase=load_traces seconds={:.1f} "
-        "train_accesses={} valid_accesses={}".format(
+  print("[G11 PHASE] workload={} seed={} phase=load_train seconds={:.1f} "
+        "accesses={}".format(
             workload, seed, time.time() - phase_started,
-            len(train_trace), len(valid_trace)), flush=True)
+            len(train_trace)), flush=True)
   phase_started = time.time()
   dist_a = stage4_distribution.collect_lru(
       train_trace, config, selector, "A")
+  print("[G11 PHASE] workload={} seed={} phase=lru_train "
+        "seconds={:.1f} decisions={}".format(
+            workload, seed, time.time() - phase_started,
+            len(dist_a["values"]["B_t"])), flush=True)
+  del train_trace
+  gc.collect()
+
+  phase_started = time.time()
+  valid_trace, _ = read_trace(
+      config["data"]["valid_trace"], int(config["trace"]["page_shift"]))
+  print("[G11 PHASE] workload={} seed={} phase=load_valid seconds={:.1f} "
+        "accesses={}".format(
+            workload, seed, time.time() - phase_started,
+            len(valid_trace)), flush=True)
+  phase_started = time.time()
   dist_b = stage4_distribution.collect_lru(
       valid_trace, config, selector, "B")
-  print("[G11 PHASE] workload={} seed={} phase=lru_distributions "
-        "seconds={:.1f} train_decisions={} valid_decisions={}".format(
+  print("[G11 PHASE] workload={} seed={} phase=lru_valid "
+        "seconds={:.1f} decisions={}".format(
             workload, seed, time.time() - phase_started,
-            len(dist_a["values"]["B_t"]), len(dist_b["values"]["B_t"])),
-        flush=True)
+            len(dist_b["values"]["B_t"])), flush=True)
   phase_started = time.time()
   dist_c = stage4_distribution.collect_capd(
       valid_trace, config, selector, job["checkpoint"], seed, device)
@@ -612,6 +631,8 @@ def _distribution_seed_job(job):
         "seconds={:.1f} decisions={}".format(
             workload, seed, time.time() - phase_started,
             len(dist_c["values"]["B_t"])), flush=True)
+  del valid_trace
+  gc.collect()
   phase_started = time.time()
   comparisons = stage4_distribution.audit_triplet(dist_a, dist_b, dist_c)
   print("[G11 PHASE] workload={} seed={} phase=distribution_metrics "
@@ -630,6 +651,56 @@ def _distribution_seed_job(job):
       workload, seed, partial["duration_seconds"], job["partial_path"]),
         flush=True)
   return job["partial_path"]
+
+
+def _run_distribution_processes(pending, total_jobs, completed,
+                                worker_count):
+  """Runs every seed in a fresh process so native/RAM state cannot accumulate."""
+  context = multiprocessing.get_context("spawn")
+  waiting = list(pending)
+  active = []
+  failure = None
+  while waiting or active:
+    while waiting and len(active) < worker_count and failure is None:
+      job = waiting.pop(0)
+      process = context.Process(
+          target=_distribution_seed_job, args=(job,),
+          name="g11-{}-{}".format(job["workload"], job["seed"]))
+      process.start()
+      active.append((process, job))
+      print("[G11 LAUNCH] workload={} seed={} pid={}".format(
+          job["workload"], job["seed"], process.pid), flush=True)
+
+    finished = []
+    for process, job in active:
+      process.join(timeout=0)
+      if process.is_alive():
+        continue
+      finished.append((process, job))
+      if (process.exitcode == 0 and
+          _distribution_partial_matches(job)):
+        completed += 1
+        print("[G11 PROGRESS] completed={}/{} workload={} seed={}".format(
+            completed, total_jobs, job["workload"], job["seed"]), flush=True)
+      elif failure is None:
+        failure = (
+            "G11 worker failed: workload={} seed={} pid={} exit={}; "
+            "completed partials remain reusable".format(
+                job["workload"], job["seed"], process.pid,
+                process.exitcode))
+    if finished:
+      active = [item for item in active if item not in finished]
+    elif active:
+      time.sleep(.2)
+
+    if failure is not None:
+      for process, _ in active:
+        if process.is_alive():
+          process.terminate()
+      for process, _ in active:
+        process.join()
+      raise RuntimeError(failure)
+  return completed
 
 
 def distribution_audit(args):
@@ -657,18 +728,9 @@ def distribution_audit(args):
       print("[G11 PROGRESS] completed={}/{}".format(
           completed, total_jobs), flush=True)
   elif pending:
-    context = multiprocessing.get_context("spawn")
     worker_count = min(args.distribution_workers, len(pending))
-    with ProcessPoolExecutor(
-        max_workers=worker_count, mp_context=context) as executor:
-      futures = {executor.submit(_distribution_seed_job, job): job
-                 for job in pending}
-      for future in as_completed(futures):
-        future.result()
-        completed += 1
-        job = futures[future]
-        print("[G11 PROGRESS] completed={}/{} workload={} seed={}".format(
-            completed, total_jobs, job["workload"], job["seed"]), flush=True)
+    completed = _run_distribution_processes(
+        pending, total_jobs, completed, worker_count)
 
   details = {workload: {} for workload in args.workloads}
   metric_rows = []
@@ -682,7 +744,11 @@ def distribution_audit(args):
     seed = int(job["seed"])
     comparisons = partial["comparisons"]
     details[workload][str(seed)] = comparisons
-    input_bindings.append(partial["input_binding"])
+    input_binding = dict(partial["input_binding"])
+    input_binding.setdefault(
+        "distribution_semantics_version",
+        stage4_distribution.NUMERIC_SEMANTICS_VERSION)
+    input_bindings.append(input_binding)
     for comparison, features in comparisons.items():
       for feature, metrics in features.items():
         metric_rows.append({
