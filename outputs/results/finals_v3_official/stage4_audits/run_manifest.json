@@ -1,0 +1,100 @@
+{
+  "B": 64,
+  "K": 8,
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "audit_input_scope": "train_and_valid_only",
+  "code_commit": "3d7b01a4955f43644b81ef34de57c2737dacb2f3",
+  "code_fingerprint": "2dee2f76e17c956043f95108de70e16f8968f635dce16c22c503f2396d5db132",
+  "command": "scripts/run_capd_stage4.py --stage summarize --repo-root /home/likc/Q-former-for-OS",
+  "contract_id": "CAPD-MIC-1.0",
+  "outputs": [
+    {
+      "path": "counterfactual_details/canneal.jsonl",
+      "sha256": "8bc0c31bd9c442e989ddfadcc393a3a672dd792352cb9c01e2c6a4a6ca3aa098"
+    },
+    {
+      "path": "counterfactual_details/dedup_pressure.jsonl",
+      "sha256": "a0bc8d9172dccb8947d900dc51121fa31dd9442c4cbbac2130696b974a662b26"
+    },
+    {
+      "path": "counterfactual_details/streamcluster_pressure.jsonl",
+      "sha256": "96849d25f7c5ac3c732d1a849f3d628adabe257c0d5e87f6704632f8203e009c"
+    },
+    {
+      "path": "counterfactual_report.md",
+      "sha256": "b9a0eee907ee59f5060a84ed112feb7ca3366d4ebd12adb94230247346a4fa4c"
+    },
+    {
+      "path": "counterfactual_summary.json",
+      "sha256": "0b8133bc39edac06cbb03fb742cc2aaa9c401e3e325c57b9f6a0b37d352fa844"
+    },
+    {
+      "path": "distribution_metrics.csv",
+      "sha256": "c024767498e337cdc0fbfc0386afd40fcd7ced190e3a1a7e74351844d4297694"
+    },
+    {
+      "path": "distribution_partials/canneal/seed_2026.json",
+      "sha256": "4b506b7e850129296eb9b9b9db02d201a60e2747acbb0d9078e5bde418e5516a"
+    },
+    {
+      "path": "distribution_partials/canneal/seed_3136859.json",
+      "sha256": "dea1c3fd366f7d89e5f3e67e144dee06781b09f2e44becf2b9d2cdb6cf69502f"
+    },
+    {
+      "path": "distribution_partials/canneal/seed_42.json",
+      "sha256": "d15541d8c7e53506375e5b8fad19526eed9716d53e4ec18e6359f81b62105d59"
+    },
+    {
+      "path": "distribution_partials/dedup_pressure/seed_2026.json",
+      "sha256": "1d5285069991356fc5c5f9a0a797655cbd1edf44edae6333aac10de69133d15d"
+    },
+    {
+      "path": "distribution_partials/dedup_pressure/seed_3136859.json",
+      "sha256": "dd07bfe931321406fbc53770d6a71135f496b646ed00e6c2f6f04d5e2d922e61"
+    },
+    {
+      "path": "distribution_partials/dedup_pressure/seed_42.json",
+      "sha256": "6a253c3854c9eea44fe171da6313c1b06770c442d35e7f885f3dca7d4a530813"
+    },
+    {
+      "path": "distribution_partials/streamcluster_pressure/seed_2026.json",
+      "sha256": "5458daf2ef2d2c2ad7f3bcafb408880904cac9c82bc1974eddb8e5c4b802891b"
+    },
+    {
+      "path": "distribution_partials/streamcluster_pressure/seed_3136859.json",
+      "sha256": "77af72f9863b127fc20c7aca077617ef79579c46106261010c2f2d990ed006c0"
+    },
+    {
+      "path": "distribution_partials/streamcluster_pressure/seed_42.json",
+      "sha256": "11d8211d70a7f63990bdcb2078296aa2cff8842579037f6fcf0f44051141664a"
+    },
+    {
+      "path": "distribution_report.md",
+      "sha256": "af44a5690fabb304fb6a204e789bd00a9630468847f580617d36b5ef86ec5bb9"
+    },
+    {
+      "path": "distribution_summary.json",
+      "sha256": "acee04bf51c33cf229e34d15eebd8beb15dc0097919db358ddaa7e6d8bc4c541"
+    },
+    {
+      "path": "input_audit.json",
+      "sha256": "205711f830236bc682ed6a3ebe534c382f01b6f10c6d4cce51b7151b82d14366"
+    },
+    {
+      "path": "stage4_summary.json",
+      "sha256": "8de184a6b724433be635abb7a03331b876435aff82baf3b2eb3e633e0eefda1e"
+    },
+    {
+      "path": "stage4_training.csv",
+      "sha256": "2a667dd8e239f037a74be71ebb14cc00987a06bcb05fc81f43f08a036bb2d62e"
+    },
+    {
+      "path": "stage4_training_report.md",
+      "sha256": "4fdb07357302a2fb0ce31dd2896af666c2cf0fee1ffb11ae666b5ab237175f3b"
+    }
+  ],
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_stage4_audit_1",
+  "test_trace_opened": false
+}

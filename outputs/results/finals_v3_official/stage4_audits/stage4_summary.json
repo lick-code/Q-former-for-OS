@@ -1,0 +1,78 @@
+{
+  "B": 64,
+  "K": 8,
+  "artifact_class": "official",
+  "artifact_schema": "capd_finals_v3_0",
+  "code_commit": "3d7b01a4955f43644b81ef34de57c2737dacb2f3",
+  "code_fingerprint": "2dee2f76e17c956043f95108de70e16f8968f635dce16c22c503f2396d5db132",
+  "command": "scripts/run_capd_stage4.py --stage summarize --repo-root /home/likc/Q-former-for-OS",
+  "contract_id": "CAPD-MIC-1.0",
+  "counterfactual_summary": "counterfactual_summary.json",
+  "distribution_summary": "distribution_summary.json",
+  "input_audit": "input_audit.json",
+  "input_fingerprints": {
+    "counterfactual_summary.json": "0b8133bc39edac06cbb03fb742cc2aaa9c401e3e325c57b9f6a0b37d352fa844",
+    "distribution_summary.json": "acee04bf51c33cf229e34d15eebd8beb15dc0097919db358ddaa7e6d8bc4c541",
+    "input_audit.json": "205711f830236bc682ed6a3ebe534c382f01b6f10c6d4cce51b7151b82d14366"
+  },
+  "prohibited_conclusions": "No baseline comparison or end-to-end performance conclusion.",
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_stage4_audit_1",
+  "seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "status": "STAGE4_IMPLEMENTED_UNVERIFIED",
+  "test_trace_opened": false,
+  "training_aggregates": {
+    "canneal": {
+      "best_valid_loss": {
+        "max": -0.03504671519001325,
+        "mean": -0.035378809356027184,
+        "min": -0.03559597897032896,
+        "sample_std": 0.0002921102780310129
+      },
+      "final_train_loss": {
+        "max": -0.056334083932822784,
+        "mean": -0.05650944773734143,
+        "min": -0.05660583589028204,
+        "sample_std": 0.00015211885732007878
+      }
+    },
+    "dedup_pressure": {
+      "best_valid_loss": {
+        "max": -0.0011781647980931293,
+        "mean": -0.0011783229658402592,
+        "min": -0.001178629831018218,
+        "sample_std": 2.6579522156256174e-07
+      },
+      "final_train_loss": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "sample_std": 0.0
+      }
+    },
+    "streamcluster_pressure": {
+      "best_valid_loss": {
+        "max": -0.04697556287217676,
+        "mean": -0.04700409458454852,
+        "min": -0.047048337987802,
+        "sample_std": 3.884838846514731e-05
+      },
+      "final_train_loss": {
+        "max": -0.05201178120777888,
+        "mean": -0.05211336668991648,
+        "min": -0.05216766612412518,
+        "sample_std": 8.804546855247297e-05
+      }
+    }
+  },
+  "training_runs": 9,
+  "workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure"
+  ]
+}
