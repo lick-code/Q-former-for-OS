@@ -26,6 +26,14 @@ QMAP-CrossAttn =
 
 ## 当前状态
 
+当前正式 CAPD-MIC-1.0 实验主线以
+`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 为准：Stage 0—5
+已经验收，Stage 5 manifest为 `STAGE5_VERIFIED`（348/348 required
+jobs）；当前正在进行 Stage 6 的稳健性、开销与系统验证。Stage 6
+协议和105-job正式矩阵已经实现并冻结，但GPU开销测量与高容量重训练
+尚未完成，因此状态为 `STAGE6_IMPLEMENTED_UNVERIFIED`，不能提前形成
+Stage 6性能结论。
+
 已经完成：
 
 ```text

@@ -732,6 +732,8 @@ def main():
     manifest["test_trace_opened"] = False
     manifest["stage5_variant"] = finals_context["config"].get(
         "stage5_variant")
+    manifest["stage6_variant"] = finals_context["config"].get(
+        "stage6_variant")
     manifest["model_contract"] = {
         "position_encoding": getattr(
             args, "position_encoding", "sinusoidal"),

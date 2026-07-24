@@ -381,6 +381,7 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
   history_length = int(config["history"]["transformer_H"])
   is_v3 = config.get("schema_version") == finals_config.SCHEMA_VERSION
   variant_id = config.get("stage5_variant", {}).get("variant_id")
+  stage6_variant_id = config.get("stage6_variant", {}).get("variant_id")
   lambda_w = float(config["labels"].get("lambda_w", 4.0))
   future_oracle = FutureOracle(
       trace, lookahead, require_complete=is_v3)
@@ -448,6 +449,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
           })
           if variant_id is not None:
             sample["stage5_variant_id"] = variant_id
+          if stage6_variant_id is not None:
+            sample["stage6_variant_id"] = stage6_variant_id
         else:
           sample["physical_address"] = history_page_ids
         output_file.write(json.dumps(sample, sort_keys=True) + "\n")
@@ -514,6 +517,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
     metadata.update(finals_config.artifact_identity_from_config(config))
     if variant_id is not None:
       metadata["stage5_variant"] = dict(config["stage5_variant"])
+    if stage6_variant_id is not None:
+      metadata["stage6_variant"] = dict(config["stage6_variant"])
   finals_config.write_json(finals_config.metadata_path(output_path), metadata)
   return metadata
 

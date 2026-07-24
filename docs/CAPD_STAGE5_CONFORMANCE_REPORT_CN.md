@@ -1,6 +1,6 @@
 # CAPD 阶段5实现符合性报告
 
-状态：`STAGE5_IMPLEMENTED_UNVERIFIED`
+状态：`STAGE5_VERIFIED`
 
 ## 已实现
 
@@ -21,13 +21,15 @@
 - `tests/test_capd_stage5_end_to_end.py`：348-job矩阵与服务器opt-in临时目录mini E2E；
 - 既有回归继续覆盖统一ReplayStats成本手算、未来标签隔离、基线不加载CAPD selector/标签以及Full checkpoint严格加载。
 
-## 尚未完成的验收
+## 正式验收结果
 
-本地没有正式Python/PyTorch运行环境，本轮未运行训练、Trace Replay、正式主实验、正式消融或敏感性实验。服务器尚未产生本阶段official结果，因此：
+- `outputs/results/finals_v3_official/stage5_main/run_manifest.json`
+  已记录 `status=STAGE5_VERIFIED`；
+- required job为348，完成348，主实验、核心消融和预注册敏感性矩阵完整；
+- `test_used_for_selection=false`，test未用于selector、标签权重、结构、
+  checkpoint、seed或默认参数选择；
+- 阶段5结果已经满足阶段6启动门槛。
 
-- 当前状态不能提升为 `STAGE5_VERIFIED`；
-- 不能形成CAPD优于或劣于任何基线的性能结论；
-- 没有使用test选择selector、标签权重、模型结构、checkpoint、seed或默认参数；
-- 没有进入阶段6的容量、成本权重、延迟、内存或真实平台验证。
-
-完整服务器门禁见 `docs/CAPD_STAGE5_SERVER_VALIDATION_CN.md`。
+完整服务器门禁与复现入口见
+`docs/CAPD_STAGE5_SERVER_VALIDATION_CN.md` 和
+`scripts/validate_capd_stage5_server.sh`。

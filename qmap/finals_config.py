@@ -22,6 +22,7 @@ CONTRACT_ID = "CAPD-MIC-1.0"
 OFFICIAL_PROFILE = "official"
 SMOKE_PROFILE = "smoke"
 STAGE5_VARIANT_FAMILIES = ("ablation", "sensitivity")
+STAGE6_VARIANT_FAMILIES = ("capacity_robustness",)
 LEGACY_CONTRACT_FIELDS = (
     ("schema_version",),
     ("memory", "dram_capacity_pages"),
@@ -342,6 +343,9 @@ def _validate_v3_config(config, require_resolved=False):
   residency_scale = int(config["features"]["residency_scale_Lres"])
   page_state_dim = int(config["features"]["page_state_dim"])
   stage5_variant = config.get("stage5_variant")
+  stage6_variant = config.get("stage6_variant")
+  if stage5_variant is not None and stage6_variant is not None:
+    raise ValueError("A config cannot be both a stage-5 and stage-6 variant.")
   if dram_capacity <= 0 or pool_size <= 0 or retained <= 0:
     raise ValueError("D, B and K must be positive.")
   if pool_size > dram_capacity or retained > pool_size:
@@ -434,7 +438,7 @@ def _validate_v3_config(config, require_resolved=False):
          for key, value in expected_costs.items()):
     raise ValueError("CAPD v3 cost model does not match CAPD-MIC-1.0.")
   if profile == OFFICIAL_PROFILE:
-    if stage5_variant is None:
+    if stage5_variant is None and stage6_variant is None:
       if (dram_capacity != 64 or retained != 8 or
           transformer_history != 10 or selector_history != 256 or
           lookahead != 256 or residency_scale != 256):
@@ -444,8 +448,12 @@ def _validate_v3_config(config, require_resolved=False):
             "Official Full v3 requires model.position_encoding=sinusoidal.")
       if float(labels.get("lambda_w", -1)) != 4.0:
         raise ValueError("Official Full v3 requires label weights 1,1,4.")
-    else:
+    elif stage5_variant is not None:
       _validate_stage5_variant_config(
+          config, dram_capacity, pool_size, retained, transformer_history,
+          selector_history, lookahead, residency_scale)
+    else:
+      _validate_stage6_variant_config(
           config, dram_capacity, pool_size, retained, transformer_history,
           selector_history, lookahead, residency_scale)
     if sorted(config.get("sweep", {}).get("pool_sizes_B", [])) != [8, 16, 32, 64]:
@@ -550,6 +558,51 @@ def _validate_stage5_variant_config(
   if actual != expected:
     raise ValueError(
         "Stage-5 variant {} has undeclared differences: expected={} "
+      "actual={}.".format(variant_id, expected, actual))
+
+
+def _validate_stage6_variant_config(
+    config, dram_capacity, pool_size, retained, transformer_history,
+    selector_history, lookahead, residency_scale):
+  """Allows only preregistered capacity changes for stage-6 robustness."""
+  variant = config.get("stage6_variant")
+  required = (
+      "variant_id", "family", "only_difference", "source_stage",
+      "test_used_for_selection", "retrain_required")
+  missing = [key for key in required if key not in variant]
+  if missing:
+    raise ValueError("stage6_variant missing fields: {}".format(missing))
+  if variant["family"] not in STAGE6_VARIANT_FAMILIES:
+    raise ValueError("Unsupported stage6_variant family.")
+  if variant["source_stage"] != "stage6":
+    raise ValueError("stage6_variant source_stage must be stage6.")
+  if variant["test_used_for_selection"] is not False:
+    raise ValueError("Stage-6 variants must never use test for selection.")
+  if variant["retrain_required"] is not True:
+    raise ValueError("Stage-6 capacity variants require retraining.")
+  if not variant["only_difference"]:
+    raise ValueError("stage6_variant.only_difference must be explicit.")
+
+  variant_id = variant["variant_id"]
+  if not variant_id.startswith("capacity_D"):
+    raise ValueError("Unknown stage6_variant.variant_id: {}".format(
+        variant_id))
+  expected_capacity = int(variant_id[len("capacity_D"):])
+  if expected_capacity not in (128, 256):
+    raise ValueError("Unsupported stage-6 capacity point.")
+  expected = {
+      "D": expected_capacity, "B": 64, "K": 8, "H": 10, "Hc": 256,
+      "L": 256, "Lres": 256, "position_encoding": "sinusoidal",
+      "lambda_w": 4.0}
+  actual = {
+      "D": dram_capacity, "B": pool_size, "K": retained,
+      "H": transformer_history, "Hc": selector_history, "L": lookahead,
+      "Lres": residency_scale,
+      "position_encoding": config["model"]["position_encoding"],
+      "lambda_w": float(config["labels"].get("lambda_w", -1))}
+  if actual != expected:
+    raise ValueError(
+        "Stage-6 variant {} has undeclared differences: expected={} "
         "actual={}.".format(variant_id, expected, actual))
 
 
@@ -629,6 +682,11 @@ def contract_from_config(config):
           "stage5_variant_id": config["stage5_variant"]["variant_id"],
           "stage5_variant_family": config["stage5_variant"]["family"],
           "lambda_w": float(config["labels"]["lambda_w"]),
+      })
+    if config.get("stage6_variant") is not None:
+      contract.update({
+          "stage6_variant_id": config["stage6_variant"]["variant_id"],
+          "stage6_variant_family": config["stage6_variant"]["family"],
       })
   return contract
 

@@ -103,16 +103,70 @@ def build_arg_parser():
   parser.add_argument("--migration_cost", type=float, default=MIGRATION_COST)
   parser.add_argument("--json_output", default=None,
                       help="Optional path to write machine-readable metrics.")
+  parser.add_argument(
+      "--stage6_profile", action="store_true",
+      help=("Collect synchronized per-decision/component latency samples and "
+            "runtime memory evidence for CAPD stage 6."))
+  parser.add_argument(
+      "--stage6_warmup_decisions", type=int, default=20,
+      help=("Number of initial policy decisions excluded from stage-6 "
+            "latency percentiles."))
   parser.add_argument("--ablation", choices=ABLATION_CHOICES, default=None,
                       help=("QMAP ablation variant. Defaults to the checkpoint "
                             "model_args value for --policy qmap."))
   return parser
 
 
+def _quantile(values, probability):
+  """Returns a deterministic linearly interpolated quantile."""
+  if not values:
+    return 0.0
+  ordered = sorted(float(value) for value in values)
+  if len(ordered) == 1:
+    return ordered[0]
+  position = (len(ordered) - 1) * float(probability)
+  lower = int(math.floor(position))
+  upper = int(math.ceil(position))
+  if lower == upper:
+    return ordered[lower]
+  fraction = position - lower
+  return ordered[lower] * (1.0 - fraction) + ordered[upper] * fraction
+
+
+def _sample_summary(values):
+  values = [float(value) for value in values]
+  if not values:
+    return {
+        "count": 0, "mean": 0.0, "min": 0.0, "p50": 0.0,
+        "p95": 0.0, "p99": 0.0, "max": 0.0}
+  return {
+      "count": len(values),
+      "mean": sum(values) / float(len(values)),
+      "min": min(values),
+      "p50": _quantile(values, 0.50),
+      "p95": _quantile(values, 0.95),
+      "p99": _quantile(values, 0.99),
+      "max": max(values),
+  }
+
+
+def _process_peak_rss_bytes():
+  """Best-effort peak resident-set size, normalized to bytes."""
+  try:
+    import resource
+    value = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    # Linux reports KiB while macOS reports bytes.
+    return value if sys.platform == "darwin" else value * 1024
+  except (ImportError, AttributeError, ValueError):
+    return None
+
+
 class ReplayStats(object):
   """Tracks replay metrics."""
 
-  def __init__(self):
+  def __init__(self, stage6_profile=False, warmup_decisions=20):
+    if warmup_decisions < 0:
+      raise ValueError("warmup_decisions must be non-negative.")
     self.total_accesses = 0
     self.hit_count = 0
     self.miss_count = 0
@@ -126,6 +180,13 @@ class ReplayStats(object):
     self.selector_time_seconds = 0.0
     self.selector_B_t = []
     self.selector_K_t = []
+    self.stage6_profile = bool(stage6_profile)
+    self.profile_warmup_decisions = int(warmup_decisions)
+    self.profile_decision_samples_ms = []
+    self.profile_component_samples_ms = {}
+    self.profile_selector_samples_ms = []
+    self.profile_memory = {}
+    self.replay_wall_seconds = 0.0
 
   @property
   def hit_rate(self):
@@ -151,9 +212,39 @@ class ReplayStats(object):
     self.selector_time_seconds += snapshot["selector_time_seconds"]
     self.selector_B_t.append(snapshot["B_t"])
     self.selector_K_t.append(snapshot["K_t"])
+    if (self.stage6_profile and
+        self.decision_count >= self.profile_warmup_decisions):
+      self.profile_selector_samples_ms.append(
+          float(snapshot["selector_time_seconds"]) * 1000.0)
+
+  def record_decision(self, elapsed_seconds, component_timings=None):
+    """Records one decision while preserving historical aggregate fields."""
+    elapsed_seconds = float(elapsed_seconds)
+    if elapsed_seconds < 0.0 or not math.isfinite(elapsed_seconds):
+      raise ValueError("Decision latency must be finite and non-negative.")
+    include_profile = (
+        self.stage6_profile and
+        self.decision_count >= self.profile_warmup_decisions)
+    self.decision_time_seconds += elapsed_seconds
+    self.decision_count += 1
+    if not include_profile:
+      return
+    self.profile_decision_samples_ms.append(elapsed_seconds * 1000.0)
+    for name, value in (component_timings or {}).items():
+      value = float(value)
+      if value < 0.0 or not math.isfinite(value):
+        raise ValueError("Component latency must be finite and non-negative.")
+      self.profile_component_samples_ms.setdefault(name, []).append(
+          value * 1000.0)
+
+  @property
+  def throughput_accesses_per_second(self):
+    if self.replay_wall_seconds <= 0.0:
+      return 0.0
+    return self.total_accesses / float(self.replay_wall_seconds)
 
   def to_dict(self, policy, trace_path, dram_capacity):
-    return {
+    result = {
         "policy": policy,
         "trace_path": trace_path,
         "dram_capacity": dram_capacity,
@@ -169,6 +260,9 @@ class ReplayStats(object):
         "decision_count": self.decision_count,
         "decision_time_seconds": self.decision_time_seconds,
         "avg_decision_time_ms": self.avg_decision_time_ms,
+        "replay_wall_seconds": self.replay_wall_seconds,
+        "throughput_accesses_per_second":
+            self.throughput_accesses_per_second,
         "candidate_filter": {
             "decision_count": self.selector_decision_count,
             "min_B_t": min(self.selector_B_t) if self.selector_B_t else 0,
@@ -185,6 +279,29 @@ class ReplayStats(object):
             "avg_selector_time_ms": self.avg_selector_time_ms,
         },
     }
+    if self.stage6_profile:
+      components = dict(self.profile_component_samples_ms)
+      if self.profile_selector_samples_ms:
+        components["selector"] = list(self.profile_selector_samples_ms)
+      components["full_decision"] = list(
+          self.profile_decision_samples_ms)
+      result["stage6_profile"] = {
+          "schema_version": "capd_finals_v3_stage6_profile_1",
+          "clock": "time.perf_counter",
+          "cuda_synchronization": "component_boundaries_for_qmap",
+          "warmup_decisions": self.profile_warmup_decisions,
+          "measured_decisions": len(self.profile_decision_samples_ms),
+          "latency_ms": {
+              name: _sample_summary(values)
+              for name, values in sorted(components.items())
+          },
+          "samples_ms": {
+              name: list(values)
+              for name, values in sorted(components.items())
+          },
+          "memory": dict(self.profile_memory),
+      }
+    return result
 
 
 def dram_access_cost(rw, args):
@@ -517,7 +634,8 @@ class QMAPPolicy(object):
 
   def __init__(self, checkpoint_path, device, history_length, candidate_count,
                lookahead=256, ablation=None, rank_guard=0,
-               rank_score_penalty=0.0, config=None, selector_params=None):
+               rank_score_penalty=0.0, config=None, selector_params=None,
+               stage6_profile=False):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
     if candidate_count <= 0:
@@ -542,6 +660,8 @@ class QMAPPolicy(object):
     self._lookahead = lookahead
     self._selector_history = None
     self.last_selector_snapshot = None
+    self.last_component_timings = {}
+    self._stage6_profile = bool(stage6_profile)
     self._is_v3 = False
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
@@ -622,6 +742,67 @@ class QMAPPolicy(object):
     if self._device.type == "cuda" and self._torch.cuda.is_available():
       self._torch.cuda.synchronize(self._device)
 
+  def _profile_start(self):
+    if not self._stage6_profile:
+      return None
+    self.synchronize()
+    return time.perf_counter()
+
+  def _profile_end(self, started, name, timings):
+    if started is None:
+      return
+    self.synchronize()
+    timings[name] = time.perf_counter() - started
+
+  def reset_profile_memory(self):
+    if (self._stage6_profile and self._device.type == "cuda" and
+        self._torch.cuda.is_available()):
+      self._torch.cuda.reset_peak_memory_stats(self._device)
+
+  def memory_profile(self):
+    """Returns static model bytes and best-effort CUDA inference peaks."""
+    parameter_ids = set()
+    buffer_ids = set()
+    parameter_bytes = 0
+    buffer_bytes = 0
+    for module in (
+        self._feature_embedder, self._extractor, self._scorer):
+      for value in module.parameters():
+        identity = id(value)
+        if identity not in parameter_ids:
+          parameter_ids.add(identity)
+          parameter_bytes += value.numel() * value.element_size()
+      for value in module.buffers():
+        identity = id(value)
+        if identity not in buffer_ids:
+          buffer_ids.add(identity)
+          buffer_bytes += value.numel() * value.element_size()
+    result = {
+        "model_parameter_bytes": int(parameter_bytes),
+        "model_buffer_bytes": int(buffer_bytes),
+        "model_static_bytes": int(parameter_bytes + buffer_bytes),
+        "device": str(self._device),
+        "process_peak_rss_bytes": _process_peak_rss_bytes(),
+    }
+    if self._device.type == "cuda" and self._torch.cuda.is_available():
+      result.update({
+          "cuda_device_name":
+              self._torch.cuda.get_device_name(self._device),
+          "torch_version": str(self._torch.__version__),
+          "cuda_peak_allocated_bytes": int(
+              self._torch.cuda.max_memory_allocated(self._device)),
+          "cuda_peak_reserved_bytes": int(
+              self._torch.cuda.max_memory_reserved(self._device)),
+      })
+    else:
+      result.update({
+          "cuda_device_name": None,
+          "torch_version": str(self._torch.__version__),
+          "cuda_peak_allocated_bytes": 0,
+          "cuda_peak_reserved_bytes": 0,
+      })
+    return result
+
   def observe(self, page, rw, access_index):
     # Called after the decision and current-page insertion, so selector
     # features at a decision never contain the triggering miss.
@@ -630,6 +811,9 @@ class QMAPPolicy(object):
 
   def choose_victim(self, dram_pages, history, max_page, access_index,
                     dram_insert_time, dirty_pages):
+    del max_page
+    timings = {}
+    started = self._profile_start()
     snapshot = None
     if self._config is not None:
       snapshot = build_replay_decision_snapshot(
@@ -660,7 +844,9 @@ class QMAPPolicy(object):
               candidate, history, residency_duration,
               candidate in dirty_pages, self._history_length)
         candidate_state_features.append(features)
+    self._profile_end(started, "selector", timings)
 
+    started = self._profile_start()
     history_page_ids, pc, rw = apply_history_ablation(
         *padded_history(history, self._history_length),
         ablation=self._ablation)
@@ -682,8 +868,12 @@ class QMAPPolicy(object):
       candidate_mask_tensor = torch.tensor(
           [candidate_mask], dtype=torch.float32, device=self._device)
       access_features = self._feature_embedder(history_page_ids, pc, rw)
+      self._profile_end(started, "tensor_and_embedding", timings)
+      started = self._profile_start()
       z = self._extractor(
           access_features, history_mask=history_mask_tensor)
+      self._profile_end(started, "transformer_encoder", timings)
+      started = self._profile_start()
       candidate_page_embeddings = (
           self._feature_embedder.embed_pages(candidate_pages)
           if getattr(self._scorer, "_shared_page_embedding", False) else None)
@@ -698,6 +888,8 @@ class QMAPPolicy(object):
                 eviction_scores.shape[1], self._rank_score_penalty)],
             dtype=eviction_scores.dtype, device=self._device)
         eviction_scores = eviction_scores - rank_penalties
+      self._profile_end(started, "cross_attention_scorer", timings)
+      started = self._profile_start()
       if self._is_v3:
         # v3 candidates are selector-ordered, not LRU-ordered. Resolve exact
         # final-score ties only from the frozen pre-decision snapshot ranks.
@@ -708,14 +900,18 @@ class QMAPPolicy(object):
         # Preserve the historical v2.1/legacy first-argmax behavior.
         victim_index = int(torch.argmax(eviction_scores, dim=1).item())
         victim = candidates[victim_index]
+      self._profile_end(started, "victim_selection", timings)
     self.last_selector_snapshot = snapshot
+    self.last_component_timings = timings
     return victim
 
 
 def replay(args, finals_replay_config=None):
   trace, _ = read_trace(args.trace_path, args.page_shift)
   max_page = max((item["page"] for item in trace), default=1)
-  stats = ReplayStats()
+  stats = ReplayStats(
+      stage6_profile=getattr(args, "stage6_profile", False),
+      warmup_decisions=getattr(args, "stage6_warmup_decisions", 20))
   dram_pages = []
   # DRAM starts empty; every trace page is conceptually backed by unbounded
   # NVM, so a page's first touch is charged as an NVM access.
@@ -769,7 +965,9 @@ def replay(args, finals_replay_config=None):
         args.rank_guard,
         args.rank_score_penalty,
         config=finals_replay_config,
-        selector_params=selector_params)
+        selector_params=selector_params,
+        stage6_profile=getattr(args, "stage6_profile", False))
+    qmap_policy.reset_profile_memory()
   elif is_learned_policy(args.policy):
     if args.learned_model is None:
       raise ValueError("--learned_model is required for {}.".format(
@@ -804,6 +1002,7 @@ def replay(args, finals_replay_config=None):
             "Finals learned baselines must retain their native tail-8 pool.")
     learned_policy = LearnedBaselinePolicy(learned_model)
 
+  replay_started = time.perf_counter()
   for access_index, access in enumerate(trace):
     page = access["page"]
     rw = access["rw"]
@@ -858,8 +1057,11 @@ def replay(args, finals_replay_config=None):
           if selector_snapshot is not None:
             stats.record_selector(selector_snapshot)
           qmap_policy.synchronize()
-        stats.decision_time_seconds += time.perf_counter() - decision_start
-        stats.decision_count += 1
+        elapsed_seconds = time.perf_counter() - decision_start
+        component_timings = (
+            qmap_policy.last_component_timings
+            if qmap_policy is not None else None)
+        stats.record_decision(elapsed_seconds, component_timings)
 
         dram_pages.remove(victim)
         clock_policy.remove(victim)
@@ -883,6 +1085,20 @@ def replay(args, finals_replay_config=None):
     if qmap_policy is not None:
       qmap_policy.observe(page, rw, access_index)
 
+  stats.replay_wall_seconds = time.perf_counter() - replay_started
+  if stats.stage6_profile:
+    stats.profile_memory = (
+        qmap_policy.memory_profile() if qmap_policy is not None else {
+            "model_parameter_bytes": 0,
+            "model_buffer_bytes": 0,
+            "model_static_bytes": 0,
+            "device": "cpu",
+            "cuda_device_name": None,
+            "torch_version": None,
+            "process_peak_rss_bytes": _process_peak_rss_bytes(),
+            "cuda_peak_allocated_bytes": 0,
+            "cuda_peak_reserved_bytes": 0,
+        })
   return stats
 
 
@@ -913,6 +1129,8 @@ def main():
   args = build_arg_parser().parse_args()
   if args.rank_score_penalty < 0.0:
     raise ValueError("--rank_score_penalty must be non-negative.")
+  if args.stage6_warmup_decisions < 0:
+    raise ValueError("--stage6_warmup_decisions must be non-negative.")
   replay_config = apply_replay_finals_config(args)
   stats = replay(args, finals_replay_config=replay_config)
   print_stats(args.policy, stats)
@@ -961,6 +1179,8 @@ def main():
             replay_config))
       if replay_config.get("stage5_variant") is not None:
         metrics["stage5_variant"] = dict(replay_config["stage5_variant"])
+      if replay_config.get("stage6_variant") is not None:
+        metrics["stage6_variant"] = dict(replay_config["stage6_variant"])
       metrics["selector_params"] = args.selector_params
       if args.selector_params:
         replay_selector = finals_config.load_json(args.selector_params)

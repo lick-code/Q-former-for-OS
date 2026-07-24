@@ -1,6 +1,6 @@
 # CAPD 阶段5：端到端主实验与组件消融协议
 
-状态：`STAGE5_IMPLEMENTED_UNVERIFIED`
+状态：`STAGE5_VERIFIED`
 
 ## Material Passport
 
@@ -114,4 +114,5 @@ Full冻结selector已是均匀 `(0.2,0.2,0.2,0.2,0.2)`，因此“均匀selector
 - 消融结果：`outputs/results/finals_v3_official/stage5_ablation/`
 - 敏感性：`dataset/jsonl/finals_v3_official/stage5_sensitivity/`、`outputs/checkpoints/finals_v3_official/stage5_sensitivity/`、`outputs/results/finals_v3_official/stage5_sensitivity/`
 
-当前只完成实现，尚未运行服务器正式矩阵，因此不得形成方法性能结论，不得进入阶段6。
+服务器正式矩阵已完成348/348个required job并通过统一验收；阶段6启动门槛
+已经满足。阶段5结果仍须遵守本协议中的适用边界，不得用test反向修改冻结方法。
