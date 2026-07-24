@@ -4,6 +4,7 @@
 import copy
 import os
 import sys
+import tempfile
 import unittest
 
 
@@ -13,6 +14,7 @@ if PROJECT_ROOT not in sys.path:
 
 from qmap import candidate_filter
 from qmap import finals_config
+from qmap import finals_data
 from qmap import finals_generator
 from qmap import stage5_variants
 
@@ -48,6 +50,33 @@ class Stage5VariantTest(unittest.TestCase):
           expected[name] = spec["changes"][name]
       self.assertEqual(expected, parameters, spec["variant_id"])
       self.assertFalse(config["stage5_variant"]["test_used_for_selection"])
+
+  def test_sensitivity_configs_reuse_sealed_full_data_profile(self):
+    profile_path = os.path.join(
+        PROJECT_ROOT, self.base["validation"]["data_quality_profile"])
+    profile = finals_data.load_json(profile_path)
+    for spec in stage5_variants.sensitivity_specs():
+      config = stage5_variants.build_variant_config(self.base, spec)
+      identity = finals_data.validate_data_profile(profile, config)
+      self.assertEqual(profile["profile_id"], identity["profile_id"])
+      with tempfile.TemporaryDirectory() as root:
+        config_path = os.path.join(root, "resolved_config.json")
+        finals_config.write_json(config_path, config)
+        loaded = finals_config.load_config(
+            config_path, require_resolved=True, project_root=PROJECT_ROOT,
+            verify_manifest_files=False)
+      self.assertEqual(
+          spec["variant_id"], loaded["stage5_variant"]["variant_id"])
+
+  def test_data_profile_still_rejects_undeclared_method_change(self):
+    profile_path = os.path.join(
+        PROJECT_ROOT, self.base["validation"]["data_quality_profile"])
+    profile = finals_data.load_json(profile_path)
+    invalid = copy.deepcopy(self.base)
+    invalid["candidate"]["retained_K"] = 4
+    with self.assertRaisesRegex(
+        ValueError, "Data quality profile method constant mismatch: K"):
+      finals_data.validate_data_profile(profile, invalid)
 
   def test_full_loader_still_rejects_non_sinusoidal_checkpoint_config(self):
     invalid = copy.deepcopy(self.base)

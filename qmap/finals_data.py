@@ -26,6 +26,21 @@ CONTRACT_ID = "CAPD-MIC-1.0"
 REQUIRED_SPLITS = ("train", "valid", "test")
 READ_VALUES = ("0", "r", "read", "load", "l")
 WRITE_VALUES = ("1", "w", "write", "store", "s")
+STAGE5_SENSITIVITY_PROFILE_BASELINE = {
+    "D": 64, "K": 8, "H": 10, "Hc": 256, "L": 256,
+}
+STAGE5_SENSITIVITY_PROFILE_DIMENSION = {
+    "sensitivity_K4": "K",
+    "sensitivity_K16": "K",
+    "sensitivity_H5": "H",
+    "sensitivity_H20": "H",
+    "sensitivity_Hc64": "Hc",
+    "sensitivity_Hc128": "Hc",
+    "sensitivity_Hc512": "Hc",
+    "sensitivity_L64": "L",
+    "sensitivity_L128": "L",
+    "sensitivity_L512": "L",
+}
 
 
 def canonical_json_bytes(value):
@@ -560,6 +575,18 @@ def validate_data_profile(profile, config):
       "pool_sizes_B": sorted(int(value) for value in
                              config["sweep"]["pool_sizes_B"]),
   }
+  variant = config.get("stage5_variant", {})
+  variant_id = variant.get("variant_id")
+  if variant.get("family") == "sensitivity":
+    # The sealed stage-2 profile qualifies the immutable source corpus under
+    # frozen Full constants.  A preregistered stage-5 sensitivity point may
+    # vary exactly one method dimension without rewriting that historical
+    # quality seal; stage-5 config validation and fresh sample generation
+    # independently enforce the variant value and usable sample count.
+    profile_dimension = STAGE5_SENSITIVITY_PROFILE_DIMENSION.get(variant_id)
+    if profile_dimension is not None:
+      expected[profile_dimension] = (
+          STAGE5_SENSITIVITY_PROFILE_BASELINE[profile_dimension])
   actual = copy.deepcopy(profile["method_constants"])
   actual["pool_sizes_B"] = sorted(
       int(value) for value in actual.get("pool_sizes_B", []))
