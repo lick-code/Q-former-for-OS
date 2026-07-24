@@ -1,0 +1,27 @@
+{
+  "completed_required_jobs": 348,
+  "contract_id": "CAPD-MIC-1.0",
+  "historical_capd_comparison": false,
+  "outputs": [
+    "stage5_main_results.csv",
+    "stage5_main_summary.json",
+    "stage5_main_report.md",
+    "stage5_ablation_results.csv",
+    "stage5_ablation_summary.json",
+    "stage5_ablation_report.md",
+    "stage5_sensitivity_results.csv",
+    "stage5_sensitivity_report.md",
+    "learned_baseline_comparability.json",
+    "stage4_boundary_crosswalk.csv",
+    "input_audit.json",
+    "run_manifest.json",
+    "execution_plan.json"
+  ],
+  "required_jobs": 348,
+  "schema_version": "capd_finals_v3_stage5_run_manifest_1",
+  "server_gate_ready": true,
+  "stage6_entered": false,
+  "status": "STAGE5_VERIFIED",
+  "test_used_for_selection": false,
+  "verified_by": "scripts/validate_capd_stage5_server.sh"
+}

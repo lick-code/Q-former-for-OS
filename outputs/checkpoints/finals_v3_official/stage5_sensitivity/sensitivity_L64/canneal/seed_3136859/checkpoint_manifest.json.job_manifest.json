@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_L64/canneal/seed_3136859 --seed 3136859",
+  "ended_unix": 1784864465.4376202,
+  "exit_code": 0,
+  "job_fingerprint": "1a7a395a0b3f2d9126b2ffe326d268885bfab4716932876d7ec1b75b8f618df5",
+  "job_id": "sensitivity:train:sensitivity_L64:canneal:3136859",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_L64/canneal/seed_3136859/checkpoint_manifest.json.log",
+  "result_fingerprint": "eb1bc5f9a377d6ee81ec67656a772077cd8c075a9b6dd7c2c7bc01679782fd68",
+  "retry_count": 0,
+  "started_unix": 1784864399.3188758,
+  "status": "COMPLETED"
+}

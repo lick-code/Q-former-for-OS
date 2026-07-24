@@ -1,0 +1,115 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 9,
+  "best_validation_loss": -0.003237743244579669,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "36a0232d692c9288c5f71d3955f94b349d415c7f5ee8efeb1b6e3d55c77d2cc6",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_L64/streamcluster_pressure/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "2a71cad4b30b198bcddb719b5b7d24ffae4373742844ddf9c82c835955cd3359",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_L64/streamcluster_pressure/seed_3136859/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "c0d516531462c4badd45da3c3ffd85804e17457ac729dd7d63158318aa04d79a",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L64/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_L64/streamcluster_pressure/seed_3136859 --seed 3136859",
+  "config_fingerprint": "e074a005627be5896de706d114c037b97bb4be3a3b2626a935fdb4fbee131285",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "2b31c00b19945884a09cc6fc8f3d451aad73f0d03b98a350ef540960609ea2c4",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.0033396284287685856,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "b9ad949ac36f740db39c63a131ae553e058b846781737f962b455c3a537895ef",
+    "valid": "c7ba4ea0ec2a1c0e2b365e9c5b9617171177742381c6283d4292d61f7205b984"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.0026069383534109767,
+      "valid_loss": -0.0027470788970757067
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.0026071386836359605,
+      "valid_loss": -0.002748329464471742
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.0026104684357586153,
+      "valid_loss": -0.002753340607781089
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.002627807580318083,
+      "valid_loss": -0.0027618695343478343
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.0026927486897501,
+      "valid_loss": -0.002939131445764156
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.002805498565601952,
+      "valid_loss": -0.002904057314389207
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.002978972063454635,
+      "valid_loss": -0.0029490028371971645
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.0031773894545896087,
+      "valid_loss": -0.0031156481944777993
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.003249059390167103,
+      "valid_loss": -0.003237743244579669
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.0033396284287685856,
+      "valid_loss": -0.0031675306891792276
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "ba6eb4a615a6e1c0c2795e4f652ff59f4117dcd7b0f1a5067736dbc6fde82a9b",
+  "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+  "source_manifest_fingerprint": "d12c5e2507c333421709ab37c1d555e50426674e3853c88759c2d44237c70235",
+  "split_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "stage5_variant": {
+    "family": "sensitivity",
+    "only_difference": "only L changes from 256 to 64",
+    "retrain_required": true,
+    "source_stage": "stage5",
+    "test_used_for_selection": false,
+    "variant_id": "sensitivity_L64"
+  },
+  "test_trace_opened": false,
+  "training_duration_seconds": 73.14021039009094,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "streamcluster_pressure"
+}

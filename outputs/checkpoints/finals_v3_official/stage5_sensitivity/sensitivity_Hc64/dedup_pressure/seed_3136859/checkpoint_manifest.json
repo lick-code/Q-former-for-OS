@@ -1,0 +1,115 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 1,
+  "best_validation_loss": -0.0011781649327421762,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "ca4ae64c2c65fd811f3c62c2935f918b7f4ab69df04f782928b6774977bedf3a",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_Hc64/dedup_pressure/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "75b7a7949ccf22a659bf46d58b4f96f61af3f41085ac6f11e6f8b2a6ee7dc03a",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_Hc64/dedup_pressure/seed_3136859/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "c0d516531462c4badd45da3c3ffd85804e17457ac729dd7d63158318aa04d79a",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_Hc64/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_Hc64/dedup_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_Hc64/dedup_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_Hc64/dedup_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_Hc64/dedup_pressure/seed_3136859 --seed 3136859",
+  "config_fingerprint": "4104cd6460c58258dd43a90ea5e1f74bd14f17aff963d9a8da040b24b8b50ac2",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "d42012b4222091383fc3dfd7eb084dfe4c714512f067aaf7620d37dc844f4fa8",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": 0.0,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "3f39a8e8c1c6bce6dc32c7851b0a6ebdb28727e44a68905de91f54ba57239bbf",
+    "valid": "6c07f51d72afe75cebdd0c5be4ce068b0d3408232b03b58bbea24888ab350609"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011781649327421762
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "08349208396ee426ba7d7ca8d3b9f6161dd3da9f1696e82b06b8bcc9fbe8ce51",
+  "source_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+  "source_manifest_fingerprint": "1c04935e3188eed4d2e7d6217b2e156253448b2967c26905353476190dd8f439",
+  "split_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "stage5_variant": {
+    "family": "sensitivity",
+    "only_difference": "only Hc changes from 256 to 64",
+    "retrain_required": true,
+    "source_stage": "stage5",
+    "test_used_for_selection": false,
+    "variant_id": "sensitivity_Hc64"
+  },
+  "test_trace_opened": false,
+  "training_duration_seconds": 32.79201531410217,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "dedup_pressure"
+}

@@ -1,0 +1,49 @@
+{
+  "artifact_class": "official",
+  "checkpoint_fingerprint": "0b992225bb4b19d6d66f604b94c91e008140b7ad56af9e8818c34d67e3255e89",
+  "checkpoint_manifest_fingerprint": "797e67c9c0c5bfd9a505cefc2f75885122954363f6b843994598402088624289",
+  "checkpoint_path": "outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_K4/streamcluster_pressure/seed_3136859/qmap_best.pth",
+  "code_commit": "b9adf4f0ea2bc27de8b081667f81dd426863b587",
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_K4/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_K4/streamcluster_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_K4/streamcluster_pressure/seed_3136859/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_K4/streamcluster_pressure/seed_3136859.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "evidence_tier": "single_seed_sensitivity",
+  "jsonl_fingerprints": {
+    "train": "5c57b2e79e544d9583b285413c24937a69a4533af8ece70419e64a2ff6ffbeab",
+    "valid": "809cae858e16b6cd7be75085e08d6d561ab0cd623ff3e4ba138498067d84804b"
+  },
+  "model_seed": 3136859,
+  "only_difference": "only K changes from 8 to 4",
+  "parameters": {
+    "B": 64,
+    "D": 64,
+    "H": 10,
+    "Hc": 256,
+    "K": 4,
+    "L": 256,
+    "Lres": 256
+  },
+  "replay_seed": null,
+  "result_fingerprint": "e5e9532229f72db6492e92a67af3e47168541ec843f3e5980875f238a0fc3669",
+  "result_path": "outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_K4/streamcluster_pressure/seed_3136859.json",
+  "run_status": "COMPLETED",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "205f25db24f04ab31d5bc8370e336fb3bacf6622ce8d5208e33f432855eeb666",
+  "selector_path": "dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_K4/streamcluster_pressure/selector_params.json",
+  "test_trace_opened": true,
+  "test_used_for_selection": false,
+  "trace_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "training_source": "stage5_train_valid_regeneration",
+  "variant_id": "sensitivity_K4",
+  "workload": "streamcluster_pressure"
+}

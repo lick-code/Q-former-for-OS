@@ -1,0 +1,49 @@
+{
+  "artifact_class": "official",
+  "checkpoint_fingerprint": "944b65e62a5f29c48f8ce59ed930756102460d91f3fec3a70dc2ffee56ee40b9",
+  "checkpoint_manifest_fingerprint": "c42206d87e075f9e347b2a9ebbab26f2a2ee38a252e34720ca5f33ad10bc4c8b",
+  "checkpoint_path": "outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_Hc128/canneal/seed_3136859/qmap_best.pth",
+  "code_commit": "b9adf4f0ea2bc27de8b081667f81dd426863b587",
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_Hc128/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_Hc128/canneal/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_Hc128/canneal/seed_3136859/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_Hc128/canneal/seed_3136859.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "evidence_tier": "single_seed_sensitivity",
+  "jsonl_fingerprints": {
+    "train": "4817ada9755aa68cbe23908fcd5a2760054ff600d60cdec955fd51777af344d4",
+    "valid": "b325b8adafecc6f261c3734137e0d5f408a9c98eec4ce735f9369ff50a68c9ee"
+  },
+  "model_seed": 3136859,
+  "only_difference": "only Hc changes from 256 to 128",
+  "parameters": {
+    "B": 64,
+    "D": 64,
+    "H": 10,
+    "Hc": 128,
+    "K": 8,
+    "L": 256,
+    "Lres": 256
+  },
+  "replay_seed": null,
+  "result_fingerprint": "318debf91d2bc31dea6a5395513079570bb9b81228604487cce64325d85f20c1",
+  "result_path": "outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_Hc128/canneal/seed_3136859.json",
+  "run_status": "COMPLETED",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "3e16b575a9e50473113eb48d21b3058e9ace25be8bddde1f340025c9c77ee8b9",
+  "selector_path": "dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_Hc128/canneal/selector_params.json",
+  "test_trace_opened": true,
+  "test_used_for_selection": false,
+  "trace_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "training_source": "stage5_train_valid_regeneration",
+  "variant_id": "sensitivity_Hc128",
+  "workload": "canneal"
+}

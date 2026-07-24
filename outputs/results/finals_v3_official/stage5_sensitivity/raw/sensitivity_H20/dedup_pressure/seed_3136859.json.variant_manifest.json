@@ -1,0 +1,49 @@
+{
+  "artifact_class": "official",
+  "checkpoint_fingerprint": "f824362398542f5f451cdee3114bbf25136bb74fa737d02ae4da24f23d00a808",
+  "checkpoint_manifest_fingerprint": "68826329f929789955283d1991571970960168d1950c1f33b7d3b3b0910e15c0",
+  "checkpoint_path": "outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/seed_3136859/qmap_best.pth",
+  "code_commit": "b9adf4f0ea2bc27de8b081667f81dd426863b587",
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/seed_3136859/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_H20/dedup_pressure/seed_3136859.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "evidence_tier": "single_seed_sensitivity",
+  "jsonl_fingerprints": {
+    "train": "2fbc5df0fd9632596ab20d6d507f7f6b646286c0a1dfc7185e7ad95f90f1f0f7",
+    "valid": "b9bb1593e0706e5402b94108cfd620311fbb08da3e045d0a2820f932705bcd6f"
+  },
+  "model_seed": 3136859,
+  "only_difference": "only H changes from 10 to 20",
+  "parameters": {
+    "B": 64,
+    "D": 64,
+    "H": 20,
+    "Hc": 256,
+    "K": 8,
+    "L": 256,
+    "Lres": 256
+  },
+  "replay_seed": null,
+  "result_fingerprint": "c5623abecec5d28263f6a467d4e08e735f1872b930d725ad5f4a7a270ba61934",
+  "result_path": "outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_H20/dedup_pressure/seed_3136859.json",
+  "run_status": "COMPLETED",
+  "schema_version": "capd_finals_v3_0",
+  "selector_fingerprint": "5788c36a2357f51cbacee21056480eeb74729d4676580fc697a1a4ac81311295",
+  "selector_path": "dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/selector_params.json",
+  "test_trace_opened": true,
+  "test_used_for_selection": false,
+  "trace_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "training_source": "stage5_train_valid_regeneration",
+  "variant_id": "sensitivity_H20",
+  "workload": "dedup_pressure"
+}

@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_K16/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_K16/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_K16/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_K16/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_K16/streamcluster_pressure/seed_3136859 --seed 3136859",
+  "ended_unix": 1784861279.8597481,
+  "exit_code": 0,
+  "job_fingerprint": "140f2244b6695b7b2db7c20bc3998b231986928da0d25b223428c2efac65abb6",
+  "job_id": "sensitivity:train:sensitivity_K16:streamcluster_pressure:3136859",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_K16/streamcluster_pressure/seed_3136859/checkpoint_manifest.json.log",
+  "result_fingerprint": "c12a2270c82b7705c856bb30f5e7e0d720f173552780448215af3ba48abefaed",
+  "retry_count": 0,
+  "started_unix": 1784861201.326488,
+  "status": "COMPLETED"
+}

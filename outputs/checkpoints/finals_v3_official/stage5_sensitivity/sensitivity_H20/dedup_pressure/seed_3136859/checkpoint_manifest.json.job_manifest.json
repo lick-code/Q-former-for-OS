@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/seed_3136859 --seed 3136859",
+  "ended_unix": 1784862385.9602115,
+  "exit_code": 0,
+  "job_fingerprint": "4a4bd020d5fba8b813af82ed82ebcaf42c13aa56a72e52811de9223aabd4b63d",
+  "job_id": "sensitivity:train:sensitivity_H20:dedup_pressure:3136859",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_H20/dedup_pressure/seed_3136859/checkpoint_manifest.json.log",
+  "result_fingerprint": "68826329f929789955283d1991571970960168d1950c1f33b7d3b3b0910e15c0",
+  "retry_count": 0,
+  "started_unix": 1784862341.7595117,
+  "status": "COMPLETED"
+}

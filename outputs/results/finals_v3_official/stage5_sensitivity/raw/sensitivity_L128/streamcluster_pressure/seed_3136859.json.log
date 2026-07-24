@@ -1,0 +1,22 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L128/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage5_sensitivity/sensitivity_L128/streamcluster_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage5_sensitivity/sensitivity_L128/streamcluster_pressure/seed_3136859/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage5_sensitivity/raw/sensitivity_L128/streamcluster_pressure/seed_3136859.json
+started_unix=1784865290.9281414
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/cuda/__init__.py:88: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 804: forward compatibility was attempted on non supported HW (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:109.)
+  return torch._C._cuda_getDeviceCount() > 0
+Policy: qmap
+Total accesses: 200000
+Hits: 197158
+Misses: 2842
+Hit rate: 98.58%
+Migrations: 2778
+NVM reads: 2841
+NVM writes: 1
+Weighted access cost: 230628.00
+Policy decisions: 2778
+Total decision time: 9.137132s
+Avg decision time: 3.289104 ms
+Candidate filter decisions: 2778
+Candidate B_t range: 64..64
+Retained K_t range: 8..8
+Avg candidate filter time: 0.811202 ms
+ended_unix=1784865315.077072
+exit_code=0
