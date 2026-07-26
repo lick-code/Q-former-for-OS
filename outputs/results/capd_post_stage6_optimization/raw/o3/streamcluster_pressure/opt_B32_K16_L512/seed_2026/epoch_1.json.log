@@ -1,0 +1,20 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/selector_params.json --evaluation_split valid --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_1.pth --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/epoch_1.json
+started_unix=1785078857.7725387
+Policy: qmap
+Total accesses: 200000
+Hits: 197171
+Misses: 2829
+Hit rate: 98.59%
+Migrations: 2765
+NVM reads: 2827
+NVM writes: 2
+Weighted access cost: 230491.00
+Policy decisions: 2765
+Total decision time: 8.650268s
+Avg decision time: 3.128487 ms
+Candidate filter decisions: 2765
+Candidate B_t range: 32..32
+Retained K_t range: 16..16
+Avg candidate filter time: 0.213459 ms
+ended_unix=1785078870.4455416
+exit_code=0

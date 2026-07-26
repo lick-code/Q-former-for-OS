@@ -1,0 +1,7 @@
+complexity_key,config_id,seed_count,test_trace_opened,test_used_for_selection,valid_cost_mean,valid_cost_sample_stddev,workload
+"[512, 512, 10, 32, 16]",opt_B32_K16_L512,3,False,False,225009.66666666666,971.0161344351253,canneal
+"[512, 512, 20, 32, 16]",opt_B32_K16_L512_H20,3,False,False,225075.66666666666,978.216915276634,canneal
+"[512, 512, 20, 32, 16]",opt_B32_K16_L512_H20,3,False,False,230227.0,0.0,streamcluster_pressure
+"[512, 512, 10, 32, 16]",opt_B32_K16_L512,3,False,False,230227.0,0.0,streamcluster_pressure
+"[512, 512, 10, 32, 16]",opt_B32_K16_L512,3,False,False,1036715.3333333334,293.3638241728747,dedup_pressure
+"[512, 256, 10, 32, 16]",opt_B32_K16,3,False,False,1036715.3333333334,293.3638241728747,dedup_pressure

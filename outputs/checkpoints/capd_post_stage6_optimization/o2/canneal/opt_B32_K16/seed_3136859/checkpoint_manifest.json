@@ -1,0 +1,176 @@
+{
+  "artifact_class": "optimization_only",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 9,
+  "best_validation_loss": -0.07037165760993958,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "2a8c2e969089a276fb9b67003fc430fc4ea0d3513bb7934c7a0ba18a7d09e56b",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "39421551a926044715be5518b7f3689157bed03f9c13d3f9d37def2150af44f2",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_last.pth"
+    },
+    "per_epoch": [
+      {
+        "epoch": 1,
+        "fingerprint": "41a2220f174c9ee37c6d88582ce7ecd16d7672d9551586c49da08ae334bc4749",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_1.pth"
+      },
+      {
+        "epoch": 2,
+        "fingerprint": "c501e707f721a0758b134e3b00cd7318abf4bad16a47d5cb00650aee73de8649",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_2.pth"
+      },
+      {
+        "epoch": 3,
+        "fingerprint": "b1a1a0dd50f020153ad08ee2c688b343a6cb0a8854e8e320fe8f1fc185e983c8",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_3.pth"
+      },
+      {
+        "epoch": 4,
+        "fingerprint": "bdd90433faac80e335dfe89d89e232c4f97314c7ce101fcd7d9081d67244dcb3",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_4.pth"
+      },
+      {
+        "epoch": 5,
+        "fingerprint": "de1ac4cbd300108f730b4e9f0f32bddf61efca9d433e65ae87b1b3c25196762b",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_5.pth"
+      },
+      {
+        "epoch": 6,
+        "fingerprint": "b6eb5145e1034211e7b92eedc9758b6e2ee2d064e7b6778d0de42b22d801f7ac",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_6.pth"
+      },
+      {
+        "epoch": 7,
+        "fingerprint": "f2ebeae35fc846ace1915c571744f89d86ea5759779664b77c688d6ae4e10a4c",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_7.pth"
+      },
+      {
+        "epoch": 8,
+        "fingerprint": "d633fc062a506b0f3447c1e8670924e0b23685728fdaa61f20dc54be5e782364",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_8.pth"
+      },
+      {
+        "epoch": 9,
+        "fingerprint": "bf0ab3e2852d900eb813e163f728c7c589c392946e290db85f6d1d14bd67779c",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_9.pth"
+      },
+      {
+        "epoch": 10,
+        "fingerprint": "4b188e3f56dab3f9e24054595f0bfaf49fd89e99a9eeab80ba2dbb37d4336a34",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859/qmap_epoch_10.pth"
+      }
+    ]
+  },
+  "code_fingerprint": "10c50455c08ff69c3ae1b5dcfcdda618d5fe147593cae4d1cba91c89c16c2628",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16/seed_3136859 --seed 3136859 --save_every_epoch",
+  "config_fingerprint": "e2e6382de1fd1e59e5115cd3dba6110163ee6509e34a5027abd140dbf047e84e",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "5986f7d63d4b81da33feb24a9c6a7d3db51c339d421e1322d4f80b7bc3249bdb",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.1045797754375808,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "9a0e39feb76f4bcc99aeb71a9f44599a4ce814ff66a0e820a23effc4af466169",
+    "valid": "16e0b1e8ae785929fb997e472c3923fa505b627a4a1235a51de6147af68c2ade"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.08942302132635253,
+      "valid_loss": -0.06665483837326368
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.09892197786541902,
+      "valid_loss": -0.06789694932599863
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.10132335014311614,
+      "valid_loss": -0.06890161668260893
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.10272353181236349,
+      "valid_loss": -0.06972468510270119
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.1033377908417477,
+      "valid_loss": -0.07000038216511409
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.1038859478750192,
+      "valid_loss": -0.07000129769245783
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.10435002614472029,
+      "valid_loss": -0.0698868253827095
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.10451379673044502,
+      "valid_loss": -0.07019752711057663
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.10467898088251859,
+      "valid_loss": -0.07037165760993958
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.1045797754375808,
+      "valid_loss": -0.0702091487745444
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "optimization_variant": {
+    "code_commit": "a602debadd82954b608c547a85a427f0a25e1cf3",
+    "family": "frozen_method_config_search",
+    "method_contract_changed": false,
+    "only_difference": "Only preregistered B/K/L/H configuration values may differ from the frozen Full control.",
+    "retrain_required": true,
+    "selection_inputs": [
+      "train",
+      "valid"
+    ],
+    "source_stage": "post_stage6_optimization",
+    "test_used_for_selection": false,
+    "variant_id": "opt_B32_K16"
+  },
+  "per_epoch_checkpoints_saved": true,
+  "run_profile": "post_stage6_optimization",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "3d2e9d5c038212ee4198d6ccdeb71fd503819b295e473111ace5302275002df0",
+  "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+  "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
+  "split_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 54.02174496650696,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "canneal"
+}

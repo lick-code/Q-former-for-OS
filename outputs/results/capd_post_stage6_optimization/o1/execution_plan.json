@@ -1,0 +1,1686 @@
+{
+  "code_commit": "a602debadd82954b608c547a85a427f0a25e1cf3",
+  "code_fingerprint": "8e24756de2c876b1c3593b81583a824a34225bcefd18fb38f1b590ee22b96cf3",
+  "jobs": [
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_full_control"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_full_control"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_full_control",
+      "config_id": "opt_full_control",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "6dd5ee01cb76c6ea3a21cdc0f47c7fe117054d962862b77722ba4ea95f1ee075",
+      "job_id": "o1:data:canneal:opt_full_control",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_B32"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_B32"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32",
+      "config_id": "opt_B32",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "bbf516a35559d843b4553f4a870515b6322d7604d900f1fe9fc0e642f7a6d250",
+      "job_id": "o1:data:canneal:opt_B32",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_K16"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_K16"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_K16",
+      "config_id": "opt_K16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "7d155cdbbc5224c0544f55933293f13090d1d5a27ae027d19000de0b4490fefb",
+      "job_id": "o1:data:canneal:opt_K16",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_L512"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_L512"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_L512",
+      "config_id": "opt_L512",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "d971d0c3f8930162aab94ea7fd7afe711d1a918acb9f91cdea60171181e9e6be",
+      "job_id": "o1:data:canneal:opt_L512",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_H20"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 20,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_H20"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_H20",
+      "config_id": "opt_H20",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "f35d90219741b5fb0b85aa1b9f059862f670e22e437fd267fe9c53a3e1f99ccd",
+      "job_id": "o1:data:canneal:opt_H20",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_B32_K16"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_B32_K16"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32_K16",
+      "config_id": "opt_B32_K16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "8719e8b6c0a7716eb3400035e7534cc7d08a2ef0f1bc90430e971751e83a1dcb",
+      "job_id": "o1:data:canneal:opt_B32_K16",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_B32_K16_L512"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32_K16_L512",
+      "config_id": "opt_B32_K16_L512",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "30807a9eab4d82b12ec201361b6b5b00a2d3e48f562578c2b63cb4e79fe3b394",
+      "job_id": "o1:data:canneal:opt_B32_K16_L512",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:canneal:opt_B32_K16_L512_H20"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 20,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512_H20"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32_K16_L512_H20",
+      "config_id": "opt_B32_K16_L512_H20",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "4daaa6620362a7c60eb5ee88956b304227dfa4291c08eac1439fb935b8bf7acb",
+      "job_id": "o1:data:canneal:opt_B32_K16_L512_H20",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_full_control"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_full_control"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_full_control",
+      "config_id": "opt_full_control",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "cc164bdc7769dac4f1aed892e64a4fbed1c2c8c1e0bbf39d101f15bb6ec3d457",
+      "job_id": "o1:data:streamcluster_pressure:opt_full_control",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_B32"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_B32"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32",
+      "config_id": "opt_B32",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "5518d4da495f6bdb7b564977050b87ea2f8a895fdcea47a47382b2ac47173aae",
+      "job_id": "o1:data:streamcluster_pressure:opt_B32",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_K16"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_K16"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_K16",
+      "config_id": "opt_K16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "57d9a41b748e63fd50dff148d9f6f02c716874b1a0638406fd45b3f3ed99e2c0",
+      "job_id": "o1:data:streamcluster_pressure:opt_K16",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_L512"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_L512"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_L512",
+      "config_id": "opt_L512",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "88d0774550e6d47aebed6fab71c5973c898b29c7c736bcf2a5b5d51caf054651",
+      "job_id": "o1:data:streamcluster_pressure:opt_L512",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_H20"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 20,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_H20"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_H20",
+      "config_id": "opt_H20",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "ca89a9793abdef6c266ac8800a224894da9796af9332cf945272f7898ec82986",
+      "job_id": "o1:data:streamcluster_pressure:opt_H20",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_B32_K16"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_B32_K16"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32_K16",
+      "config_id": "opt_B32_K16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "4fe4d01ffd585124e2f369ac7bd7eae20bca30e497e332ac31b4e65da5165056",
+      "job_id": "o1:data:streamcluster_pressure:opt_B32_K16",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_B32_K16_L512"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32_K16_L512",
+      "config_id": "opt_B32_K16_L512",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "0a8eb5a1b0fc5df6d93ee9bfa1d6facf7c81b2999711e7f7866c58b1975553d9",
+      "job_id": "o1:data:streamcluster_pressure:opt_B32_K16_L512",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:streamcluster_pressure:opt_B32_K16_L512_H20"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 20,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512_H20"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32_K16_L512_H20",
+      "config_id": "opt_B32_K16_L512_H20",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "c74bda6ee0673b1f4d5c7d068cbc8426d8aea00445b4173de85fe38f37f6d21d",
+      "job_id": "o1:data:streamcluster_pressure:opt_B32_K16_L512_H20",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_full_control"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_full_control"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_full_control",
+      "config_id": "opt_full_control",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "615f9f74f2241635b2bbabade36ed03ec5b264493919a09a3718ff619b4fcede",
+      "job_id": "o1:data:dedup_pressure:opt_full_control",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_B32"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_B32"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32",
+      "config_id": "opt_B32",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "8b6d994cf620b1ca5178c4c91e8f0dd629ff7d62f256bf301cbbe07851e4f49c",
+      "job_id": "o1:data:dedup_pressure:opt_B32",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_K16"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_K16"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_K16",
+      "config_id": "opt_K16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "364f2dd895e15f68493b2253aae5dcbe62fbf154af71b68c2a42ed9d09371d2c",
+      "job_id": "o1:data:dedup_pressure:opt_K16",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_L512"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 8,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_L512"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_L512",
+      "config_id": "opt_L512",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "3275774ecb84364a15a13ff560f220419c422fa7883fa00523f904b9fcfe02d7",
+      "job_id": "o1:data:dedup_pressure:opt_L512",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_H20"
+      ],
+      "candidate": {
+        "B": 64,
+        "D": 64,
+        "H": 20,
+        "Hc": 256,
+        "K": 8,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_H20"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_H20",
+      "config_id": "opt_H20",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "bd7d83e71453682f6939764632fb240b94836da65aa5c1ceb28b125af3922113",
+      "job_id": "o1:data:dedup_pressure:opt_H20",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_B32_K16"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_B32_K16"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32_K16",
+      "config_id": "opt_B32_K16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "fac8bb6f1f963ec4ef277fdf9328bc4f1c4f3403309da1096c9e2fd63beae9b2",
+      "job_id": "o1:data:dedup_pressure:opt_B32_K16",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_B32_K16_L512"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32_K16_L512",
+      "config_id": "opt_B32_K16_L512",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "d6d25739a3f8fb657f4bc069ff887880a68abdede1e6ff7eb026a4aa171a4cc7",
+      "job_id": "o1:data:dedup_pressure:opt_B32_K16_L512",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_optimization.py",
+        "--stage",
+        "o1",
+        "--job-id",
+        "o1:data:dedup_pressure:opt_B32_K16_L512_H20"
+      ],
+      "candidate": {
+        "B": 32,
+        "D": 64,
+        "H": 20,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512_H20"
+      },
+      "code_fingerprint": "6f986ea2fab8977663be3af258ea05f025a600be9c425a6b9804f82843c845b3",
+      "command": "python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32_K16_L512_H20",
+      "config_id": "opt_B32_K16_L512_H20",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "422c5b7852e9dceb259119a1df9e64853bac25155a5cb94026e49b1243695aae",
+      "job_id": "o1:data:dedup_pressure:opt_B32_K16_L512_H20",
+      "kind": "data",
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/oracle.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:canneal:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_full_control": "6dd5ee01cb76c6ea3a21cdc0f47c7fe117054d962862b77722ba4ea95f1ee075"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "201d7e18033de328eb80943e8c2ba631c1a97ba6ab0fbe1a5580cba1bfa15254",
+      "job_id": "o1:oracle:canneal:opt_full_control",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32/oracle.json",
+      "config_id": "opt_B32",
+      "dependencies": [
+        "o1:data:canneal:opt_B32"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_B32": "bbf516a35559d843b4553f4a870515b6322d7604d900f1fe9fc0e642f7a6d250"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "b92bd6c8932296bb1233fe3487c207bad33fd6079804fd6ce46eee8cc5d78e92",
+      "job_id": "o1:oracle:canneal:opt_B32",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_K16/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_K16/oracle.json",
+      "config_id": "opt_K16",
+      "dependencies": [
+        "o1:data:canneal:opt_K16"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_K16": "7d155cdbbc5224c0544f55933293f13090d1d5a27ae027d19000de0b4490fefb"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "3c4176abc9a713efb2282de039a10ce31fd283324243972537c89e6366a4215b",
+      "job_id": "o1:oracle:canneal:opt_K16",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_K16/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_L512/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_L512/oracle.json",
+      "config_id": "opt_L512",
+      "dependencies": [
+        "o1:data:canneal:opt_L512"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_L512": "d971d0c3f8930162aab94ea7fd7afe711d1a918acb9f91cdea60171181e9e6be"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "a97c2d93ac2522445f4eceeda7d982d35097fdeb02e15709d1595aec31f8b79d",
+      "job_id": "o1:oracle:canneal:opt_L512",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_L512/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_H20/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_H20/oracle.json",
+      "config_id": "opt_H20",
+      "dependencies": [
+        "o1:data:canneal:opt_H20"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_H20": "f35d90219741b5fb0b85aa1b9f059862f670e22e437fd267fe9c53a3e1f99ccd"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "8374fa2c336fc6dfaebceb898fafadb2c42c3f10ea65594464ef3a24c8f1ad57",
+      "job_id": "o1:oracle:canneal:opt_H20",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_H20/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16/oracle.json",
+      "config_id": "opt_B32_K16",
+      "dependencies": [
+        "o1:data:canneal:opt_B32_K16"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_B32_K16": "8719e8b6c0a7716eb3400035e7534cc7d08a2ef0f1bc90430e971751e83a1dcb"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "b0653cb0031330c2db7ba6236136eaf5d8710906961b486d89c8ab5a7bf37857",
+      "job_id": "o1:oracle:canneal:opt_B32_K16",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512/oracle.json",
+      "config_id": "opt_B32_K16_L512",
+      "dependencies": [
+        "o1:data:canneal:opt_B32_K16_L512"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_B32_K16_L512": "30807a9eab4d82b12ec201361b6b5b00a2d3e48f562578c2b63cb4e79fe3b394"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "6927934703b11605bce47b539ead0045fd1c5bd1ab8ccbb100fe07c2310315f9",
+      "job_id": "o1:oracle:canneal:opt_B32_K16_L512",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512_H20/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512_H20/oracle.json",
+      "config_id": "opt_B32_K16_L512_H20",
+      "dependencies": [
+        "o1:data:canneal:opt_B32_K16_L512_H20"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_B32_K16_L512_H20": "4daaa6620362a7c60eb5ee88956b304227dfa4291c08eac1439fb935b8bf7acb"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "83f1fb14943c8550ddff0188b39fb0e0fa2afe8fe52ed1177814269f1dace184",
+      "job_id": "o1:oracle:canneal:opt_B32_K16_L512_H20",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512_H20/oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/lru.json"
+      ],
+      "code_fingerprint": "4c22ac09ad95d53769e7e468fc0386f556a88c12223cde7459aea8b11ea28711",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/lru.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:canneal:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_full_control": "6dd5ee01cb76c6ea3a21cdc0f47c7fe117054d962862b77722ba4ea95f1ee075"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "264eedee460d1ec66e94a6eb9689357e37d4e7edf1076c593ab3b3a55251222c",
+      "job_id": "o1:baseline:canneal:lru",
+      "kind": "baseline",
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/lru.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/clock.json"
+      ],
+      "code_fingerprint": "4c22ac09ad95d53769e7e468fc0386f556a88c12223cde7459aea8b11ea28711",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/clock.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:canneal:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:canneal:opt_full_control": "6dd5ee01cb76c6ea3a21cdc0f47c7fe117054d962862b77722ba4ea95f1ee075"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "84884057a8891dbd55b8ede8f88f79d0e12061abec191644fc2db640af1c8158",
+      "job_id": "o1:baseline:canneal:clock",
+      "kind": "baseline",
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/clock.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/oracle.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_full_control": "cc164bdc7769dac4f1aed892e64a4fbed1c2c8c1e0bbf39d101f15bb6ec3d457"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "7dc4fb93582f2225b216a5c169cb6ca17d15f80a1d0e47909eaf5fb72c753600",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_full_control",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32/oracle.json",
+      "config_id": "opt_B32",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_B32"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_B32": "5518d4da495f6bdb7b564977050b87ea2f8a895fdcea47a47382b2ac47173aae"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "d04d78006f778927cf57fd7176c303687ef1808e5f611ad43531c8871b4064ca",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_B32",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_K16/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_K16/oracle.json",
+      "config_id": "opt_K16",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_K16"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_K16": "57d9a41b748e63fd50dff148d9f6f02c716874b1a0638406fd45b3f3ed99e2c0"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "cebf24ef40d9dabc080ea58b0e5a955563c7396151533c33c9343a9a9985464a",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_K16",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_K16/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_L512/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_L512/oracle.json",
+      "config_id": "opt_L512",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_L512"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_L512": "88d0774550e6d47aebed6fab71c5973c898b29c7c736bcf2a5b5d51caf054651"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "07a091efbb479874aa2ecc3bf8912d26db33599b8f0c6ee918d7e1eb0954d5a6",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_L512",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_L512/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_H20/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_H20/oracle.json",
+      "config_id": "opt_H20",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_H20"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_H20": "ca89a9793abdef6c266ac8800a224894da9796af9332cf945272f7898ec82986"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "cb464d3950299e4d159027740078ee0fbac37311277a33e15de1b3ab15b4ba54",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_H20",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_H20/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16/oracle.json",
+      "config_id": "opt_B32_K16",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_B32_K16"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_B32_K16": "4fe4d01ffd585124e2f369ac7bd7eae20bca30e497e332ac31b4e65da5165056"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "e984e89917f075b59b49e9285626cbf11bc917cd7be1d22234af65dac9cbbed4",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_B32_K16",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512/oracle.json",
+      "config_id": "opt_B32_K16_L512",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_B32_K16_L512"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_B32_K16_L512": "0a8eb5a1b0fc5df6d93ee9bfa1d6facf7c81b2999711e7f7866c58b1975553d9"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "fb44cdba43a2015ba4693acc6a265269bebca140e00252dad8945a8e018d9831",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_B32_K16_L512",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512_H20/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512_H20/oracle.json",
+      "config_id": "opt_B32_K16_L512_H20",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_B32_K16_L512_H20"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_B32_K16_L512_H20": "c74bda6ee0673b1f4d5c7d068cbc8426d8aea00445b4173de85fe38f37f6d21d"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "8f803ea7b3b923cd328c4668ec6388279f06dd2ab4282f65842257bb67d44303",
+      "job_id": "o1:oracle:streamcluster_pressure:opt_B32_K16_L512_H20",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512_H20/oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/lru.json"
+      ],
+      "code_fingerprint": "4c22ac09ad95d53769e7e468fc0386f556a88c12223cde7459aea8b11ea28711",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/lru.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_full_control": "cc164bdc7769dac4f1aed892e64a4fbed1c2c8c1e0bbf39d101f15bb6ec3d457"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "5896bc045cf8ec7bd57294bd665fe83babbef1df67ef599cd05957fd4b6dc0bf",
+      "job_id": "o1:baseline:streamcluster_pressure:lru",
+      "kind": "baseline",
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/lru.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/clock.json"
+      ],
+      "code_fingerprint": "4c22ac09ad95d53769e7e468fc0386f556a88c12223cde7459aea8b11ea28711",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/clock.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:streamcluster_pressure:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:streamcluster_pressure:opt_full_control": "cc164bdc7769dac4f1aed892e64a4fbed1c2c8c1e0bbf39d101f15bb6ec3d457"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "d117d5169ebd8ce912f2b68b2b2cbcde597248a7dfb50e3e8baa7ec391cc1065",
+      "job_id": "o1:baseline:streamcluster_pressure:clock",
+      "kind": "baseline",
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/clock.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/oracle.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_full_control": "615f9f74f2241635b2bbabade36ed03ec5b264493919a09a3718ff619b4fcede"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "4878624eadcc578984828c835d025e79ac88f95b8912eb2c53925e7ff91c99a7",
+      "job_id": "o1:oracle:dedup_pressure:opt_full_control",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32/oracle.json",
+      "config_id": "opt_B32",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_B32"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_B32": "8b6d994cf620b1ca5178c4c91e8f0dd629ff7d62f256bf301cbbe07851e4f49c"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "1d4320e0e0b88e0487b8e400bc1a3d40e7e97fd82fe533f6fab558b0f9d9a248",
+      "job_id": "o1:oracle:dedup_pressure:opt_B32",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_K16/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_K16/oracle.json",
+      "config_id": "opt_K16",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_K16"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_K16": "364f2dd895e15f68493b2253aae5dcbe62fbf154af71b68c2a42ed9d09371d2c"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "cfcaf6693f9615ba03e15f74881008fe3229a8806a7791b1f2ed1611d04cc6c9",
+      "job_id": "o1:oracle:dedup_pressure:opt_K16",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_K16/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_L512/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_L512/oracle.json",
+      "config_id": "opt_L512",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_L512"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_L512": "3275774ecb84364a15a13ff560f220419c422fa7883fa00523f904b9fcfe02d7"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "f8907adcec575f219e3d1adbb8c5edd6dcc63fcbf4117db5809c0fbe22579de9",
+      "job_id": "o1:oracle:dedup_pressure:opt_L512",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_L512/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_H20/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_H20/oracle.json",
+      "config_id": "opt_H20",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_H20"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_H20": "bd7d83e71453682f6939764632fb240b94836da65aa5c1ceb28b125af3922113"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "c62fbe0e5365ff6d50037a1d625bfddd2187d931b649aee3adf3cd66ccecd4f2",
+      "job_id": "o1:oracle:dedup_pressure:opt_H20",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_H20/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16/oracle.json",
+      "config_id": "opt_B32_K16",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_B32_K16"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_B32_K16": "fac8bb6f1f963ec4ef277fdf9328bc4f1c4f3403309da1096c9e2fd63beae9b2"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "40c8ae197c745c201575347b0370877d7b7d5a83dc234a9348b55233d300f200",
+      "job_id": "o1:oracle:dedup_pressure:opt_B32_K16",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512/oracle.json",
+      "config_id": "opt_B32_K16_L512",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_B32_K16_L512"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_B32_K16_L512": "d6d25739a3f8fb657f4bc069ff887880a68abdede1e6ff7eb026a4aa171a4cc7"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "cd9422c9ae337002b69474e48d1172558c43d26cec14659f851dde2e3025ac12",
+      "job_id": "o1:oracle:dedup_pressure:opt_B32_K16_L512",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/optimization_oracle.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/selector_params.json",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512_H20/oracle.json"
+      ],
+      "code_fingerprint": "ec25441a28e9c04bbdf3b3e0d5faa5f7ab61987c0f6746b4604e15c74554473b",
+      "command": "python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512_H20/oracle.json",
+      "config_id": "opt_B32_K16_L512_H20",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_B32_K16_L512_H20"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_B32_K16_L512_H20": "422c5b7852e9dceb259119a1df9e64853bac25155a5cb94026e49b1243695aae"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "a8dd778c68a672555295850d0190112ef666e6b2f801c7ef65fd7f85cdea8b22",
+      "job_id": "o1:oracle:dedup_pressure:opt_B32_K16_L512_H20",
+      "kind": "oracle",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512_H20/oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/lru.json"
+      ],
+      "code_fingerprint": "4c22ac09ad95d53769e7e468fc0386f556a88c12223cde7459aea8b11ea28711",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/lru.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_full_control": "615f9f74f2241635b2bbabade36ed03ec5b264493919a09a3718ff619b4fcede"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "c2bc40f3b8f06402954a363f2152f32f9d33bbc2f6d14a089f953fadc17ff923",
+      "job_id": "o1:baseline:dedup_pressure:lru",
+      "kind": "baseline",
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/lru.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/clock.json"
+      ],
+      "code_fingerprint": "4c22ac09ad95d53769e7e468fc0386f556a88c12223cde7459aea8b11ea28711",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/clock.json",
+      "config_id": "opt_full_control",
+      "dependencies": [
+        "o1:data:dedup_pressure:opt_full_control"
+      ],
+      "dependency_fingerprints": {
+        "o1:data:dedup_pressure:opt_full_control": "615f9f74f2241635b2bbabade36ed03ec5b264493919a09a3718ff619b4fcede"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "dace91b366b366d6a0b261ff27b1e7e2fff5450d02554455bc14799c72bcca92",
+      "job_id": "o1:baseline:dedup_pressure:clock",
+      "kind": "baseline",
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/clock.json",
+      "workload": "dedup_pressure"
+    }
+  ],
+  "method_contract_changed": false,
+  "phase": "o1",
+  "required_jobs": 54,
+  "schema_version": "capd_post_stage6_o1_plan_1",
+  "status": "PLANNED",
+  "test_used_for_selection": false
+}

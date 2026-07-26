@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/lru.json
+started_unix=1785074293.8689759
+Policy: lru
+Total accesses: 1000000
+Hits: 997282
+Misses: 2718
+Hit rate: 99.73%
+Migrations: 2654
+NVM reads: 1506
+NVM writes: 1212
+Weighted access cost: 1036530.00
+Policy decisions: 2654
+Total decision time: 0.000812s
+Avg decision time: 0.000306 ms
+ended_unix=1785074298.3479493
+exit_code=0

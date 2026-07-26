@@ -1,0 +1,176 @@
+{
+  "artifact_class": "optimization_only",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.2101566612176346,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "ec45bfaa779bc4701ae8d96b0f02243c1f3a3b289eb951e891ff65cfed35ac1e",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "5766e6191c881f439a87c37e6ef5e539e46186ac36d743e4066d6504b8e81d85",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_last.pth"
+    },
+    "per_epoch": [
+      {
+        "epoch": 1,
+        "fingerprint": "f883a53569672d321590d5bb01c8ba4fa15c69684efc84bee4ad2626a9d60d0e",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_1.pth"
+      },
+      {
+        "epoch": 2,
+        "fingerprint": "edfc29baff24e41bbd6ab15c2c404a21ba0e8f921a07c779d292b83b6f5a5de0",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_2.pth"
+      },
+      {
+        "epoch": 3,
+        "fingerprint": "8dfb900150bda204aa4e9208324edc9ead98a06f217c57f0e38d26908bee1518",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_3.pth"
+      },
+      {
+        "epoch": 4,
+        "fingerprint": "d1de8e599af341f439293530d0f50480835eec83811e6c91b5e6c8f808f157ee",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_4.pth"
+      },
+      {
+        "epoch": 5,
+        "fingerprint": "36a6e6a08e6b88c911568ad5fd74e32be476ba1865a48e7be194309360c7f56b",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_5.pth"
+      },
+      {
+        "epoch": 6,
+        "fingerprint": "60d1a4598810f4daa95b623800d6b419ce891ee830a8485a893dfd53b5b1c15d",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_6.pth"
+      },
+      {
+        "epoch": 7,
+        "fingerprint": "b032c73846c181951a0e94149e98ede3b9f54f0f3b8904cb2af4580697468644",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_7.pth"
+      },
+      {
+        "epoch": 8,
+        "fingerprint": "8df5e998e0f42733e5e8ea1e3b8a2299f9c3f43c47104e337e4135a14f013e09",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_8.pth"
+      },
+      {
+        "epoch": 9,
+        "fingerprint": "2aa1e73a4c3b715b2dcfeb106f2607b5be4015896a982c2e960b8ab5e71718ed",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_9.pth"
+      },
+      {
+        "epoch": 10,
+        "fingerprint": "e3a32f792fc057818ecf56f4769e44dea78f9e7aa80d9f584e186573f0b76d68",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_10.pth"
+      }
+    ]
+  },
+  "code_fingerprint": "10c50455c08ff69c3ae1b5dcfcdda618d5fe147593cae4d1cba91c89c16c2628",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026 --seed 2026 --save_every_epoch",
+  "config_fingerprint": "96d8503cb9a8b6a7dfc62e9acb1bb156a04752d363511d8a20c0ad83f92448d4",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "2b31c00b19945884a09cc6fc8f3d451aad73f0d03b98a350ef540960609ea2c4",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.2212963652838131,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "9904e7ec72f294d1d8b45643a11c7be2ea1513111cebb8b8c246e97c3575ee80",
+    "valid": "c09a85729bbbf658af863ad15f7f922d20239a741ec1b80ed86eb00bd4b27db4"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.1888519745621392,
+      "valid_loss": -0.20444832867785787
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.2180786935667343,
+      "valid_loss": -0.2088232525948728
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.2204019444556359,
+      "valid_loss": -0.20953177034938603
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.22078225509647062,
+      "valid_loss": -0.2097727974688404
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.22087607341681553,
+      "valid_loss": -0.20993348489400376
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.22116370766889304,
+      "valid_loss": -0.21000513206288385
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.22113202142474406,
+      "valid_loss": -0.21006719504347007
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.22125743802034242,
+      "valid_loss": -0.21009870246052742
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.22128017138525405,
+      "valid_loss": -0.21013539690482483
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.2212963652838131,
+      "valid_loss": -0.2101566612176346
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "optimization_variant": {
+    "code_commit": "a602debadd82954b608c547a85a427f0a25e1cf3",
+    "family": "frozen_method_config_search",
+    "method_contract_changed": false,
+    "only_difference": "Only preregistered B/K/L/H configuration values may differ from the frozen Full control.",
+    "retrain_required": true,
+    "selection_inputs": [
+      "train",
+      "valid"
+    ],
+    "source_stage": "post_stage6_optimization",
+    "test_used_for_selection": false,
+    "variant_id": "opt_B32_K16_L512"
+  },
+  "per_epoch_checkpoints_saved": true,
+  "run_profile": "post_stage6_optimization",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 2026,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "9c67d2628fb71b3b09071393ad085eb7f5d3872c65934bef71f420554edc8f23",
+  "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+  "source_manifest_fingerprint": "d12c5e2507c333421709ab37c1d555e50426674e3853c88759c2d44237c70235",
+  "split_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 62.977593660354614,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "streamcluster_pressure"
+}

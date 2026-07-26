@@ -1,0 +1,12 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/selector_params.json --evaluation_split valid --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/dedup_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_4.pth --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o3/dedup_pressure/opt_B32_K16_L512/seed_2026/epoch_4.json",
+  "ended_unix": 1785079316.736327,
+  "exit_code": 0,
+  "job_fingerprint": "4b55ba274dd94ef419d32c42337a21374912f61be9195c7d2aaea65a9e234e9d",
+  "job_id": "o3:replay:dedup_pressure:opt_B32_K16_L512:2026:4",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o3/dedup_pressure/opt_B32_K16_L512/seed_2026/epoch_4.json.log",
+  "result_fingerprint": "a61005cbec22c81be7c59aaaea2b107eebbbfce0183302e48f622c94578b08e9",
+  "started_unix": 1785079299.047346,
+  "status": "COMPLETED"
+}

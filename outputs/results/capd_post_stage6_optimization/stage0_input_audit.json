@@ -1,0 +1,83 @@
+{
+  "blocked_o4_inputs": 3,
+  "checks": [
+    {
+      "detail": "Stage 6 must remain verified at 105/105 with no test selection.",
+      "name": "stage6_manifest",
+      "path": "outputs/results/finals_v3_official/stage6/run_manifest.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "Bridge must remain completed at 33/33 and diagnostic-only.",
+      "name": "bridge_manifest",
+      "path": "outputs/results/capd_bridge_diagnostic/run_manifest.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "Official collection is fully allocated over train=[0,600000), valid=[600000,800000), test=[800000,1000000); no unused interval is a fresh holdout.",
+      "name": "official_source_canneal",
+      "path": "dataset/metadata/finals_v3_source_specs/canneal.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "A new sealed collection is required before O4, not before O1-O3.",
+      "name": "fresh_holdout_canneal",
+      "path": "dataset/metadata/capd_post_stage6_optimization/holdout/canneal.json",
+      "status": "BLOCKED_O4_ONLY"
+    },
+    {
+      "detail": "Official collection is fully allocated over train=[0,600000), valid=[600000,800000), test=[800000,1000000); no unused interval is a fresh holdout.",
+      "name": "official_source_streamcluster_pressure",
+      "path": "dataset/metadata/finals_v3_source_specs/streamcluster_pressure.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "A new sealed collection is required before O4, not before O1-O3.",
+      "name": "fresh_holdout_streamcluster_pressure",
+      "path": "dataset/metadata/capd_post_stage6_optimization/holdout/streamcluster_pressure.json",
+      "status": "BLOCKED_O4_ONLY"
+    },
+    {
+      "detail": "Official collection is fully allocated over train=[0,1000000), valid=[1000000,2000000), test=[2000000,3000000); no unused interval is a fresh holdout.",
+      "name": "official_source_dedup_pressure",
+      "path": "dataset/metadata/finals_v3_source_specs/dedup_pressure.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "A new sealed collection is required before O4, not before O1-O3.",
+      "name": "fresh_holdout_dedup_pressure",
+      "path": "dataset/metadata/capd_post_stage6_optimization/holdout/dedup_pressure.json",
+      "status": "BLOCKED_O4_ONLY"
+    }
+  ],
+  "eligible_to_start_O1": true,
+  "eligible_to_start_O2": true,
+  "eligible_to_start_O3": true,
+  "eligible_to_start_O4": false,
+  "failed_checks": 0,
+  "method_contract_changed": false,
+  "official_sources": {
+    "canneal": {
+      "allocated_end_exclusive": 1000000,
+      "collection_id": "canneal-20260722T125000",
+      "source_spec_fingerprint": "43ae09f1c1152950a1325d4437463dd97477a79a4879dea5a398616337dea000"
+    },
+    "dedup_pressure": {
+      "allocated_end_exclusive": 3000000,
+      "collection_id": "dedup_pressure-20260722T131403",
+      "source_spec_fingerprint": "2624b6e4e67b1e848464311f8ff7e49fee3ee5553ee403850c91425841fde80d"
+    },
+    "streamcluster_pressure": {
+      "allocated_end_exclusive": 1000000,
+      "collection_id": "streamcluster_pressure-20260722T133000",
+      "source_spec_fingerprint": "c362756d62e787fd5b01bb02dfd5fdc46076bc45ccc1a3aa78e8480ddcea13c3"
+    }
+  },
+  "official_stage6_replaced": false,
+  "profile_id": "capd_post_stage6_frozen_method_optimization_v1",
+  "required_holdout_count": 3,
+  "schema_version": "capd_post_stage6_stage0_audit_2",
+  "sealed_holdout_count": 0,
+  "status": "O0_READY_FOR_O1_O3",
+  "test_used_for_selection": false
+}

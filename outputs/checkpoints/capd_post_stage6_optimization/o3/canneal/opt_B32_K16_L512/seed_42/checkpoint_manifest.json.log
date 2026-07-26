@@ -1,0 +1,59 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512/seed_42 --seed 42 --save_every_epoch
+started_unix=1785077515.0788994
+QMAP training: train=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/train.jsonl valid=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/valid.jsonl samples=7215/2377 device=cuda
+epoch=1/10 iter=1 loss=-0.146306
+epoch=1/10 iter=100 loss=-0.076682
+epoch=1/10 iter=200 loss=-0.198279
+epoch=1/10 train_loss=-0.156192 valid_loss=-0.136889
+epoch=2/10 iter=300 loss=-0.117833
+epoch=2/10 iter=400 loss=-0.118801
+epoch=2/10 train_loss=-0.177816 valid_loss=-0.142303
+epoch=3/10 iter=500 loss=-0.178447
+epoch=3/10 iter=600 loss=-0.213159
+epoch=3/10 train_loss=-0.181733 valid_loss=-0.143621
+epoch=4/10 iter=700 loss=-0.086246
+epoch=4/10 iter=800 loss=-0.274931
+epoch=4/10 iter=900 loss=-0.091732
+epoch=4/10 train_loss=-0.183024 valid_loss=-0.144321
+epoch=5/10 iter=1000 loss=-0.120642
+epoch=5/10 iter=1100 loss=-0.153054
+epoch=5/10 train_loss=-0.184619 valid_loss=-0.144736
+epoch=6/10 iter=1200 loss=-0.092721
+epoch=6/10 iter=1300 loss=-0.123288
+epoch=6/10 train_loss=-0.185723 valid_loss=-0.145128
+epoch=7/10 iter=1400 loss=-0.181859
+epoch=7/10 iter=1500 loss=-0.154210
+epoch=7/10 train_loss=-0.185840 valid_loss=-0.145295
+epoch=8/10 iter=1600 loss=-0.154871
+epoch=8/10 iter=1700 loss=-0.216590
+epoch=8/10 iter=1800 loss=-0.215510
+epoch=8/10 train_loss=-0.185739 valid_loss=-0.145581
+epoch=9/10 iter=1900 loss=-0.212473
+epoch=9/10 iter=2000 loss=-0.152530
+epoch=9/10 train_loss=-0.186247 valid_loss=-0.145692
+epoch=10/10 iter=2100 loss=-0.092823
+epoch=10/10 iter=2200 loss=-0.187007
+epoch=10/10 train_loss=-0.186388 valid_loss=-0.145806
+Training finished. best=/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512/seed_42/qmap_best.pth last=/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512/seed_42/qmap_last.pth
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+ended_unix=1785077568.6180823
+exit_code=0

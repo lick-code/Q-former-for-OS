@@ -1,0 +1,176 @@
+{
+  "artifact_class": "optimization_only",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 9,
+  "best_validation_loss": -0.14594958441952866,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "902062993dd2c54e517aa6890a754a805faa482fa5c6593cee5e56a92591d8eb",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "9fb1f794c029fc1689cdd87a889982c64a0d7f1d72a2d581a9bf5178e3827f19",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_last.pth"
+    },
+    "per_epoch": [
+      {
+        "epoch": 1,
+        "fingerprint": "35e192244da3b3fee3f6cb73ea42936d9d9ab42b0a9940150942b8e826931d87",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_1.pth"
+      },
+      {
+        "epoch": 2,
+        "fingerprint": "e6bc2caf1c396dd2c3b2a2915c4763ad336e32ebc6720c5dcdb6b0caf97d2a6e",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_2.pth"
+      },
+      {
+        "epoch": 3,
+        "fingerprint": "2b70fde809f74d50dce52e1fa3d7184567e70f967ec1da15057f7e33c8e435b9",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_3.pth"
+      },
+      {
+        "epoch": 4,
+        "fingerprint": "497b9a13172e8d6f0f85e4ee3560a4dcc2c8b37e25b383d75771f60307f84439",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_4.pth"
+      },
+      {
+        "epoch": 5,
+        "fingerprint": "bba0379502026ec617125e7e15deb4de98e8b846a2fc1946855901e4f05624d3",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_5.pth"
+      },
+      {
+        "epoch": 6,
+        "fingerprint": "16e57d61c523d6d25ee727ca7548de71f6e50b14e8a0da32d5b76d402488492b",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_6.pth"
+      },
+      {
+        "epoch": 7,
+        "fingerprint": "78740d733600b11198b9df6b708a1f4bc0b2a792c709abac4338eb07ea7149cc",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_7.pth"
+      },
+      {
+        "epoch": 8,
+        "fingerprint": "3c54d6d4e7e58221deadc097de0b837009477f8fd39d4aca45f0af2d437299bb",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_8.pth"
+      },
+      {
+        "epoch": 9,
+        "fingerprint": "4c10d4d9a4077be471557faed1db89e77a859c6841c963d77eaaff4a788e8414",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_9.pth"
+      },
+      {
+        "epoch": 10,
+        "fingerprint": "ea788c1fa8ef4eaffea4b4e03e970e1de722d3b0072ad831d6ca4b872b683523",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026/qmap_epoch_10.pth"
+      }
+    ]
+  },
+  "code_fingerprint": "10c50455c08ff69c3ae1b5dcfcdda618d5fe147593cae4d1cba91c89c16c2628",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_2026 --seed 2026 --save_every_epoch",
+  "config_fingerprint": "587d8ce5f2eb9b0bb9fc381c67fe7a080bcde158b12f05fd223e4a4c5d7c7110",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "5986f7d63d4b81da33feb24a9c6a7d3db51c339d421e1322d4f80b7bc3249bdb",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.18604978753369203,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "cf6d8489ece8aa616cdfad547bf008c8550da7e4627e52825f2f81b5d5a4f7a4",
+    "valid": "30d451a6245e7de05f79564c1d501416837e44b5e2d8ad400bd0012c1f3e88d6"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.15575213080057793,
+      "valid_loss": -0.13946459064881006
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.17938135051687734,
+      "valid_loss": -0.1436527517437935
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.18266090399593907,
+      "valid_loss": -0.14449034651120504
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.1840683145827688,
+      "valid_loss": -0.14533178853491943
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.1847927017153892,
+      "valid_loss": -0.14557834225396316
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.18500938932452582,
+      "valid_loss": -0.14569037521878878
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.1855899874384688,
+      "valid_loss": -0.14582308292388915
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.18579032966883574,
+      "valid_loss": -0.14592706757287185
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.18547440915310806,
+      "valid_loss": -0.14594958441952866
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.18604978753369203,
+      "valid_loss": -0.14590524849792322
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "optimization_variant": {
+    "code_commit": "a602debadd82954b608c547a85a427f0a25e1cf3",
+    "family": "frozen_method_config_search",
+    "method_contract_changed": false,
+    "only_difference": "Only preregistered B/K/L/H configuration values may differ from the frozen Full control.",
+    "retrain_required": true,
+    "selection_inputs": [
+      "train",
+      "valid"
+    ],
+    "source_stage": "post_stage6_optimization",
+    "test_used_for_selection": false,
+    "variant_id": "opt_B32_K16_L512_H20"
+  },
+  "per_epoch_checkpoints_saved": true,
+  "run_profile": "post_stage6_optimization",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 2026,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "4926bb569bf3f71b664c140e5dd0f91c488e583ef4eaf1c92405c2592fe143b2",
+  "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+  "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
+  "split_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 52.64947319030762,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "canneal"
+}

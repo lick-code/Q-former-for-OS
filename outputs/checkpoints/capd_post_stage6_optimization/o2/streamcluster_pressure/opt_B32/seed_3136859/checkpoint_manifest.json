@@ -1,0 +1,176 @@
+{
+  "artifact_class": "optimization_only",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.04707685686396749,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "1c7986b9b88c081ba1c36ad343d84aeb62fc3bc1066721c24e4a2f94d58ef56e",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "9976a29175b27e23cabf75fa10371abb77c495ed60084c714b4f86d77282403e",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_last.pth"
+    },
+    "per_epoch": [
+      {
+        "epoch": 1,
+        "fingerprint": "21a3942b59cc9e06fc8ac7df774af4233f14c425cdc94d7e192e13d9d19f1c5c",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_1.pth"
+      },
+      {
+        "epoch": 2,
+        "fingerprint": "a382f77ba7abad272a31c9643d14b9b9cbaedc2c7e2d6d9797da38a0d3ed7559",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_2.pth"
+      },
+      {
+        "epoch": 3,
+        "fingerprint": "eba37759b7193665058265b7bc9a5664257e5d9e4039f676bcfcfa9a7bb024b4",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_3.pth"
+      },
+      {
+        "epoch": 4,
+        "fingerprint": "409593cc5b7a757b2adaa1d5a6bc0e08569ffb30bf07795f86bd77a079066950",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_4.pth"
+      },
+      {
+        "epoch": 5,
+        "fingerprint": "a67fb61ec1397708ac07ad20cf57b973827b508f0dbd865636a31bd1b86c44f2",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_5.pth"
+      },
+      {
+        "epoch": 6,
+        "fingerprint": "5827bb63e4aca64621eb07abd009aa4455cc17f41611298ca963bdfbd3c4e5e4",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_6.pth"
+      },
+      {
+        "epoch": 7,
+        "fingerprint": "4c93de5c40230a0fc258e9935a0052fe1b573c6c40d368e6fe2ea962ec63e8a3",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_7.pth"
+      },
+      {
+        "epoch": 8,
+        "fingerprint": "89f0140f1c922f2f2d1b755749ce48676ebd9ecdf799e84794e26a44e501dd02",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_8.pth"
+      },
+      {
+        "epoch": 9,
+        "fingerprint": "442d200a258b123f384597f34c7ea4c4f52c9d8b4bebc91f975a806f7d8c1819",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_9.pth"
+      },
+      {
+        "epoch": 10,
+        "fingerprint": "f49e9829dc5981ac309cfc6a151eaea0ea4da2fc8461874d19140a0f74cf2679",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859/qmap_epoch_10.pth"
+      }
+    ]
+  },
+  "code_fingerprint": "10c50455c08ff69c3ae1b5dcfcdda618d5fe147593cae4d1cba91c89c16c2628",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32/seed_3136859 --seed 3136859 --save_every_epoch",
+  "config_fingerprint": "f2b50f5d90e50e4e67d8e74eb03893d84626ce9af1459dcd61d1713d40bfacd3",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "2b31c00b19945884a09cc6fc8f3d451aad73f0d03b98a350ef540960609ea2c4",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.05216003444237525,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "c9494d9a17ecf5beeed5eccbe6d3676023567f262edb14dabdb1349e957ddc36",
+    "valid": "9a48be7e040051d21c8bafb6b879c357dc6a041bb10eda32c8c51951ac2d08e7"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.042722476283362246,
+      "valid_loss": -0.04428318802141742
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.049938518519732446,
+      "valid_loss": -0.045115869408578015
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.05139804290443221,
+      "valid_loss": -0.04675481221481655
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.051747338099898225,
+      "valid_loss": -0.046884774429242264
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.05186646953499054,
+      "valid_loss": -0.04698319521764021
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.052031389143153584,
+      "valid_loss": -0.04696699037227068
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.05206446865957011,
+      "valid_loss": -0.04704882744490431
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.05213450952022172,
+      "valid_loss": -0.04706316951955302
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.052044327021576464,
+      "valid_loss": -0.04707070314482357
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.05216003444237525,
+      "valid_loss": -0.04707685686396749
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "optimization_variant": {
+    "code_commit": "a602debadd82954b608c547a85a427f0a25e1cf3",
+    "family": "frozen_method_config_search",
+    "method_contract_changed": false,
+    "only_difference": "Only preregistered B/K/L/H configuration values may differ from the frozen Full control.",
+    "retrain_required": true,
+    "selection_inputs": [
+      "train",
+      "valid"
+    ],
+    "source_stage": "post_stage6_optimization",
+    "test_used_for_selection": false,
+    "variant_id": "opt_B32"
+  },
+  "per_epoch_checkpoints_saved": true,
+  "run_profile": "post_stage6_optimization",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "7f270d107aac8e227e5d5de6536bcf22772c1f1dc3d909fdea477672d800cd76",
+  "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+  "source_manifest_fingerprint": "d12c5e2507c333421709ab37c1d555e50426674e3853c88759c2d44237c70235",
+  "split_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 63.52678871154785,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "streamcluster_pressure"
+}

@@ -1,0 +1,42 @@
+{
+  "full_control_retained": true,
+  "proceed_by_workload": {
+    "canneal": [
+      "opt_B32_K16",
+      "opt_B32_K16_L512",
+      "opt_B32_K16_L512_H20",
+      "opt_full_control"
+    ],
+    "dedup_pressure": [
+      "opt_B32_K16",
+      "opt_B32_K16_L512",
+      "opt_B32_K16_L512_H20",
+      "opt_full_control"
+    ],
+    "streamcluster_pressure": [
+      "opt_B32",
+      "opt_B32_K16",
+      "opt_B32_K16_L512",
+      "opt_B32_K16_L512_H20",
+      "opt_H20",
+      "opt_K16",
+      "opt_L512",
+      "opt_full_control"
+    ]
+  },
+  "proceed_config_ids": [
+    "opt_B32",
+    "opt_B32_K16",
+    "opt_B32_K16_L512",
+    "opt_B32_K16_L512_H20",
+    "opt_H20",
+    "opt_K16",
+    "opt_L512",
+    "opt_full_control"
+  ],
+  "schema_version": "capd_post_stage6_o1_gate_1",
+  "selection_rule": "strictly lower valid weighted_access_cost than best LRU/Clock and at least one strict future-label preference; Full retained",
+  "status": "O1_COMPLETED",
+  "test_trace_opened": false,
+  "test_used_for_selection": false
+}

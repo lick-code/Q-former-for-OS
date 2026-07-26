@@ -1,0 +1,12 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/selector_params.json --evaluation_split valid --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_4.pth --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o2/canneal/opt_full_control/seed_3136859/epoch_4.json",
+  "ended_unix": 1785074411.0103097,
+  "exit_code": 0,
+  "job_fingerprint": "fd752907da38a7c353071a69690b5df630853965c045c8000cd8c504af772b21",
+  "job_id": "o2:replay:canneal:opt_full_control:3136859:4",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o2/canneal/opt_full_control/seed_3136859/epoch_4.json.log",
+  "result_fingerprint": "8e727603714db4e079a0ab0a6b1c5d5191960c702bc8b3714d8bdc866df8d163",
+  "started_unix": 1785074398.5081897,
+  "status": "COMPLETED"
+}

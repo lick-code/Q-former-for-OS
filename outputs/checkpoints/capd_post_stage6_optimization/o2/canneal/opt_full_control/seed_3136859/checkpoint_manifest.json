@@ -1,0 +1,176 @@
+{
+  "artifact_class": "optimization_only",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.03559597897032896,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "1f5027734946cb5deeedbd609531f1e128083def22cf2d689835ff8d13c9683b",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "fe1e869dae515038201204ec4c1199a3a8e11154c97f2db273b22aede845c231",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_last.pth"
+    },
+    "per_epoch": [
+      {
+        "epoch": 1,
+        "fingerprint": "10c220b1fb6b96c942c134c9491a743f84cdad0a65e302c199e3d5af22a907d5",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_1.pth"
+      },
+      {
+        "epoch": 2,
+        "fingerprint": "140cf58d585bf9aee51451853b08662e290513a81f0311ce303c8d47b373217a",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_2.pth"
+      },
+      {
+        "epoch": 3,
+        "fingerprint": "95e9c7ebaaefa6092d0f9e41e1e6e1bfe8c01646fcf7e90734f636bef3222bfb",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_3.pth"
+      },
+      {
+        "epoch": 4,
+        "fingerprint": "bcd174552e38adbdc09da965effedf4594f4cbb279cc5ef1175bc1b1034e2498",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_4.pth"
+      },
+      {
+        "epoch": 5,
+        "fingerprint": "7185eb0fbf6a49155edef3291b3b8c04c7b98ff129535fbca30114be04e07056",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_5.pth"
+      },
+      {
+        "epoch": 6,
+        "fingerprint": "8bf5590354f146396817a37f28254feccad79b3ef8b03eb680d2a1d039e9d8ec",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_6.pth"
+      },
+      {
+        "epoch": 7,
+        "fingerprint": "f89cccd30d0e5d675257fcced43226b4a87dab23889822b56f86ebc2c6164c81",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_7.pth"
+      },
+      {
+        "epoch": 8,
+        "fingerprint": "6ed557465b98f45497cef422541a5359c6ec6e3bcc407022ef4a7ce583a582f4",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_8.pth"
+      },
+      {
+        "epoch": 9,
+        "fingerprint": "1556d85d961fb77c55d3ef1e6a8dc3bfe47e12e8d94812e8977b23baea79ea11",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_9.pth"
+      },
+      {
+        "epoch": 10,
+        "fingerprint": "bf9ecff02a9b8f2e3ca9d2fdeb00d1cde4a8271b35cc421cbc69e639463eab2f",
+        "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859/qmap_epoch_10.pth"
+      }
+    ]
+  },
+  "code_fingerprint": "10c50455c08ff69c3ae1b5dcfcdda618d5fe147593cae4d1cba91c89c16c2628",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_full_control/seed_3136859 --seed 3136859 --save_every_epoch",
+  "config_fingerprint": "55618ee70f05d5e23c975e26d9a9d2523cc2cdfbae8e2d87c2f54cec284b26eb",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "5986f7d63d4b81da33feb24a9c6a7d3db51c339d421e1322d4f80b7bc3249bdb",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.05658842338891947,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "3bb22eaa0e3dafaa020f9fe0ee11503a547389c89225bb8fad2b2301ccf01549",
+    "valid": "9b35358215320d4e79a7f853a6d14baa5e699001c4efcb152cacd2562745fc2a"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.04455320879948878,
+      "valid_loss": -0.029219120815396307
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.04856874134424513,
+      "valid_loss": -0.033997090781728426
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.05519487696444302,
+      "valid_loss": -0.03455376376708349
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.05586096093849798,
+      "valid_loss": -0.03493366775413354
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.05631640598804286,
+      "valid_loss": -0.03521543137729168
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.056331390267716046,
+      "valid_loss": -0.03533505370219549
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.05659609367922608,
+      "valid_loss": -0.035423308759927746
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.05648097913481493,
+      "valid_loss": -0.035503779004017515
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.056676157610078826,
+      "valid_loss": -0.03551001059512297
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.05658842338891947,
+      "valid_loss": -0.03559597897032896
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "optimization_variant": {
+    "code_commit": "a602debadd82954b608c547a85a427f0a25e1cf3",
+    "family": "frozen_method_config_search",
+    "method_contract_changed": false,
+    "only_difference": "Only preregistered B/K/L/H configuration values may differ from the frozen Full control.",
+    "retrain_required": true,
+    "selection_inputs": [
+      "train",
+      "valid"
+    ],
+    "source_stage": "post_stage6_optimization",
+    "test_used_for_selection": false,
+    "variant_id": "opt_full_control"
+  },
+  "per_epoch_checkpoints_saved": true,
+  "run_profile": "post_stage6_optimization",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "c06623d0c5c8cc6f771b0e6c9f9d77cb0d54b92fdfde8def1cc7bb10b39ea0cd",
+  "source_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+  "source_manifest_fingerprint": "33ee5f0f77966a23dfad7b07a1b50779a849fe27ed2da0a0d13b1a3adbb74686",
+  "split_fingerprints": {
+    "test": "3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+    "train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "valid": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 50.77444267272949,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "canneal"
+}

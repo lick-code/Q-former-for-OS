@@ -1,0 +1,12 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/selector_params.json --evaluation_split valid --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512_H20/seed_42/qmap_epoch_2.pth --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o3/canneal/opt_B32_K16_L512_H20/seed_42/epoch_2.json",
+  "ended_unix": 1785077935.9849932,
+  "exit_code": 0,
+  "job_fingerprint": "a865dd716fa0bba8a94baa675e0f4ff53a19b540742cd0ba5462c83a5c34953d",
+  "job_id": "o3:replay:canneal:opt_B32_K16_L512_H20:42:2",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o3/canneal/opt_B32_K16_L512_H20/seed_42/epoch_2.json.log",
+  "result_fingerprint": "b4ffc458eba64233f8b2b3f1f27c00e1fc3635ba2de496b6e46739d9137d2504",
+  "started_unix": 1785077923.767134,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,204 @@
+{
+  "fresh_holdout_opened": false,
+  "locked_by_workload": {
+    "canneal": {
+      "config": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512"
+      },
+      "selected_checkpoints": [
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512/seed_42/qmap_epoch_8.pth",
+          "checkpoint_fingerprint": "05c761c6f96a5dbdf9fc56a5c648731b6f3eee03aee8577b4b6e173e7b9af237",
+          "config_fingerprint": "0084a1ed852ba6bd0b8e8e91df0553e02d071b701dcdc725d1838ae5aea0a358",
+          "config_id": "opt_B32_K16_L512",
+          "epoch": 8,
+          "evaluation_split": "valid",
+          "phase": "o3",
+          "seed": 42,
+          "selector_fingerprint": "0531823c1e25e6c45eb520b1e84b2e9d917810d5a95c8f39c6ead00af4b0ce75",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.14558060710628828,
+          "weighted_access_cost": 224170.0,
+          "workload": "canneal"
+        },
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/canneal/opt_B32_K16_L512/seed_2026/qmap_epoch_9.pth",
+          "checkpoint_fingerprint": "298e074ed66d823f5da08568ee057a510e86d562accde5c11efc9048982a65ca",
+          "config_fingerprint": "0084a1ed852ba6bd0b8e8e91df0553e02d071b701dcdc725d1838ae5aea0a358",
+          "config_id": "opt_B32_K16_L512",
+          "epoch": 9,
+          "evaluation_split": "valid",
+          "phase": "o3",
+          "seed": 2026,
+          "selector_fingerprint": "0531823c1e25e6c45eb520b1e84b2e9d917810d5a95c8f39c6ead00af4b0ce75",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.14606201961636545,
+          "weighted_access_cost": 224786.0,
+          "workload": "canneal"
+        },
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/canneal/opt_B32_K16_L512/seed_3136859/qmap_epoch_10.pth",
+          "checkpoint_fingerprint": "c6038fe6456c4a758444a52187c5f5ac9ad5561dc75c62250c5fb957563018a7",
+          "config_fingerprint": "0084a1ed852ba6bd0b8e8e91df0553e02d071b701dcdc725d1838ae5aea0a358",
+          "config_id": "opt_B32_K16_L512",
+          "epoch": 10,
+          "evaluation_split": "valid",
+          "phase": "o2",
+          "seed": 3136859,
+          "selector_fingerprint": "0531823c1e25e6c45eb520b1e84b2e9d917810d5a95c8f39c6ead00af4b0ce75",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.14569218461712202,
+          "weighted_access_cost": 226073.0,
+          "workload": "canneal"
+        }
+      ],
+      "valid_cost_mean": 225009.66666666666,
+      "valid_cost_sample_stddev": 971.0161344351253
+    },
+    "dedup_pressure": {
+      "config": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 256,
+        "Lres": 256,
+        "config_id": "opt_B32_K16"
+      },
+      "selected_checkpoints": [
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/dedup_pressure/opt_B32_K16/seed_42/qmap_epoch_1.pth",
+          "checkpoint_fingerprint": "53d90452c4a268eeb5047e60ac08329a332b61a7a04785f47dc975324401efe8",
+          "config_fingerprint": "1ec9d7ee560770cf0f693e43006d649b3824fe883f1b3ab2040fda25ec3c78d7",
+          "config_id": "opt_B32_K16",
+          "epoch": 1,
+          "evaluation_split": "valid",
+          "phase": "o3",
+          "seed": 42,
+          "selector_fingerprint": "d86559f7caa54c35e752eb4709134bc83c78182c4df99a8322a2779a024c21a5",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.003186708293765424,
+          "weighted_access_cost": 1036377.0,
+          "workload": "dedup_pressure"
+        },
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/dedup_pressure/opt_B32_K16/seed_2026/qmap_epoch_1.pth",
+          "checkpoint_fingerprint": "84c69a3d891753ad2eb7be9915177c36527b06a44a5e6b87707f2395387263c0",
+          "config_fingerprint": "1ec9d7ee560770cf0f693e43006d649b3824fe883f1b3ab2040fda25ec3c78d7",
+          "config_id": "opt_B32_K16",
+          "epoch": 1,
+          "evaluation_split": "valid",
+          "phase": "o3",
+          "seed": 2026,
+          "selector_fingerprint": "d86559f7caa54c35e752eb4709134bc83c78182c4df99a8322a2779a024c21a5",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.0031785677714520192,
+          "weighted_access_cost": 1036870.0,
+          "workload": "dedup_pressure"
+        },
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/dedup_pressure/opt_B32_K16/seed_3136859/qmap_epoch_1.pth",
+          "checkpoint_fingerprint": "3efa18afc50ab75e855e771bb031122c486e17b595da4c3423198dec952c15de",
+          "config_fingerprint": "1ec9d7ee560770cf0f693e43006d649b3824fe883f1b3ab2040fda25ec3c78d7",
+          "config_id": "opt_B32_K16",
+          "epoch": 1,
+          "evaluation_split": "valid",
+          "phase": "o2",
+          "seed": 3136859,
+          "selector_fingerprint": "d86559f7caa54c35e752eb4709134bc83c78182c4df99a8322a2779a024c21a5",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.0031808144805661165,
+          "weighted_access_cost": 1036899.0,
+          "workload": "dedup_pressure"
+        }
+      ],
+      "valid_cost_mean": 1036715.3333333334,
+      "valid_cost_sample_stddev": 293.3638241728747
+    },
+    "streamcluster_pressure": {
+      "config": {
+        "B": 32,
+        "D": 64,
+        "H": 10,
+        "Hc": 256,
+        "K": 16,
+        "L": 512,
+        "Lres": 256,
+        "config_id": "opt_B32_K16_L512"
+      },
+      "selected_checkpoints": [
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_42/qmap_epoch_10.pth",
+          "checkpoint_fingerprint": "d7c016c41c67d10f055b3c72b076da31ca83c31d90917b1bcd792bd8a5bb64cd",
+          "config_fingerprint": "96d8503cb9a8b6a7dfc62e9acb1bb156a04752d363511d8a20c0ad83f92448d4",
+          "config_id": "opt_B32_K16_L512",
+          "epoch": 10,
+          "evaluation_split": "valid",
+          "phase": "o3",
+          "seed": 42,
+          "selector_fingerprint": "9c67d2628fb71b3b09071393ad085eb7f5d3872c65934bef71f420554edc8f23",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.2101458106608538,
+          "weighted_access_cost": 230227.0,
+          "workload": "streamcluster_pressure"
+        },
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o3/streamcluster_pressure/opt_B32_K16_L512/seed_2026/qmap_epoch_10.pth",
+          "checkpoint_fingerprint": "e3a32f792fc057818ecf56f4769e44dea78f9e7aa80d9f584e186573f0b76d68",
+          "config_fingerprint": "96d8503cb9a8b6a7dfc62e9acb1bb156a04752d363511d8a20c0ad83f92448d4",
+          "config_id": "opt_B32_K16_L512",
+          "epoch": 10,
+          "evaluation_split": "valid",
+          "phase": "o3",
+          "seed": 2026,
+          "selector_fingerprint": "9c67d2628fb71b3b09071393ad085eb7f5d3872c65934bef71f420554edc8f23",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.2101566612176346,
+          "weighted_access_cost": 230227.0,
+          "workload": "streamcluster_pressure"
+        },
+        {
+          "checkpoint": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32_K16_L512/seed_3136859/qmap_epoch_10.pth",
+          "checkpoint_fingerprint": "d10f93d35545d420f98ed995303df744f393c899d733cd3d0f25ee4b9bc09833",
+          "config_fingerprint": "96d8503cb9a8b6a7dfc62e9acb1bb156a04752d363511d8a20c0ad83f92448d4",
+          "config_id": "opt_B32_K16_L512",
+          "epoch": 10,
+          "evaluation_split": "valid",
+          "phase": "o2",
+          "seed": 3136859,
+          "selector_fingerprint": "9c67d2628fb71b3b09071393ad085eb7f5d3872c65934bef71f420554edc8f23",
+          "test_trace_opened": false,
+          "test_used_for_selection": false,
+          "valid_loss": -0.21005351805871122,
+          "weighted_access_cost": 230227.0,
+          "workload": "streamcluster_pressure"
+        }
+      ],
+      "valid_cost_mean": 230227.0,
+      "valid_cost_sample_stddev": 0.0
+    }
+  },
+  "method_contract_changed": false,
+  "official_stage6_replaced": false,
+  "schema_version": "capd_post_stage6_o3_locked_configurations_1",
+  "selection_rule": "three-seed valid cost mean, sample stddev, lower complexity, config_id",
+  "status": "O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT",
+  "test_trace_opened": false,
+  "test_used_for_selection": false
+}

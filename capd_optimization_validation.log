@@ -1,0 +1,614 @@
+[START] input_audit 2026-07-26T13:44:53Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage audit-inputs
+[START] input_audit 2026-07-26T13:44:53Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage audit-inputs
+[O0] status=O0_READY_FOR_O1_O3 O1=True O4=False sealed_holdouts=0/3
+[END] input_audit 2026-07-26T13:44:53Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/input_audit.log
+[START] targeted_pytest 2026-07-26T13:44:53Z
+[COMMAND] python3 -m pytest -q -p no:cacheprovider tests/test_capd_optimization_plan.py tests/test_checkpoint_config_contract.py
+[START] targeted_pytest 2026-07-26T13:44:53Z
+[COMMAND] python3 -m pytest -q -p no:cacheprovider tests/test_capd_optimization_plan.py tests/test_checkpoint_config_contract.py
+............                                                             [100%]
+12 passed in 0.49s
+[END] targeted_pytest 2026-07-26T13:44:54Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/targeted_pytest.log
+[START] mini_e2e 2026-07-26T13:44:54Z
+[COMMAND] env CAPD_OPTIMIZATION_E2E=1 python3 -m pytest -q -p no:cacheprovider tests/test_capd_optimization_end_to_end.py::OptimizationTorchMiniEndToEndTest
+[START] mini_e2e 2026-07-26T13:44:54Z
+[COMMAND] env CAPD_OPTIMIZATION_E2E=1 python3 -m pytest -q -p no:cacheprovider tests/test_capd_optimization_end_to_end.py::OptimizationTorchMiniEndToEndTest
+.                                                                        [100%]
+1 passed in 6.28s
+[END] mini_e2e 2026-07-26T13:45:01Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/mini_e2e.log
+[START] execution_plan 2026-07-26T13:45:01Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage plan
+[START] execution_plan 2026-07-26T13:45:01Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage plan
+[PLAN] o1 required_jobs=54
+[DECLARED] phases=5 configs=8
+o1:data:canneal:opt_full_control python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_full_control
+o1:data:canneal:opt_B32 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32
+o1:data:canneal:opt_K16 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_K16
+o1:data:canneal:opt_L512 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_L512
+o1:data:canneal:opt_H20 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_H20
+o1:data:canneal:opt_B32_K16 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32_K16
+o1:data:canneal:opt_B32_K16_L512 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32_K16_L512
+o1:data:canneal:opt_B32_K16_L512_H20 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:canneal:opt_B32_K16_L512_H20
+o1:data:streamcluster_pressure:opt_full_control python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_full_control
+o1:data:streamcluster_pressure:opt_B32 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32
+o1:data:streamcluster_pressure:opt_K16 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_K16
+o1:data:streamcluster_pressure:opt_L512 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_L512
+o1:data:streamcluster_pressure:opt_H20 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_H20
+o1:data:streamcluster_pressure:opt_B32_K16 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32_K16
+o1:data:streamcluster_pressure:opt_B32_K16_L512 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32_K16_L512
+o1:data:streamcluster_pressure:opt_B32_K16_L512_H20 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:streamcluster_pressure:opt_B32_K16_L512_H20
+o1:data:dedup_pressure:opt_full_control python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_full_control
+o1:data:dedup_pressure:opt_B32 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32
+o1:data:dedup_pressure:opt_K16 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_K16
+o1:data:dedup_pressure:opt_L512 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_L512
+o1:data:dedup_pressure:opt_H20 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_H20
+o1:data:dedup_pressure:opt_B32_K16 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32_K16
+o1:data:dedup_pressure:opt_B32_K16_L512 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32_K16_L512
+o1:data:dedup_pressure:opt_B32_K16_L512_H20 python3 scripts/run_capd_optimization.py --stage o1 --job-id o1:data:dedup_pressure:opt_B32_K16_L512_H20
+o1:oracle:canneal:opt_full_control python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/oracle.json
+o1:oracle:canneal:opt_B32 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32/oracle.json
+o1:oracle:canneal:opt_K16 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_K16/oracle.json
+o1:oracle:canneal:opt_L512 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_L512/oracle.json
+o1:oracle:canneal:opt_H20 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_H20/oracle.json
+o1:oracle:canneal:opt_B32_K16 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16/oracle.json
+o1:oracle:canneal:opt_B32_K16_L512 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512/oracle.json
+o1:oracle:canneal:opt_B32_K16_L512_H20 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_B32_K16_L512_H20/oracle.json
+o1:baseline:canneal:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/lru.json
+o1:baseline:canneal:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/canneal/opt_full_control/clock.json
+o1:oracle:streamcluster_pressure:opt_full_control python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/oracle.json
+o1:oracle:streamcluster_pressure:opt_B32 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32/oracle.json
+o1:oracle:streamcluster_pressure:opt_K16 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_K16/oracle.json
+o1:oracle:streamcluster_pressure:opt_L512 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_L512/oracle.json
+o1:oracle:streamcluster_pressure:opt_H20 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_H20/oracle.json
+o1:oracle:streamcluster_pressure:opt_B32_K16 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16/oracle.json
+o1:oracle:streamcluster_pressure:opt_B32_K16_L512 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512/oracle.json
+o1:oracle:streamcluster_pressure:opt_B32_K16_L512_H20 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_B32_K16_L512_H20/oracle.json
+o1:baseline:streamcluster_pressure:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/lru.json
+o1:baseline:streamcluster_pressure:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/streamcluster_pressure/opt_full_control/clock.json
+o1:oracle:dedup_pressure:opt_full_control python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/oracle.json
+o1:oracle:dedup_pressure:opt_B32 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32/oracle.json
+o1:oracle:dedup_pressure:opt_K16 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_K16/oracle.json
+o1:oracle:dedup_pressure:opt_L512 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_L512/oracle.json
+o1:oracle:dedup_pressure:opt_H20 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_H20/oracle.json
+o1:oracle:dedup_pressure:opt_B32_K16 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16/oracle.json
+o1:oracle:dedup_pressure:opt_B32_K16_L512 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512/oracle.json
+o1:oracle:dedup_pressure:opt_B32_K16_L512_H20 python3 qmap/optimization_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_B32_K16_L512_H20/oracle.json
+o1:baseline:dedup_pressure:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/lru.json
+o1:baseline:dedup_pressure:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o1/dedup_pressure/opt_full_control/clock.json
+[END] execution_plan 2026-07-26T13:45:01Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/execution_plan.log
+[START] o1_compute 2026-07-26T13:45:01Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage o1 --execute
+[START] o1_compute 2026-07-26T13:45:01Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage o1 --execute
+[PLAN] o1 required_jobs=54
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_full_control
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_B32
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_K16
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_L512
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_H20
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_B32_K16
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_B32_K16_L512
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/canneal/generator_summary.json
+[COMPLETED] o1:data:canneal:opt_B32_K16_L512_H20
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_full_control
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_B32
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_K16
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_L512
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_H20
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_B32_K16
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_B32_K16_L512
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/streamcluster_pressure/generator_summary.json
+[COMPLETED] o1:data:streamcluster_pressure:opt_B32_K16_L512_H20
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_full_control/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_full_control
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_B32
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_K16/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_K16
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_L512/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_L512
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_H20/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_H20
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_B32_K16
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_B32_K16_L512
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512_H20/dedup_pressure/generator_summary.json
+[COMPLETED] o1:data:dedup_pressure:opt_B32_K16_L512_H20
+[COMPLETED] o1:oracle:canneal:opt_full_control
+[COMPLETED] o1:oracle:canneal:opt_B32
+[COMPLETED] o1:oracle:canneal:opt_K16
+[COMPLETED] o1:oracle:canneal:opt_L512
+[COMPLETED] o1:oracle:canneal:opt_H20
+[COMPLETED] o1:oracle:canneal:opt_B32_K16
+[COMPLETED] o1:oracle:canneal:opt_B32_K16_L512
+[COMPLETED] o1:oracle:canneal:opt_B32_K16_L512_H20
+[COMPLETED] o1:baseline:canneal:lru
+[COMPLETED] o1:baseline:canneal:clock
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_full_control
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_B32
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_K16
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_L512
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_H20
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_B32_K16
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_B32_K16_L512
+[COMPLETED] o1:oracle:streamcluster_pressure:opt_B32_K16_L512_H20
+[COMPLETED] o1:baseline:streamcluster_pressure:lru
+[COMPLETED] o1:baseline:streamcluster_pressure:clock
+[COMPLETED] o1:oracle:dedup_pressure:opt_full_control
+[COMPLETED] o1:oracle:dedup_pressure:opt_B32
+[COMPLETED] o1:oracle:dedup_pressure:opt_K16
+[COMPLETED] o1:oracle:dedup_pressure:opt_L512
+[COMPLETED] o1:oracle:dedup_pressure:opt_H20
+[COMPLETED] o1:oracle:dedup_pressure:opt_B32_K16
+[COMPLETED] o1:oracle:dedup_pressure:opt_B32_K16_L512
+[COMPLETED] o1:oracle:dedup_pressure:opt_B32_K16_L512_H20
+[COMPLETED] o1:baseline:dedup_pressure:lru
+[COMPLETED] o1:baseline:dedup_pressure:clock
+[END] o1_compute 2026-07-26T13:58:22Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/o1_compute.log
+[START] o1_summarize 2026-07-26T13:58:22Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage summarize-o1
+[START] o1_summarize 2026-07-26T13:58:22Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage summarize-o1
+[O1] status=O1_COMPLETED proceed_configs=8
+[END] o1_summarize 2026-07-26T13:58:23Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/o1_summarize.log
+[START] o2_compute 2026-07-26T13:58:23Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage o2 --execute
+[START] o2_compute 2026-07-26T13:58:23Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage o2 --execute
+[PLAN] o2 required_jobs=192
+[RESUME] o1:data:canneal:opt_full_control
+[RESUME] o1:data:canneal:opt_B32_K16
+[RESUME] o1:data:canneal:opt_B32_K16_L512
+[RESUME] o1:data:canneal:opt_B32_K16_L512_H20
+[RESUME] o1:data:streamcluster_pressure:opt_full_control
+[RESUME] o1:data:streamcluster_pressure:opt_B32
+[RESUME] o1:data:streamcluster_pressure:opt_K16
+[RESUME] o1:data:streamcluster_pressure:opt_L512
+[RESUME] o1:data:streamcluster_pressure:opt_H20
+[RESUME] o1:data:streamcluster_pressure:opt_B32_K16
+[RESUME] o1:data:streamcluster_pressure:opt_B32_K16_L512
+[RESUME] o1:data:streamcluster_pressure:opt_B32_K16_L512_H20
+[RESUME] o1:data:dedup_pressure:opt_full_control
+[RESUME] o1:data:dedup_pressure:opt_B32_K16
+[RESUME] o1:data:dedup_pressure:opt_B32_K16_L512
+[RESUME] o1:data:dedup_pressure:opt_B32_K16_L512_H20
+[COMPLETED] o2:train:canneal:opt_full_control:3136859
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:1
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:2
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:3
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:4
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:5
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:6
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:7
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:8
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:9
+[COMPLETED] o2:replay:canneal:opt_full_control:3136859:10
+[COMPLETED] o2:train:canneal:opt_B32_K16:3136859
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:1
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:2
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:3
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:4
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:5
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:6
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:7
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:8
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:9
+[COMPLETED] o2:replay:canneal:opt_B32_K16:3136859:10
+[COMPLETED] o2:train:canneal:opt_B32_K16_L512:3136859
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:1
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:2
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:3
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:4
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:5
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:6
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:7
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:8
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:9
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512:3136859:10
+[COMPLETED] o2:train:canneal:opt_B32_K16_L512_H20:3136859
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:1
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:2
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:3
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:4
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:5
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:6
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:7
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:8
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:9
+[COMPLETED] o2:replay:canneal:opt_B32_K16_L512_H20:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_full_control:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_full_control:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_B32:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_K16:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_K16:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_L512:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_L512:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_H20:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_H20:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_B32_K16:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_B32_K16_L512:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:10
+[COMPLETED] o2:train:streamcluster_pressure:opt_B32_K16_L512_H20:3136859
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:1
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:2
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:3
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:4
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:5
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:6
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:7
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:8
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:9
+[COMPLETED] o2:replay:streamcluster_pressure:opt_B32_K16_L512_H20:3136859:10
+[COMPLETED] o2:train:dedup_pressure:opt_full_control:3136859
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:1
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:2
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:3
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:4
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:5
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:6
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:7
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:8
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:9
+[COMPLETED] o2:replay:dedup_pressure:opt_full_control:3136859:10
+[COMPLETED] o2:train:dedup_pressure:opt_B32_K16:3136859
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:1
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:2
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:3
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:4
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:5
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:6
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:7
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:8
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:9
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16:3136859:10
+[COMPLETED] o2:train:dedup_pressure:opt_B32_K16_L512:3136859
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:1
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:2
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:3
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:4
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:5
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:6
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:7
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:8
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:9
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512:3136859:10
+[COMPLETED] o2:train:dedup_pressure:opt_B32_K16_L512_H20:3136859
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:1
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:2
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:3
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:4
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:5
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:6
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:7
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:8
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:9
+[COMPLETED] o2:replay:dedup_pressure:opt_B32_K16_L512_H20:3136859:10
+[END] o2_compute 2026-07-26T14:51:54Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/o2_compute.log
+[START] o2_summarize 2026-07-26T14:51:54Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage summarize-o2
+[START] o2_summarize 2026-07-26T14:51:54Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage summarize-o2
+[O2] status=O2_COMPLETED workloads=3
+[END] o2_summarize 2026-07-26T14:51:54Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/o2_summarize.log
+[START] o3_compute 2026-07-26T14:51:54Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage o3 --execute
+[START] o3_compute 2026-07-26T14:51:54Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage o3 --execute
+[PLAN] o3 required_jobs=138
+[RESUME] o1:data:canneal:opt_B32_K16_L512
+[RESUME] o1:data:canneal:opt_B32_K16_L512_H20
+[RESUME] o1:data:streamcluster_pressure:opt_B32_K16_L512
+[RESUME] o1:data:streamcluster_pressure:opt_B32_K16_L512_H20
+[RESUME] o1:data:dedup_pressure:opt_B32_K16
+[RESUME] o1:data:dedup_pressure:opt_B32_K16_L512
+[COMPLETED] o3:train:canneal:opt_B32_K16_L512:42
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:1
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:2
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:3
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:4
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:5
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:6
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:7
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:8
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:9
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:42:10
+[COMPLETED] o3:train:canneal:opt_B32_K16_L512:2026
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:1
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:2
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:3
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:4
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:5
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:6
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:7
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:8
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:9
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512:2026:10
+[COMPLETED] o3:train:canneal:opt_B32_K16_L512_H20:42
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:1
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:2
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:3
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:4
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:5
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:6
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:7
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:8
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:9
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:42:10
+[COMPLETED] o3:train:canneal:opt_B32_K16_L512_H20:2026
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:1
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:2
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:3
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:4
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:5
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:6
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:7
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:8
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:9
+[COMPLETED] o3:replay:canneal:opt_B32_K16_L512_H20:2026:10
+[COMPLETED] o3:train:streamcluster_pressure:opt_B32_K16_L512_H20:42
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:1
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:2
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:3
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:4
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:5
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:6
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:7
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:8
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:9
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:42:10
+[COMPLETED] o3:train:streamcluster_pressure:opt_B32_K16_L512_H20:2026
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:1
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:2
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:3
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:4
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:5
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:6
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:7
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:8
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:9
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512_H20:2026:10
+[COMPLETED] o3:train:streamcluster_pressure:opt_B32_K16_L512:42
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:1
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:2
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:3
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:4
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:5
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:6
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:7
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:8
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:9
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:42:10
+[COMPLETED] o3:train:streamcluster_pressure:opt_B32_K16_L512:2026
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:1
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:2
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:3
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:4
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:5
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:6
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:7
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:8
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:9
+[COMPLETED] o3:replay:streamcluster_pressure:opt_B32_K16_L512:2026:10
+[COMPLETED] o3:train:dedup_pressure:opt_B32_K16_L512:42
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:1
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:2
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:3
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:4
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:5
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:6
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:7
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:8
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:9
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:42:10
+[COMPLETED] o3:train:dedup_pressure:opt_B32_K16_L512:2026
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:1
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:2
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:3
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:4
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:5
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:6
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:7
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:8
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:9
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16_L512:2026:10
+[COMPLETED] o3:train:dedup_pressure:opt_B32_K16:42
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:1
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:2
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:3
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:4
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:5
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:6
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:7
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:8
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:9
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:42:10
+[COMPLETED] o3:train:dedup_pressure:opt_B32_K16:2026
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:1
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:2
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:3
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:4
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:5
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:6
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:7
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:8
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:9
+[COMPLETED] o3:replay:dedup_pressure:opt_B32_K16:2026:10
+[END] o3_compute 2026-07-26T15:30:59Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/o3_compute.log
+[START] o3_summarize 2026-07-26T15:30:59Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage summarize-o3
+[START] o3_summarize 2026-07-26T15:30:59Z
+[COMMAND] python3 scripts/run_capd_optimization.py --stage summarize-o3
+[O3] status=O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT workloads=3
+[END] o3_summarize 2026-07-26T15:31:00Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/o3_summarize.log
+[START] provenance_check 2026-07-26T15:31:00Z
+[COMMAND] python3 -c $'\nimport json\no0=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/stage0_input_audit.json\',\n    encoding=\'utf-8\'))\no1=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o1/headroom_gate.json\',\n    encoding=\'utf-8\'))\no2=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o2/search_shortlist.json\',\n    encoding=\'utf-8\'))\no3=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o3/run_manifest.json\',\n    encoding=\'utf-8\'))\nassert o0[\'status\']==\'O0_READY_FOR_O1_O3\'\nassert o0[\'eligible_to_start_O1\'] is True\nassert o1[\'status\']==\'O1_COMPLETED\'\nassert o2[\'status\']==\'O2_COMPLETED\'\nassert o3[\'status\']==\'O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT\'\nfor payload in (o0,o1,o2,o3):\n    assert payload[\'test_used_for_selection\'] is False\nassert o3[\'method_contract_changed\'] is False\nassert o3[\'official_stage6_replaced\'] is False\n'
+[START] provenance_check 2026-07-26T15:31:00Z
+[COMMAND] python3 -c $'\nimport json\no0=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/stage0_input_audit.json\',\n    encoding=\'utf-8\'))\no1=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o1/headroom_gate.json\',\n    encoding=\'utf-8\'))\no2=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o2/search_shortlist.json\',\n    encoding=\'utf-8\'))\no3=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o3/run_manifest.json\',\n    encoding=\'utf-8\'))\nassert o0[\'status\']==\'O0_READY_FOR_O1_O3\'\nassert o0[\'eligible_to_start_O1\'] is True\nassert o1[\'status\']==\'O1_COMPLETED\'\nassert o2[\'status\']==\'O2_COMPLETED\'\nassert o3[\'status\']==\'O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT\'\nfor payload in (o0,o1,o2,o3):\n    assert payload[\'test_used_for_selection\'] is False\nassert o3[\'method_contract_changed\'] is False\nassert o3[\'official_stage6_replaced\'] is False\n'
+[END] provenance_check 2026-07-26T15:31:00Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/provenance_check.log
+[START] upstream_immutability 2026-07-26T15:31:00Z
+[COMMAND] python3 -c $'\nimport json\ns6=json.load(open(\n    \'outputs/results/finals_v3_official/stage6/run_manifest.json\',\n    encoding=\'utf-8\'))\nbridge=json.load(open(\n    \'outputs/results/capd_bridge_diagnostic/run_manifest.json\',\n    encoding=\'utf-8\'))\nassert s6[\'status\']==\'STAGE6_VERIFIED\'\nassert s6[\'required_jobs\']==s6[\'completed_required_jobs\']==105\nassert bridge[\'status\']==\'BRIDGE_DIAGNOSTIC_COMPLETED\'\nassert bridge[\'required_jobs\']==bridge[\'completed_required_jobs\']==33\n'
+[START] upstream_immutability 2026-07-26T15:31:00Z
+[COMMAND] python3 -c $'\nimport json\ns6=json.load(open(\n    \'outputs/results/finals_v3_official/stage6/run_manifest.json\',\n    encoding=\'utf-8\'))\nbridge=json.load(open(\n    \'outputs/results/capd_bridge_diagnostic/run_manifest.json\',\n    encoding=\'utf-8\'))\nassert s6[\'status\']==\'STAGE6_VERIFIED\'\nassert s6[\'required_jobs\']==s6[\'completed_required_jobs\']==105\nassert bridge[\'status\']==\'BRIDGE_DIAGNOSTIC_COMPLETED\'\nassert bridge[\'required_jobs\']==bridge[\'completed_required_jobs\']==33\n'
+[END] upstream_immutability 2026-07-26T15:31:00Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/upstream_immutability.log
+[START] diff_check 2026-07-26T15:31:00Z
+[COMMAND] git diff --check
+[START] diff_check 2026-07-26T15:31:00Z
+[COMMAND] git diff --check
+[END] diff_check 2026-07-26T15:31:00Z exit_code=0 log=/tmp/capd-optimization.v4CbPS/logs/diff_check.log
+[INFO] acceptance evidence: /tmp/capd-optimization.v4CbPS
+[FINAL] O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT

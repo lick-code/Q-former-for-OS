@@ -1,0 +1,12 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_post_stage6_optimization/opt_B32_K16_L512/streamcluster_pressure/selector_params.json --evaluation_split valid --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_post_stage6_optimization/o2/streamcluster_pressure/opt_B32_K16_L512/seed_3136859/qmap_epoch_5.pth --json_output /home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o2/streamcluster_pressure/opt_B32_K16_L512/seed_3136859/epoch_5.json",
+  "ended_unix": 1785076379.257227,
+  "exit_code": 0,
+  "job_fingerprint": "93558c0c54deeec7d78a8f92ed90e03974c9fdea66bcbfbf5433599630a9f7d7",
+  "job_id": "o2:replay:streamcluster_pressure:opt_B32_K16_L512:3136859:5",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/capd_post_stage6_optimization/raw/o2/streamcluster_pressure/opt_B32_K16_L512/seed_3136859/epoch_5.json.log",
+  "result_fingerprint": "6cea5d669c1d3b614a9193def5747ffc9f4cc5ac9b076c2e3eb16ff241a318c0",
+  "started_unix": 1785076366.594992,
+  "status": "COMPLETED"
+}
