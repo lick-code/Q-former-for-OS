@@ -973,7 +973,9 @@ class QMAPPolicy(object):
       if self._bridge_diagnostics:
         valid_scores = [
             float(score) for score, valid in zip(
-                _flat_sequence(eviction_scores[0]), candidate_mask)
+                _flat_sequence(
+                    eviction_scores[0], "bridge eviction_scores"),
+                candidate_mask)
             if valid]
         valid_scores.sort(reverse=True)
         self.last_score_margin = (

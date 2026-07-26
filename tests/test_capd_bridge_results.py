@@ -13,6 +13,7 @@ if PROJECT_ROOT not in sys.path:
 from qmap import bridge_results
 from qmap import bridge_variants
 from qmap.qmap_eval import ReplayStats
+from qmap.qmap_eval import _flat_sequence
 from qmap.qmap_eval import bounded_next_use_distance
 
 
@@ -98,7 +99,11 @@ class BridgeResultTest(unittest.TestCase):
     self.assertEqual(2, bounded_next_use_distance(trace, 1, 2, 3))
     self.assertEqual(4, bounded_next_use_distance(trace, 0, 9, 3))
 
+  def test_bridge_score_conversion_requires_named_flat_sequence(self):
+    self.assertEqual(
+        [0.75, 0.25],
+        _flat_sequence([0.75, 0.25], "bridge eviction_scores"))
+
 
 if __name__ == "__main__":
   unittest.main()
-
