@@ -1,5 +1,7 @@
 # CAPD 阶段6 Linux服务器验收
 
+执行状态：`STAGE6_VERIFIED`（2026-07-26）
+
 ## 1. 前置条件
 
 - Stage 5 manifest状态为`STAGE5_VERIFIED`；
@@ -72,3 +74,16 @@ server_gate_ready == true
 
 `system_platform_validation`可以是`CONDITIONAL_NOT_RUN`，但论文和报告
 必须如实披露。
+
+## 6. 本次正式验收记录
+
+- 最终验收日志：`stage6_validation_retry.log`；
+- 服务器证据目录：`/tmp/capd-stage6.Q0AKVm`；
+- 105/105个required job完成；
+- 目标测试、torch mini E2E、完整pytest、profile、capacity、
+  summarize、provenance和diff检查均为`exit_code=0`；
+- 最终输出：`[FINAL] STAGE6_VERIFIED`；
+- 真实混合内存平台状态：`CONDITIONAL_NOT_RUN`。
+
+首次执行记录保存在`stage6_validation.log`，其未通过状态不作为最终
+验收结论；完成修正后的统一重跑日志是本次状态提升的依据。

@@ -11,8 +11,8 @@
 - 合同状态：`FROZEN`
 - 实现状态：`STAGE1_R1_VERIFIED`（G01--G10、G13 均已完成服务器验收）
 - 数据状态：`STAGE2_VERIFIED_REUSABLE`（R1 不改变 trace、split、标签、selector 或 JSONL 内容语义）
-- 阶段状态：阶段3 `STAGE3_VERIFIED`；阶段4 `STAGE4_VERIFIED`；阶段5 `STAGE5_VERIFIED`；阶段6 `STAGE6_IMPLEMENTED_UNVERIFIED`
-- 实证状态：阶段5 official 主实验与消融矩阵已验收；阶段6稳健性与开销结论仍待服务器正式矩阵
+- 阶段状态：阶段3 `STAGE3_VERIFIED`；阶段4 `STAGE4_VERIFIED`；阶段5 `STAGE5_VERIFIED`；阶段6 `STAGE6_VERIFIED`
+- 实证状态：阶段5 official 主实验与消融矩阵、阶段6 official 稳健性与开销矩阵均已完成服务器验收；真实混合内存平台验证按冻结协议记为条件性未运行
 - 来源：2026-07-20 中文 CAPD 完整方法稿、2026-07-22 更新稿、当前仓库代码与配置审查
 
 ## 1. 合同地位与适用范围
@@ -466,12 +466,15 @@ job，并通过统一验收门禁；test未用于模型或参数选择。
 
 ### 阶段6：稳健性、开销与系统验证
 
-- 当前状态：`STAGE6_IMPLEMENTED_UNVERIFIED`；协议、任务矩阵和输入审计已冻结，
-  正式GPU矩阵与延迟/显存测量尚未完成；
+- 当前状态：`STAGE6_VERIFIED`；105/105 个 required job、目标测试、
+  torch mini E2E、完整 pytest、正式 GPU profile、容量矩阵、汇总与
+  provenance 门禁均已于 2026-07-26 通过服务器验收；
 - 工作负载类别、容量压力、读写比例、代价权重和随机种子稳健性；
 - selector、Transformer、Cross-Attention和完整决策的平均/P95/P99延迟及内存开销；
 - 吞吐下降、迁移次数和NVM写入变化；
-- 在条件允许时增加真实混合内存平台或更接近系统的回放验证。
+- 真实混合内存平台在本轮不可用，按冻结协议记录为
+  `CONDITIONAL_NOT_RUN`；该条件项不阻塞软件阶段6验收，但必须在论文
+  和最终报告中披露。
 
 ## 9. 实验报告边界
 

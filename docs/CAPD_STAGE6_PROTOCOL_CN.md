@@ -1,6 +1,7 @@
 # CAPD 阶段6稳健性、开销与系统验证协议
 
-状态：`FROZEN_FOR_EXECUTION`
+状态：`FROZEN_FOR_EXECUTION`（已按本协议完成正式执行与服务器验收，
+阶段状态为 `STAGE6_VERIFIED`）
 
 上游门禁：Stage 5 必须为 `STAGE5_VERIFIED`，348/348 个 required job
 完成，且 `test_used_for_selection=false`。
