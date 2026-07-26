@@ -1,0 +1,20 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_42/qmap_best.pth --stage6_profile --stage6_warmup_decisions 20 --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_profile/raw/dedup_pressure/qmap/seed_42.json
+started_unix=1785044909.1129608
+Policy: qmap
+Total accesses: 1000000
+Hits: 996667
+Misses: 3333
+Hit rate: 99.67%
+Migrations: 3269
+NVM reads: 1791
+NVM writes: 1542
+Weighted access cost: 1045275.00
+Policy decisions: 3269
+Total decision time: 11.060390s
+Avg decision time: 3.383417 ms
+Candidate filter decisions: 3269
+Candidate B_t range: 64..64
+Retained K_t range: 8..8
+Avg candidate filter time: 0.397271 ms
+ended_unix=1785044954.813573
+exit_code=0

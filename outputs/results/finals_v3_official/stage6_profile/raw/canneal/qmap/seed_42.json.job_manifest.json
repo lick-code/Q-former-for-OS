@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/canneal/B64/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage4_reranker/canneal/seed_42/qmap_best.pth --stage6_profile --stage6_warmup_decisions 20 --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_profile/raw/canneal/qmap/seed_42.json",
+  "ended_unix": 1785044654.8103974,
+  "exit_code": 0,
+  "job_fingerprint": "b440266740eb17003776781cda11d63b73e6d50507b2dda8d3df8826fe113ef6",
+  "job_id": "profile:canneal:qmap:42",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_profile/raw/canneal/qmap/seed_42.json.log",
+  "result_fingerprint": "98f2535337e4a5de7502e963173e56211a278ffcdf53b2d27665159237abd3e7",
+  "retry_count": 0,
+  "started_unix": 1785044633.3871624,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,34 @@
+{
+  "controlled_rw_intervention": false,
+  "interpretation_boundary": "Natural workload ratios are descriptive and are not a causal read/write-ratio intervention.",
+  "rows": [
+    {
+      "best_external_policy": "lru",
+      "capd_improvement_percent": -0.11133505249909788,
+      "interpretation": "descriptive_natural_workload_robustness",
+      "read_ratio": 0.738365,
+      "rw_source": "real_trace_column",
+      "workload": "canneal",
+      "write_ratio": 0.261635
+    },
+    {
+      "best_external_policy": "lru",
+      "capd_improvement_percent": 0.6324968978353784,
+      "interpretation": "descriptive_natural_workload_robustness",
+      "read_ratio": 0.98762,
+      "rw_source": "real_trace_column",
+      "workload": "streamcluster_pressure",
+      "write_ratio": 0.01238
+    },
+    {
+      "best_external_policy": "lru",
+      "capd_improvement_percent": -0.022228834529771375,
+      "interpretation": "descriptive_natural_workload_robustness",
+      "read_ratio": 0.726166,
+      "rw_source": "real_trace_column",
+      "workload": "dedup_pressure",
+      "write_ratio": 0.273834
+    }
+  ],
+  "status": "SUMMARIZED"
+}

@@ -1,0 +1,116 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.002141766157001257,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "b3ea0cdf2098824076029edf8e46e263274ec5e666f337e6a375dc8b072d9bfc",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/seed_2026/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "cd7032ca48028af72e97be7c0471c380b6cdb313dd8ae32dd6df6ee4a3f5c884",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/seed_2026/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "93ab679539d49caab339c9c2ff7b5a5471ef33f0c7977af1f6677851c3415e97",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/seed_2026 --seed 2026",
+  "config_fingerprint": "b45115379e9bd097a5bc174d5994bffb5444c6774e3cdf6bbc09a1edac418e0a",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "2b31c00b19945884a09cc6fc8f3d451aad73f0d03b98a350ef540960609ea2c4",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.0006569189012167961,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "17831d1ae8f1b599859b96a4e3e7c8ae4c5f92f9975480a4286ab7639c5b8469",
+    "valid": "67f8b849ff9ba8738d3df62584818d9a1a138bf04eee1a22d9c698e8b8cc0b61"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.0005775713838460878,
+      "valid_loss": -0.002139170910231769
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.0005778894341719432,
+      "valid_loss": -0.0021389902336522936
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.0005786433801289618,
+      "valid_loss": -0.002139088721014559
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.0005801774370740718,
+      "valid_loss": -0.0021387573797255754
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.0005825659348152754,
+      "valid_loss": -0.0021388842025771735
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.0005878087015837196,
+      "valid_loss": -0.0021387418964877725
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.0005971501750035549,
+      "valid_loss": -0.002139181992970407
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.000611402908354763,
+      "valid_loss": -0.0021400114754214885
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.0006223833188414574,
+      "valid_loss": -0.002140439208596945
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.0006569189012167961,
+      "valid_loss": -0.002141766157001257
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 2026,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "10d162b655e9bb06fd5817ca87687c90cc1428f527e9750716be69cadc78911e",
+  "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+  "source_manifest_fingerprint": "d12c5e2507c333421709ab37c1d555e50426674e3853c88759c2d44237c70235",
+  "split_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "stage5_variant": null,
+  "stage6_variant": {
+    "family": "capacity_robustness",
+    "only_difference": "only DRAM capacity D changes from 64 to 256",
+    "retrain_required": true,
+    "source_stage": "stage6",
+    "test_used_for_selection": false,
+    "variant_id": "capacity_D256"
+  },
+  "test_trace_opened": false,
+  "training_duration_seconds": 57.32652950286865,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "streamcluster_pressure"
+}

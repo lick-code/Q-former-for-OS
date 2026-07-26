@@ -1,0 +1,116 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 1,
+  "best_validation_loss": 0.0,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "387f8e80537d94d68875805869ceebd08e7d73964a6c7f30d682cf8ff537fb98",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "4629c331aced88b9ce3f2d29352a758af623c0cf2cae2c0c8def6ba2982a2a0b",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/seed_3136859/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "93ab679539d49caab339c9c2ff7b5a5471ef33f0c7977af1f6677851c3415e97",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/seed_3136859 --seed 3136859",
+  "config_fingerprint": "cd1f671585328fa9623f1cd93fc31c34a3a9b40e1e34b39cd34566e8f53feacc",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "d42012b4222091383fc3dfd7eb084dfe4c714512f067aaf7620d37dc844f4fa8",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": 0.0,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "da155a557e5b8df7ba7a8bfa0e9076833aaabc4b155af0435d1966c798b82b46",
+    "valid": "023679a8581c4dce3cc89b9b85f76b51bb8a6506330b2915818d1d95f5c651ac"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.0,
+      "valid_loss": 0.0
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "f153bf42f8cf380e58b23e749fe6241fa8d1097d30b78c0826b21d162c43bc7d",
+  "source_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+  "source_manifest_fingerprint": "1c04935e3188eed4d2e7d6217b2e156253448b2967c26905353476190dd8f439",
+  "split_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "stage5_variant": null,
+  "stage6_variant": {
+    "family": "capacity_robustness",
+    "only_difference": "only DRAM capacity D changes from 64 to 256",
+    "retrain_required": true,
+    "source_stage": "stage6",
+    "test_used_for_selection": false,
+    "variant_id": "capacity_D256"
+  },
+  "test_trace_opened": false,
+  "training_duration_seconds": 33.9343740940094,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "dedup_pressure"
+}

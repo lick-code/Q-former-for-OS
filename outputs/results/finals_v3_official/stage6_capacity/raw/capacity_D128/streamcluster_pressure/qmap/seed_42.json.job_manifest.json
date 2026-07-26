@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D128/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D128/streamcluster_pressure/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D128/streamcluster_pressure/seed_42/qmap_best.pth --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_capacity/raw/capacity_D128/streamcluster_pressure/qmap/seed_42.json",
+  "ended_unix": 1785045650.1411402,
+  "exit_code": 0,
+  "job_fingerprint": "368ea06451745ae682c2ccd1f45a2523ae29dee4fb51bf41aea5588aca302480",
+  "job_id": "capacity:replay:capacity_D128:streamcluster_pressure:qmap:42",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_capacity/raw/capacity_D128/streamcluster_pressure/qmap/seed_42.json.log",
+  "result_fingerprint": "d911686082b9408ec682ff2419bc14256e12cce92bc4a12d359f50330a217c56",
+  "retry_count": 0,
+  "started_unix": 1785045628.840407,
+  "status": "COMPLETED"
+}

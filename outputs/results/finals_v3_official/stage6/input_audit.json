@@ -1,0 +1,291 @@
+{
+  "checkpoint_count": 9,
+  "checks": [
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/run_manifest.json",
+      "name": "stage5_manifest_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "STAGE5_VERIFIED",
+      "name": "stage5_verified",
+      "status": "PASS"
+    },
+    {
+      "detail": "348/348",
+      "name": "stage5_complete",
+      "status": "PASS"
+    },
+    {
+      "detail": "False",
+      "name": "stage5_test_not_selected",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/stage5_main_summary.json",
+      "name": "stage5_main_summary_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json",
+      "name": "canneal_config_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/selector_params.json",
+      "name": "canneal_selector_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/train.jsonl",
+      "name": "canneal_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/canneal/B64/valid.jsonl",
+      "name": "canneal_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "resolved config validates",
+      "name": "canneal_config_semantics",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/finals_v3_official/canneal.json",
+      "name": "canneal_source_manifest_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/canneal/test.csv",
+      "name": "canneal_test_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e actual=3a5ecb35b4aec98a8fb470483ce0427d4da21ede1e3af387d9b7d61bccf6138e",
+      "name": "canneal_test_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/canneal/train.csv",
+      "name": "canneal_train_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f actual=4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+      "name": "canneal_train_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/canneal/valid.csv",
+      "name": "canneal_valid_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142 actual=2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142",
+      "name": "canneal_valid_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/finals_v3_official/reports/canneal.json",
+      "name": "canneal_data_report",
+      "status": "PASS"
+    },
+    {
+      "detail": "PASSED",
+      "name": "canneal_data_passed",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/canneal/seed_3136859/qmap_best.pth",
+      "name": "checkpoint_canneal_3136859",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/canneal/seed_42/qmap_best.pth",
+      "name": "checkpoint_canneal_42",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/canneal/seed_2026/qmap_best.pth",
+      "name": "checkpoint_canneal_2026",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json",
+      "name": "streamcluster_pressure_config_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/selector_params.json",
+      "name": "streamcluster_pressure_selector_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/train.jsonl",
+      "name": "streamcluster_pressure_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/valid.jsonl",
+      "name": "streamcluster_pressure_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "resolved config validates",
+      "name": "streamcluster_pressure_config_semantics",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+      "name": "streamcluster_pressure_source_manifest_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/streamcluster_pressure/test.csv",
+      "name": "streamcluster_pressure_test_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7 actual=7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+      "name": "streamcluster_pressure_test_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "name": "streamcluster_pressure_train_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d actual=a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+      "name": "streamcluster_pressure_train_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv",
+      "name": "streamcluster_pressure_valid_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774 actual=e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774",
+      "name": "streamcluster_pressure_valid_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/finals_v3_official/reports/streamcluster_pressure.json",
+      "name": "streamcluster_pressure_data_report",
+      "status": "PASS"
+    },
+    {
+      "detail": "PASSED",
+      "name": "streamcluster_pressure_data_passed",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/streamcluster_pressure/seed_3136859/qmap_best.pth",
+      "name": "checkpoint_streamcluster_pressure_3136859",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/streamcluster_pressure/seed_42/qmap_best.pth",
+      "name": "checkpoint_streamcluster_pressure_42",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/streamcluster_pressure/seed_2026/qmap_best.pth",
+      "name": "checkpoint_streamcluster_pressure_2026",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json",
+      "name": "dedup_pressure_config_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/selector_params.json",
+      "name": "dedup_pressure_selector_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/train.jsonl",
+      "name": "dedup_pressure_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/valid.jsonl",
+      "name": "dedup_pressure_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "resolved config validates",
+      "name": "dedup_pressure_config_semantics",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+      "name": "dedup_pressure_source_manifest_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/dedup_pressure/test.csv",
+      "name": "dedup_pressure_test_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e actual=02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+      "name": "dedup_pressure_test_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/dedup_pressure/train.csv",
+      "name": "dedup_pressure_train_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716 actual=1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+      "name": "dedup_pressure_train_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/dedup_pressure/valid.csv",
+      "name": "dedup_pressure_valid_trace_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected=19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8 actual=19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8",
+      "name": "dedup_pressure_valid_fingerprint",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/finals_v3_official/reports/dedup_pressure.json",
+      "name": "dedup_pressure_data_report",
+      "status": "PASS"
+    },
+    {
+      "detail": "PASSED",
+      "name": "dedup_pressure_data_passed",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_3136859/qmap_best.pth",
+      "name": "checkpoint_dedup_pressure_3136859",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_42/qmap_best.pth",
+      "name": "checkpoint_dedup_pressure_42",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/checkpoints/finals_v3_official/stage4_reranker/dedup_pressure/seed_2026/qmap_best.pth",
+      "name": "checkpoint_dedup_pressure_2026",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "CAPD-MIC-1.0",
+  "expected_checkpoint_count": 9,
+  "schema_version": "capd_finals_v3_stage6_input_audit_1",
+  "stage_status": "STAGE6_IMPLEMENTED_UNVERIFIED",
+  "status": "PASSED",
+  "test_used_for_selection": false
+}

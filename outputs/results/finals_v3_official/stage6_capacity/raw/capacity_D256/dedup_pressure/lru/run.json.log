@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/resolved_config.json --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_capacity/raw/capacity_D256/dedup_pressure/lru/run.json
+started_unix=1785047422.947178
+Policy: lru
+Total accesses: 1000000
+Hits: 996685
+Misses: 3315
+Hit rate: 99.67%
+Migrations: 3059
+NVM reads: 1773
+NVM writes: 1542
+Weighted access cost: 1043157.00
+Policy decisions: 3059
+Total decision time: 0.000907s
+Avg decision time: 0.000297 ms
+ended_unix=1785047458.2878864
+exit_code=0

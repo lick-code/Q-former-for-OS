@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/dedup_pressure/resolved_config.json --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_capacity/raw/capacity_D256/dedup_pressure/clock/run.json
+started_unix=1785047497.6745741
+Policy: clock
+Total accesses: 1000000
+Hits: 996700
+Misses: 3300
+Hit rate: 99.67%
+Migrations: 3044
+NVM reads: 1757
+NVM writes: 1543
+Weighted access cost: 1042998.00
+Policy decisions: 3044
+Total decision time: 0.004106s
+Avg decision time: 0.001349 ms
+ended_unix=1785047529.3876684
+exit_code=0

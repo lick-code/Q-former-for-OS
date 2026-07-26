@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D128/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D128/canneal/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D128/canneal/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D128/canneal/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D128/canneal/seed_3136859 --seed 3136859",
+  "ended_unix": 1785045233.2802389,
+  "exit_code": 0,
+  "job_fingerprint": "d3e0611f126c47fcd548cf6feabc8d26bce1ffe023542adca88028152815d877",
+  "job_id": "capacity:train:capacity_D128:canneal:3136859",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D128/canneal/seed_3136859/checkpoint_manifest.json.log",
+  "result_fingerprint": "e9688e8b5bcbfec04ddd308d016d90be5dfbdaacf0329ea0d70e7667380e702c",
+  "retry_count": 0,
+  "started_unix": 1785045192.4700124,
+  "status": "COMPLETED"
+}

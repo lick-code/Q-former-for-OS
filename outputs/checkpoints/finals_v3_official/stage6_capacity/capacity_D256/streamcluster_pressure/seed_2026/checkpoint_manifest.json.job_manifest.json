@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/seed_2026 --seed 2026",
+  "ended_unix": 1785046885.039607,
+  "exit_code": 0,
+  "job_fingerprint": "ea75c6c6d5f88d595b0813b2cb96813339f0af1f15595c091804a9b89ca0bd62",
+  "job_id": "capacity:train:capacity_D256:streamcluster_pressure:2026",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/finals_v3_official/stage6_capacity/capacity_D256/streamcluster_pressure/seed_2026/checkpoint_manifest.json.log",
+  "result_fingerprint": "149601f7c629c31e94a0ab391ea881a329ce41325532f63acae57bdcfdfe6d15",
+  "retry_count": 0,
+  "started_unix": 1785046822.4772234,
+  "status": "COMPLETED"
+}

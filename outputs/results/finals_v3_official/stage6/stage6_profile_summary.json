@@ -1,0 +1,1463 @@
+{
+  "effect_summary": {
+    "canneal": {
+      "migration_reference_policy": "lru",
+      "nvm_write_reference_policy": "lru",
+      "policies": {
+        "clock": {
+          "migrations": {
+            "count": 1,
+            "max": 3000.0,
+            "mean": 3000.0,
+            "min": 3000.0,
+            "p50": 3000.0,
+            "p95": 3000.0,
+            "p99": 3000.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 21.0,
+            "mean": 21.0,
+            "min": 21.0,
+            "p50": 21.0,
+            "p95": 21.0,
+            "p99": 21.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 534832.6775561367,
+            "mean": 534832.6775561367,
+            "min": 534832.6775561367,
+            "p50": 534832.6775561367,
+            "p95": 534832.6775561367,
+            "p99": 534832.6775561367
+          }
+        },
+        "lfu": {
+          "migrations": {
+            "count": 1,
+            "max": 5687.0,
+            "mean": 5687.0,
+            "min": 5687.0,
+            "p50": 5687.0,
+            "p95": 5687.0,
+            "p99": 5687.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 662.0,
+            "mean": 662.0,
+            "min": 662.0,
+            "p50": 662.0,
+            "p95": 662.0,
+            "p99": 662.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 464930.4128650322,
+            "mean": 464930.4128650322,
+            "min": 464930.4128650322,
+            "p50": 464930.4128650322,
+            "p95": 464930.4128650322,
+            "p99": 464930.4128650322
+          }
+        },
+        "lru": {
+          "migrations": {
+            "count": 1,
+            "max": 2462.0,
+            "mean": 2462.0,
+            "min": 2462.0,
+            "p50": 2462.0,
+            "p95": 2462.0,
+            "p99": 2462.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 16.0,
+            "mean": 16.0,
+            "min": 16.0,
+            "p50": 16.0,
+            "p95": 16.0,
+            "p99": 16.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 649787.6336363623,
+            "mean": 649787.6336363623,
+            "min": 649787.6336363623,
+            "p50": 649787.6336363623,
+            "p95": 649787.6336363623,
+            "p99": 649787.6336363623
+          }
+        },
+        "qmap": {
+          "migrations": {
+            "count": 3,
+            "max": 2636.0,
+            "mean": 2485.0,
+            "min": 2378.0,
+            "p50": 2441.0,
+            "p95": 2616.5,
+            "p99": 2632.1
+          },
+          "nvm_writes": {
+            "count": 3,
+            "max": 16.0,
+            "mean": 16.0,
+            "min": 16.0,
+            "p50": 16.0,
+            "p95": 16.0,
+            "p99": 16.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 3,
+            "max": 21761.90325413707,
+            "mean": 20752.42288693479,
+            "min": 19619.163869902353,
+            "p50": 20876.201536764944,
+            "p95": 21673.333082399855,
+            "p99": 21744.189219789623
+          }
+        },
+        "random": {
+          "migrations": {
+            "count": 3,
+            "max": 4058.0,
+            "mean": 4052.0,
+            "min": 4045.0,
+            "p50": 4053.0,
+            "p95": 4057.5,
+            "p99": 4057.9
+          },
+          "nvm_writes": {
+            "count": 3,
+            "max": 104.0,
+            "mean": 100.0,
+            "min": 98.0,
+            "p50": 98.0,
+            "p95": 103.4,
+            "p99": 103.88000000000001
+          },
+          "throughput_accesses_per_second": {
+            "count": 3,
+            "max": 629204.9650026421,
+            "mean": 583689.1253753566,
+            "min": 544268.4365712863,
+            "p50": 577593.9745521416,
+            "p95": 624043.865957592,
+            "p99": 628172.7451936321
+          }
+        }
+      },
+      "qmap_migration_change_percent": 0.934199837530463,
+      "qmap_migration_delta": 23.0,
+      "qmap_nvm_write_change_percent": 0.0,
+      "qmap_nvm_write_delta": 0.0,
+      "qmap_throughput_degradation_percent": 96.80627611042712,
+      "throughput_reference_policy": "lru"
+    },
+    "dedup_pressure": {
+      "migration_reference_policy": "lru",
+      "nvm_write_reference_policy": "lru",
+      "policies": {
+        "clock": {
+          "migrations": {
+            "count": 1,
+            "max": 3267.0,
+            "mean": 3267.0,
+            "min": 3267.0,
+            "p50": 3267.0,
+            "p95": 3267.0,
+            "p99": 3267.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 1550.0,
+            "mean": 1550.0,
+            "min": 1550.0,
+            "p50": 1550.0,
+            "p95": 1550.0,
+            "p99": 1550.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 713962.062538735,
+            "mean": 713962.062538735,
+            "min": 713962.062538735,
+            "p50": 713962.062538735,
+            "p95": 713962.062538735,
+            "p99": 713962.062538735
+          }
+        },
+        "lfu": {
+          "migrations": {
+            "count": 1,
+            "max": 98193.0,
+            "mean": 98193.0,
+            "min": 98193.0,
+            "p50": 98193.0,
+            "p95": 98193.0,
+            "p99": 98193.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 48664.0,
+            "mean": 48664.0,
+            "min": 48664.0,
+            "p50": 48664.0,
+            "p95": 48664.0,
+            "p99": 48664.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 260937.85810055377,
+            "mean": 260937.85810055377,
+            "min": 260937.85810055377,
+            "p50": 260937.85810055377,
+            "p95": 260937.85810055377,
+            "p99": 260937.85810055377
+          }
+        },
+        "lru": {
+          "migrations": {
+            "count": 1,
+            "max": 3259.0,
+            "mean": 3259.0,
+            "min": 3259.0,
+            "p50": 3259.0,
+            "p95": 3259.0,
+            "p99": 3259.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 1546.0,
+            "mean": 1546.0,
+            "min": 1546.0,
+            "p50": 1546.0,
+            "p95": 1546.0,
+            "p99": 1546.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 697412.2250179516,
+            "mean": 697412.2250179516,
+            "min": 697412.2250179516,
+            "p50": 697412.2250179516,
+            "p95": 697412.2250179516,
+            "p99": 697412.2250179516
+          }
+        },
+        "qmap": {
+          "migrations": {
+            "count": 3,
+            "max": 3295.0,
+            "mean": 3282.6666666666665,
+            "min": 3269.0,
+            "p50": 3284.0,
+            "p95": 3293.8999999999996,
+            "p99": 3294.7799999999997
+          },
+          "nvm_writes": {
+            "count": 3,
+            "max": 1542.0,
+            "mean": 1541.3333333333333,
+            "min": 1541.0,
+            "p50": 1541.0,
+            "p95": 1541.9,
+            "p99": 1541.98
+          },
+          "throughput_accesses_per_second": {
+            "count": 3,
+            "max": 69799.95281174337,
+            "mean": 69274.30117250746,
+            "min": 68467.16689327022,
+            "p50": 69555.78381250879,
+            "p95": 69775.53591181991,
+            "p99": 69795.06943175867
+          }
+        },
+        "random": {
+          "migrations": {
+            "count": 3,
+            "max": 3545.0,
+            "mean": 3544.0,
+            "min": 3543.0,
+            "p50": 3544.0,
+            "p95": 3544.8999999999996,
+            "p99": 3544.98
+          },
+          "nvm_writes": {
+            "count": 3,
+            "max": 1673.0,
+            "mean": 1658.6666666666667,
+            "min": 1650.0,
+            "p50": 1653.0,
+            "p95": 1671.0,
+            "p99": 1672.6
+          },
+          "throughput_accesses_per_second": {
+            "count": 3,
+            "max": 707863.2878610152,
+            "mean": 705163.5702502518,
+            "min": 701803.4580336618,
+            "p50": 705823.9648560785,
+            "p95": 707659.3555605216,
+            "p99": 707822.5014009165
+          }
+        }
+      },
+      "qmap_migration_change_percent": 0.7261941290784448,
+      "qmap_migration_delta": 23.666666666666515,
+      "qmap_nvm_write_change_percent": -0.3018542475204879,
+      "qmap_nvm_write_delta": -4.6666666666667425,
+      "qmap_throughput_degradation_percent": 90.29720137703407,
+      "throughput_reference_policy": "clock"
+    },
+    "streamcluster_pressure": {
+      "migration_reference_policy": "lru",
+      "nvm_write_reference_policy": "lru",
+      "policies": {
+        "clock": {
+          "migrations": {
+            "count": 1,
+            "max": 3239.0,
+            "mean": 3239.0,
+            "min": 3239.0,
+            "p50": 3239.0,
+            "p95": 3239.0,
+            "p99": 3239.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 33.0,
+            "mean": 33.0,
+            "min": 33.0,
+            "p50": 33.0,
+            "p95": 33.0,
+            "p99": 33.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 556481.3473071712,
+            "mean": 556481.3473071712,
+            "min": 556481.3473071712,
+            "p50": 556481.3473071712,
+            "p95": 556481.3473071712,
+            "p99": 556481.3473071712
+          }
+        },
+        "lfu": {
+          "migrations": {
+            "count": 1,
+            "max": 3410.0,
+            "mean": 3410.0,
+            "min": 3410.0,
+            "p50": 3410.0,
+            "p95": 3410.0,
+            "p99": 3410.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 45.0,
+            "mean": 45.0,
+            "min": 45.0,
+            "p50": 45.0,
+            "p95": 45.0,
+            "p99": 45.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 538634.9360291461,
+            "mean": 538634.9360291461,
+            "min": 538634.9360291461,
+            "p50": 538634.9360291461,
+            "p95": 538634.9360291461,
+            "p99": 538634.9360291461
+          }
+        },
+        "lru": {
+          "migrations": {
+            "count": 1,
+            "max": 2900.0,
+            "mean": 2900.0,
+            "min": 2900.0,
+            "p50": 2900.0,
+            "p95": 2900.0,
+            "p99": 2900.0
+          },
+          "nvm_writes": {
+            "count": 1,
+            "max": 22.0,
+            "mean": 22.0,
+            "min": 22.0,
+            "p50": 22.0,
+            "p95": 22.0,
+            "p99": 22.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 1,
+            "max": 662120.853881806,
+            "mean": 662120.853881806,
+            "min": 662120.853881806,
+            "p50": 662120.853881806,
+            "p95": 662120.853881806,
+            "p99": 662120.853881806
+          }
+        },
+        "qmap": {
+          "migrations": {
+            "count": 3,
+            "max": 2778.0,
+            "mean": 2778.0,
+            "min": 2778.0,
+            "p50": 2778.0,
+            "p95": 2778.0,
+            "p99": 2778.0
+          },
+          "nvm_writes": {
+            "count": 3,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "p50": 1.0,
+            "p95": 1.0,
+            "p99": 1.0
+          },
+          "throughput_accesses_per_second": {
+            "count": 3,
+            "max": 19170.906936504834,
+            "mean": 18933.398577369186,
+            "min": 18717.70558040296,
+            "p50": 18911.583215199764,
+            "p95": 19144.97456437433,
+            "p99": 19165.720462078734
+          }
+        },
+        "random": {
+          "migrations": {
+            "count": 3,
+            "max": 3494.0,
+            "mean": 3469.3333333333335,
+            "min": 3432.0,
+            "p50": 3482.0,
+            "p95": 3492.8,
+            "p99": 3493.7599999999998
+          },
+          "nvm_writes": {
+            "count": 3,
+            "max": 40.0,
+            "mean": 35.333333333333336,
+            "min": 31.0,
+            "p50": 35.0,
+            "p95": 39.5,
+            "p99": 39.900000000000006
+          },
+          "throughput_accesses_per_second": {
+            "count": 3,
+            "max": 658464.1588787352,
+            "mean": 633265.2317606752,
+            "min": 592192.7002087879,
+            "p50": 649138.8361945025,
+            "p95": 657531.6266103118,
+            "p99": 658277.6524250505
+          }
+        }
+      },
+      "qmap_migration_change_percent": -4.206896551724138,
+      "qmap_migration_delta": -122.0,
+      "qmap_nvm_write_change_percent": -95.45454545454545,
+      "qmap_nvm_write_delta": -21.0,
+      "qmap_throughput_degradation_percent": 97.14049203157269,
+      "throughput_reference_policy": "lru"
+    }
+  },
+  "memory_rows": [
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 3136859,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2512687104,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 42,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2512535552,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 2026,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2493239296,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 87633920,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 87584768,
+      "replay_seed": 1,
+      "torch_version": null,
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 87392256,
+      "replay_seed": 2,
+      "torch_version": null,
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "lru",
+      "process_peak_rss_bytes": 87556096,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "lfu",
+      "process_peak_rss_bytes": 87736320,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "clock",
+      "process_peak_rss_bytes": 87588864,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "canneal"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 3136859,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2502213632,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 42,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2519859200,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 2026,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2528866304,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 87429120,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 87724032,
+      "replay_seed": 1,
+      "torch_version": null,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 87425024,
+      "replay_seed": 2,
+      "torch_version": null,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "lru",
+      "process_peak_rss_bytes": 87564288,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "lfu",
+      "process_peak_rss_bytes": 87621632,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "clock",
+      "process_peak_rss_bytes": 87539712,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 3136859,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2792792064,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 42,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2805653504,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "cuda_peak_allocated_bytes": 5906432,
+      "cuda_peak_reserved_bytes": 23068672,
+      "device": "cuda",
+      "model_buffer_bytes": 720,
+      "model_parameter_bytes": 4830116,
+      "model_seed": 2026,
+      "model_static_bytes": 4830836,
+      "policy": "qmap",
+      "process_peak_rss_bytes": 2801684480,
+      "replay_seed": 0,
+      "torch_version": "1.13.1+cu117",
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 380063744,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 380133376,
+      "replay_seed": 1,
+      "torch_version": null,
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "random",
+      "process_peak_rss_bytes": 379867136,
+      "replay_seed": 2,
+      "torch_version": null,
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "lru",
+      "process_peak_rss_bytes": 379924480,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "lfu",
+      "process_peak_rss_bytes": 384458752,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "dedup_pressure"
+    },
+    {
+      "cuda_device_name": null,
+      "cuda_peak_allocated_bytes": 0,
+      "cuda_peak_reserved_bytes": 0,
+      "device": "cpu",
+      "model_buffer_bytes": 0,
+      "model_parameter_bytes": 0,
+      "model_seed": null,
+      "model_static_bytes": 0,
+      "policy": "clock",
+      "process_peak_rss_bytes": 380010496,
+      "replay_seed": 0,
+      "torch_version": null,
+      "workload": "dedup_pressure"
+    }
+  ],
+  "status": "SUMMARIZED",
+  "throughput_rows": [
+    {
+      "migrations": 2636,
+      "model_seed": 3136859,
+      "nvm_writes": 16,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 10.19411435299844,
+      "throughput_accesses_per_second": 19619.163869902353,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 2378,
+      "model_seed": 42,
+      "nvm_writes": 16,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 9.19037262799975,
+      "throughput_accesses_per_second": 21761.90325413707,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 2441,
+      "model_seed": 2026,
+      "nvm_writes": 16,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 9.580286894997698,
+      "throughput_accesses_per_second": 20876.201536764944,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 4053,
+      "model_seed": null,
+      "nvm_writes": 98,
+      "policy": "random",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.3674657330120681,
+      "throughput_accesses_per_second": 544268.4365712863,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 4045,
+      "model_seed": null,
+      "nvm_writes": 104,
+      "policy": "random",
+      "replay_seed": 1,
+      "replay_wall_seconds": 0.31786144599027466,
+      "throughput_accesses_per_second": 629204.9650026421,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 4058,
+      "model_seed": null,
+      "nvm_writes": 98,
+      "policy": "random",
+      "replay_seed": 2,
+      "replay_wall_seconds": 0.3462639999925159,
+      "throughput_accesses_per_second": 577593.9745521416,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 2462,
+      "model_seed": null,
+      "nvm_writes": 16,
+      "policy": "lru",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.30779286900360603,
+      "throughput_accesses_per_second": 649787.6336363623,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 5687,
+      "model_seed": null,
+      "nvm_writes": 662,
+      "policy": "lfu",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.4301719020004384,
+      "throughput_accesses_per_second": 464930.4128650322,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 3000,
+      "model_seed": null,
+      "nvm_writes": 21,
+      "policy": "clock",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.37394872900040355,
+      "throughput_accesses_per_second": 534832.6775561367,
+      "workload": "canneal"
+    },
+    {
+      "migrations": 2778,
+      "model_seed": 3136859,
+      "nvm_writes": 1,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 10.685070300998632,
+      "throughput_accesses_per_second": 18717.70558040296,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 2778,
+      "model_seed": 42,
+      "nvm_writes": 1,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 10.575529173001996,
+      "throughput_accesses_per_second": 18911.583215199764,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 2778,
+      "model_seed": 2026,
+      "nvm_writes": 1,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 10.432474617002299,
+      "throughput_accesses_per_second": 19170.906936504834,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 3482,
+      "model_seed": null,
+      "nvm_writes": 31,
+      "policy": "random",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.3037371090031229,
+      "throughput_accesses_per_second": 658464.1588787352,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 3432,
+      "model_seed": null,
+      "nvm_writes": 35,
+      "policy": "random",
+      "replay_seed": 1,
+      "replay_wall_seconds": 0.3377279050037032,
+      "throughput_accesses_per_second": 592192.7002087879,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 3494,
+      "model_seed": null,
+      "nvm_writes": 40,
+      "policy": "random",
+      "replay_seed": 2,
+      "replay_wall_seconds": 0.3081004999985453,
+      "throughput_accesses_per_second": 649138.8361945025,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 2900,
+      "model_seed": null,
+      "nvm_writes": 22,
+      "policy": "lru",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.3020596599963028,
+      "throughput_accesses_per_second": 662120.853881806,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 3410,
+      "model_seed": null,
+      "nvm_writes": 45,
+      "policy": "lfu",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.37130900099873543,
+      "throughput_accesses_per_second": 538634.9360291461,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 3239,
+      "model_seed": null,
+      "nvm_writes": 33,
+      "policy": "clock",
+      "replay_seed": 0,
+      "replay_wall_seconds": 0.35940108499198686,
+      "throughput_accesses_per_second": 556481.3473071712,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "migrations": 3295,
+      "model_seed": 3136859,
+      "nvm_writes": 1541,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 14.376949625002453,
+      "throughput_accesses_per_second": 69555.78381250879,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 3269,
+      "model_seed": 42,
+      "nvm_writes": 1542,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 14.326657249999698,
+      "throughput_accesses_per_second": 69799.95281174337,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 3284,
+      "model_seed": 2026,
+      "nvm_writes": 1541,
+      "policy": "qmap",
+      "replay_seed": 0,
+      "replay_wall_seconds": 14.605540807009675,
+      "throughput_accesses_per_second": 68467.16689327022,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 3544,
+      "model_seed": null,
+      "nvm_writes": 1653,
+      "policy": "random",
+      "replay_seed": 0,
+      "replay_wall_seconds": 1.4249003599979915,
+      "throughput_accesses_per_second": 701803.4580336618,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 3543,
+      "model_seed": null,
+      "nvm_writes": 1650,
+      "policy": "random",
+      "replay_seed": 1,
+      "replay_wall_seconds": 1.4167838580033276,
+      "throughput_accesses_per_second": 705823.9648560785,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 3545,
+      "model_seed": null,
+      "nvm_writes": 1673,
+      "policy": "random",
+      "replay_seed": 2,
+      "replay_wall_seconds": 1.4127021660096943,
+      "throughput_accesses_per_second": 707863.2878610152,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 3259,
+      "model_seed": null,
+      "nvm_writes": 1546,
+      "policy": "lru",
+      "replay_seed": 0,
+      "replay_wall_seconds": 1.4338721980020637,
+      "throughput_accesses_per_second": 697412.2250179516,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 98193,
+      "model_seed": null,
+      "nvm_writes": 48664,
+      "policy": "lfu",
+      "replay_seed": 0,
+      "replay_wall_seconds": 3.8323300699994434,
+      "throughput_accesses_per_second": 260937.85810055377,
+      "workload": "dedup_pressure"
+    },
+    {
+      "migrations": 3267,
+      "model_seed": null,
+      "nvm_writes": 1550,
+      "policy": "clock",
+      "replay_seed": 0,
+      "replay_wall_seconds": 1.4006346449896228,
+      "throughput_accesses_per_second": 713962.062538735,
+      "workload": "dedup_pressure"
+    }
+  ],
+  "workloads": {
+    "canneal": {
+      "clock": {
+        "full_decision": {
+          "count": 2980,
+          "max": 0.022464009816758335,
+          "mean": 0.0014592915689010148,
+          "min": 0.0007700000423938036,
+          "p50": 0.0008760107448324561,
+          "p95": 0.0016953024896792998,
+          "p99": 0.02192488725995645
+        }
+      },
+      "lfu": {
+        "full_decision": {
+          "count": 5667,
+          "max": 0.05143000453244895,
+          "mean": 0.019927228498173993,
+          "min": 0.018780003301799297,
+          "p50": 0.019699989934451878,
+          "p95": 0.021037105761934072,
+          "p99": 0.023689084628131244
+        }
+      },
+      "lru": {
+        "full_decision": {
+          "count": 2442,
+          "max": 0.0004770117811858654,
+          "mean": 0.0002836695948808647,
+          "min": 0.00024600012693554163,
+          "p50": 0.0002710003172978759,
+          "p95": 0.00039199949242174625,
+          "p99": 0.0004195857036393137
+        }
+      },
+      "qmap": {
+        "cross_attention_scorer": {
+          "count": 7395,
+          "max": 1.742238993756473,
+          "mean": 1.074345415446906,
+          "min": 1.020654002786614,
+          "p50": 1.0513150045881048,
+          "p95": 1.2551232997793704,
+          "p99": 1.4003244409104807
+        },
+        "full_decision": {
+          "count": 7395,
+          "max": 5.598436007858254,
+          "mean": 3.3246690488547626,
+          "min": 3.1698889943072572,
+          "p50": 3.246477004722692,
+          "p95": 3.8711791028617872,
+          "p99": 4.257675459375605
+        },
+        "selector": {
+          "count": 7395,
+          "max": 0.8868340082699433,
+          "mean": 0.4083265753531705,
+          "min": 0.3805259912041947,
+          "p50": 0.39462999848183244,
+          "p95": 0.4964070001733488,
+          "p99": 0.5581181190791535
+        },
+        "tensor_and_embedding": {
+          "count": 7395,
+          "max": 1.1645679915091023,
+          "mean": 0.6463731952322341,
+          "min": 0.6010310025885701,
+          "p50": 0.6313839985523373,
+          "p95": 0.7592496025608853,
+          "p99": 0.8469262399012221
+        },
+        "transformer_encoder": {
+          "count": 7395,
+          "max": 1.7214940016856417,
+          "mean": 0.9109742162720678,
+          "min": 0.8539810078218579,
+          "p50": 0.8871509926393628,
+          "p95": 1.0695939025026742,
+          "p99": 1.1890195359592322
+        },
+        "victim_selection": {
+          "count": 7395,
+          "max": 0.22293000074569136,
+          "mean": 0.09941886467393173,
+          "min": 0.09276698983740062,
+          "p50": 0.09559300087857991,
+          "p95": 0.11990290222456673,
+          "p99": 0.1471183187095448
+        }
+      },
+      "random": {
+        "full_decision": {
+          "count": 12096,
+          "max": 0.022261010599322617,
+          "mean": 0.001280628706298697,
+          "min": 0.0009179930202662945,
+          "p50": 0.0011899974197149277,
+          "p95": 0.001701995643088594,
+          "p99": 0.002111152571160344
+        }
+      }
+    },
+    "dedup_pressure": {
+      "clock": {
+        "full_decision": {
+          "count": 3247,
+          "max": 0.02332800067961216,
+          "mean": 0.0012583321156232636,
+          "min": 0.0007569906301796436,
+          "p50": 0.0008539936970919371,
+          "p95": 0.0011177078704349694,
+          "p99": 0.021877000108361244
+        }
+      },
+      "lfu": {
+        "full_decision": {
+          "count": 98173,
+          "max": 0.06380100967362523,
+          "mean": 0.020437921933574615,
+          "min": 0.019127008272334933,
+          "p50": 0.02032199699897319,
+          "p95": 0.020727995433844626,
+          "p99": 0.02386199776083231
+        }
+      },
+      "lru": {
+        "full_decision": {
+          "count": 3239,
+          "max": 0.0005350011633709073,
+          "mean": 0.00028015579471198424,
+          "min": 0.00021999585442245007,
+          "p50": 0.0002629967639222741,
+          "p95": 0.00036500568967312574,
+          "p99": 0.00039699982153251767
+        }
+      },
+      "qmap": {
+        "cross_attention_scorer": {
+          "count": 9788,
+          "max": 1.7124269943451509,
+          "mean": 1.0479314646391145,
+          "min": 1.0203459969488904,
+          "p50": 1.0331765006412752,
+          "p95": 1.0776993600302376,
+          "p99": 1.1578054132405646
+        },
+        "full_decision": {
+          "count": 9788,
+          "max": 4.956939999829046,
+          "mean": 3.22854943547172,
+          "min": 3.1650550081394613,
+          "p50": 3.196367499185726,
+          "p95": 3.315248406579485,
+          "p99": 3.502975465089548
+        },
+        "selector": {
+          "count": 9788,
+          "max": 0.8505449950462207,
+          "mean": 0.39473401909241357,
+          "min": 0.38005399983376265,
+          "p50": 0.3919074952136725,
+          "p95": 0.4042004504299257,
+          "p99": 0.45137770139263006
+        },
+        "tensor_and_embedding": {
+          "count": 9788,
+          "max": 0.9221179934684187,
+          "mean": 0.6260216543563109,
+          "min": 0.6012930098222569,
+          "p50": 0.6233360036276281,
+          "p95": 0.6417449076252524,
+          "p99": 0.7116880582179869
+        },
+        "transformer_encoder": {
+          "count": 9788,
+          "max": 1.4407880080398172,
+          "mean": 0.8850721418967116,
+          "min": 0.8513369975844398,
+          "p50": 0.8764290032559074,
+          "p95": 0.9074838497326709,
+          "p99": 0.9830630537180693
+        },
+        "victim_selection": {
+          "count": 9788,
+          "max": 0.18367900338489562,
+          "mean": 0.09671417909772731,
+          "min": 0.09273100295104086,
+          "p50": 0.09545149805489928,
+          "p95": 0.1049993014021311,
+          "p99": 0.11399282971979095
+        }
+      },
+      "random": {
+        "full_decision": {
+          "count": 10572,
+          "max": 0.015851997886784375,
+          "mean": 0.0012395812690719106,
+          "min": 0.0009180075721815228,
+          "p50": 0.0011270021786913276,
+          "p95": 0.0017739948816597462,
+          "p99": 0.002129997155861929
+        }
+      }
+    },
+    "streamcluster_pressure": {
+      "clock": {
+        "full_decision": {
+          "count": 3219,
+          "max": 0.022801003069616854,
+          "mean": 0.0013059300284296894,
+          "min": 0.0007700000423938036,
+          "p50": 0.0008830102160573006,
+          "p95": 0.001573102781549096,
+          "p99": 0.01690320641500882
+        }
+      },
+      "lfu": {
+        "full_decision": {
+          "count": 3390,
+          "max": 0.038676997064612806,
+          "mean": 0.020841448569524714,
+          "min": 0.01967200660146773,
+          "p50": 0.020684994524344802,
+          "p95": 0.021662196377292275,
+          "p99": 0.024793151387711994
+        }
+      },
+      "lru": {
+        "full_decision": {
+          "count": 2880,
+          "max": 0.0006859918357804418,
+          "mean": 0.00027583503449730214,
+          "min": 0.00023700704332441092,
+          "p50": 0.00027500209398567677,
+          "p95": 0.0003079912858083844,
+          "p99": 0.00032621435821056366
+        }
+      },
+      "qmap": {
+        "cross_attention_scorer": {
+          "count": 8274,
+          "max": 2.12344600004144,
+          "mean": 1.0766653263438573,
+          "min": 1.024543002131395,
+          "p50": 1.045645505655557,
+          "p95": 1.2572627500048839,
+          "p99": 1.378818717203103
+        },
+        "full_decision": {
+          "count": 8274,
+          "max": 6.350637995637953,
+          "mean": 3.314661710408229,
+          "min": 3.1627790012862533,
+          "p50": 3.232001508877147,
+          "p95": 3.855744301836239,
+          "p99": 4.2619559436570835
+        },
+        "selector": {
+          "count": 8274,
+          "max": 1.057663990650326,
+          "mean": 0.4037032888693803,
+          "min": 0.3784239961532876,
+          "p50": 0.389729997550603,
+          "p95": 0.49114455323433504,
+          "p99": 0.5609028774779288
+        },
+        "tensor_and_embedding": {
+          "count": 8274,
+          "max": 1.3470210105879232,
+          "mean": 0.6398443424176722,
+          "min": 0.6007519987178966,
+          "p50": 0.6229645005078055,
+          "p95": 0.7470376505807506,
+          "p99": 0.8296120952581987
+        },
+        "transformer_encoder": {
+          "count": 8274,
+          "max": 2.0953760104021057,
+          "mean": 0.9117138670618795,
+          "min": 0.8538850088370964,
+          "p50": 0.8821294977678917,
+          "p95": 1.0662785563908983,
+          "p99": 1.1912445056077559
+        },
+        "victim_selection": {
+          "count": 8274,
+          "max": 0.24497800040990114,
+          "mean": 0.09927294637152648,
+          "min": 0.09277800563722849,
+          "p50": 0.0955775030888617,
+          "p95": 0.11861899620271288,
+          "p99": 0.1450090466823894
+        }
+      },
+      "random": {
+        "full_decision": {
+          "count": 10348,
+          "max": 0.019869999960064888,
+          "mean": 0.0012675084816483628,
+          "min": 0.0009220093488693237,
+          "p50": 0.0011980009730905294,
+          "p95": 0.0016666483134031291,
+          "p99": 0.00204612661036663
+        }
+      }
+    }
+  }
+}

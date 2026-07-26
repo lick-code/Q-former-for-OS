@@ -1,0 +1,560 @@
+{
+  "capacities": {
+    "128": {
+      "canneal": {
+        "best_external_cost": 218627.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": -0.564126724207597,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 223165.0,
+            "mean": 223165.0,
+            "min": 223165.0,
+            "sample_stddev": 0.0,
+            "values": [
+              223165.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 251864.0,
+            "mean": 251864.0,
+            "min": 251864.0,
+            "sample_stddev": 0.0,
+            "values": [
+              251864.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 218627.0,
+            "mean": 218627.0,
+            "min": 218627.0,
+            "sample_stddev": 0.0,
+            "values": [
+              218627.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 227787.0,
+            "mean": 227352.33333333334,
+            "min": 226926.0,
+            "sample_stddev": 430.56048742695066,
+            "values": [
+              227787.0,
+              227344.0,
+              226926.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 220271.0,
+          "mean": 219860.33333333334,
+          "min": 219545.0,
+          "sample_stddev": 372.27051096391364,
+          "values": [
+            220271.0,
+            219765.0,
+            219545.0
+          ]
+        }
+      },
+      "dedup_pressure": {
+        "best_external_cost": 1044437.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": 0.003542578441782511,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 1044549.0,
+            "mean": 1044549.0,
+            "min": 1044549.0,
+            "sample_stddev": 0.0,
+            "values": [
+              1044549.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 2343531.0,
+            "mean": 2343531.0,
+            "min": 2343531.0,
+            "sample_stddev": 0.0,
+            "values": [
+              2343531.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 1044437.0,
+            "mean": 1044437.0,
+            "min": 1044437.0,
+            "sample_stddev": 0.0,
+            "values": [
+              1044437.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 1046318.0,
+            "mean": 1046225.3333333334,
+            "min": 1046077.0,
+            "sample_stddev": 129.7857208375919,
+            "values": [
+              1046318.0,
+              1046077.0,
+              1046281.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 1044442.0,
+          "mean": 1044400.0,
+          "min": 1044321.0,
+          "sample_stddev": 68.46166810705097,
+          "values": [
+            1044442.0,
+            1044437.0,
+            1044321.0
+          ]
+        }
+      },
+      "streamcluster_pressure": {
+        "best_external_cost": 230133.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": 0.08212642254696197,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 232371.0,
+            "mean": 232371.0,
+            "min": 232371.0,
+            "sample_stddev": 0.0,
+            "values": [
+              232371.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 234897.0,
+            "mean": 234897.0,
+            "min": 234897.0,
+            "sample_stddev": 0.0,
+            "values": [
+              234897.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 230133.0,
+            "mean": 230133.0,
+            "min": 230133.0,
+            "sample_stddev": 0.0,
+            "values": [
+              230133.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 233899.0,
+            "mean": 233721.33333333334,
+            "min": 233440.0,
+            "sample_stddev": 246.43525180731214,
+            "values": [
+              233899.0,
+              233440.0,
+              233825.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 229944.0,
+          "mean": 229944.0,
+          "min": 229944.0,
+          "sample_stddev": 0.0,
+          "values": [
+            229944.0,
+            229944.0,
+            229944.0
+          ]
+        }
+      }
+    },
+    "256": {
+      "canneal": {
+        "best_external_cost": 214569.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": -0.04443015222764847,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 217044.0,
+            "mean": 217044.0,
+            "min": 217044.0,
+            "sample_stddev": 0.0,
+            "values": [
+              217044.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 235835.0,
+            "mean": 235835.0,
+            "min": 235835.0,
+            "sample_stddev": 0.0,
+            "values": [
+              235835.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 214569.0,
+            "mean": 214569.0,
+            "min": 214569.0,
+            "sample_stddev": 0.0,
+            "values": [
+              214569.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 218446.0,
+            "mean": 218247.66666666666,
+            "min": 218088.0,
+            "sample_stddev": 182.1052809045727,
+            "values": [
+              218209.0,
+              218446.0,
+              218088.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 214690.0,
+          "mean": 214664.33333333334,
+          "min": 214646.0,
+          "sample_stddev": 22.89832599412746,
+          "values": [
+            214690.0,
+            214657.0,
+            214646.0
+          ]
+        }
+      },
+      "dedup_pressure": {
+        "best_external_cost": 1042998.0,
+        "best_external_policy": "clock",
+        "capd_improvement_percent": -0.008373298254970013,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 1042998.0,
+            "mean": 1042998.0,
+            "min": 1042998.0,
+            "sample_stddev": 0.0,
+            "values": [
+              1042998.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 2286251.0,
+            "mean": 2286251.0,
+            "min": 2286251.0,
+            "sample_stddev": 0.0,
+            "values": [
+              2286251.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 1043157.0,
+            "mean": 1043157.0,
+            "min": 1043157.0,
+            "sample_stddev": 0.0,
+            "values": [
+              1043157.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 1043794.0,
+            "mean": 1043687.3333333334,
+            "min": 1043534.0,
+            "sample_stddev": 136.13718571108092,
+            "values": [
+              1043794.0,
+              1043534.0,
+              1043734.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 1043157.0,
+          "mean": 1043085.3333333334,
+          "min": 1043003.0,
+          "sample_stddev": 77.55213300311819,
+          "values": [
+            1043096.0,
+            1043157.0,
+            1043003.0
+          ]
+        }
+      },
+      "streamcluster_pressure": {
+        "best_external_cost": 228532.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": 0.0016044434331546416,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 229596.0,
+            "mean": 229596.0,
+            "min": 229596.0,
+            "sample_stddev": 0.0,
+            "values": [
+              229596.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 232372.0,
+            "mean": 232372.0,
+            "min": 232372.0,
+            "sample_stddev": 0.0,
+            "values": [
+              232372.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 228532.0,
+            "mean": 228532.0,
+            "min": 228532.0,
+            "sample_stddev": 0.0,
+            "values": [
+              228532.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 230434.0,
+            "mean": 230283.33333333334,
+            "min": 230060.0,
+            "sample_stddev": 197.30517817161652,
+            "values": [
+              230356.0,
+              230060.0,
+              230434.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 228532.0,
+          "mean": 228528.33333333334,
+          "min": 228521.0,
+          "sample_stddev": 6.3508529610858835,
+          "values": [
+            228532.0,
+            228521.0,
+            228532.0
+          ]
+        }
+      }
+    },
+    "64": {
+      "canneal": {
+        "best_external_cost": 227242.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": -0.11133505249909788,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 233190.0,
+            "mean": 233190.0,
+            "min": 233190.0,
+            "sample_stddev": 0.0,
+            "values": [
+              233190.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 266593.0,
+            "mean": 266593.0,
+            "min": 266593.0,
+            "sample_stddev": 0.0,
+            "values": [
+              266593.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 227242.0,
+            "mean": 227242.0,
+            "min": 227242.0,
+            "sample_stddev": 0.0,
+            "values": [
+              227242.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 245290.0,
+            "mean": 245236.0,
+            "min": 245183.0,
+            "sample_stddev": 53.50700888668698,
+            "values": [
+              245235.0,
+              245183.0,
+              245290.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 229156.0,
+          "mean": 227495.0,
+          "min": 226318.0,
+          "sample_stddev": 1479.6124492582508,
+          "values": [
+            229156.0,
+            226318.0,
+            227011.0
+          ]
+        }
+      },
+      "dedup_pressure": {
+        "best_external_cost": 1045189.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": -0.022228834529771375,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 1045301.0,
+            "mean": 1045301.0,
+            "min": 1045301.0,
+            "sample_stddev": 0.0,
+            "values": [
+              1045301.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 2372171.0,
+            "mean": 2372171.0,
+            "min": 2372171.0,
+            "sample_stddev": 0.0,
+            "values": [
+              2372171.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 1045189.0,
+            "mean": 1045189.0,
+            "min": 1045189.0,
+            "sample_stddev": 0.0,
+            "values": [
+              1045189.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 1049097.0,
+            "mean": 1049000.0,
+            "min": 1048937.0,
+            "sample_stddev": 85.246700815926,
+            "values": [
+              1048966.0,
+              1048937.0,
+              1049097.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 1045555.0,
+          "mean": 1045421.3333333334,
+          "min": 1045275.0,
+          "sample_stddev": 140.4291042958451,
+          "values": [
+            1045555.0,
+            1045275.0,
+            1045434.0
+          ]
+        }
+      },
+      "streamcluster_pressure": {
+        "best_external_cost": 232096.0,
+        "best_external_policy": "lru",
+        "capd_improvement_percent": 0.6324968978353784,
+        "external": {
+          "clock": {
+            "count": 1,
+            "max": 235891.0,
+            "mean": 235891.0,
+            "min": 235891.0,
+            "sample_stddev": 0.0,
+            "values": [
+              235891.0
+            ]
+          },
+          "lfu": {
+            "count": 1,
+            "max": 237844.0,
+            "mean": 237844.0,
+            "min": 237844.0,
+            "sample_stddev": 0.0,
+            "values": [
+              237844.0
+            ]
+          },
+          "lru": {
+            "count": 1,
+            "max": 232096.0,
+            "mean": 232096.0,
+            "min": 232096.0,
+            "sample_stddev": 0.0,
+            "values": [
+              232096.0
+            ]
+          },
+          "random": {
+            "count": 3,
+            "max": 238738.0,
+            "mean": 238438.66666666666,
+            "min": 238026.0,
+            "sample_stddev": 369.28218659086895,
+            "values": [
+              238552.0,
+              238026.0,
+              238738.0
+            ]
+          }
+        },
+        "qmap": {
+          "count": 3,
+          "max": 230628.0,
+          "mean": 230628.0,
+          "min": 230628.0,
+          "sample_stddev": 0.0,
+          "values": [
+            230628.0,
+            230628.0,
+            230628.0
+          ]
+        }
+      }
+    }
+  },
+  "status": "SUMMARIZED"
+}

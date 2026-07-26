@@ -1,0 +1,32 @@
+{
+  "completed_required_jobs": 105,
+  "contract_id": "CAPD-MIC-1.0",
+  "method_contract_changed": false,
+  "outputs": [
+    "input_audit.json",
+    "execution_plan.json",
+    "stage6_profile_results.csv",
+    "stage6_profile_summary.json",
+    "stage6_profile_report.md",
+    "stage6_capacity_results.csv",
+    "stage6_capacity_summary.json",
+    "stage6_capacity_report.md",
+    "stage6_cost_robustness.csv",
+    "stage6_cost_robustness.json",
+    "stage6_cost_robustness_report.md",
+    "stage6_rw_robustness.csv",
+    "stage6_rw_robustness.json",
+    "stage6_rw_robustness_report.md",
+    "stage6_system_platform_validation.json",
+    "stage6_system_platform_validation_report.md",
+    "run_manifest.json"
+  ],
+  "required_jobs": 105,
+  "schema_version": "capd_finals_v3_stage6_run_manifest_1",
+  "server_gate_ready": true,
+  "stage5_status": "STAGE5_VERIFIED",
+  "status": "STAGE6_VERIFIED",
+  "system_platform_validation": "CONDITIONAL_NOT_RUN",
+  "test_used_for_selection": false,
+  "verified_by": "scripts/validate_capd_stage6_server.sh"
+}

@@ -1,0 +1,32 @@
+[START] input_audit 2026-07-26T05:13:06Z
+[COMMAND] python3 scripts/run_capd_stage6.py --stage audit-inputs 
+[END] input_audit 2026-07-26T05:13:12Z exit_code=0 log=/tmp/capd-stage6.YHyuzo/logs/input_audit.log
+[START] targeted_pytest 2026-07-26T05:13:12Z
+[COMMAND] python3 -m pytest -q tests/test_capd_stage6_results.py tests/test_capd_stage6_plan.py tests/test_capd_stage6_end_to_end.py 
+[END] targeted_pytest 2026-07-26T05:13:18Z exit_code=0 log=/tmp/capd-stage6.YHyuzo/logs/targeted_pytest.log
+[START] mini_e2e 2026-07-26T05:13:18Z
+[COMMAND] env CAPD_STAGE6_E2E=1 python3 -m pytest -q tests/test_capd_stage6_end_to_end.py::Stage6TorchMiniEndToEndTest 
+[END] mini_e2e 2026-07-26T05:13:26Z exit_code=0 log=/tmp/capd-stage6.YHyuzo/logs/mini_e2e.log
+[START] full_pytest 2026-07-26T05:13:26Z
+[COMMAND] python3 -m pytest -q 
+[END] full_pytest 2026-07-26T05:13:36Z exit_code=0 log=/tmp/capd-stage6.YHyuzo/logs/full_pytest.log
+[START] execution_plan 2026-07-26T05:13:36Z
+[COMMAND] python3 scripts/run_capd_stage6.py --stage plan 
+[END] execution_plan 2026-07-26T05:13:42Z exit_code=0 log=/tmp/capd-stage6.YHyuzo/logs/execution_plan.log
+[START] profile 2026-07-26T05:13:42Z
+[COMMAND] python3 scripts/run_capd_stage6.py --stage profile --execute 
+[END] profile 2026-07-26T05:13:47Z exit_code=0 log=/tmp/capd-stage6.YHyuzo/logs/profile.log
+[START] capacity 2026-07-26T05:13:47Z
+[COMMAND] python3 scripts/run_capd_stage6.py --stage capacity --execute 
+[END] capacity 2026-07-26T05:14:11Z exit_code=1 log=/tmp/capd-stage6.YHyuzo/logs/capacity.log
+[START] summarize 2026-07-26T05:14:11Z
+[COMMAND] python3 scripts/run_capd_stage6.py --stage summarize 
+[END] summarize 2026-07-26T05:14:17Z exit_code=1 log=/tmp/capd-stage6.YHyuzo/logs/summarize.log
+[START] provenance_check 2026-07-26T05:14:17Z
+[COMMAND] python3 -c import\ json\;\ p=\'outputs/results/finals_v3_official/stage6/run_manifest.json\'\;\ d=json.load\(open\(p\,\ encoding=\'utf-8\'\)\)\;\ assert\ d\[\'status\'\]==\'STAGE6_IMPLEMENTED_UNVERIFIED\'\;\ assert\ d\[\'required_jobs\'\]==105\;\ assert\ d\[\'completed_required_jobs\'\]==105\;\ assert\ d\[\'stage5_status\'\]==\'STAGE5_VERIFIED\'\;\ assert\ d\[\'test_used_for_selection\'\]\ is\ False\;\ assert\ d\[\'method_contract_changed\'\]\ is\ False\;\ assert\ d\[\'server_gate_ready\'\]\ is\ True 
+[END] provenance_check 2026-07-26T05:14:17Z exit_code=1 log=/tmp/capd-stage6.YHyuzo/logs/provenance_check.log
+[START] diff_check 2026-07-26T05:14:17Z
+[COMMAND] git diff --check 
+[END] diff_check 2026-07-26T05:14:17Z exit_code=0 log=/tmp/capd-stage6.YHyuzo/logs/diff_check.log
+[INFO] acceptance evidence: /tmp/capd-stage6.YHyuzo failures=3
+[FINAL] STAGE6_NOT_VERIFIED

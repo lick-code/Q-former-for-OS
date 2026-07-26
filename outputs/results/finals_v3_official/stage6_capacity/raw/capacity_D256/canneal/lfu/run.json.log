@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/stage6_capacity/capacity_D256/canneal/resolved_config.json --policy lfu --json_output /home/likc/Q-former-for-OS/outputs/results/finals_v3_official/stage6_capacity/raw/capacity_D256/canneal/lfu/run.json
+started_unix=1785046588.7389746
+Policy: lfu
+Total accesses: 200000
+Hits: 196635
+Misses: 3365
+Hit rate: 98.32%
+Migrations: 3109
+NVM reads: 3135
+NVM writes: 230
+Weighted access cost: 235835.00
+Policy decisions: 3109
+Total decision time: 0.253441s
+Avg decision time: 0.081519 ms
+ended_unix=1785046598.4530375
+exit_code=0

@@ -1,0 +1,1647 @@
+{
+  "profiles": {
+    "migration_cost_high": {
+      "cost_model": {
+        "dram_read_cost": 1.0,
+        "dram_write_cost": 1.0,
+        "migration_cost": 20.0,
+        "nvm_read_cost": 2.0,
+        "nvm_write_cost": 8.0
+      },
+      "workloads": {
+        "canneal": {
+          "best_external_cost": 251862.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.1917716844938895,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 263190.0,
+              "mean": 263190.0,
+              "min": 263190.0,
+              "sample_stddev": 0.0,
+              "values": [
+                263190.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 323463.0,
+              "mean": 323463.0,
+              "min": 323463.0,
+              "sample_stddev": 0.0,
+              "values": [
+                323463.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 251862.0,
+              "mean": 251862.0,
+              "min": 251862.0,
+              "sample_stddev": 0.0,
+              "values": [
+                251862.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 285870.0,
+              "mean": 285756.0,
+              "min": 285633.0,
+              "sample_stddev": 118.75605247733692,
+              "values": [
+                285765.0,
+                285633.0,
+                285870.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 255516.0,
+            "mean": 252345.0,
+            "min": 250098.0,
+            "sample_stddev": 2824.714675856661,
+            "values": [
+              255516.0,
+              250098.0,
+              251421.0
+            ]
+          }
+        },
+        "dedup_pressure": {
+          "best_external_cost": 1077779.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.043515414570148424,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 1077971.0,
+              "mean": 1077971.0,
+              "min": 1077971.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1077971.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 3354101.0,
+              "mean": 3354101.0,
+              "min": 3354101.0,
+              "sample_stddev": 0.0,
+              "values": [
+                3354101.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 1077779.0,
+              "mean": 1077779.0,
+              "min": 1077779.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1077779.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 1084547.0,
+              "mean": 1084440.0,
+              "min": 1084367.0,
+              "sample_stddev": 94.69424480928078,
+              "values": [
+                1084406.0,
+                1084367.0,
+                1084547.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 1078505.0,
+            "mean": 1078248.0,
+            "min": 1077965.0,
+            "sample_stddev": 270.9372621106222,
+            "values": [
+              1078505.0,
+              1077965.0,
+              1078274.0
+            ]
+          }
+        },
+        "streamcluster_pressure": {
+          "best_external_cost": 261096.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": 1.0295063884548212,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 268281.0,
+              "mean": 268281.0,
+              "min": 268281.0,
+              "sample_stddev": 0.0,
+              "values": [
+                268281.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 271944.0,
+              "mean": 271944.0,
+              "min": 271944.0,
+              "sample_stddev": 0.0,
+              "values": [
+                271944.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 261096.0,
+              "mean": 261096.0,
+              "min": 261096.0,
+              "sample_stddev": 0.0,
+              "values": [
+                261096.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 273678.0,
+              "mean": 273132.0,
+              "min": 272346.0,
+              "sample_stddev": 697.6790092872222,
+              "values": [
+                273372.0,
+                272346.0,
+                273678.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 258408.0,
+            "mean": 258408.0,
+            "min": 258408.0,
+            "sample_stddev": 0.0,
+            "values": [
+              258408.0,
+              258408.0,
+              258408.0
+            ]
+          }
+        }
+      }
+    },
+    "official": {
+      "cost_model": {
+        "dram_read_cost": 1.0,
+        "dram_write_cost": 1.0,
+        "migration_cost": 10.0,
+        "nvm_read_cost": 2.0,
+        "nvm_write_cost": 8.0
+      },
+      "workloads": {
+        "canneal": {
+          "best_external_cost": 227242.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.11133505249909788,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 233190.0,
+              "mean": 233190.0,
+              "min": 233190.0,
+              "sample_stddev": 0.0,
+              "values": [
+                233190.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 266593.0,
+              "mean": 266593.0,
+              "min": 266593.0,
+              "sample_stddev": 0.0,
+              "values": [
+                266593.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 227242.0,
+              "mean": 227242.0,
+              "min": 227242.0,
+              "sample_stddev": 0.0,
+              "values": [
+                227242.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 245290.0,
+              "mean": 245236.0,
+              "min": 245183.0,
+              "sample_stddev": 53.50700888668698,
+              "values": [
+                245235.0,
+                245183.0,
+                245290.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 229156.0,
+            "mean": 227495.0,
+            "min": 226318.0,
+            "sample_stddev": 1479.6124492582508,
+            "values": [
+              229156.0,
+              226318.0,
+              227011.0
+            ]
+          }
+        },
+        "dedup_pressure": {
+          "best_external_cost": 1045189.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.022228834529771375,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 1045301.0,
+              "mean": 1045301.0,
+              "min": 1045301.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1045301.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 2372171.0,
+              "mean": 2372171.0,
+              "min": 2372171.0,
+              "sample_stddev": 0.0,
+              "values": [
+                2372171.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 1045189.0,
+              "mean": 1045189.0,
+              "min": 1045189.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1045189.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 1049097.0,
+              "mean": 1049000.0,
+              "min": 1048937.0,
+              "sample_stddev": 85.246700815926,
+              "values": [
+                1048966.0,
+                1048937.0,
+                1049097.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 1045555.0,
+            "mean": 1045421.3333333334,
+            "min": 1045275.0,
+            "sample_stddev": 140.4291042958451,
+            "values": [
+              1045555.0,
+              1045275.0,
+              1045434.0
+            ]
+          }
+        },
+        "streamcluster_pressure": {
+          "best_external_cost": 232096.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": 0.6324968978353784,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 235891.0,
+              "mean": 235891.0,
+              "min": 235891.0,
+              "sample_stddev": 0.0,
+              "values": [
+                235891.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 237844.0,
+              "mean": 237844.0,
+              "min": 237844.0,
+              "sample_stddev": 0.0,
+              "values": [
+                237844.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 232096.0,
+              "mean": 232096.0,
+              "min": 232096.0,
+              "sample_stddev": 0.0,
+              "values": [
+                232096.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 238738.0,
+              "mean": 238438.66666666666,
+              "min": 238026.0,
+              "sample_stddev": 369.28218659086895,
+              "values": [
+                238552.0,
+                238026.0,
+                238738.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 230628.0,
+            "mean": 230628.0,
+            "min": 230628.0,
+            "sample_stddev": 0.0,
+            "values": [
+              230628.0,
+              230628.0,
+              230628.0
+            ]
+          }
+        }
+      }
+    },
+    "write_cost_high": {
+      "cost_model": {
+        "dram_read_cost": 1.0,
+        "dram_write_cost": 1.0,
+        "migration_cost": 10.0,
+        "nvm_read_cost": 2.0,
+        "nvm_write_cost": 16.0
+      },
+      "workloads": {
+        "canneal": {
+          "best_external_cost": 227370.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.11127237542331882,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 233358.0,
+              "mean": 233358.0,
+              "min": 233358.0,
+              "sample_stddev": 0.0,
+              "values": [
+                233358.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 271889.0,
+              "mean": 271889.0,
+              "min": 271889.0,
+              "sample_stddev": 0.0,
+              "values": [
+                271889.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 227370.0,
+              "mean": 227370.0,
+              "min": 227370.0,
+              "sample_stddev": 0.0,
+              "values": [
+                227370.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 246074.0,
+              "mean": 246036.0,
+              "min": 246015.0,
+              "sample_stddev": 32.96968304366907,
+              "values": [
+                246019.0,
+                246015.0,
+                246074.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 229284.0,
+            "mean": 227623.0,
+            "min": 226446.0,
+            "sample_stddev": 1479.6124492582508,
+            "values": [
+              229284.0,
+              226446.0,
+              227139.0
+            ]
+          }
+        },
+        "dedup_pressure": {
+          "best_external_cost": 1057557.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.018438722451839477,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 1057701.0,
+              "mean": 1057701.0,
+              "min": 1057701.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1057701.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 2761483.0,
+              "mean": 2761483.0,
+              "min": 2761483.0,
+              "sample_stddev": 0.0,
+              "values": [
+                2761483.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 1057557.0,
+              "mean": 1057557.0,
+              "min": 1057557.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1057557.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 1062481.0,
+              "mean": 1062269.3333333333,
+              "min": 1062137.0,
+              "sample_stddev": 185.21429030540094,
+              "values": [
+                1062190.0,
+                1062137.0,
+                1062481.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 1057883.0,
+            "mean": 1057752.0,
+            "min": 1057611.0,
+            "sample_stddev": 136.27545633752248,
+            "values": [
+              1057883.0,
+              1057611.0,
+              1057762.0
+            ]
+          }
+        },
+        "streamcluster_pressure": {
+          "best_external_cost": 232272.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": 0.7043466280912034,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 236155.0,
+              "mean": 236155.0,
+              "min": 236155.0,
+              "sample_stddev": 0.0,
+              "values": [
+                236155.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 238204.0,
+              "mean": 238204.0,
+              "min": 238204.0,
+              "sample_stddev": 0.0,
+              "values": [
+                238204.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 232272.0,
+              "mean": 232272.0,
+              "min": 232272.0,
+              "sample_stddev": 0.0,
+              "values": [
+                232272.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 239058.0,
+              "mean": 238721.33333333334,
+              "min": 238306.0,
+              "sample_stddev": 382.122144521007,
+              "values": [
+                238800.0,
+                238306.0,
+                239058.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 230636.0,
+            "mean": 230636.0,
+            "min": 230636.0,
+            "sample_stddev": 0.0,
+            "values": [
+              230636.0,
+              230636.0,
+              230636.0
+            ]
+          }
+        }
+      }
+    },
+    "write_cost_low": {
+      "cost_model": {
+        "dram_read_cost": 1.0,
+        "dram_write_cost": 1.0,
+        "migration_cost": 10.0,
+        "nvm_read_cost": 2.0,
+        "nvm_write_cost": 4.0
+      },
+      "workloads": {
+        "canneal": {
+          "best_external_cost": 227178.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.1113664175228235,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 233106.0,
+              "mean": 233106.0,
+              "min": 233106.0,
+              "sample_stddev": 0.0,
+              "values": [
+                233106.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 263945.0,
+              "mean": 263945.0,
+              "min": 263945.0,
+              "sample_stddev": 0.0,
+              "values": [
+                263945.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 227178.0,
+              "mean": 227178.0,
+              "min": 227178.0,
+              "sample_stddev": 0.0,
+              "values": [
+                227178.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 244898.0,
+              "mean": 244836.0,
+              "min": 244767.0,
+              "sample_stddev": 65.77993615077473,
+              "values": [
+                244843.0,
+                244767.0,
+                244898.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 229092.0,
+            "mean": 227431.0,
+            "min": 226254.0,
+            "sample_stddev": 1479.6124492582508,
+            "values": [
+              229092.0,
+              226254.0,
+              226947.0
+            ]
+          }
+        },
+        "dedup_pressure": {
+          "best_external_cost": 1039005.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": -0.024157727826141357,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 1039101.0,
+              "mean": 1039101.0,
+              "min": 1039101.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1039101.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 2177515.0,
+              "mean": 2177515.0,
+              "min": 2177515.0,
+              "sample_stddev": 0.0,
+              "values": [
+                2177515.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 1039005.0,
+              "mean": 1039005.0,
+              "min": 1039005.0,
+              "sample_stddev": 0.0,
+              "values": [
+                1039005.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 1042405.0,
+              "mean": 1042365.3333333334,
+              "min": 1042337.0,
+              "sample_stddev": 35.388321990924254,
+              "values": [
+                1042354.0,
+                1042337.0,
+                1042405.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 1039391.0,
+            "mean": 1039256.0,
+            "min": 1039107.0,
+            "sample_stddev": 142.51666569212176,
+            "values": [
+              1039391.0,
+              1039107.0,
+              1039270.0
+            ]
+          }
+        },
+        "streamcluster_pressure": {
+          "best_external_cost": 232008.0,
+          "best_external_policy": "lru",
+          "capd_improvement_percent": 0.5965311540981346,
+          "external": {
+            "clock": {
+              "count": 1,
+              "max": 235759.0,
+              "mean": 235759.0,
+              "min": 235759.0,
+              "sample_stddev": 0.0,
+              "values": [
+                235759.0
+              ]
+            },
+            "lfu": {
+              "count": 1,
+              "max": 237664.0,
+              "mean": 237664.0,
+              "min": 237664.0,
+              "sample_stddev": 0.0,
+              "values": [
+                237664.0
+              ]
+            },
+            "lru": {
+              "count": 1,
+              "max": 232008.0,
+              "mean": 232008.0,
+              "min": 232008.0,
+              "sample_stddev": 0.0,
+              "values": [
+                232008.0
+              ]
+            },
+            "random": {
+              "count": 3,
+              "max": 238578.0,
+              "mean": 238297.33333333334,
+              "min": 237886.0,
+              "sample_stddev": 364.03479687158114,
+              "values": [
+                238428.0,
+                237886.0,
+                238578.0
+              ]
+            }
+          },
+          "qmap": {
+            "count": 3,
+            "max": 230624.0,
+            "mean": 230624.0,
+            "min": 230624.0,
+            "sample_stddev": 0.0,
+            "values": [
+              230624.0,
+              230624.0,
+              230624.0
+            ]
+          }
+        }
+      }
+    }
+  },
+  "rows": [
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 255516.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 250098.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 251421.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 285765.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 1,
+      "reweighted_cost": 285633.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 2,
+      "reweighted_cost": 285870.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 251862.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 323463.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 263190.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 258408.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 258408.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 258408.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 273372.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 1,
+      "reweighted_cost": 272346.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 2,
+      "reweighted_cost": 273678.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 261096.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 271944.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 268281.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1078505.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1077965.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1078274.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1084406.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 1,
+      "reweighted_cost": 1084367.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "migration_cost_high",
+      "replay_seed": 2,
+      "reweighted_cost": 1084547.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1077779.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 3354101.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "migration_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1077971.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 229156.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 226318.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 227011.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 245235.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 1,
+      "reweighted_cost": 245183.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 2,
+      "reweighted_cost": 245290.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 227242.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 266593.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 233190.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 230628.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 230628.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 230628.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 238552.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 1,
+      "reweighted_cost": 238026.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 2,
+      "reweighted_cost": 238738.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 232096.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 237844.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 235891.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 1045555.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 1045275.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 1045434.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 1048966.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 1,
+      "reweighted_cost": 1048937.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "official",
+      "replay_seed": 2,
+      "reweighted_cost": 1049097.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 1045189.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 2372171.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "official",
+      "replay_seed": 0,
+      "reweighted_cost": 1045301.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 229284.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 226446.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 227139.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 246019.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 1,
+      "reweighted_cost": 246015.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 2,
+      "reweighted_cost": 246074.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 227370.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 271889.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 233358.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 230636.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 230636.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 230636.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 238800.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 1,
+      "reweighted_cost": 238306.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 2,
+      "reweighted_cost": 239058.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 232272.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 238204.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 236155.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1057883.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1057611.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1057762.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1062190.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 1,
+      "reweighted_cost": 1062137.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_high",
+      "replay_seed": 2,
+      "reweighted_cost": 1062481.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1057557.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 2761483.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "write_cost_high",
+      "replay_seed": 0,
+      "reweighted_cost": 1057701.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 229092.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 226254.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 226947.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 244843.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 1,
+      "reweighted_cost": 244767.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 2,
+      "reweighted_cost": 244898.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 227178.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 263945.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 233106.0,
+      "workload": "canneal"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 230624.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 230624.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 230624.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 238428.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 1,
+      "reweighted_cost": 237886.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 2,
+      "reweighted_cost": 238578.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 232008.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 237664.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 235759.0,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 1039391.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 42,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 1039107.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": 2026,
+      "policy": "qmap",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 1039270.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 1042354.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 1,
+      "reweighted_cost": 1042337.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "random",
+      "profile": "write_cost_low",
+      "replay_seed": 2,
+      "reweighted_cost": 1042405.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lru",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 1039005.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "lfu",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 2177515.0,
+      "workload": "dedup_pressure"
+    },
+    {
+      "model_seed": null,
+      "policy": "clock",
+      "profile": "write_cost_low",
+      "replay_seed": 0,
+      "reweighted_cost": 1039101.0,
+      "workload": "dedup_pressure"
+    }
+  ],
+  "status": "SUMMARIZED"
+}
