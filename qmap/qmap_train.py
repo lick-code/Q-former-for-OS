@@ -227,6 +227,11 @@ def build_arg_parser():
   parser.add_argument("--dropout", type=float, default=0.0)
   parser.add_argument("--device", default=None)
   parser.add_argument("--seed", type=int, default=3136859)
+  parser.add_argument(
+      "--save_every_epoch", action="store_true",
+      help=(
+          "Also save qmap_epoch_N.pth for validation-replay checkpoint "
+          "selection. Defaults off, preserving the official Stage-5/6 path."))
   parser.add_argument("--ablation", choices=ABLATION_CHOICES,
                       default="cross_attention")
   return parser
@@ -674,9 +679,9 @@ def main():
         validation_loss, args, finals_context,
         best_epoch=best_epoch, best_validation_loss=best_loss)
     torch.save(payload, last_path)
-    if finals_context is None:
+    if finals_context is None or args.save_every_epoch:
       # Preserve historical experiment-script checkpoint names outside the
-      # isolated finals_v2.1 path.
+      # isolated finals_v2.1 path. O2 opts in explicitly for v3 checkpoints.
       torch.save(payload, os.path.join(
           args.output_dir, "qmap_epoch_{}.pth".format(epoch)))
     if is_best:
@@ -696,6 +701,7 @@ def main():
       "selection_criterion": (
           "minimum_valid_loss_only" if valid_loader else
           "minimum_train_loss_no_validation"),
+      "per_epoch_checkpoints_saved": bool(args.save_every_epoch),
       "training_duration_seconds": time.time() - training_started,
       "nan_or_inf_detected": False,
       "checkpoints": {
@@ -736,6 +742,16 @@ def main():
         "stage5_variant")
     manifest["stage6_variant"] = finals_context["config"].get(
         "stage6_variant")
+    manifest["optimization_variant"] = finals_context["config"].get(
+        "optimization_variant")
+    if args.save_every_epoch:
+      manifest["checkpoints"]["per_epoch"] = [{
+          "epoch": epoch,
+          "path": os.path.abspath(os.path.join(
+              args.output_dir, "qmap_epoch_{}.pth".format(epoch))),
+          "fingerprint": finals_config.fingerprint_file(os.path.join(
+              args.output_dir, "qmap_epoch_{}.pth".format(epoch))),
+      } for epoch in range(1, args.epochs + 1)]
     manifest["model_contract"] = {
         "position_encoding": getattr(
             args, "position_encoding", "sinusoidal"),

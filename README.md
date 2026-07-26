@@ -26,12 +26,20 @@ QMAP-CrossAttn =
 
 ## 当前状态
 
-Stage 6验收后的旧结果—新结果桥接诊断已实现，当前为
-`BRIDGE_IMPLEMENTED_UNVERIFIED`。它用5个streamcluster锚点逐项拆分
-旧/新流水线、候选selector、trace来源和DRAM容量的影响；33-job矩阵
-尚待服务器执行。该诊断不覆盖`STAGE6_VERIFIED`，也不得用于test调参。
+Stage 6验收后的旧结果—新结果桥接诊断已经完成服务器验收，当前为
+`BRIDGE_DIAGNOSTIC_COMPLETED`（33/33 required jobs）。它用5个
+streamcluster锚点逐项拆分旧/新流水线、候选selector、trace来源和
+DRAM容量的影响。该诊断不覆盖`STAGE6_VERIFIED`，也不得用于test调参。
 协议与服务器命令见
 `docs/CAPD_BRIDGE_DIAGNOSTIC_CN.md`。
+
+Stage 6后的冻结方法配置优化轨道已经声明为 `O0`—`O4`。该轨道不复用
+历史README中“Stage 7 = seed stability”的编号，也不改变
+`CAPD-MIC-1.0`。当前 O0 已允许 O1—O3 使用 train/valid 执行 Oracle
+headroom、配置搜索和多 seed 锁定；official test 不参与选择。现有
+official采集已被train/valid/test完整用尽，因此 O4 的一次性最终评估
+仍须重新采集并封存三条全新 final holdout。协议见
+`docs/CAPD_POST_STAGE6_OPTIMIZATION_PROTOCOL_CN.md`。
 
 当前正式 CAPD-MIC-1.0 实验主线以
 `docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 为准：Stage 0—6

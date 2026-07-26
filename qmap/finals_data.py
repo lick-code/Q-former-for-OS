@@ -594,6 +594,14 @@ def validate_data_profile(profile, config):
     # generated samples enforce the new D independently; the historical
     # source-quality seal must remain bound to the Full baseline D.
     expected["D"] = STAGE5_SENSITIVITY_PROFILE_BASELINE["D"]
+  optimization_variant = config.get("optimization_variant", {})
+  if optimization_variant.get("family") == "frozen_method_config_search":
+    # O1-O3 reuse the same sealed source corpus while varying only B/K/L/H.
+    # The historical Stage-2 data-quality seal remains evaluated at Full
+    # method constants; the optimization config validator and newly generated
+    # JSONL independently enforce each preregistered setting.
+    for key in ("D", "K", "H", "Hc", "L"):
+      expected[key] = STAGE5_SENSITIVITY_PROFILE_BASELINE[key]
   actual = copy.deepcopy(profile["method_constants"])
   actual["pool_sizes_B"] = sorted(
       int(value) for value in actual.get("pool_sizes_B", []))

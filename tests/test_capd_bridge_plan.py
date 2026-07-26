@@ -26,7 +26,7 @@ class BridgePlanTest(unittest.TestCase):
 
   def test_plan_is_the_frozen_33_job_matrix(self):
     root = os.path.join(
-        PROJECT_ROOT, "outputs", "results", "capd_bridge_diagnostic")
+        PROJECT_ROOT, "tmp", "capd_bridge_plan_tests")
     plan = bridge.build_plan(self._args(root))
     self.assertEqual(33, plan["required_jobs"])
     self.assertEqual({

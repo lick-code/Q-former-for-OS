@@ -63,6 +63,11 @@ def build_arg_parser():
                       help="Input CSV trace with PC,Address and optional RW.")
   parser.add_argument("--config", default=None,
                       help="Resolved, versioned CAPD finals config.")
+  parser.add_argument(
+      "--evaluation_split", choices=("test", "valid"), default="test",
+      help=(
+          "Resolved-config split to replay. Defaults to test for historical "
+          "runs; post-Stage-6 selection must explicitly use valid."))
   parser.add_argument("--selector_params", default=None,
                       help="Frozen selector_params.json for QMAP finals_v2.")
   parser.add_argument("--checkpoint", default=None,
@@ -640,12 +645,18 @@ def apply_replay_finals_config(args):
       raise ValueError("--trace_path is required when --config is omitted.")
     return None
   config = finals_config.load_config(
-      config_path, require_resolved=True, project_root=PROJECT_ROOT)
-  configured_trace = config["data"]["test_trace"]
+      config_path, require_resolved=True, project_root=PROJECT_ROOT,
+      verify_manifest_files=(
+          getattr(args, "evaluation_split", "test") == "test"))
+  evaluation_split = getattr(args, "evaluation_split", "test")
+  configured_trace = config["data"][
+      "{}_trace".format(evaluation_split)]
   supplied_trace = getattr(args, "trace_path", None)
   if (supplied_trace and
       os.path.abspath(supplied_trace) != os.path.abspath(configured_trace)):
-    raise ValueError("--trace_path does not match resolved config test_trace.")
+    raise ValueError(
+        "--trace_path does not match resolved config {}_trace.".format(
+            evaluation_split))
   args.trace_path = configured_trace
   args.dram_capacity = int(config["memory"]["dram_capacity_pages"])
   args.history_length = int(config["history"]["transformer_H"])
@@ -1269,8 +1280,14 @@ def main():
           replay_config)
       metrics["git_commit"] = replay_config.get("run", {}).get(
           "git_commit", "unknown")
-      metrics["test_trace_fingerprint"] = finals_config.fingerprint_file(
-          args.trace_path)
+      metrics["evaluation_split"] = args.evaluation_split
+      metrics["evaluation_trace_fingerprint"] = (
+          finals_config.fingerprint_file(args.trace_path))
+      metrics["test_trace_opened"] = args.evaluation_split == "test"
+      metrics["test_used_for_selection"] = False
+      if args.evaluation_split == "test":
+        metrics["test_trace_fingerprint"] = metrics[
+            "evaluation_trace_fingerprint"]
       metrics["nvm_capacity_pages"] = replay_config["memory"][
           "nvm_capacity_pages"]
       metrics["dram_initial_state"] = replay_config.get(
@@ -1290,6 +1307,9 @@ def main():
         metrics["stage5_variant"] = dict(replay_config["stage5_variant"])
       if replay_config.get("stage6_variant") is not None:
         metrics["stage6_variant"] = dict(replay_config["stage6_variant"])
+      if replay_config.get("optimization_variant") is not None:
+        metrics["optimization_variant"] = dict(
+            replay_config["optimization_variant"])
       metrics["selector_params"] = args.selector_params
       if args.selector_params:
         replay_selector = finals_config.load_json(args.selector_params)

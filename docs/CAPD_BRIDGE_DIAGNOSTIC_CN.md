@@ -1,6 +1,6 @@
 # CAPD 旧结果—Stage 6 桥接诊断
 
-状态：`BRIDGE_IMPLEMENTED_UNVERIFIED`
+状态：`BRIDGE_DIAGNOSTIC_COMPLETED`（33/33 required jobs，服务器验收通过）
 
 该实验用于解释旧论文 `streamcluster_pressure` 约 10.83% 的收益为何在
 当前 Stage 6 中变为约 0.63%。它是 Stage 6 完成后的事后诊断，不是
@@ -164,4 +164,3 @@ legacy_baseline_drift.csv
 bridge_report.md
 run_manifest.json
 ```
-

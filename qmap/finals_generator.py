@@ -382,6 +382,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
   is_v3 = config.get("schema_version") == finals_config.SCHEMA_VERSION
   variant_id = config.get("stage5_variant", {}).get("variant_id")
   stage6_variant_id = config.get("stage6_variant", {}).get("variant_id")
+  optimization_variant_id = config.get(
+      "optimization_variant", {}).get("variant_id")
   lambda_w = float(config["labels"].get("lambda_w", 4.0))
   future_oracle = FutureOracle(
       trace, lookahead, require_complete=is_v3)
@@ -451,6 +453,8 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
             sample["stage5_variant_id"] = variant_id
           if stage6_variant_id is not None:
             sample["stage6_variant_id"] = stage6_variant_id
+          if optimization_variant_id is not None:
+            sample["optimization_variant_id"] = optimization_variant_id
         else:
           sample["physical_address"] = history_page_ids
         output_file.write(json.dumps(sample, sort_keys=True) + "\n")
@@ -519,13 +523,23 @@ def generate_reranker_jsonl(trace, trace_path, split_name, output_path, config,
       metadata["stage5_variant"] = dict(config["stage5_variant"])
     if stage6_variant_id is not None:
       metadata["stage6_variant"] = dict(config["stage6_variant"])
+    if optimization_variant_id is not None:
+      metadata["optimization_variant"] = dict(
+          config["optimization_variant"])
   finals_config.write_json(finals_config.metadata_path(output_path), metadata)
   return metadata
 
 
 def fit_selector_and_generate(args):
+  metadata_only_test = bool(
+      getattr(args, "metadata_only_test", False))
   config = finals_config.load_config(
-      args.config, require_resolved=True, project_root=PROJECT_ROOT)
+      args.config, require_resolved=True, project_root=PROJECT_ROOT,
+      verify_manifest_files=not metadata_only_test)
+  if (metadata_only_test and
+      config.get("run_profile") != finals_config.OPTIMIZATION_PROFILE):
+    raise ValueError(
+        "--metadata-only-test is restricted to post-Stage-6 optimization.")
   is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
   configured_page_shift = int(config.get("trace", {}).get("page_shift", 12))
   if args.page_shift is not None and args.page_shift != configured_page_shift:
@@ -539,13 +553,16 @@ def fit_selector_and_generate(args):
   trace_fingerprints = {
       "train_trace": finals_config.fingerprint_file(train_path),
       "valid_trace": finals_config.fingerprint_file(valid_path),
-      "test_trace": finals_config.fingerprint_file(test_path),
+      "test_trace": (
+          config["data"]["split_fingerprints"]["test"]
+          if metadata_only_test else
+          finals_config.fingerprint_file(test_path)),
   }
   if is_v3 and finals_config.uses_independent_validation(config):
     if config.get("validation", {}).get("require_data_manifest"):
       manifest = finals_data.load_source_manifest(
           config["data"]["source_manifest"], PROJECT_ROOT,
-          verify_files=True, require_quality_pass=True,
+          verify_files=not metadata_only_test, require_quality_pass=True,
           expected_workload=config["run"]["workload"])
       finals_config.assert_independent_trace_sources(
           config, source_manifest=manifest, project_root=PROJECT_ROOT)
@@ -684,6 +701,12 @@ def build_arg_parser():
   parser.add_argument("--summary-output", required=True)
   parser.add_argument("--page-shift", type=int, default=None,
                       help="Optional assertion against config.trace.page_shift.")
+  parser.add_argument(
+      "--metadata-only-test", action="store_true",
+      help=(
+          "For post-Stage-6 optimization only, trust the sealed test "
+          "fingerprint and never open test rows while generating train/valid "
+          "artifacts."))
   return parser
 
 

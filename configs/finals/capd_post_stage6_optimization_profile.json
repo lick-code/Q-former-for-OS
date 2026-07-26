@@ -1,0 +1,226 @@
+{
+  "schema_version": "capd_post_stage6_optimization_profile_1",
+  "profile_id": "capd_post_stage6_frozen_method_optimization_v1",
+  "status": "PROTOCOL_DECLARED",
+  "contract_id": "CAPD-MIC-1.0",
+  "scientific_role": "validation_selected_frozen_method_configuration_optimization",
+  "method_contract_changed": false,
+  "official_stage6_replaced": false,
+  "training_epochs": 10,
+  "workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure"
+  ],
+  "phase_order": [
+    "O0_PROTOCOL_AND_HOLDOUT",
+    "O1_ORACLE_HEADROOM",
+    "O2_CONFIG_SEARCH",
+    "O3_MULTISEED_CONFIRMATION",
+    "O4_FINAL_HOLDOUT_ONCE"
+  ],
+  "phases": {
+    "O0_PROTOCOL_AND_HOLDOUT": {
+      "allowed_inputs": [
+        "metadata",
+        "existing Stage-5/6 manifests",
+        "fresh holdout metadata for sealing"
+      ],
+      "forbidden_inputs": [
+        "fresh holdout rows",
+        "fresh holdout metrics"
+      ],
+      "outputs": [
+        "execution_plan.json",
+        "stage0_input_audit.json",
+        "sealed holdout manifests"
+      ],
+      "gate": "protocol and upstream evidence pass; missing fresh holdouts block O4 only, while O1-O3 remain eligible"
+    },
+    "O1_ORACLE_HEADROOM": {
+      "allowed_inputs": [
+        "train",
+        "valid"
+      ],
+      "forbidden_inputs": [
+        "official test",
+        "fresh final holdout"
+      ],
+      "outputs": [
+        "headroom_results.csv",
+        "headroom_summary.json",
+        "headroom_gate.json"
+      ],
+      "gate": "only configurations with measurable validation headroom proceed to training; ambiguous cases retain the frozen Full control"
+    },
+    "O2_CONFIG_SEARCH": {
+      "allowed_inputs": [
+        "train",
+        "valid"
+      ],
+      "forbidden_inputs": [
+        "official test",
+        "fresh final holdout"
+      ],
+      "outputs": [
+        "per-epoch checkpoints",
+        "validation replay results",
+        "search_results.csv",
+        "search_shortlist.json"
+      ],
+      "gate": "two configurations per workload are selected by validation weighted_access_cost only"
+    },
+    "O3_MULTISEED_CONFIRMATION": {
+      "allowed_inputs": [
+        "train",
+        "valid"
+      ],
+      "forbidden_inputs": [
+        "official test",
+        "fresh final holdout"
+      ],
+      "outputs": [
+        "three-seed validation results",
+        "locked_configuration.json"
+      ],
+      "gate": "one configuration per workload is locked by validation mean cost, then sample standard deviation, then lower-complexity tie-break"
+    },
+    "O4_FINAL_HOLDOUT_ONCE": {
+      "allowed_inputs": [
+        "locked configuration",
+        "fresh final holdout"
+      ],
+      "forbidden_inputs": [
+        "parameter changes after any holdout metric is visible",
+        "checkpoint changes after any holdout metric is visible"
+      ],
+      "outputs": [
+        "final_results.csv",
+        "final_summary.json",
+        "run_manifest.json"
+      ],
+      "gate": "each locked QMAP model and preregistered baseline is evaluated exactly once; results never overwrite Stage 5 or Stage 6"
+    }
+  },
+  "frozen_method": {
+    "D": 64,
+    "Hc": 256,
+    "Lres": 256,
+    "loss": "QMAPCostAwareRankingLoss",
+    "selector": "CAPD B-to-K selector",
+    "architecture": "QMAP-CrossAttn",
+    "cost_profile": "official",
+    "training_scope": "per_workload"
+  },
+  "candidate_configurations": [
+    {
+      "config_id": "opt_full_control",
+      "B": 64,
+      "K": 8,
+      "L": 256,
+      "H": 10
+    },
+    {
+      "config_id": "opt_B32",
+      "B": 32,
+      "K": 8,
+      "L": 256,
+      "H": 10
+    },
+    {
+      "config_id": "opt_K16",
+      "B": 64,
+      "K": 16,
+      "L": 256,
+      "H": 10
+    },
+    {
+      "config_id": "opt_L512",
+      "B": 64,
+      "K": 8,
+      "L": 512,
+      "H": 10
+    },
+    {
+      "config_id": "opt_H20",
+      "B": 64,
+      "K": 8,
+      "L": 256,
+      "H": 20
+    },
+    {
+      "config_id": "opt_B32_K16",
+      "B": 32,
+      "K": 16,
+      "L": 256,
+      "H": 10
+    },
+    {
+      "config_id": "opt_B32_K16_L512",
+      "B": 32,
+      "K": 16,
+      "L": 512,
+      "H": 10
+    },
+    {
+      "config_id": "opt_B32_K16_L512_H20",
+      "B": 32,
+      "K": 16,
+      "L": 512,
+      "H": 20
+    }
+  ],
+  "selection": {
+    "screening_seed": 3136859,
+    "confirmation_seeds": [
+      3136859,
+      42,
+      2026
+    ],
+    "shortlist_size_per_workload": 2,
+    "checkpoint_primary_metric": "valid weighted_access_cost",
+    "checkpoint_tie_breaks": [
+      "valid ApproxNDCG loss",
+      "earlier epoch"
+    ],
+    "configuration_tie_breaks": [
+      "three-seed valid weighted_access_cost mean",
+      "three-seed valid weighted_access_cost sample_stddev",
+      "lower complexity",
+      "config_id lexical order"
+    ],
+    "test_used_for_selection": false
+  },
+  "fresh_holdout": {
+    "requires_new_collection": true,
+    "minimum_accesses": {
+      "canneal": 200000,
+      "streamcluster_pressure": 200000,
+      "dedup_pressure": 1000000
+    },
+    "metadata_paths": {
+      "canneal": "dataset/metadata/capd_post_stage6_optimization/holdout/canneal.json",
+      "streamcluster_pressure": "dataset/metadata/capd_post_stage6_optimization/holdout/streamcluster_pressure.json",
+      "dedup_pressure": "dataset/metadata/capd_post_stage6_optimization/holdout/dedup_pressure.json"
+    },
+    "required_manifest_fields": [
+      "schema_version",
+      "workload_id",
+      "collection_id",
+      "raw_trace_path",
+      "raw_trace_fingerprint",
+      "access_count",
+      "provenance_complete",
+      "sealed",
+      "used_for_selection",
+      "eligible_for_final_holdout"
+    ],
+    "access_policy": {
+      "O0_PROTOCOL_AND_HOLDOUT": "metadata_and_fingerprint_only",
+      "O1_ORACLE_HEADROOM": "forbidden",
+      "O2_CONFIG_SEARCH": "forbidden",
+      "O3_MULTISEED_CONFIRMATION": "forbidden",
+      "O4_FINAL_HOLDOUT_ONCE": "single_final_evaluation"
+    }
+  }
+}

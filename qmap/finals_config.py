@@ -22,8 +22,10 @@ CONTRACT_ID = "CAPD-MIC-1.0"
 OFFICIAL_PROFILE = "official"
 SMOKE_PROFILE = "smoke"
 DIAGNOSTIC_PROFILE = "diagnostic_bridge"
+OPTIMIZATION_PROFILE = "post_stage6_optimization"
 STAGE5_VARIANT_FAMILIES = ("ablation", "sensitivity")
 STAGE6_VARIANT_FAMILIES = ("capacity_robustness",)
+OPTIMIZATION_VARIANT_FAMILIES = ("frozen_method_config_search",)
 LEGACY_CONTRACT_FIELDS = (
     ("schema_version",),
     ("memory", "dram_capacity_pages"),
@@ -279,7 +281,8 @@ def assert_independent_trace_sources(config, fingerprints=None,
 def _requires_data_manifest(config):
   return (
       config.get("schema_version") == SCHEMA_VERSION and
-      config.get("run_profile") == OFFICIAL_PROFILE and
+      config.get("run_profile") in (
+          OFFICIAL_PROFILE, OPTIMIZATION_PROFILE) and
       config.get("validation", {}).get("require_data_manifest") is True)
 
 
@@ -288,7 +291,7 @@ def uses_independent_validation(config):
   return (
       config.get("schema_version") == SCHEMA_VERSION and
       config.get("run_profile") in (
-          OFFICIAL_PROFILE, DIAGNOSTIC_PROFILE))
+          OFFICIAL_PROFILE, DIAGNOSTIC_PROFILE, OPTIMIZATION_PROFILE))
 
 
 def _bind_resolved_data_manifest(config, project_root=None,
@@ -342,9 +345,11 @@ def _validate_v3_config(config, require_resolved=False):
 
   profile = config["run_profile"]
   if profile not in (
-      OFFICIAL_PROFILE, SMOKE_PROFILE, DIAGNOSTIC_PROFILE):
+      OFFICIAL_PROFILE, SMOKE_PROFILE, DIAGNOSTIC_PROFILE,
+      OPTIMIZATION_PROFILE):
     raise ValueError(
-        "run_profile must be official, smoke, or diagnostic_bridge.")
+        "run_profile must be official, smoke, diagnostic_bridge, or "
+        "post_stage6_optimization.")
   dram_capacity = int(config["memory"]["dram_capacity_pages"])
   pool_size = int(config["candidate"]["pool_size_B"])
   retained = int(config["candidate"]["retained_K"])
@@ -355,8 +360,16 @@ def _validate_v3_config(config, require_resolved=False):
   page_state_dim = int(config["features"]["page_state_dim"])
   stage5_variant = config.get("stage5_variant")
   stage6_variant = config.get("stage6_variant")
-  if stage5_variant is not None and stage6_variant is not None:
-    raise ValueError("A config cannot be both a stage-5 and stage-6 variant.")
+  optimization_variant = config.get("optimization_variant")
+  if sum(value is not None for value in (
+      stage5_variant, stage6_variant, optimization_variant)) > 1:
+    raise ValueError("A config cannot belong to multiple variant tracks.")
+  if profile == OPTIMIZATION_PROFILE and optimization_variant is None:
+    raise ValueError(
+        "post_stage6_optimization requires optimization_variant.")
+  if profile != OPTIMIZATION_PROFILE and optimization_variant is not None:
+    raise ValueError(
+        "optimization_variant requires post_stage6_optimization profile.")
   if dram_capacity <= 0 or pool_size <= 0 or retained <= 0:
     raise ValueError("D, B and K must be positive.")
   if pool_size > dram_capacity or retained > pool_size:
@@ -396,8 +409,11 @@ def _validate_v3_config(config, require_resolved=False):
       raise ValueError(
           "Independent-validation v3 profiles require "
           "independent_valid_trace.")
-    expected_artifact_class = (
-        "official" if profile == OFFICIAL_PROFILE else "diagnostic_only")
+    expected_artifact_class = {
+        OFFICIAL_PROFILE: "official",
+        DIAGNOSTIC_PROFILE: "diagnostic_only",
+        OPTIMIZATION_PROFILE: "optimization_only",
+    }[profile]
     if validation.get("artifact_class") != expected_artifact_class:
       raise ValueError(
           "{} v3 artifacts must use artifact_class={}.".format(
@@ -407,6 +423,11 @@ def _validate_v3_config(config, require_resolved=False):
       raise ValueError(
           "diagnostic_bridge must not masquerade as manifest-bound official "
           "evidence.")
+    if (profile == OPTIMIZATION_PROFILE and
+        validation["require_data_manifest"] is not True):
+      raise ValueError(
+          "post_stage6_optimization must stay bound to the sealed official "
+          "source manifest.")
   else:
     if validation["strategy"] != "train_trace_decision_holdout":
       raise ValueError("Smoke v3 requires train_trace_decision_holdout.")
@@ -480,11 +501,16 @@ def _validate_v3_config(config, require_resolved=False):
           selector_history, lookahead, residency_scale)
     if sorted(config.get("sweep", {}).get("pool_sizes_B", [])) != [8, 16, 32, 64]:
       raise ValueError("Official v3 sweep must be B={8,16,32,64}.")
-  elif config["model"]["position_encoding"] != "sinusoidal":
-    raise ValueError(
-        "Non-official v3 requires sinusoidal position encoding.")
-  elif float(labels.get("lambda_w", -1)) != 4.0:
-    raise ValueError("Smoke v3 requires label weights 1,1,4.")
+  elif profile == OPTIMIZATION_PROFILE:
+    _validate_optimization_variant_config(
+        config, dram_capacity, pool_size, retained, transformer_history,
+        selector_history, lookahead, residency_scale)
+  else:
+    if config["model"]["position_encoding"] != "sinusoidal":
+      raise ValueError(
+          "Non-official v3 requires sinusoidal position encoding.")
+    if float(labels.get("lambda_w", -1)) != 4.0:
+      raise ValueError("Non-official v3 requires label weights 1,1,4.")
   if pool_size not in config.get("sweep", {}).get("pool_sizes_B", [pool_size]):
     raise ValueError("pool_size_B is outside the configured sweep.")
 
@@ -629,6 +655,65 @@ def _validate_stage6_variant_config(
         "actual={}.".format(variant_id, expected, actual))
 
 
+def _validate_optimization_variant_config(
+    config, dram_capacity, pool_size, retained, transformer_history,
+    selector_history, lookahead, residency_scale):
+  """Allows only the preregistered frozen-method O2 configuration matrix."""
+  variant = config.get("optimization_variant")
+  required = (
+      "variant_id", "family", "source_stage", "only_difference",
+      "test_used_for_selection", "method_contract_changed",
+      "retrain_required")
+  missing = [key for key in required if key not in variant]
+  if missing:
+    raise ValueError(
+        "optimization_variant missing fields: {}".format(missing))
+  if variant["family"] not in OPTIMIZATION_VARIANT_FAMILIES:
+    raise ValueError("Unsupported optimization_variant family.")
+  if variant["source_stage"] != "post_stage6_optimization":
+    raise ValueError(
+        "optimization_variant source_stage must be "
+        "post_stage6_optimization.")
+  if variant["test_used_for_selection"] is not False:
+    raise ValueError("Optimization variants must never use test selection.")
+  if variant["method_contract_changed"] is not False:
+    raise ValueError("Optimization variants must preserve CAPD-MIC-1.0.")
+  if variant["retrain_required"] is not True:
+    raise ValueError("Optimization variants require fresh retraining.")
+  if not variant["only_difference"]:
+    raise ValueError("optimization_variant.only_difference must be explicit.")
+
+  allowed = {
+      "opt_full_control": (64, 8, 256, 10),
+      "opt_B32": (32, 8, 256, 10),
+      "opt_K16": (64, 16, 256, 10),
+      "opt_L512": (64, 8, 512, 10),
+      "opt_H20": (64, 8, 256, 20),
+      "opt_B32_K16": (32, 16, 256, 10),
+      "opt_B32_K16_L512": (32, 16, 512, 10),
+      "opt_B32_K16_L512_H20": (32, 16, 512, 20),
+  }
+  variant_id = variant["variant_id"]
+  if variant_id not in allowed:
+    raise ValueError(
+        "Unknown optimization_variant.variant_id: {}".format(variant_id))
+  expected_B, expected_K, expected_L, expected_H = allowed[variant_id]
+  expected = {
+      "D": 64, "B": expected_B, "K": expected_K, "H": expected_H,
+      "Hc": 256, "L": expected_L, "Lres": 256,
+      "position_encoding": "sinusoidal", "lambda_w": 4.0}
+  actual = {
+      "D": dram_capacity, "B": pool_size, "K": retained,
+      "H": transformer_history, "Hc": selector_history, "L": lookahead,
+      "Lres": residency_scale,
+      "position_encoding": config["model"]["position_encoding"],
+      "lambda_w": float(config["labels"].get("lambda_w", -1))}
+  if actual != expected:
+    raise ValueError(
+        "Optimization variant {} has undeclared differences: expected={} "
+        "actual={}.".format(variant_id, expected, actual))
+
+
 def validate_config(config, require_resolved=False):
   schema = config.get("schema_version")
   if schema == LEGACY_SCHEMA_VERSION:
@@ -710,6 +795,13 @@ def contract_from_config(config):
       contract.update({
           "stage6_variant_id": config["stage6_variant"]["variant_id"],
           "stage6_variant_family": config["stage6_variant"]["family"],
+      })
+    if config.get("optimization_variant") is not None:
+      contract.update({
+          "optimization_variant_id":
+              config["optimization_variant"]["variant_id"],
+          "optimization_variant_family":
+              config["optimization_variant"]["family"],
       })
   return contract
 
@@ -847,7 +939,7 @@ def validate_result_contract(config, result, selector_params=None,
     required = (
         "policy", "total_accesses", "hits", "misses", "nvm_reads",
         "nvm_writes",
-        "migrations", "weighted_access_cost", "test_trace_fingerprint",
+        "migrations", "weighted_access_cost",
         "cost_model", "nvm_capacity_pages", "dram_initial_state",
         "initial_residency", "trace_page_backing",
         "first_touch_accounting", "dirty_demotion_nvm_write")
@@ -859,9 +951,22 @@ def validate_result_contract(config, result, selector_params=None,
       raise ValueError("result hit/miss accounting mismatch.")
     if result["cost_model"] != config["cost_model"]:
       raise ValueError("result cost_model mismatch.")
-    expected_test_fingerprint = fingerprint_file(config["data"]["test_trace"])
-    if result["test_trace_fingerprint"] != expected_test_fingerprint:
-      raise ValueError("result/test trace fingerprint mismatch.")
+    evaluation_split = result.get("evaluation_split", "test")
+    if evaluation_split not in ("valid", "test"):
+      raise ValueError("result evaluation_split must be valid or test.")
+    expected_trace_fingerprint = fingerprint_file(
+        config["data"]["{}_trace".format(evaluation_split)])
+    if evaluation_split == "test":
+      if result.get(
+          "test_trace_fingerprint") != expected_trace_fingerprint:
+        raise ValueError("result/test trace fingerprint mismatch.")
+    else:
+      if result.get(
+          "evaluation_trace_fingerprint") != expected_trace_fingerprint:
+        raise ValueError("result/valid trace fingerprint mismatch.")
+      if result.get("test_used_for_selection") is not False:
+        raise ValueError(
+            "Validation replay must declare test_used_for_selection=false.")
     if result["nvm_capacity_pages"] is not None:
       raise ValueError("result NVM capacity must be unbounded/null.")
     for key in (
