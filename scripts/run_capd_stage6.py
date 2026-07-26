@@ -98,8 +98,9 @@ def _code_fingerprint(repo_root):
   paths = (
       "scripts/run_capd_stage6.py", "qmap/stage6_results.py",
       "qmap/stage6_variants.py", "qmap/finals_config.py",
-      "qmap/finals_generator.py", "qmap/qmap_train.py",
-      "qmap/qmap_eval.py", "policy_learning/cache_model/model.py")
+      "qmap/finals_data.py", "qmap/finals_generator.py",
+      "qmap/qmap_train.py", "qmap/qmap_eval.py",
+      "policy_learning/cache_model/model.py")
   return finals_config.fingerprint_value({
       path: finals_config.fingerprint_file(os.path.join(repo_root, path))
       for path in paths})

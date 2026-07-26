@@ -587,6 +587,13 @@ def validate_data_profile(profile, config):
     if profile_dimension is not None:
       expected[profile_dimension] = (
           STAGE5_SENSITIVITY_PROFILE_BASELINE[profile_dimension])
+  stage6_variant = config.get("stage6_variant", {})
+  if stage6_variant.get("family") == "capacity_robustness":
+    # Stage-6 capacity points reuse the same immutable source corpus and its
+    # sealed stage-2 quality profile.  The variant config and freshly
+    # generated samples enforce the new D independently; the historical
+    # source-quality seal must remain bound to the Full baseline D.
+    expected["D"] = STAGE5_SENSITIVITY_PROFILE_BASELINE["D"]
   actual = copy.deepcopy(profile["method_constants"])
   actual["pool_sizes_B"] = sorted(
       int(value) for value in actual.get("pool_sizes_B", []))

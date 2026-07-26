@@ -12,6 +12,7 @@ if PROJECT_ROOT not in sys.path:
   sys.path.insert(0, PROJECT_ROOT)
 
 from qmap import finals_config
+from qmap import finals_data
 from qmap import stage6_variants
 from scripts import run_capd_stage6 as stage6
 
@@ -63,6 +64,22 @@ class Stage6PlanTest(unittest.TestCase):
     invalid["run"].pop("resolved_config_fingerprint", None)
     with self.assertRaises(ValueError):
       finals_config.validate_config(invalid, require_resolved=True)
+
+  def test_capacity_config_reuses_sealed_full_data_profile(self):
+    path = os.path.join(
+        PROJECT_ROOT, "dataset", "jsonl", "finals_v3_official",
+        "canneal", "B64", "resolved_config.json")
+    base = finals_config.load_json(path)
+    profile_path = os.path.join(
+        PROJECT_ROOT, base["validation"]["data_quality_profile"])
+    profile = finals_data.load_json(profile_path)
+    for capacity in stage6_variants.CAPACITIES:
+      config = stage6_variants.build_capacity_config(base, capacity)
+      identity = finals_data.validate_data_profile(profile, config)
+      self.assertEqual(profile["profile_id"], identity["profile_id"])
+      self.assertEqual(
+          "capacity_D{}".format(capacity),
+          config["stage6_variant"]["variant_id"])
 
   def test_stage5_and_stage6_variant_cannot_mix(self):
     path = os.path.join(
