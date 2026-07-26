@@ -1,0 +1,106 @@
+{
+  "artifact_class": "diagnostic_only",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 9,
+  "best_validation_loss": -0.928696623525104,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "3bdab6db9659d0cff51ab532e171ae5806ff2074d524dd129acd0b3bfbd5342d",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "67a9088857a96dcbc6423e562b348dea0b23ef095ca9e3ba8b2df11c9ac7f7d4",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "0005772b336ad27438bad978b4260b596e9f117b2fbb4448c990806476b0256a",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026 --seed 2026",
+  "config_fingerprint": "40387d8af4d52c3a82dea28b7c842ee2fb11a57cb4aa5b11706e3b5351673412",
+  "config_generation_commit": "794365165c2b714477111c9190707e7b2f67a693",
+  "contract_id": "CAPD-MIC-1.0",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.9492830073132235,
+  "git_commit": "794365165c2b714477111c9190707e7b2f67a693",
+  "jsonl_fingerprints": {
+    "train": "b2231d6ebd3add00ef8d203652cccace3803401392d6ee857f63805a56f70e71",
+    "valid": "3fa39c622019721acd46d75ba242c5d542e8785824f79e953dfbc341bf52d357"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.7593340962134358,
+      "valid_loss": -0.8732814655916111
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.9081290974031628,
+      "valid_loss": -0.8927899325216139
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.9212477874877812,
+      "valid_loss": -0.9011945712405283
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.9279430982706797,
+      "valid_loss": -0.9066688410333685
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.9361845291484042,
+      "valid_loss": -0.9199876559747232
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.940990655470992,
+      "valid_loss": -0.9228652176019307
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.943859285253393,
+      "valid_loss": -0.9240995279035052
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.9454000573938764,
+      "valid_loss": -0.9257376600761671
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.9475394975193931,
+      "valid_loss": -0.928696623525104
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.9492830073132235,
+      "valid_loss": -0.9279930716430819
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "diagnostic_bridge",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 2026,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "7fd97a41a2ad32f626cb644579d84232066804c346d2eb4b8ba1a3b09d7df0ea",
+  "source_manifest": "dataset/metadata/real_workload_suite_pressure_manifest.json",
+  "source_manifest_fingerprint": null,
+  "split_fingerprints": {
+    "test": "fbff0c2a683dadb29a1af1afebc361dab404a1e314939f05324f40a437020f63",
+    "train": "166a7ad3cdd39449dd0dafe58bf8364184d210e7e8545b5b66538b4de899f032",
+    "valid": "88417a006b9dca4642a3db55eb54098d01de3c36791eb66f1fc45f46622f9bfc"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 94.322261095047,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "streamcluster_pressure"
+}

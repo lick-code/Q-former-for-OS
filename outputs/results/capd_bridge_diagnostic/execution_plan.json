@@ -1,0 +1,1106 @@
+{
+  "attribution_chain": [
+    {
+      "factor": "engine_and_pipeline",
+      "left": "legacy_published_D16_B8K8",
+      "right": "legacy_current_identity_D16_B8K8"
+    },
+    {
+      "factor": "candidate_selector",
+      "left": "legacy_current_identity_D16_B8K8",
+      "right": "legacy_current_selector_D16_B16K8"
+    },
+    {
+      "factor": "trace_source",
+      "left": "legacy_current_selector_D16_B16K8",
+      "right": "official_current_selector_D16_B16K8"
+    },
+    {
+      "factor": "dram_capacity_and_feasible_pool",
+      "left": "official_current_selector_D16_B16K8",
+      "right": "official_current_full_D64_B64K8"
+    }
+  ],
+  "cases": [
+    {
+      "B": 8,
+      "D": 16,
+      "K": 8,
+      "candidate_mode": "legacy_lru_tail_8",
+      "case_id": "legacy_published_D16_B8K8",
+      "engine": "legacy_published_pipeline",
+      "only_difference": "frozen published legacy evidence",
+      "source_id": "legacy_pressure_window"
+    },
+    {
+      "B": 64,
+      "D": 64,
+      "K": 8,
+      "candidate_mode": "selector_B_to_K",
+      "case_id": "official_current_full_D64_B64K8",
+      "engine": "current_capd_mic_1_0",
+      "only_difference": "frozen Stage-5 Full evidence at D=64",
+      "source_id": "official_recollection"
+    },
+    {
+      "B": 8,
+      "D": 16,
+      "K": 8,
+      "candidate_mode": "identity_P_equals_C",
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "engine": "current_capd_mic_1_0",
+      "only_difference": "current engine on legacy pressure window with D=16 and B=K=8",
+      "source_id": "legacy_pressure_window"
+    },
+    {
+      "B": 16,
+      "D": 16,
+      "K": 8,
+      "candidate_mode": "selector_B_to_K",
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "engine": "current_capd_mic_1_0",
+      "only_difference": "enable current B-to-K selector: B changes from 8 to 16",
+      "source_id": "legacy_pressure_window"
+    },
+    {
+      "B": 16,
+      "D": 16,
+      "K": 8,
+      "candidate_mode": "selector_B_to_K",
+      "case_id": "official_current_selector_D16_B16K8",
+      "engine": "current_capd_mic_1_0",
+      "only_difference": "trace source changes from legacy window to official recollection",
+      "source_id": "official_recollection"
+    }
+  ],
+  "code_commit": "794365165c2b714477111c9190707e7b2f67a693",
+  "code_fingerprint": "85557781eb529d07a0ff436c5eecbee737f89c56e9f6195551685bd3263a3067",
+  "compute_case_count": 3,
+  "imported_case_count": 2,
+  "imported_evidence_fingerprints": {
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/clock/run.json": "d173bc7b3a02e1ed76f2ad7a64a6910b1773b6a3969689978007b43b77dbd51e",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/lfu/run.json": "e08cbd7eba07376e84f532e5d975e7d619f7b4f27bc007c914d92d527e6485d8",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/lru/run.json": "1dc65d375dab41f7ad2999140b0900500ad268a411343387ca4a7aedcf9e5a5a",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/qmap/seed_2026.json": "9b40564daa2a8f711a758d72f8f43f28cb543370ba7a7ada720dc3c08f2b1063",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/qmap/seed_3136859.json": "f70c5120b2780130fcd08a39a22e5ac12481077e7819a2c485d9a74757ac8185",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/qmap/seed_42.json": "37b38bc3aecf20292eda7909339f17c40c686ba5c9da1f87a0df3d7052ae2139",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/random/seed_0.json": "d0e745082ab0638122e1888eb84855af7626c862c608787c6f2919b9e6339182",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/random/seed_1.json": "9fe1a19a7f70690fcf985c6896d017af24cc34d7fdc552715c154a5694f608cd",
+    "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/random/seed_2.json": "a76a74b2b6d75b5444b5f8d07ce6e79ddf9f52167f7e6baaf1415cd0b175823b",
+    "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/clock.json": "6c734aa4b53da389f6c865a7a60a35bc04dfeb8979a15ce923cfb4800661f302",
+    "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/lfu.json": "27b83fa45428e8c74d9adb3f1589a54d3358230e19e932016103f8d4d188cc4e",
+    "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/lru.json": "de07c4a1963e6ef01e2d0abef53bf6696a0ae2632a70d76606f36e5d5a97d702",
+    "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/random.json": "0d92837d0a72d470d21328b0e892776eac500df2b0222c9961c92b9c8dae9f3f",
+    "outputs/results/seed_stability/streamcluster_pressure/seed_2026/qmap.json": "eca3d3ea49cc6cbe0475ca354d78c3062cf72257a5eac4f14b3ef6ce55e8d493",
+    "outputs/results/seed_stability/streamcluster_pressure/seed_3136859/qmap.json": "542e3d9781b934e0146bfa9b3e85745f9a0ed7711cdbe33ce3213f713bb4f9ca",
+    "outputs/results/seed_stability/streamcluster_pressure/seed_42/qmap.json": "cb3ee21e89dea11a6d876a563b781d5a45d71d11884da8e3c9c6a56acc19f593"
+  },
+  "job_counts": {
+    "baseline": 12,
+    "data": 3,
+    "replay": 9,
+    "train": 9
+  },
+  "jobs": [
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_bridge.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "bridge:data:legacy_current_identity_D16_B8K8"
+      ],
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "command": "python3 scripts/run_capd_bridge.py --stage run --job-id bridge:data:legacy_current_identity_D16_B8K8",
+      "dependencies": [],
+      "job_fingerprint": "7fcd537d018b3d3bea8f11fa18107ce3c975c0f99e1b767ca4db5197bad98d4e",
+      "job_id": "bridge:data:legacy_current_identity_D16_B8K8",
+      "kind": "data",
+      "required": true,
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/variant_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_3136859",
+        "--seed",
+        "3136859"
+      ],
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_3136859 --seed 3136859",
+      "dependencies": [
+        "bridge:data:legacy_current_identity_D16_B8K8"
+      ],
+      "job_fingerprint": "130763d9a23f25dd0158deac71493cdf7abe8f44166120a34eca449b58e630a4",
+      "job_id": "bridge:train:legacy_current_identity_D16_B8K8:3136859",
+      "kind": "train",
+      "model_seed": 3136859,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_3136859/checkpoint_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_3136859/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_3136859.json"
+      ],
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_3136859/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_3136859.json",
+      "dependencies": [
+        "bridge:train:legacy_current_identity_D16_B8K8:3136859"
+      ],
+      "job_fingerprint": "56efb0c6136467fe6485d02e6ae9efc1542a73eef9778463d4bf8ca7da3620ff",
+      "job_id": "bridge:replay:legacy_current_identity_D16_B8K8:qmap:3136859",
+      "kind": "replay",
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_3136859.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_42",
+        "--seed",
+        "42"
+      ],
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_42 --seed 42",
+      "dependencies": [
+        "bridge:data:legacy_current_identity_D16_B8K8"
+      ],
+      "job_fingerprint": "3c5ef051b95b75b362304cc349cf6bc1ecf49ab35bdbd6a5f7777b4a0e3a8e8d",
+      "job_id": "bridge:train:legacy_current_identity_D16_B8K8:42",
+      "kind": "train",
+      "model_seed": 42,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_42/checkpoint_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_42/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_42.json"
+      ],
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_42/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_42.json",
+      "dependencies": [
+        "bridge:train:legacy_current_identity_D16_B8K8:42"
+      ],
+      "job_fingerprint": "d3c618a989965e736680e2d122c24225f79e568b21c8b701585ebae2531f6a48",
+      "job_id": "bridge:replay:legacy_current_identity_D16_B8K8:qmap:42",
+      "kind": "replay",
+      "model_seed": 42,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_42.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026",
+        "--seed",
+        "2026"
+      ],
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026 --seed 2026",
+      "dependencies": [
+        "bridge:data:legacy_current_identity_D16_B8K8"
+      ],
+      "job_fingerprint": "d0882fb23585361503a5769b7ba7143d8522fec8a8602ce3132739ffd75d822d",
+      "job_id": "bridge:train:legacy_current_identity_D16_B8K8:2026",
+      "kind": "train",
+      "model_seed": 2026,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026/checkpoint_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_2026.json"
+      ],
+      "case_id": "legacy_current_identity_D16_B8K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_2026.json",
+      "dependencies": [
+        "bridge:train:legacy_current_identity_D16_B8K8:2026"
+      ],
+      "job_fingerprint": "108b3a8ffd792467682ea13b6d3b6a5191d3c2deeada5e26cf5d92d907751878",
+      "job_id": "bridge:replay:legacy_current_identity_D16_B8K8:qmap:2026",
+      "kind": "replay",
+      "model_seed": 2026,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_2026.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_bridge.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 scripts/run_capd_bridge.py --stage run --job-id bridge:data:legacy_current_selector_D16_B16K8",
+      "dependencies": [],
+      "job_fingerprint": "1e00cc76b33db25ec31fcd8683ee2c12f292fbce13e3da7cc15c4ee3628797b7",
+      "job_id": "bridge:data:legacy_current_selector_D16_B16K8",
+      "kind": "data",
+      "required": true,
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/variant_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_3136859",
+        "--seed",
+        "3136859"
+      ],
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_3136859 --seed 3136859",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "05833a93fc7f5e89d7dc5e5bba70cb3ffdf248d4a538b8d05e5920aeb4ff4a10",
+      "job_id": "bridge:train:legacy_current_selector_D16_B16K8:3136859",
+      "kind": "train",
+      "model_seed": 3136859,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_3136859/checkpoint_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_3136859/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_3136859.json"
+      ],
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_3136859/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_3136859.json",
+      "dependencies": [
+        "bridge:train:legacy_current_selector_D16_B16K8:3136859"
+      ],
+      "job_fingerprint": "f4be197c749021580c553ff05e1c1d81019dcb3030250be5c86d0fed85605607",
+      "job_id": "bridge:replay:legacy_current_selector_D16_B16K8:qmap:3136859",
+      "kind": "replay",
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_3136859.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_42",
+        "--seed",
+        "42"
+      ],
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_42 --seed 42",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "5d08b7984bca691ad682aa61bf841a05a50ee3265034f38f5c1ea313879566ce",
+      "job_id": "bridge:train:legacy_current_selector_D16_B16K8:42",
+      "kind": "train",
+      "model_seed": 42,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_42/checkpoint_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_42/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_42.json"
+      ],
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_42/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_42.json",
+      "dependencies": [
+        "bridge:train:legacy_current_selector_D16_B16K8:42"
+      ],
+      "job_fingerprint": "df6dd03929f2ef411f924b405c2fdcc12c98866be4ba32737bfbb1086e0564a5",
+      "job_id": "bridge:replay:legacy_current_selector_D16_B16K8:qmap:42",
+      "kind": "replay",
+      "model_seed": 42,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_42.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_2026",
+        "--seed",
+        "2026"
+      ],
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_2026 --seed 2026",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "90984297ac91c00f139ffaad17680f4d8c4c3650441fe1477d20b9cc68b31b4a",
+      "job_id": "bridge:train:legacy_current_selector_D16_B16K8:2026",
+      "kind": "train",
+      "model_seed": 2026,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_2026/checkpoint_manifest.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_2026/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_2026.json"
+      ],
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/seed_2026/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_2026.json",
+      "dependencies": [
+        "bridge:train:legacy_current_selector_D16_B16K8:2026"
+      ],
+      "job_fingerprint": "e8eda997673850aebf6ed438faa34dc5263f6ac1a91ecdacb02b0f730dfdc238",
+      "job_id": "bridge:replay:legacy_current_selector_D16_B16K8:qmap:2026",
+      "kind": "replay",
+      "model_seed": 2026,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_selector_D16_B16K8/qmap/seed_2026.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_bridge.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 scripts/run_capd_bridge.py --stage run --job-id bridge:data:official_current_selector_D16_B16K8",
+      "dependencies": [],
+      "job_fingerprint": "2f6a55b1f7feb94e933b3ba67dba0abcb03904d56ed316537d2f1feea274a4ea",
+      "job_id": "bridge:data:official_current_selector_D16_B16K8",
+      "kind": "data",
+      "required": true,
+      "resource": "cpu_memory_bound",
+      "result_path": "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/variant_manifest.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859",
+        "--seed",
+        "3136859"
+      ],
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859 --seed 3136859",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "41ea2e3d840b00263d718010c001e75812e20001d01470273f7bde292c42b0d3",
+      "job_id": "bridge:train:official_current_selector_D16_B16K8:3136859",
+      "kind": "train",
+      "model_seed": 3136859,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859/checkpoint_manifest.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_3136859.json"
+      ],
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_3136859.json",
+      "dependencies": [
+        "bridge:train:official_current_selector_D16_B16K8:3136859"
+      ],
+      "job_fingerprint": "3730570d7f3e88c2bac91de49b3d702969a7b9887d3084292708082d62f0d3c8",
+      "job_id": "bridge:replay:official_current_selector_D16_B16K8:qmap:3136859",
+      "kind": "replay",
+      "model_seed": 3136859,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_3136859.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_42",
+        "--seed",
+        "42"
+      ],
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_42 --seed 42",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "2b4d9c67acae1da45627ff18cd9c3c0121aa25fa60f8b4dee7c592de90b0c181",
+      "job_id": "bridge:train:official_current_selector_D16_B16K8:42",
+      "kind": "train",
+      "model_seed": 42,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_42/checkpoint_manifest.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_42/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_42.json"
+      ],
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_42/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_42.json",
+      "dependencies": [
+        "bridge:train:official_current_selector_D16_B16K8:42"
+      ],
+      "job_fingerprint": "a3ace6fd8cba06dc27977d9d3c71f4a4498181bd14c8e1719757449b645295c1",
+      "job_id": "bridge:replay:official_current_selector_D16_B16K8:qmap:42",
+      "kind": "replay",
+      "model_seed": 42,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_42.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_train.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json",
+        "--train_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl",
+        "--valid_data",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl",
+        "--output_dir",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026",
+        "--seed",
+        "2026"
+      ],
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026 --seed 2026",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "8fd0bca15b1929592589a452f4f79ce76cb34511dc0f93bbb2debc14e7fa98a8",
+      "job_id": "bridge:train:official_current_selector_D16_B16K8:2026",
+      "kind": "train",
+      "model_seed": 2026,
+      "required": true,
+      "resource": "single_gpu_train",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026/checkpoint_manifest.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--selector_params",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json",
+        "--policy",
+        "qmap",
+        "--checkpoint",
+        "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026/qmap_best.pth",
+        "--bridge_diagnostics",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_2026.json"
+      ],
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_2026.json",
+      "dependencies": [
+        "bridge:train:official_current_selector_D16_B16K8:2026"
+      ],
+      "job_fingerprint": "fdf879ed0ae6ae70d30ab71b925cb79c8ca5c3ebe390e3226c7ad0e4b14b1121",
+      "job_id": "bridge:replay:official_current_selector_D16_B16K8:qmap:2026",
+      "kind": "replay",
+      "model_seed": 2026,
+      "policy": "qmap",
+      "required": true,
+      "resource": "single_gpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_2026.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "lru",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/lru/run.json"
+      ],
+      "capacity": 16,
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/lru/run.json",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "872e922123a531ee9b69517f9911944086850b5d70ba42aaf2671b487f191677",
+      "job_id": "bridge:baseline:legacy_pressure_window:D16:lru:deterministic",
+      "kind": "baseline",
+      "policy": "lru",
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/lru/run.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "lfu",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/lfu/run.json"
+      ],
+      "capacity": 16,
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --policy lfu --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/lfu/run.json",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "30b6de4089f326941f8a6137462e52b8044e77ead9fabba8b5b62772d9a7aa7a",
+      "job_id": "bridge:baseline:legacy_pressure_window:D16:lfu:deterministic",
+      "kind": "baseline",
+      "policy": "lfu",
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/lfu/run.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "clock",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/clock/run.json"
+      ],
+      "capacity": 16,
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/clock/run.json",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "1a2d6d852de5875184eea8f1cb55dba031996ec037d62a354c8f516d032795df",
+      "job_id": "bridge:baseline:legacy_pressure_window:D16:clock:deterministic",
+      "kind": "baseline",
+      "policy": "clock",
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/clock/run.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "random",
+        "--stage5_replay_seed",
+        "0",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_0.json"
+      ],
+      "capacity": 16,
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --policy random --stage5_replay_seed 0 --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_0.json",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "5f063a364e102fd3cb017ca7cc8bdaaf462dcd5896aa6ceb1efb0fd0dedd2025",
+      "job_id": "bridge:baseline:legacy_pressure_window:D16:random:0",
+      "kind": "baseline",
+      "policy": "random",
+      "replay_seed": 0,
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_0.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "random",
+        "--stage5_replay_seed",
+        "1",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_1.json"
+      ],
+      "capacity": 16,
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --policy random --stage5_replay_seed 1 --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_1.json",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "393089d8cc913e8e4b15117bc28a55e5e4eeec0296e3434b609c314b6376de27",
+      "job_id": "bridge:baseline:legacy_pressure_window:D16:random:1",
+      "kind": "baseline",
+      "policy": "random",
+      "replay_seed": 1,
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_1.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "random",
+        "--stage5_replay_seed",
+        "2",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_2.json"
+      ],
+      "capacity": 16,
+      "case_id": "legacy_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --policy random --stage5_replay_seed 2 --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_2.json",
+      "dependencies": [
+        "bridge:data:legacy_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "bb75d1cc9ed53f52d6701d41af6694554ed90544376c4b94bbaabfb06f2e4a3b",
+      "job_id": "bridge:baseline:legacy_pressure_window:D16:random:2",
+      "kind": "baseline",
+      "policy": "random",
+      "replay_seed": 2,
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/random/seed_2.json",
+      "source_id": "legacy_pressure_window",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "lru",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/lru/run.json"
+      ],
+      "capacity": 16,
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/lru/run.json",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "1757476372ced2c9a7def5e7fcf073bed3db7941f26a59678d5991f053b6c0f5",
+      "job_id": "bridge:baseline:official_recollection:D16:lru:deterministic",
+      "kind": "baseline",
+      "policy": "lru",
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/lru/run.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "lfu",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/lfu/run.json"
+      ],
+      "capacity": 16,
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy lfu --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/lfu/run.json",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "57701b0fe1cc815bd3a277e9d3f48961f7ad897de9032654ac90c4b7c51f0f36",
+      "job_id": "bridge:baseline:official_recollection:D16:lfu:deterministic",
+      "kind": "baseline",
+      "policy": "lfu",
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/lfu/run.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "clock",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/clock/run.json"
+      ],
+      "capacity": 16,
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/clock/run.json",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "721f5d6640af630920ff6ed6c1eb92f387449290ebaedbeb2bdb91265bb2d35c",
+      "job_id": "bridge:baseline:official_recollection:D16:clock:deterministic",
+      "kind": "baseline",
+      "policy": "clock",
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/clock/run.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "random",
+        "--stage5_replay_seed",
+        "0",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_0.json"
+      ],
+      "capacity": 16,
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy random --stage5_replay_seed 0 --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_0.json",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "b96c65df38c7824caf32fcf34810eb953d519d55d6053c4bfc7913139b7f341a",
+      "job_id": "bridge:baseline:official_recollection:D16:random:0",
+      "kind": "baseline",
+      "policy": "random",
+      "replay_seed": 0,
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_0.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "random",
+        "--stage5_replay_seed",
+        "1",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_1.json"
+      ],
+      "capacity": 16,
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy random --stage5_replay_seed 1 --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_1.json",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "1387b713443171f14450284252c0ea67116792e90a5588e418e857f0e321a854",
+      "job_id": "bridge:baseline:official_recollection:D16:random:1",
+      "kind": "baseline",
+      "policy": "random",
+      "replay_seed": 1,
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_1.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json",
+        "--policy",
+        "random",
+        "--stage5_replay_seed",
+        "2",
+        "--json_output",
+        "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_2.json"
+      ],
+      "capacity": 16,
+      "case_id": "official_current_selector_D16_B16K8",
+      "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy random --stage5_replay_seed 2 --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_2.json",
+      "dependencies": [
+        "bridge:data:official_current_selector_D16_B16K8"
+      ],
+      "job_fingerprint": "178659c940593d85601de6ced2d55f071f68bcd447268470e78846a43f223b12",
+      "job_id": "bridge:baseline:official_recollection:D16:random:2",
+      "kind": "baseline",
+      "policy": "random",
+      "replay_seed": 2,
+      "required": true,
+      "resource": "cpu_replay",
+      "result_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_2.json",
+      "source_id": "official_recollection",
+      "stage": "run"
+    }
+  ],
+  "official_stage6_replaced": false,
+  "required_jobs": 33,
+  "schema_version": "capd_bridge_execution_plan_1",
+  "scientific_role": "post_hoc_diagnostic_not_method_selection",
+  "source_fingerprints": {
+    "legacy_pressure_window": {
+      "test": "fbff0c2a683dadb29a1af1afebc361dab404a1e314939f05324f40a437020f63",
+      "train": "166a7ad3cdd39449dd0dafe58bf8364184d210e7e8545b5b66538b4de899f032",
+      "valid": "88417a006b9dca4642a3db55eb54098d01de3c36791eb66f1fc45f46622f9bfc"
+    },
+    "official_recollection": {
+      "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+      "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+      "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+    }
+  },
+  "stage6_manifest_fingerprint": "08f540ba999ebef5fa5cfc7d595bbe3a5246667bd02d9abe20c434ed824f9ab1",
+  "status": "BRIDGE_IMPLEMENTED_UNVERIFIED",
+  "test_used_for_selection": false
+}

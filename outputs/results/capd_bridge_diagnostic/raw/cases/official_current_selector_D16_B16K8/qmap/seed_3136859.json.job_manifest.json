@@ -1,0 +1,13 @@
+{
+  "atomic_manifest": true,
+  "command": "python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_3136859.json",
+  "ended_unix": 1785058593.8275244,
+  "exit_code": 0,
+  "job_fingerprint": "3730570d7f3e88c2bac91de49b3d702969a7b9887d3084292708082d62f0d3c8",
+  "job_id": "bridge:replay:official_current_selector_D16_B16K8:qmap:3136859",
+  "log_path": "/home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/official_current_selector_D16_B16K8/qmap/seed_3136859.json.log",
+  "result_fingerprint": "48c8b72d693257b904e9685e5ddf770caa3a15252558f4ff1d2f4bd08e434222",
+  "retry_count": 0,
+  "started_unix": 1785058578.7138693,
+  "status": "COMPLETED"
+}

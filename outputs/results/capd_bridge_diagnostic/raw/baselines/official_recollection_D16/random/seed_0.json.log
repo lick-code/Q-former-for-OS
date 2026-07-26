@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy random --stage5_replay_seed 0 --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/random/seed_0.json
+started_unix=1785058803.784353
+Policy: random
+Total accesses: 200000
+Hits: 194368
+Misses: 5632
+Hit rate: 97.18%
+Migrations: 5616
+NVM reads: 5558
+NVM writes: 74
+Weighted access cost: 262236.00
+Policy decisions: 5616
+Total decision time: 0.006566s
+Avg decision time: 0.001169 ms
+ended_unix=1785058804.7725875
+exit_code=0

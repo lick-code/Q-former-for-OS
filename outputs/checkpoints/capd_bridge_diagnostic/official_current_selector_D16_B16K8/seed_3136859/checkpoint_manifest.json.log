@@ -1,0 +1,74 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859 --seed 3136859
+started_unix=1785058486.4269497
+QMAP training: train=/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl valid=/home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl samples=12101/4019 device=cuda
+epoch=1/10 iter=1 loss=-0.512304
+epoch=1/10 iter=100 loss=-0.522080
+epoch=1/10 iter=200 loss=-0.626339
+epoch=1/10 iter=300 loss=-0.793349
+epoch=1/10 train_loss=-0.623620 valid_loss=-0.682200
+epoch=2/10 iter=400 loss=-0.678069
+epoch=2/10 iter=500 loss=-0.709243
+epoch=2/10 iter=600 loss=-0.771339
+epoch=2/10 iter=700 loss=-0.558041
+epoch=2/10 train_loss=-0.678859 valid_loss=-0.687799
+epoch=3/10 iter=800 loss=-0.558965
+epoch=3/10 iter=900 loss=-0.525537
+epoch=3/10 iter=1000 loss=-0.589664
+epoch=3/10 iter=1100 loss=-0.527734
+epoch=3/10 train_loss=-0.681411 valid_loss=-0.689224
+epoch=4/10 iter=1200 loss=-0.683235
+epoch=4/10 iter=1300 loss=-0.681745
+epoch=4/10 iter=1400 loss=-0.652090
+epoch=4/10 iter=1500 loss=-0.684601
+epoch=4/10 train_loss=-0.682842 valid_loss=-0.689578
+epoch=5/10 iter=1600 loss=-0.559546
+epoch=5/10 iter=1700 loss=-0.654039
+epoch=5/10 iter=1800 loss=-0.685576
+epoch=5/10 train_loss=-0.682946 valid_loss=-0.690053
+epoch=6/10 iter=1900 loss=-0.715209
+epoch=6/10 iter=2000 loss=-0.777026
+epoch=6/10 iter=2100 loss=-0.591092
+epoch=6/10 iter=2200 loss=-0.838717
+epoch=6/10 train_loss=-0.684129 valid_loss=-0.690117
+epoch=7/10 iter=2300 loss=-0.652652
+epoch=7/10 iter=2400 loss=-0.621945
+epoch=7/10 iter=2500 loss=-0.623200
+epoch=7/10 iter=2600 loss=-0.716827
+epoch=7/10 train_loss=-0.682968 valid_loss=-0.690386
+epoch=8/10 iter=2700 loss=-0.621429
+epoch=8/10 iter=2800 loss=-0.778547
+epoch=8/10 iter=2900 loss=-0.654149
+epoch=8/10 iter=3000 loss=-0.745204
+epoch=8/10 train_loss=-0.683091 valid_loss=-0.690445
+epoch=9/10 iter=3100 loss=-0.716313
+epoch=9/10 iter=3200 loss=-0.747343
+epoch=9/10 iter=3300 loss=-0.622283
+epoch=9/10 iter=3400 loss=-0.869554
+epoch=9/10 train_loss=-0.684063 valid_loss=-0.690531
+epoch=10/10 iter=3500 loss=-0.591298
+epoch=10/10 iter=3600 loss=-0.745194
+epoch=10/10 iter=3700 loss=-0.684580
+epoch=10/10 train_loss=-0.683693 valid_loss=-0.690466
+Training finished. best=/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859/qmap_best.pth last=/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_3136859/qmap_last.pth
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+/home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+ended_unix=1785058578.7127364
+exit_code=0

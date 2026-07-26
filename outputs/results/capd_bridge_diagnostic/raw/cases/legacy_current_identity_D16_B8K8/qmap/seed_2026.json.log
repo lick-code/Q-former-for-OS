@@ -1,0 +1,20 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/selector_params.json --policy qmap --checkpoint /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/legacy_current_identity_D16_B8K8/seed_2026/qmap_best.pth --bridge_diagnostics --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/cases/legacy_current_identity_D16_B8K8/qmap/seed_2026.json
+started_unix=1785058024.8777106
+Policy: qmap
+Total accesses: 200000
+Hits: 193919
+Misses: 6081
+Hit rate: 96.96%
+Migrations: 6065
+NVM reads: 5490
+NVM writes: 591
+Weighted access cost: 270277.00
+Policy decisions: 6065
+Total decision time: 20.136986s
+Avg decision time: 3.320196 ms
+Candidate filter decisions: 6065
+Candidate B_t range: 8..8
+Retained K_t range: 8..8
+Avg candidate filter time: 0.079533 ms
+ended_unix=1785058049.4825454
+exit_code=0

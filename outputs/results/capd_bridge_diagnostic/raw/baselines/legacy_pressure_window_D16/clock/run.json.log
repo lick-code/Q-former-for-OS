@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/legacy_current_selector_D16_B16K8/resolved_config.json --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/legacy_pressure_window_D16/clock/run.json
+started_unix=1785058796.647392
+Policy: clock
+Total accesses: 200000
+Hits: 191047
+Misses: 8953
+Hit rate: 95.52%
+Migrations: 8937
+NVM reads: 8379
+NVM writes: 574
+Weighted access cost: 301767.00
+Policy decisions: 8937
+Total decision time: 0.014390s
+Avg decision time: 0.001610 ms
+ended_unix=1785058797.6536329
+exit_code=0

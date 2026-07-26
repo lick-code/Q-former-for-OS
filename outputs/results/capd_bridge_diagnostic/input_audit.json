@@ -1,0 +1,184 @@
+{
+  "bridge_status": "BRIDGE_IMPLEMENTED_UNVERIFIED",
+  "checks": [
+    {
+      "detail": "outputs/results/finals_v3_official/stage6/run_manifest.json",
+      "name": "stage6_manifest_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "STAGE6_VERIFIED",
+      "name": "stage6_verified",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json",
+      "name": "base_config_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "44a24bbe43a14f19162882f7251adae9ef4f4a920781bb1cad567814035f4b40",
+      "name": "base_config_valid",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/real_workload_suite_pressure_manifest.json",
+      "name": "legacy_pressure_window_manifest_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv",
+      "name": "legacy_pressure_window_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "270000 / 270000",
+      "name": "legacy_pressure_window_train_record_count",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv",
+      "name": "legacy_pressure_window_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "100000 / 100000",
+      "name": "legacy_pressure_window_valid_record_count",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
+      "name": "legacy_pressure_window_test_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "200000 / 200000",
+      "name": "legacy_pressure_window_test_record_count",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+      "name": "official_recollection_manifest_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "name": "official_recollection_train_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "600000 / 600000",
+      "name": "official_recollection_train_record_count",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv",
+      "name": "official_recollection_valid_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "200000 / 200000",
+      "name": "official_recollection_valid_record_count",
+      "status": "PASS"
+    },
+    {
+      "detail": "dataset/processed/finals_v3_official/streamcluster_pressure/test.csv",
+      "name": "official_recollection_test_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "200000 / 200000",
+      "name": "official_recollection_test_record_count",
+      "status": "PASS"
+    },
+    {
+      "detail": "fbff0c2a683dadb29a1af1afebc361dab404a1e314939f05324f40a437020f63 != 7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+      "name": "bridge_test_traces_are_distinct",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/seed_stability/streamcluster_pressure/seed_3136859/qmap.json",
+      "name": "imported_evidence_00",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/seed_stability/streamcluster_pressure/seed_42/qmap.json",
+      "name": "imported_evidence_01",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/seed_stability/streamcluster_pressure/seed_2026/qmap.json",
+      "name": "imported_evidence_02",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/lru.json",
+      "name": "imported_evidence_03",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/random.json",
+      "name": "imported_evidence_04",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/lfu.json",
+      "name": "imported_evidence_05",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/real_workload_suite_pressure/selected/parsec_streamcluster/clock.json",
+      "name": "imported_evidence_06",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/qmap/seed_3136859.json",
+      "name": "imported_evidence_07",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/qmap/seed_42.json",
+      "name": "imported_evidence_08",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/qmap/seed_2026.json",
+      "name": "imported_evidence_09",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/lru/run.json",
+      "name": "imported_evidence_10",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/lfu/run.json",
+      "name": "imported_evidence_11",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/clock/run.json",
+      "name": "imported_evidence_12",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/random/seed_0.json",
+      "name": "imported_evidence_13",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/random/seed_1.json",
+      "name": "imported_evidence_14",
+      "status": "PASS"
+    },
+    {
+      "detail": "outputs/results/finals_v3_official/stage5_main/raw/streamcluster_pressure/random/seed_2.json",
+      "name": "imported_evidence_15",
+      "status": "PASS"
+    }
+  ],
+  "schema_version": "capd_bridge_input_audit_1",
+  "scientific_role": "post_hoc_diagnostic_not_method_selection",
+  "status": "PASSED",
+  "test_used_for_selection": false
+}

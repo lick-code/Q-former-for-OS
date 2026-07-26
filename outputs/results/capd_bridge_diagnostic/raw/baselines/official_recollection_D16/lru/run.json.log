@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_bridge_diagnostic/raw/baselines/official_recollection_D16/lru/run.json
+started_unix=1785058800.7116718
+Policy: lru
+Total accesses: 200000
+Hits: 195967
+Misses: 4033
+Hit rate: 97.98%
+Migrations: 4017
+NVM reads: 3961
+NVM writes: 72
+Weighted access cost: 244635.00
+Policy decisions: 4017
+Total decision time: 0.001196s
+Avg decision time: 0.000298 ms
+ended_unix=1785058801.6854537
+exit_code=0

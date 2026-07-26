@@ -1,0 +1,159 @@
+{
+  "bridge_variant": {
+    "B": 16,
+    "D": 16,
+    "K": 8,
+    "candidate_mode": "selector_B_to_K",
+    "case_id": "legacy_current_selector_D16_B16K8",
+    "engine": "current_capd_mic_1_0",
+    "only_difference": "enable current B-to-K selector: B changes from 8 to 16",
+    "scientific_role": "post_hoc_diagnostic_not_method_selection",
+    "source_id": "legacy_pressure_window",
+    "source_manifest": "dataset/metadata/real_workload_suite_pressure_manifest.json",
+    "source_manifest_fingerprint": "0dbca33c9ba4eeaae126173e570492e92704664041ff8e10a8e51bc3f1086851",
+    "source_provenance_class": "legacy_published_pressure_window",
+    "test_used_for_selection": false
+  },
+  "candidate": {
+    "pool_size_B": 16,
+    "retained_K": 8,
+    "selector_history_Hc": 256
+  },
+  "contract": {
+    "id": "CAPD-MIC-1.0"
+  },
+  "cost_model": {
+    "dram_read_cost": 1.0,
+    "dram_write_cost": 1.0,
+    "migration_cost": 10.0,
+    "nvm_read_cost": 2.0,
+    "nvm_write_cost": 8.0
+  },
+  "data": {
+    "source_manifest": "dataset/metadata/real_workload_suite_pressure_manifest.json",
+    "split_fingerprints": {
+      "test": "fbff0c2a683dadb29a1af1afebc361dab404a1e314939f05324f40a437020f63",
+      "train": "166a7ad3cdd39449dd0dafe58bf8364184d210e7e8545b5b66538b4de899f032",
+      "valid": "88417a006b9dca4642a3db55eb54098d01de3c36791eb66f1fc45f46622f9bfc"
+    },
+    "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
+    "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv",
+    "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv"
+  },
+  "embedding": {
+    "page": {
+      "max_vocab_size": 100000,
+      "oov": "unk",
+      "shared": true,
+      "unk_index": 0,
+      "vocab_fit": "train_only"
+    },
+    "pc": {
+      "max_vocab_size": 50000,
+      "oov": "unk",
+      "unk_index": 0,
+      "vocab_fit": "train_only"
+    }
+  },
+  "evaluation": {
+    "random_seed": 0
+  },
+  "features": {
+    "lru_direction": "oldest_is_one",
+    "page_state_dim": 4,
+    "residency_scale_Lres": 256,
+    "selector_clip_quantile": 0.99
+  },
+  "history": {
+    "transformer_H": 10
+  },
+  "labels": {
+    "future_lookahead_L": 256,
+    "lambda_d": 1.0,
+    "lambda_q": 1.0,
+    "lambda_w": 4.0,
+    "tail_policy": "drop_incomplete_window"
+  },
+  "loss": {
+    "approx_ndcg_alpha": 10.0
+  },
+  "memory": {
+    "dram_capacity_pages": 16,
+    "nvm_capacity_pages": null
+  },
+  "metrics": {
+    "selector_recall_tie": "any_hit"
+  },
+  "model": {
+    "position_encoding": "sinusoidal"
+  },
+  "outputs": {
+    "checkpoint_root": "outputs/checkpoints/finals_v3_official",
+    "data_audit_root": "dataset/metadata/finals_v3_official/reports",
+    "jsonl_root": "dataset/jsonl/finals_v3_official",
+    "result_root": "outputs/results/finals_v3_official"
+  },
+  "replay": {
+    "dirty_demotion_nvm_write": "none",
+    "dram_initial_state": "empty",
+    "first_touch_accounting": "nvm_access",
+    "initial_residency": "all_trace_pages_in_nvm",
+    "trace_page_backing": "all_trace_pages"
+  },
+  "run": {
+    "bridge_case_id": "legacy_current_selector_D16_B16K8",
+    "bridge_source_id": "legacy_pressure_window",
+    "git_commit": "794365165c2b714477111c9190707e7b2f67a693",
+    "project_root": "/home/likc/Q-former-for-OS",
+    "resolved_config_fingerprint": "3b5b47acc09c184fc9058c43d99538a667213b66ce66ea99f4347df8b4dbabad",
+    "split_fingerprints": {
+      "test": "fbff0c2a683dadb29a1af1afebc361dab404a1e314939f05324f40a437020f63",
+      "train": "166a7ad3cdd39449dd0dafe58bf8364184d210e7e8545b5b66538b4de899f032",
+      "valid": "88417a006b9dca4642a3db55eb54098d01de3c36791eb66f1fc45f46622f9bfc"
+    },
+    "workload": "streamcluster_pressure"
+  },
+  "run_profile": "diagnostic_bridge",
+  "schema_version": "capd_finals_v3_0",
+  "selector": {
+    "behavior_policy": "lru",
+    "epsilon_y": 1e-08,
+    "grid_step": 0.1
+  },
+  "sweep": {
+    "pool_sizes_B": [
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "trace": {
+    "page_shift": 12
+  },
+  "training": {
+    "batch_size": 32,
+    "epochs": 10,
+    "learning_rate": 0.0001,
+    "scope": "per_workload",
+    "seed": 3136859
+  },
+  "validation": {
+    "artifact_class": "diagnostic_only",
+    "data_quality_profile": "configs/finals/capd_bridge_diagnostic_profile.json",
+    "development_fallback": "train_trace_decision_holdout",
+    "guard_accesses": 256,
+    "holdout_fraction": 0.2,
+    "require_data_manifest": false,
+    "rounding": "ceil",
+    "strategy": "independent_valid_trace"
+  },
+  "workloads": {
+    "streamcluster_pressure": {
+      "source_manifest": "dataset/metadata/real_workload_suite_pressure_manifest.json",
+      "test_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_test.csv",
+      "train_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_train.csv",
+      "valid_trace": "dataset/processed/real_workload_suite_pressure/selected/parsec_streamcluster_valid.csv"
+    }
+  }
+}

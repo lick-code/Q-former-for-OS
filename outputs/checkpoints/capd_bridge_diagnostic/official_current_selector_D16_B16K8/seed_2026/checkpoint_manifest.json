@@ -1,0 +1,106 @@
+{
+  "artifact_class": "diagnostic_only",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.6897004634614975,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "8ebfe0ed560613c3f0e7235c44542ac4daa1cf52781ed27d817734583fd54e7c",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "663b6c10ce37ae25aa8372943272efd978b165ecf2cb57b8eb61a208da074221",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "0005772b336ad27438bad978b4260b596e9f117b2fbb4448c990806476b0256a",
+  "command": "qmap/qmap_train.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/capd_bridge_diagnostic/official_current_selector_D16_B16K8/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/capd_bridge_diagnostic/official_current_selector_D16_B16K8/seed_2026 --seed 2026",
+  "config_fingerprint": "2fc55e2b06838a10e5e032a4bfc8298dcd58d273a6c145d35f130542476ce0d5",
+  "config_generation_commit": "794365165c2b714477111c9190707e7b2f67a693",
+  "contract_id": "CAPD-MIC-1.0",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": -0.6825123461145209,
+  "git_commit": "794365165c2b714477111c9190707e7b2f67a693",
+  "jsonl_fingerprints": {
+    "train": "5bf244d57de073541f7cbe09b104efeaa3bf05037b161adb1eed0e42c6146f75",
+    "valid": "e6689c6146cce52465b0894d82c9391066dba20740d0a2b277f13fbfbec7a1b6"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.6106355593670012,
+      "valid_loss": -0.6753795932209681
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.6767958692793481,
+      "valid_loss": -0.6877792789822533
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.6816421883244628,
+      "valid_loss": -0.6888826174868478
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.6821772287105822,
+      "valid_loss": -0.6893893868204147
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.6835980979937047,
+      "valid_loss": -0.6895855535117407
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.6838698498020072,
+      "valid_loss": -0.6893926586896654
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.6826980367971285,
+      "valid_loss": -0.6896343127129569
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.6841223879980223,
+      "valid_loss": -0.6896016671070977
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.6833172942214402,
+      "valid_loss": -0.6893927218422057
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.6825123461145209,
+      "valid_loss": -0.6897004634614975
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "run_profile": "diagnostic_bridge",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 2026,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "47fd040d3f30ccc88ffa2b63a538267be7a593f137c28401982a88aea6249ac1",
+  "source_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+  "source_manifest_fingerprint": null,
+  "split_fingerprints": {
+    "test": "7620aef325310ef88b78b935ed6818bba5f6c0cfdadf624f1f9aad9570ac62d7",
+    "train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "valid": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 69.4672417640686,
+  "training_seed_source": "explicit_cli",
+  "workload_id": "streamcluster_pressure"
+}
