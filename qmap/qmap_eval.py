@@ -16,6 +16,7 @@ the same lightweight feature construction as qmap_generator.py.
 """
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -111,6 +112,12 @@ def build_arg_parser():
       "--stage6_warmup_decisions", type=int, default=20,
       help=("Number of initial policy decisions excluded from stage-6 "
             "latency percentiles."))
+  parser.add_argument(
+      "--bridge_diagnostics", action="store_true",
+      help=(
+          "Record post-hoc QMAP-vs-LRU victim disagreement, bounded next-use "
+          "outcomes, score margins, and victim-sequence identity. This is "
+          "diagnostic evidence only and must not be used for test tuning."))
   parser.add_argument("--ablation", choices=ABLATION_CHOICES, default=None,
                       help=("QMAP ablation variant. Defaults to the checkpoint "
                             "model_args value for --policy qmap."))
@@ -164,7 +171,8 @@ def _process_peak_rss_bytes():
 class ReplayStats(object):
   """Tracks replay metrics."""
 
-  def __init__(self, stage6_profile=False, warmup_decisions=20):
+  def __init__(self, stage6_profile=False, warmup_decisions=20,
+               bridge_diagnostics=False):
     if warmup_decisions < 0:
       raise ValueError("warmup_decisions must be non-negative.")
     self.total_accesses = 0
@@ -187,6 +195,15 @@ class ReplayStats(object):
     self.profile_selector_samples_ms = []
     self.profile_memory = {}
     self.replay_wall_seconds = 0.0
+    self.bridge_diagnostics = bool(bridge_diagnostics)
+    self.bridge_lru_victim_disagreements = 0
+    self.bridge_lru_in_retained_candidates = 0
+    self.bridge_better_next_use = 0
+    self.bridge_worse_next_use = 0
+    self.bridge_equal_next_use = 0
+    self.bridge_distance_advantages = []
+    self.bridge_score_margins = []
+    self.bridge_victim_sequence = hashlib.sha256()
 
   @property
   def hit_rate(self):
@@ -236,6 +253,32 @@ class ReplayStats(object):
         raise ValueError("Component latency must be finite and non-negative.")
       self.profile_component_samples_ms.setdefault(name, []).append(
           value * 1000.0)
+
+  def record_bridge_decision(
+      self, access_index, victim, lru_victim, qmap_next_use,
+      lru_next_use, score_margin, retained_candidates):
+    """Records one diagnostic comparison without affecting replay behavior."""
+    if not self.bridge_diagnostics:
+      return
+    self.bridge_victim_sequence.update(
+        "{}:{}\n".format(int(access_index), int(victim)).encode("ascii"))
+    if lru_victim in retained_candidates:
+      self.bridge_lru_in_retained_candidates += 1
+    if victim != lru_victim:
+      self.bridge_lru_victim_disagreements += 1
+      advantage = int(qmap_next_use) - int(lru_next_use)
+      self.bridge_distance_advantages.append(advantage)
+      if advantage > 0:
+        self.bridge_better_next_use += 1
+      elif advantage < 0:
+        self.bridge_worse_next_use += 1
+      else:
+        self.bridge_equal_next_use += 1
+    if score_margin is not None:
+      score_margin = float(score_margin)
+      if not math.isfinite(score_margin) or score_margin < 0.0:
+        raise ValueError("Bridge score margin must be finite and non-negative.")
+      self.bridge_score_margins.append(score_margin)
 
   @property
   def throughput_accesses_per_second(self):
@@ -300,6 +343,34 @@ class ReplayStats(object):
               for name, values in sorted(components.items())
           },
           "memory": dict(self.profile_memory),
+      }
+    if self.bridge_diagnostics:
+      decisions = int(self.decision_count)
+      disagreements = int(self.bridge_lru_victim_disagreements)
+      result["bridge_diagnostics"] = {
+          "schema_version": "capd_bridge_decision_diagnostics_1",
+          "scientific_role": "post_hoc_diagnostic_not_selection",
+          "test_used_for_selection": False,
+          "decision_count": decisions,
+          "victim_sequence_fingerprint":
+              self.bridge_victim_sequence.hexdigest(),
+          "lru_victim_disagreements": disagreements,
+          "lru_victim_disagreement_rate": (
+              disagreements / float(decisions) if decisions else 0.0),
+          "lru_in_retained_candidates":
+              int(self.bridge_lru_in_retained_candidates),
+          "lru_in_retained_candidates_rate": (
+              self.bridge_lru_in_retained_candidates / float(decisions)
+              if decisions else 0.0),
+          "disagreement_next_use_outcomes": {
+              "qmap_better": int(self.bridge_better_next_use),
+              "qmap_worse": int(self.bridge_worse_next_use),
+              "equal": int(self.bridge_equal_next_use),
+          },
+          "bounded_next_use_distance_advantage":
+              _sample_summary(self.bridge_distance_advantages),
+          "top1_top2_score_margin":
+              _sample_summary(self.bridge_score_margins),
       }
     return result
 
@@ -453,6 +524,15 @@ def choose_victim_lfu(dram_pages, access_frequency, last_access_time):
                         last_access_time.get(page, -1)))
 
 
+def bounded_next_use_distance(trace, access_index, page, lookahead):
+  """Returns next-use distance capped at lookahead+1 for diagnostics."""
+  limit = min(len(trace), int(access_index) + int(lookahead) + 1)
+  for future_index in range(int(access_index) + 1, limit):
+    if trace[future_index]["page"] == page:
+      return future_index - int(access_index)
+  return int(lookahead) + 1
+
+
 def is_learned_policy(policy):
   return policy in ("kleio_lite", "patterns_lite")
 
@@ -485,8 +565,8 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
   expected_holdout_fingerprint = selector_params.get(
       "decision_holdout_fingerprint")
   is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
-  is_v3_official = (
-      is_v3 and config["run_profile"] == finals_config.OFFICIAL_PROFILE)
+  uses_independent_validation = (
+      is_v3 and finals_config.uses_independent_validation(config))
   if is_v3:
     required_checkpoint = (
         "feature_embedder", "extractor", "scorer", "model_args", "seed",
@@ -531,7 +611,7 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
     jsonl_fingerprints = checkpoint.get("jsonl_fingerprints", {})
     if set(jsonl_fingerprints) != {"train", "valid"}:
       raise ValueError("Checkpoint must bind train and valid JSONL.")
-  if is_v3_official:
+  if uses_independent_validation:
     if (selector_params.get("decision_holdout") is not None or
         expected_holdout_fingerprint is not None or
         checkpoint.get("decision_holdout") is not None or
@@ -635,7 +715,7 @@ class QMAPPolicy(object):
   def __init__(self, checkpoint_path, device, history_length, candidate_count,
                lookahead=256, ablation=None, rank_guard=0,
                rank_score_penalty=0.0, config=None, selector_params=None,
-               stage6_profile=False):
+               stage6_profile=False, bridge_diagnostics=False):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
     if candidate_count <= 0:
@@ -661,7 +741,9 @@ class QMAPPolicy(object):
     self._selector_history = None
     self.last_selector_snapshot = None
     self.last_component_timings = {}
+    self.last_score_margin = None
     self._stage6_profile = bool(stage6_profile)
+    self._bridge_diagnostics = bool(bridge_diagnostics)
     self._is_v3 = False
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
@@ -888,6 +970,15 @@ class QMAPPolicy(object):
                 eviction_scores.shape[1], self._rank_score_penalty)],
             dtype=eviction_scores.dtype, device=self._device)
         eviction_scores = eviction_scores - rank_penalties
+      if self._bridge_diagnostics:
+        valid_scores = [
+            float(score) for score, valid in zip(
+                _flat_sequence(eviction_scores[0]), candidate_mask)
+            if valid]
+        valid_scores.sort(reverse=True)
+        self.last_score_margin = (
+            valid_scores[0] - valid_scores[1]
+            if len(valid_scores) >= 2 else 0.0)
       self._profile_end(started, "cross_attention_scorer", timings)
       started = self._profile_start()
       if self._is_v3:
@@ -911,7 +1002,8 @@ def replay(args, finals_replay_config=None):
   max_page = max((item["page"] for item in trace), default=1)
   stats = ReplayStats(
       stage6_profile=getattr(args, "stage6_profile", False),
-      warmup_decisions=getattr(args, "stage6_warmup_decisions", 20))
+      warmup_decisions=getattr(args, "stage6_warmup_decisions", 20),
+      bridge_diagnostics=getattr(args, "bridge_diagnostics", False))
   dram_pages = []
   # DRAM starts empty; every trace page is conceptually backed by unbounded
   # NVM, so a page's first touch is charged as an NVM access.
@@ -944,8 +1036,8 @@ def replay(args, finals_replay_config=None):
           finals_replay_config, selector_params)
       if (finals_replay_config["schema_version"] ==
           finals_config.SCHEMA_VERSION and
-          finals_replay_config["run_profile"] ==
-          finals_config.OFFICIAL_PROFILE):
+          finals_config.uses_independent_validation(
+              finals_replay_config)):
         if (selector_params.get("decision_holdout") is not None or
             selector_params.get("decision_holdout_fingerprint") is not None):
           raise ValueError("Official replay rejects smoke holdout selector.")
@@ -966,7 +1058,8 @@ def replay(args, finals_replay_config=None):
         args.rank_score_penalty,
         config=finals_replay_config,
         selector_params=selector_params,
-        stage6_profile=getattr(args, "stage6_profile", False))
+        stage6_profile=getattr(args, "stage6_profile", False),
+        bridge_diagnostics=getattr(args, "bridge_diagnostics", False))
     qmap_policy.reset_profile_memory()
   elif is_learned_policy(args.policy):
     if args.learned_model is None:
@@ -1056,6 +1149,18 @@ def replay(args, finals_replay_config=None):
           selector_snapshot = qmap_policy.last_selector_snapshot
           if selector_snapshot is not None:
             stats.record_selector(selector_snapshot)
+          if stats.bridge_diagnostics:
+            lru_victim = choose_victim_lru(dram_pages)
+            retained = (
+                selector_snapshot["candidate_pages"]
+                if selector_snapshot is not None else list(dram_pages))
+            stats.record_bridge_decision(
+                access_index, victim, lru_victim,
+                bounded_next_use_distance(
+                    trace, access_index, victim, args.lookahead),
+                bounded_next_use_distance(
+                    trace, access_index, lru_victim, args.lookahead),
+                qmap_policy.last_score_margin, retained)
           qmap_policy.synchronize()
         elapsed_seconds = time.perf_counter() - decision_start
         component_timings = (
@@ -1131,6 +1236,8 @@ def main():
     raise ValueError("--rank_score_penalty must be non-negative.")
   if args.stage6_warmup_decisions < 0:
     raise ValueError("--stage6_warmup_decisions must be non-negative.")
+  if args.bridge_diagnostics and args.policy != "qmap":
+    raise ValueError("--bridge_diagnostics is valid only for policy=qmap.")
   replay_config = apply_replay_finals_config(args)
   stats = replay(args, finals_replay_config=replay_config)
   print_stats(args.policy, stats)
@@ -1195,9 +1302,9 @@ def main():
             if key in replay_selector
         }
         metrics["candidate_coverage_metric_source"] = (
-            "valid_trace" if replay_config.get("run_profile") ==
-            finals_config.OFFICIAL_PROFILE else
-            "train_trace_decision_holdout")
+            "valid_trace"
+            if finals_config.uses_independent_validation(replay_config)
+            else "train_trace_decision_holdout")
       finals_config.write_json(
           os.path.join(output_dir, "resolved_config.json"), replay_config)
     if args.checkpoint:

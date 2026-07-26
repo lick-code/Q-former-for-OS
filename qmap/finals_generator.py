@@ -541,7 +541,7 @@ def fit_selector_and_generate(args):
       "valid_trace": finals_config.fingerprint_file(valid_path),
       "test_trace": finals_config.fingerprint_file(test_path),
   }
-  if is_v3 and config["run_profile"] == finals_config.OFFICIAL_PROFILE:
+  if is_v3 and finals_config.uses_independent_validation(config):
     if config.get("validation", {}).get("require_data_manifest"):
       manifest = finals_data.load_source_manifest(
           config["data"]["source_manifest"], PROJECT_ROOT,

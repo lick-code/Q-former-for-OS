@@ -291,10 +291,10 @@ def _validate_finals_artifacts(config, config_path, selector_path,
   selector_fingerprint = finals_config.selector_fingerprint(selector_params)
   selector_holdout = selector_params.get("decision_holdout")
   holdout_fingerprint = selector_params.get("decision_holdout_fingerprint")
-  is_v3_official = (
+  uses_independent_validation = (
       config["schema_version"] == finals_config.SCHEMA_VERSION and
-      config["run_profile"] == finals_config.OFFICIAL_PROFILE)
-  if is_v3_official:
+      finals_config.uses_independent_validation(config))
+  if uses_independent_validation:
     if selector_holdout is not None or holdout_fingerprint is not None:
       raise ValueError("Official v3 rejects decision-holdout artifacts.")
   else:
@@ -312,18 +312,20 @@ def _validate_finals_artifacts(config, config_path, selector_path,
     metadata = finals_config.load_jsonl_metadata(
         path, config=config, split=split, selector_params=selector_params)
     expected_partition = (
-        "independent_{}_trace".format(split) if is_v3_official else
+        "independent_{}_trace".format(split)
+        if uses_independent_validation else
         "train_trace_decision_holdout")
     if metadata.get("source_partition") != expected_partition:
       raise ValueError("{} JSONL has the wrong source partition.".format(
           split))
     expected_trace_key = (
-        "{}_trace_fingerprint".format(split) if is_v3_official else
+        "{}_trace_fingerprint".format(split)
+        if uses_independent_validation else
         "train_trace_fingerprint")
     if metadata.get("source_trace_fingerprint") != selector_params.get(
         expected_trace_key):
       raise ValueError("{} JSONL source trace mismatch.".format(split))
-    if not is_v3_official:
+    if not uses_independent_validation:
       if metadata.get("decision_holdout_fingerprint") != holdout_fingerprint:
         raise ValueError("{} JSONL decision holdout mismatch.".format(split))
       finals_config.validate_decision_holdout(
@@ -334,7 +336,7 @@ def _validate_finals_artifacts(config, config_path, selector_path,
     if int(metadata.get("sample_count", 0)) <= 0:
       raise ValueError("{} JSONL must contain validation-ready samples.".format(
           split))
-    if not is_v3_official and config["schema_version"] != finals_config.SCHEMA_VERSION:
+    if config["schema_version"] != finals_config.SCHEMA_VERSION:
       expected_count_key = (
           "train_decision_points" if split == "train"
           else "validation_decision_points")

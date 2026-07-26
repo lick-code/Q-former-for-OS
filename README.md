@@ -26,13 +26,21 @@ QMAP-CrossAttn =
 
 ## 当前状态
 
+Stage 6验收后的旧结果—新结果桥接诊断已实现，当前为
+`BRIDGE_IMPLEMENTED_UNVERIFIED`。它用5个streamcluster锚点逐项拆分
+旧/新流水线、候选selector、trace来源和DRAM容量的影响；33-job矩阵
+尚待服务器执行。该诊断不覆盖`STAGE6_VERIFIED`，也不得用于test调参。
+协议与服务器命令见
+`docs/CAPD_BRIDGE_DIAGNOSTIC_CN.md`。
+
 当前正式 CAPD-MIC-1.0 实验主线以
-`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 为准：Stage 0—5
-已经验收，Stage 5 manifest为 `STAGE5_VERIFIED`（348/348 required
-jobs）；当前正在进行 Stage 6 的稳健性、开销与系统验证。Stage 6
-协议和105-job正式矩阵已经实现并冻结，但GPU开销测量与高容量重训练
-尚未完成，因此状态为 `STAGE6_IMPLEMENTED_UNVERIFIED`，不能提前形成
-Stage 6性能结论。
+`docs/CAPD_METHOD_IMPLEMENTATION_CONTRACT_CN.md` 为准：Stage 0—6
+均已通过服务器验收。Stage 5 manifest为 `STAGE5_VERIFIED`
+（348/348 required jobs）；Stage 6 manifest为 `STAGE6_VERIFIED`
+（105/105 required jobs）。Stage 6 的GPU开销测量、`D=128/256`
+高容量重训练与公平回放、成本权重和自然读写比例汇总均已完成。
+真实混合内存平台未提供，按预注册协议记录为
+`CONDITIONAL_NOT_RUN`，软件测量没有被重标为硬件实测。
 
 已经完成：
 

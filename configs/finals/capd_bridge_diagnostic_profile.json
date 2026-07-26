@@ -1,0 +1,23 @@
+{
+  "profile_id": "capd_bridge_diagnostic_v1",
+  "status": "DIAGNOSTIC_ONLY",
+  "scientific_role": "post_hoc_diagnostic_not_method_selection",
+  "workload": "streamcluster_pressure",
+  "sources": [
+    "legacy_pressure_window",
+    "official_recollection"
+  ],
+  "factors": [
+    "engine_and_pipeline",
+    "candidate_selector",
+    "trace_source",
+    "dram_capacity_and_feasible_pool"
+  ],
+  "test_used_for_selection": false,
+  "eligible_for_official_stage6_replacement": false,
+  "notes": [
+    "Independent train and valid traces are retained.",
+    "Test replay is final diagnostic measurement only.",
+    "Results must remain separate from the Stage-6 official matrix."
+  ]
+}

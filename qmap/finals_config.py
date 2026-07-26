@@ -21,6 +21,7 @@ LEGACY_SCHEMA_VERSION = "capd_finals_v2_1"
 CONTRACT_ID = "CAPD-MIC-1.0"
 OFFICIAL_PROFILE = "official"
 SMOKE_PROFILE = "smoke"
+DIAGNOSTIC_PROFILE = "diagnostic_bridge"
 STAGE5_VARIANT_FAMILIES = ("ablation", "sensitivity")
 STAGE6_VARIANT_FAMILIES = ("capacity_robustness",)
 LEGACY_CONTRACT_FIELDS = (
@@ -282,6 +283,14 @@ def _requires_data_manifest(config):
       config.get("validation", {}).get("require_data_manifest") is True)
 
 
+def uses_independent_validation(config):
+  """Whether train and validation artifacts come from independent traces."""
+  return (
+      config.get("schema_version") == SCHEMA_VERSION and
+      config.get("run_profile") in (
+          OFFICIAL_PROFILE, DIAGNOSTIC_PROFILE))
+
+
 def _bind_resolved_data_manifest(config, project_root=None,
                                  verify_manifest_files=True):
   """Verifies and binds a PASSED source manifest into a resolved config."""
@@ -332,8 +341,10 @@ def _validate_v3_config(config, require_resolved=False):
     raise ValueError("CAPD v3 requires contract.id={}.".format(CONTRACT_ID))
 
   profile = config["run_profile"]
-  if profile not in (OFFICIAL_PROFILE, SMOKE_PROFILE):
-    raise ValueError("run_profile must be official or smoke.")
+  if profile not in (
+      OFFICIAL_PROFILE, SMOKE_PROFILE, DIAGNOSTIC_PROFILE):
+    raise ValueError(
+        "run_profile must be official, smoke, or diagnostic_bridge.")
   dram_capacity = int(config["memory"]["dram_capacity_pages"])
   pool_size = int(config["candidate"]["pool_size_B"])
   retained = int(config["candidate"]["retained_K"])
@@ -380,11 +391,22 @@ def _validate_v3_config(config, require_resolved=False):
     raise ValueError("CAPD v3 requires a data quality profile path.")
   if validation["development_fallback"] != "train_trace_decision_holdout":
     raise ValueError("CAPD v3 must retain the named development fallback.")
-  if profile == OFFICIAL_PROFILE:
+  if uses_independent_validation(config):
     if validation["strategy"] != "independent_valid_trace":
-      raise ValueError("Official v3 requires independent_valid_trace.")
-    if validation.get("artifact_class") != "official":
-      raise ValueError("Official v3 artifacts must use artifact_class=official.")
+      raise ValueError(
+          "Independent-validation v3 profiles require "
+          "independent_valid_trace.")
+    expected_artifact_class = (
+        "official" if profile == OFFICIAL_PROFILE else "diagnostic_only")
+    if validation.get("artifact_class") != expected_artifact_class:
+      raise ValueError(
+          "{} v3 artifacts must use artifact_class={}.".format(
+              profile, expected_artifact_class))
+    if (profile == DIAGNOSTIC_PROFILE and
+        validation["require_data_manifest"] is not False):
+      raise ValueError(
+          "diagnostic_bridge must not masquerade as manifest-bound official "
+          "evidence.")
   else:
     if validation["strategy"] != "train_trace_decision_holdout":
       raise ValueError("Smoke v3 requires train_trace_decision_holdout.")
@@ -459,7 +481,8 @@ def _validate_v3_config(config, require_resolved=False):
     if sorted(config.get("sweep", {}).get("pool_sizes_B", [])) != [8, 16, 32, 64]:
       raise ValueError("Official v3 sweep must be B={8,16,32,64}.")
   elif config["model"]["position_encoding"] != "sinusoidal":
-    raise ValueError("Smoke v3 requires sinusoidal position encoding.")
+    raise ValueError(
+        "Non-official v3 requires sinusoidal position encoding.")
   elif float(labels.get("lambda_w", -1)) != 4.0:
     raise ValueError("Smoke v3 requires label weights 1,1,4.")
   if pool_size not in config.get("sweep", {}).get("pool_sizes_B", [pool_size]):
@@ -866,7 +889,7 @@ def validate_result_contract(config, result, selector_params=None,
              for name in metric_names):
         raise ValueError("QMAP result/selector coverage metric mismatch.")
       expected_source = (
-          "valid_trace" if config["run_profile"] == OFFICIAL_PROFILE else
+          "valid_trace" if uses_independent_validation(config) else
           "train_trace_decision_holdout")
       if result.get("candidate_coverage_metric_source") != expected_source:
         raise ValueError(
