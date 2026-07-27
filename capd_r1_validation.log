@@ -1,0 +1,194 @@
+[START] input_audit 2026-07-27T03:55:08Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage audit-inputs
+[START] input_audit 2026-07-27T03:55:08Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage audit-inputs
+[R1] input_audit status=R1_READY checks=7
+[END] input_audit 2026-07-27T03:55:08Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/input_audit.log
+[START] targeted_pytest 2026-07-27T03:55:08Z
+[COMMAND] python3 -m pytest -q -p no:cacheprovider tests/test_capd_r1_plan.py tests/test_capd_r1_results.py
+[START] targeted_pytest 2026-07-27T03:55:08Z
+[COMMAND] python3 -m pytest -q -p no:cacheprovider tests/test_capd_r1_plan.py tests/test_capd_r1_results.py
+.......                                                                  [100%]
+7 passed in 0.19s
+[END] targeted_pytest 2026-07-27T03:55:08Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/targeted_pytest.log
+[START] mini_e2e 2026-07-27T03:55:08Z
+[COMMAND] env CAPD_R1_E2E=1 python3 -m pytest -q -p no:cacheprovider tests/test_capd_r1_end_to_end.py::R1MiniEndToEndTest
+[START] mini_e2e 2026-07-27T03:55:08Z
+[COMMAND] env CAPD_R1_E2E=1 python3 -m pytest -q -p no:cacheprovider tests/test_capd_r1_end_to_end.py::R1MiniEndToEndTest
+.                                                                        [100%]
+1 passed in 2.10s
+[END] mini_e2e 2026-07-27T03:55:11Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/mini_e2e.log
+[START] full_pytest 2026-07-27T03:55:11Z
+[COMMAND] python3 -m pytest -q -p no:cacheprovider
+[START] full_pytest 2026-07-27T03:55:11Z
+[COMMAND] python3 -m pytest -q -p no:cacheprovider
+...............s............s........s.......ss......................... [ 34%]
+..........................................................sss........... [ 69%]
+s......................s......................................           [100%]
+196 passed, 10 skipped in 29.46s
+[END] full_pytest 2026-07-27T03:55:41Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/full_pytest.log
+[START] execution_plan 2026-07-27T03:55:41Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage plan
+[START] execution_plan 2026-07-27T03:55:41Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage plan
+[R1] plan required_jobs=45 counts={'data': 9, 'oracle': 9, 'opportunity': 9, 'baseline': 18}
+r1:data:canneal:pressure_D16 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:canneal:pressure_D16
+r1:oracle:canneal:pressure_D16 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D16/oracle.json
+r1:opportunity:canneal:pressure_D16 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D16/opportunity_audit.json
+r1:baseline:canneal:pressure_D16:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D16/lru.json
+r1:baseline:canneal:pressure_D16:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D16/clock.json
+r1:data:canneal:pressure_D32 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:canneal:pressure_D32
+r1:oracle:canneal:pressure_D32 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D32/oracle.json
+r1:opportunity:canneal:pressure_D32 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D32/opportunity_audit.json
+r1:baseline:canneal:pressure_D32:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D32/lru.json
+r1:baseline:canneal:pressure_D32:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D32/clock.json
+r1:data:canneal:pressure_D64 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:canneal:pressure_D64
+r1:oracle:canneal:pressure_D64 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D64/oracle.json
+r1:opportunity:canneal:pressure_D64 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D64/opportunity_audit.json
+r1:baseline:canneal:pressure_D64:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D64/lru.json
+r1:baseline:canneal:pressure_D64:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/canneal/pressure_D64/clock.json
+r1:data:streamcluster_pressure:pressure_D16 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:streamcluster_pressure:pressure_D16
+r1:oracle:streamcluster_pressure:pressure_D16 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D16/oracle.json
+r1:opportunity:streamcluster_pressure:pressure_D16 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D16/opportunity_audit.json
+r1:baseline:streamcluster_pressure:pressure_D16:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D16/lru.json
+r1:baseline:streamcluster_pressure:pressure_D16:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D16/clock.json
+r1:data:streamcluster_pressure:pressure_D32 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:streamcluster_pressure:pressure_D32
+r1:oracle:streamcluster_pressure:pressure_D32 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D32/oracle.json
+r1:opportunity:streamcluster_pressure:pressure_D32 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D32/opportunity_audit.json
+r1:baseline:streamcluster_pressure:pressure_D32:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D32/lru.json
+r1:baseline:streamcluster_pressure:pressure_D32:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D32/clock.json
+r1:data:streamcluster_pressure:pressure_D64 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:streamcluster_pressure:pressure_D64
+r1:oracle:streamcluster_pressure:pressure_D64 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D64/oracle.json
+r1:opportunity:streamcluster_pressure:pressure_D64 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D64/opportunity_audit.json
+r1:baseline:streamcluster_pressure:pressure_D64:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D64/lru.json
+r1:baseline:streamcluster_pressure:pressure_D64:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/streamcluster_pressure/pressure_D64/clock.json
+r1:data:dedup_pressure:pressure_D16 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:dedup_pressure:pressure_D16
+r1:oracle:dedup_pressure:pressure_D16 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D16/oracle.json
+r1:opportunity:dedup_pressure:pressure_D16 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D16/opportunity_audit.json
+r1:baseline:dedup_pressure:pressure_D16:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D16/lru.json
+r1:baseline:dedup_pressure:pressure_D16:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D16/clock.json
+r1:data:dedup_pressure:pressure_D32 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:dedup_pressure:pressure_D32
+r1:oracle:dedup_pressure:pressure_D32 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D32/oracle.json
+r1:opportunity:dedup_pressure:pressure_D32 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D32/opportunity_audit.json
+r1:baseline:dedup_pressure:pressure_D32:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D32/lru.json
+r1:baseline:dedup_pressure:pressure_D32:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D32/clock.json
+r1:data:dedup_pressure:pressure_D64 python3 scripts/run_capd_r1.py --stage run --job-id r1:data:dedup_pressure:pressure_D64
+r1:oracle:dedup_pressure:pressure_D64 python3 qmap/pressure_oracle.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D64/oracle.json
+r1:opportunity:dedup_pressure:pressure_D64 python3 qmap/pressure_headroom.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/resolved_config.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/selector_params.json --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D64/opportunity_audit.json
+r1:baseline:dedup_pressure:pressure_D64:lru python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/resolved_config.json --evaluation_split valid --policy lru --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D64/lru.json
+r1:baseline:dedup_pressure:pressure_D64:clock python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D64/clock.json
+[END] execution_plan 2026-07-27T03:55:41Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/execution_plan.log
+[START] r1_compute 2026-07-27T03:55:41Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage run --execute
+[START] r1_compute 2026-07-27T03:55:41Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage run --execute
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/canneal/generator_summary.json
+[COMPLETED] r1:data:canneal:pressure_D16
+[COMPLETED] r1:oracle:canneal:pressure_D16
+[COMPLETED] r1:opportunity:canneal:pressure_D16
+[COMPLETED] r1:baseline:canneal:pressure_D16:lru
+[COMPLETED] r1:baseline:canneal:pressure_D16:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/canneal/generator_summary.json
+[COMPLETED] r1:data:canneal:pressure_D32
+[COMPLETED] r1:oracle:canneal:pressure_D32
+[COMPLETED] r1:opportunity:canneal:pressure_D32
+[COMPLETED] r1:baseline:canneal:pressure_D32:lru
+[COMPLETED] r1:baseline:canneal:pressure_D32:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/canneal/generator_summary.json
+[COMPLETED] r1:data:canneal:pressure_D64
+[COMPLETED] r1:oracle:canneal:pressure_D64
+[COMPLETED] r1:opportunity:canneal:pressure_D64
+[COMPLETED] r1:baseline:canneal:pressure_D64:lru
+[COMPLETED] r1:baseline:canneal:pressure_D64:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/streamcluster_pressure/generator_summary.json
+[COMPLETED] r1:data:streamcluster_pressure:pressure_D16
+[COMPLETED] r1:oracle:streamcluster_pressure:pressure_D16
+[COMPLETED] r1:opportunity:streamcluster_pressure:pressure_D16
+[COMPLETED] r1:baseline:streamcluster_pressure:pressure_D16:lru
+[COMPLETED] r1:baseline:streamcluster_pressure:pressure_D16:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/streamcluster_pressure/generator_summary.json
+[COMPLETED] r1:data:streamcluster_pressure:pressure_D32
+[COMPLETED] r1:oracle:streamcluster_pressure:pressure_D32
+[COMPLETED] r1:opportunity:streamcluster_pressure:pressure_D32
+[COMPLETED] r1:baseline:streamcluster_pressure:pressure_D32:lru
+[COMPLETED] r1:baseline:streamcluster_pressure:pressure_D32:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/streamcluster_pressure/generator_summary.json
+[COMPLETED] r1:data:streamcluster_pressure:pressure_D64
+[COMPLETED] r1:oracle:streamcluster_pressure:pressure_D64
+[COMPLETED] r1:opportunity:streamcluster_pressure:pressure_D64
+[COMPLETED] r1:baseline:streamcluster_pressure:pressure_D64:lru
+[COMPLETED] r1:baseline:streamcluster_pressure:pressure_D64:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D16/dedup_pressure/generator_summary.json
+[COMPLETED] r1:data:dedup_pressure:pressure_D16
+[COMPLETED] r1:oracle:dedup_pressure:pressure_D16
+[COMPLETED] r1:opportunity:dedup_pressure:pressure_D16
+[COMPLETED] r1:baseline:dedup_pressure:pressure_D16:lru
+[COMPLETED] r1:baseline:dedup_pressure:pressure_D16:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/generator_summary.json
+[COMPLETED] r1:data:dedup_pressure:pressure_D32
+[COMPLETED] r1:oracle:dedup_pressure:pressure_D32
+[COMPLETED] r1:opportunity:dedup_pressure:pressure_D32
+[COMPLETED] r1:baseline:dedup_pressure:pressure_D32:lru
+[COMPLETED] r1:baseline:dedup_pressure:pressure_D32:clock
+[done] selector=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/selector_params.json
+[done] train_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/train.jsonl
+[done] valid_jsonl=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/valid.jsonl
+[done] summary=/home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D64/dedup_pressure/generator_summary.json
+[COMPLETED] r1:data:dedup_pressure:pressure_D64
+[COMPLETED] r1:oracle:dedup_pressure:pressure_D64
+[COMPLETED] r1:opportunity:dedup_pressure:pressure_D64
+[COMPLETED] r1:baseline:dedup_pressure:pressure_D64:lru
+[COMPLETED] r1:baseline:dedup_pressure:pressure_D64:clock
+[END] r1_compute 2026-07-27T04:03:43Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/r1_compute.log
+[START] r1_summarize 2026-07-27T04:03:43Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage summarize
+[START] r1_summarize 2026-07-27T04:03:43Z
+[COMMAND] python3 scripts/run_capd_r1.py --stage summarize
+[R1] status=R1_IMPLEMENTED_UNVERIFIED completed=45/45
+[END] r1_summarize 2026-07-27T04:03:44Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/r1_summarize.log
+[START] provenance_check 2026-07-27T04:03:44Z
+[COMMAND] python3 -c $'\nimport json\np=\'outputs/results/capd_r1_pressure_headroom/run_manifest.json\'\nd=json.load(open(p, encoding=\'utf-8\'))\nassert d[\'status\']==\'R1_IMPLEMENTED_UNVERIFIED\'\nassert d[\'required_jobs\']==d[\'completed_required_jobs\']==45\nassert d[\'job_counts\']=={\n    \'data\':9,\'oracle\':9,\'opportunity\':9,\'baseline\':18}\nassert d[\'result_row_count\']==9\nassert d[\'training_jobs\']==0\nassert d[\'stage6_status\']==\'STAGE6_VERIFIED\'\nassert d[\'bridge_status\']==\'BRIDGE_DIAGNOSTIC_COMPLETED\'\nassert d[\'o3_status\']==\'O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT\'\nassert d[\'method_selection_performed\'] is False\nassert d[\'bridge_test_used_for_selection\'] is False\nassert d[\'test_trace_opened\'] is False\nassert d[\'test_used_for_selection\'] is False\nassert d[\'method_contract_changed\'] is False\nassert d[\'official_stage6_replaced\'] is False\n'
+[START] provenance_check 2026-07-27T04:03:44Z
+[COMMAND] python3 -c $'\nimport json\np=\'outputs/results/capd_r1_pressure_headroom/run_manifest.json\'\nd=json.load(open(p, encoding=\'utf-8\'))\nassert d[\'status\']==\'R1_IMPLEMENTED_UNVERIFIED\'\nassert d[\'required_jobs\']==d[\'completed_required_jobs\']==45\nassert d[\'job_counts\']=={\n    \'data\':9,\'oracle\':9,\'opportunity\':9,\'baseline\':18}\nassert d[\'result_row_count\']==9\nassert d[\'training_jobs\']==0\nassert d[\'stage6_status\']==\'STAGE6_VERIFIED\'\nassert d[\'bridge_status\']==\'BRIDGE_DIAGNOSTIC_COMPLETED\'\nassert d[\'o3_status\']==\'O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT\'\nassert d[\'method_selection_performed\'] is False\nassert d[\'bridge_test_used_for_selection\'] is False\nassert d[\'test_trace_opened\'] is False\nassert d[\'test_used_for_selection\'] is False\nassert d[\'method_contract_changed\'] is False\nassert d[\'official_stage6_replaced\'] is False\n'
+[END] provenance_check 2026-07-27T04:03:44Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/provenance_check.log
+[START] upstream_immutability 2026-07-27T04:03:44Z
+[COMMAND] python3 -c $'\nimport json\ns6=json.load(open(\n    \'outputs/results/finals_v3_official/stage6/run_manifest.json\',\n    encoding=\'utf-8\'))\nbridge=json.load(open(\n    \'outputs/results/capd_bridge_diagnostic/run_manifest.json\',\n    encoding=\'utf-8\'))\no3=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o3/run_manifest.json\',\n    encoding=\'utf-8\'))\nassert s6[\'status\']==\'STAGE6_VERIFIED\'\nassert s6[\'required_jobs\']==s6[\'completed_required_jobs\']==105\nassert bridge[\'status\']==\'BRIDGE_DIAGNOSTIC_COMPLETED\'\nassert bridge[\'required_jobs\']==bridge[\'completed_required_jobs\']==33\nassert o3[\'status\']==\'O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT\'\n'
+[START] upstream_immutability 2026-07-27T04:03:44Z
+[COMMAND] python3 -c $'\nimport json\ns6=json.load(open(\n    \'outputs/results/finals_v3_official/stage6/run_manifest.json\',\n    encoding=\'utf-8\'))\nbridge=json.load(open(\n    \'outputs/results/capd_bridge_diagnostic/run_manifest.json\',\n    encoding=\'utf-8\'))\no3=json.load(open(\n    \'outputs/results/capd_post_stage6_optimization/o3/run_manifest.json\',\n    encoding=\'utf-8\'))\nassert s6[\'status\']==\'STAGE6_VERIFIED\'\nassert s6[\'required_jobs\']==s6[\'completed_required_jobs\']==105\nassert bridge[\'status\']==\'BRIDGE_DIAGNOSTIC_COMPLETED\'\nassert bridge[\'required_jobs\']==bridge[\'completed_required_jobs\']==33\nassert o3[\'status\']==\'O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT\'\n'
+[END] upstream_immutability 2026-07-27T04:03:44Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/upstream_immutability.log
+[START] diff_check 2026-07-27T04:03:44Z
+[COMMAND] git diff --check
+[START] diff_check 2026-07-27T04:03:44Z
+[COMMAND] git diff --check
+[END] diff_check 2026-07-27T04:03:44Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/diff_check.log
+[START] finalize_verified 2026-07-27T04:03:44Z
+[COMMAND] python3 -c $'\nimport json,os,tempfile\np=\'outputs/results/capd_r1_pressure_headroom/run_manifest.json\'\nd=json.load(open(p, encoding=\'utf-8\'))\nd[\'status\']=\'R1_PRESSURE_HEADROOM_VERIFIED\'\nd[\'verified_by\']=\'scripts/validate_capd_r1_server.sh\'\nfd,t=tempfile.mkstemp(prefix=\'.r1-\',suffix=\'.json\',dir=os.path.dirname(p))\nf=os.fdopen(fd,\'w\',encoding=\'utf-8\')\njson.dump(d,f,ensure_ascii=False,indent=2,sort_keys=True)\nf.write(\'\\n\')\nf.close()\nos.replace(t,p)\n'
+[START] finalize_verified 2026-07-27T04:03:44Z
+[COMMAND] python3 -c $'\nimport json,os,tempfile\np=\'outputs/results/capd_r1_pressure_headroom/run_manifest.json\'\nd=json.load(open(p, encoding=\'utf-8\'))\nd[\'status\']=\'R1_PRESSURE_HEADROOM_VERIFIED\'\nd[\'verified_by\']=\'scripts/validate_capd_r1_server.sh\'\nfd,t=tempfile.mkstemp(prefix=\'.r1-\',suffix=\'.json\',dir=os.path.dirname(p))\nf=os.fdopen(fd,\'w\',encoding=\'utf-8\')\njson.dump(d,f,ensure_ascii=False,indent=2,sort_keys=True)\nf.write(\'\\n\')\nf.close()\nos.replace(t,p)\n'
+[END] finalize_verified 2026-07-27T04:03:44Z exit_code=0 log=/tmp/capd-r1.7ywXiS/logs/finalize_verified.log
+[INFO] acceptance evidence: /tmp/capd-r1.7ywXiS
+[FINAL] R1_PRESSURE_HEADROOM_VERIFIED

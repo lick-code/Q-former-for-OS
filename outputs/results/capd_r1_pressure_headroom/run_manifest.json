@@ -1,0 +1,28 @@
+{
+  "bridge_status": "BRIDGE_DIAGNOSTIC_COMPLETED",
+  "bridge_test_used_for_selection": false,
+  "completed_required_jobs": 45,
+  "job_counts": {
+    "baseline": 18,
+    "data": 9,
+    "opportunity": 9,
+    "oracle": 9
+  },
+  "method_contract_changed": false,
+  "method_selection_performed": false,
+  "o3_status": "O3_CONFIGURATIONS_LOCKED_AWAITING_FRESH_HOLDOUT",
+  "official_stage6_replaced": false,
+  "pressure_point_count": 3,
+  "profile_id": "capd_r1_pressure_headroom_v1",
+  "required_jobs": 45,
+  "result_row_count": 9,
+  "schema_version": "capd_r1_run_manifest_1",
+  "stage6_status": "STAGE6_VERIFIED",
+  "status": "R1_PRESSURE_HEADROOM_VERIFIED",
+  "summary_fingerprint": "1cda7fea0ce611adee074407caa87af023014b74127e89743356ac3ea760ae5e",
+  "test_trace_opened": false,
+  "test_used_for_selection": false,
+  "training_jobs": 0,
+  "verified_by": "scripts/validate_capd_r1_server.sh",
+  "workload_count": 3
+}

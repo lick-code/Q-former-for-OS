@@ -1,0 +1,16 @@
+command=/home/likc/.conda/envs/capd/bin/python3 qmap/qmap_eval.py --config /home/likc/Q-former-for-OS/dataset/jsonl/capd_r1_pressure_headroom/pressure_D32/dedup_pressure/resolved_config.json --evaluation_split valid --policy clock --json_output /home/likc/Q-former-for-OS/outputs/results/capd_r1_pressure_headroom/raw/dedup_pressure/pressure_D32/clock.json
+started_unix=1785124947.996441
+Policy: clock
+Total accesses: 1000000
+Hits: 997182
+Misses: 2818
+Hit rate: 99.72%
+Migrations: 2786
+NVM reads: 1581
+NVM writes: 1237
+Weighted access cost: 1038100.00
+Policy decisions: 2786
+Total decision time: 0.003843s
+Avg decision time: 0.001379 ms
+ended_unix=1785124952.4472349
+exit_code=0
