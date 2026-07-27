@@ -1,0 +1,59 @@
+{
+  "bridge_test_used_for_selection": false,
+  "checks": [
+    {
+      "detail": "Manifest accepted.",
+      "name": "stage6",
+      "path": "outputs/results/finals_v3_official/stage6/run_manifest.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "Manifest accepted.",
+      "name": "bridge",
+      "path": "outputs/results/capd_bridge_diagnostic/run_manifest.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "Manifest accepted.",
+      "name": "o3_lock",
+      "path": "outputs/results/capd_post_stage6_optimization/o3/run_manifest.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "O3 remains frozen and does not replace Stage 6.",
+      "name": "o3_method_contract",
+      "path": "outputs/results/capd_post_stage6_optimization/o3/run_manifest.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "Official train/valid paths and split fingerprints accepted; test rows were not opened.",
+      "name": "base_config_canneal",
+      "path": "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "Official train/valid paths and split fingerprints accepted; test rows were not opened.",
+      "name": "base_config_streamcluster_pressure",
+      "path": "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json",
+      "status": "PASSED"
+    },
+    {
+      "detail": "Official train/valid paths and split fingerprints accepted; test rows were not opened.",
+      "name": "base_config_dedup_pressure",
+      "path": "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json",
+      "status": "PASSED"
+    }
+  ],
+  "eligible_to_execute_R1": true,
+  "failed_checks": 0,
+  "method_contract_changed": false,
+  "method_selection_performed": false,
+  "official_stage6_replaced": false,
+  "pressure_point_count": 3,
+  "profile_id": "capd_r1_pressure_headroom_v1",
+  "schema_version": "capd_r1_input_audit_1",
+  "status": "R1_READY",
+  "test_trace_opened": false,
+  "test_used_for_selection": false,
+  "workload_count": 3
+}

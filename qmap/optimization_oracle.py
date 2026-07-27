@@ -137,7 +137,6 @@ def replay_validation(config, selector_params):
       "selector_fingerprint":
           finals_config.selector_fingerprint(selector_params),
       "experiment_contract": finals_config.contract_from_config(config),
-      "optimization_variant": dict(config["optimization_variant"]),
       "oracle_decisions": oracle_decisions,
       "oracle_lru_disagreements": oracle_lru_disagreements,
       "oracle_lru_disagreement_rate": (
@@ -152,6 +151,10 @@ def replay_validation(config, selector_params):
       "method_contract_changed": False,
       "cost_model": dict(config["cost_model"]),
   })
+  if config.get("optimization_variant") is not None:
+    result["optimization_variant"] = dict(config["optimization_variant"])
+  if config.get("pressure_variant") is not None:
+    result["pressure_variant"] = dict(config["pressure_variant"])
   return result
 
 

@@ -1,0 +1,1560 @@
+{
+  "allowed_splits": [
+    "train",
+    "valid"
+  ],
+  "bridge_test_used_for_selection": false,
+  "code_commit": "6e04a248280ea829ea40d62e332b787f29d38585",
+  "code_fingerprint": "009b4c24a529ba29f0cab6896388fd7302854d1b46c39c35b2af74fd12e4ffc0",
+  "forbidden_splits": [
+    "test",
+    "fresh_holdout"
+  ],
+  "job_counts": {
+    "baseline": 18,
+    "data": 9,
+    "opportunity": 9,
+    "oracle": 9
+  },
+  "jobs": [
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:canneal:pressure_D16"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:canneal:pressure_D16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "f86f286d89d714dcb94c4939829384e0c70db067ad05a26e16a8bb9f18b683e6",
+      "job_id": "r1:data:canneal:pressure_D16",
+      "kind": "data",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\oracle.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\oracle.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D16": "f86f286d89d714dcb94c4939829384e0c70db067ad05a26e16a8bb9f18b683e6"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "d687df539868860d14605cb4dbdbaefaa5537d6082025e76cb3ec39602417a4c",
+      "job_id": "r1:oracle:canneal:pressure_D16",
+      "kind": "oracle",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D16": "f86f286d89d714dcb94c4939829384e0c70db067ad05a26e16a8bb9f18b683e6"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "fd43b1f45dec34750899fb9239efbd0e08b2d9a17cf8920283cc0885306bf53a",
+      "job_id": "r1:opportunity:canneal:pressure_D16",
+      "kind": "opportunity",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\opportunity_audit.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\lru.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\lru.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D16": "f86f286d89d714dcb94c4939829384e0c70db067ad05a26e16a8bb9f18b683e6"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "70531f19de9d4fa839abbdef75d19006f80b73d2dbc91559fad139ca1809fbc1",
+      "job_id": "r1:baseline:canneal:pressure_D16:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\lru.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\clock.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\canneal\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\clock.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D16": "f86f286d89d714dcb94c4939829384e0c70db067ad05a26e16a8bb9f18b683e6"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "b50d72bf2f0fd259137e63b8bb303de421d428196a706d03062364cadffc6a7d",
+      "job_id": "r1:baseline:canneal:pressure_D16:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D16\\clock.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:canneal:pressure_D32"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:canneal:pressure_D32",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "7ae15067da1db341db9bdaa778cf51f95d55e171260088db5a3a60dd1d0cbdee",
+      "job_id": "r1:data:canneal:pressure_D32",
+      "kind": "data",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\oracle.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\oracle.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D32": "7ae15067da1db341db9bdaa778cf51f95d55e171260088db5a3a60dd1d0cbdee"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "beb10668178d23d4b042fb0e3f4709d55118d880f2dd80ad4f636043b09c610e",
+      "job_id": "r1:oracle:canneal:pressure_D32",
+      "kind": "oracle",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D32": "7ae15067da1db341db9bdaa778cf51f95d55e171260088db5a3a60dd1d0cbdee"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "6fc3acdea64b439e99aef10c41ebd2392e41c5ced9c1bf748cc7a7b3fdbe6ec4",
+      "job_id": "r1:opportunity:canneal:pressure_D32",
+      "kind": "opportunity",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\opportunity_audit.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\lru.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\lru.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D32": "7ae15067da1db341db9bdaa778cf51f95d55e171260088db5a3a60dd1d0cbdee"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "76068da3e2d6b2a5c3fe194a41d35f6cb40d53bfc9764c24f1dd03d8f8f9edc0",
+      "job_id": "r1:baseline:canneal:pressure_D32:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\lru.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\clock.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\canneal\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\clock.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D32": "7ae15067da1db341db9bdaa778cf51f95d55e171260088db5a3a60dd1d0cbdee"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "b539e614bdc48b95e640824d659ecd815668d4a9dc392cb9ee2a0638348990b7",
+      "job_id": "r1:baseline:canneal:pressure_D32:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D32\\clock.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:canneal:pressure_D64"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:canneal:pressure_D64",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/canneal/B64/resolved_config.json": "a0c188ee7382724f112a1498976f80e84276312a2b692805c1056649a16c6aa8"
+      },
+      "job_fingerprint": "91d56effc87d2834a2a2d992b50f99dfda0d628ab90598acca986b55b2e529da",
+      "job_id": "r1:data:canneal:pressure_D64",
+      "kind": "data",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\variant_manifest.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\oracle.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\oracle.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D64": "91d56effc87d2834a2a2d992b50f99dfda0d628ab90598acca986b55b2e529da"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "754033778ca6dd53127ccc5f05b6ef7fef1716c95224ee8aefee9a09d56bf957",
+      "job_id": "r1:oracle:canneal:pressure_D64",
+      "kind": "oracle",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\oracle.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D64": "91d56effc87d2834a2a2d992b50f99dfda0d628ab90598acca986b55b2e529da"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "6919d9caf5bf773f67c113b0c0ef7257938ef834bf5fa1525d0ed978bdf0f0da",
+      "job_id": "r1:opportunity:canneal:pressure_D64",
+      "kind": "opportunity",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\opportunity_audit.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\lru.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\lru.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D64": "91d56effc87d2834a2a2d992b50f99dfda0d628ab90598acca986b55b2e529da"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "d256406d4fad27ec54d4b372b66cb1e8b89b18bc361d9ce47e7c06231484e895",
+      "job_id": "r1:baseline:canneal:pressure_D64:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\lru.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\clock.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\canneal\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\clock.json'",
+      "dependencies": [
+        "r1:data:canneal:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:canneal:pressure_D64": "91d56effc87d2834a2a2d992b50f99dfda0d628ab90598acca986b55b2e529da"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "b85fca1c249aaee615e79cc3f93a8fdc32d270a2ac907417042374d2cd1bde3f",
+      "job_id": "r1:baseline:canneal:pressure_D64:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\canneal\\pressure_D64\\clock.json",
+      "workload": "canneal"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:streamcluster_pressure:pressure_D16"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:streamcluster_pressure:pressure_D16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "5ad21b9c03aa0914e5dc651dd6e60762a07932658c9c8ea5ebdb0c6403bdf4e1",
+      "job_id": "r1:data:streamcluster_pressure:pressure_D16",
+      "kind": "data",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\oracle.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\oracle.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D16": "5ad21b9c03aa0914e5dc651dd6e60762a07932658c9c8ea5ebdb0c6403bdf4e1"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "0c331f651d82fd5e81f7c8a74c5e7c73d6b8137a02df572af1483394d854a8e5",
+      "job_id": "r1:oracle:streamcluster_pressure:pressure_D16",
+      "kind": "oracle",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D16": "5ad21b9c03aa0914e5dc651dd6e60762a07932658c9c8ea5ebdb0c6403bdf4e1"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "d85f50e6f331f822ef9bd369902a00c714ce2609e20d526a5019a3ec6c2541a1",
+      "job_id": "r1:opportunity:streamcluster_pressure:pressure_D16",
+      "kind": "opportunity",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\opportunity_audit.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\lru.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\lru.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D16": "5ad21b9c03aa0914e5dc651dd6e60762a07932658c9c8ea5ebdb0c6403bdf4e1"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "fbd339944b39a6f213b88e0679939f0fbc9e4765d600701fd9553aac7e3ea50a",
+      "job_id": "r1:baseline:streamcluster_pressure:pressure_D16:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\lru.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\clock.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\streamcluster_pressure\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\clock.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D16": "5ad21b9c03aa0914e5dc651dd6e60762a07932658c9c8ea5ebdb0c6403bdf4e1"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "d5e2895bc1d454b8124450f067137a345c636253afa0b3ab591d3c866ef69cac",
+      "job_id": "r1:baseline:streamcluster_pressure:pressure_D16:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D16\\clock.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:streamcluster_pressure:pressure_D32"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:streamcluster_pressure:pressure_D32",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "ad3db14be63dd9d2596e584257860a6acb9d0ca74b9e0fdef3bc80bb4a6fb5e4",
+      "job_id": "r1:data:streamcluster_pressure:pressure_D32",
+      "kind": "data",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\oracle.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\oracle.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D32": "ad3db14be63dd9d2596e584257860a6acb9d0ca74b9e0fdef3bc80bb4a6fb5e4"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "599cfe742198cc260c82b95e6f52b3781e6402a60a382195b1788bd42c8c7cd0",
+      "job_id": "r1:oracle:streamcluster_pressure:pressure_D32",
+      "kind": "oracle",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D32": "ad3db14be63dd9d2596e584257860a6acb9d0ca74b9e0fdef3bc80bb4a6fb5e4"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "2d8dc2586193b33011f157c627a1e283e49fde2f58bcc43dae04cc79cea98a30",
+      "job_id": "r1:opportunity:streamcluster_pressure:pressure_D32",
+      "kind": "opportunity",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\opportunity_audit.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\lru.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\lru.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D32": "ad3db14be63dd9d2596e584257860a6acb9d0ca74b9e0fdef3bc80bb4a6fb5e4"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "cadee7161c02fee13d22c8b99c1c89eee54266f510835e02ba27d93bd836285a",
+      "job_id": "r1:baseline:streamcluster_pressure:pressure_D32:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\lru.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\clock.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\streamcluster_pressure\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\clock.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D32": "ad3db14be63dd9d2596e584257860a6acb9d0ca74b9e0fdef3bc80bb4a6fb5e4"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "9220aaaabfdd8536639f2dddcd09c6b9cbea359725b811b0a379ddffaadcf34a",
+      "job_id": "r1:baseline:streamcluster_pressure:pressure_D32:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D32\\clock.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:streamcluster_pressure:pressure_D64"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:streamcluster_pressure:pressure_D64",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/streamcluster_pressure/B64/resolved_config.json": "a74324d1156492cd17d5be523518112b545642d7bcedcd78ad3f9d3f0e6efdae"
+      },
+      "job_fingerprint": "04d04de6924e712522d1357f1e1ae64c7354e57e3beda824424ded3a30a5d92a",
+      "job_id": "r1:data:streamcluster_pressure:pressure_D64",
+      "kind": "data",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\variant_manifest.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\oracle.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\oracle.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D64": "04d04de6924e712522d1357f1e1ae64c7354e57e3beda824424ded3a30a5d92a"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "2e4370fb492d1ccd368c06879b18a5c82a2b0aed2be856d08cfc370ce560a41f",
+      "job_id": "r1:oracle:streamcluster_pressure:pressure_D64",
+      "kind": "oracle",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\oracle.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D64": "04d04de6924e712522d1357f1e1ae64c7354e57e3beda824424ded3a30a5d92a"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "4b0cb1989f6e1fead2a1544127c4b7c268cd0c11a8c04274ae35b29aa1600a5b",
+      "job_id": "r1:opportunity:streamcluster_pressure:pressure_D64",
+      "kind": "opportunity",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\opportunity_audit.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\lru.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\lru.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D64": "04d04de6924e712522d1357f1e1ae64c7354e57e3beda824424ded3a30a5d92a"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "ec1b5d4a2e6a685f2ee9bf3067f1fee84abb821c67bed52df2ba7518b77817f8",
+      "job_id": "r1:baseline:streamcluster_pressure:pressure_D64:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\lru.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\clock.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\streamcluster_pressure\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\clock.json'",
+      "dependencies": [
+        "r1:data:streamcluster_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:streamcluster_pressure:pressure_D64": "04d04de6924e712522d1357f1e1ae64c7354e57e3beda824424ded3a30a5d92a"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "67c8d7f57a2eb595e7a7025bc3895bc0477890a57cf91ae1be94f5b1126e3388",
+      "job_id": "r1:baseline:streamcluster_pressure:pressure_D64:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\streamcluster_pressure\\pressure_D64\\clock.json",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:dedup_pressure:pressure_D16"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:dedup_pressure:pressure_D16",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "22f55b5786230c80dea70b55281e943388fef4b1fcc24571dfce52a170626043",
+      "job_id": "r1:data:dedup_pressure:pressure_D16",
+      "kind": "data",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\oracle.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\oracle.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D16": "22f55b5786230c80dea70b55281e943388fef4b1fcc24571dfce52a170626043"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "244cf4d1cbadf35e6a340d5e8c4bdd649255264d3cb5df6d47d3212dcf743b91",
+      "job_id": "r1:oracle:dedup_pressure:pressure_D16",
+      "kind": "oracle",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D16": "22f55b5786230c80dea70b55281e943388fef4b1fcc24571dfce52a170626043"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "f30ffa8eb91f56a537f2cfdd8dd9ee5360622b6be097427492ba0a80444d420d",
+      "job_id": "r1:opportunity:dedup_pressure:pressure_D16",
+      "kind": "opportunity",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\opportunity_audit.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\lru.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\lru.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D16": "22f55b5786230c80dea70b55281e943388fef4b1fcc24571dfce52a170626043"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "09c6bc74cb399bfeb10f4c6138d1add631f6249d167123176a6346bc73cb9088",
+      "job_id": "r1:baseline:dedup_pressure:pressure_D16:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\lru.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\clock.json"
+      ],
+      "case_id": "pressure_D16",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D16\\dedup_pressure\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\clock.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D16"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D16": "22f55b5786230c80dea70b55281e943388fef4b1fcc24571dfce52a170626043"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "0e30969fc3fb3425d2087e7ad8fb9d07ea7e3e5d7670024a8e66ab844be2dd9e",
+      "job_id": "r1:baseline:dedup_pressure:pressure_D16:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 16,
+        "D": 16,
+        "K": 8,
+        "case_id": "pressure_D16"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D16\\clock.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:dedup_pressure:pressure_D32"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:dedup_pressure:pressure_D32",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "d7222e0a35937a1687065b9230970a3577c0dbfa07b0372c60a8e84044bbcc47",
+      "job_id": "r1:data:dedup_pressure:pressure_D32",
+      "kind": "data",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\oracle.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\oracle.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D32": "d7222e0a35937a1687065b9230970a3577c0dbfa07b0372c60a8e84044bbcc47"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "abbaee776dc08addf94968289b7fe556bb464fd1b2e8e8c9440dc9a453563e48",
+      "job_id": "r1:oracle:dedup_pressure:pressure_D32",
+      "kind": "oracle",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D32": "d7222e0a35937a1687065b9230970a3577c0dbfa07b0372c60a8e84044bbcc47"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "c6c3dac1d23448c4f6daa80c096ba0da672a4c55a7c7ab8d98e3169347946a38",
+      "job_id": "r1:opportunity:dedup_pressure:pressure_D32",
+      "kind": "opportunity",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\opportunity_audit.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\lru.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\lru.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D32": "d7222e0a35937a1687065b9230970a3577c0dbfa07b0372c60a8e84044bbcc47"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "24267f0225a0fd065ef0773ea8ebe01b5b3e18fbee2d0bfbd70c0fea14b5ae6d",
+      "job_id": "r1:baseline:dedup_pressure:pressure_D32:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\lru.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\clock.json"
+      ],
+      "case_id": "pressure_D32",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D32\\dedup_pressure\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\clock.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D32"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D32": "d7222e0a35937a1687065b9230970a3577c0dbfa07b0372c60a8e84044bbcc47"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "b182f862c36809e532a7fad020540942bcbfb7b0091f018a3dd3b7bdd472959e",
+      "job_id": "r1:baseline:dedup_pressure:pressure_D32:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 32,
+        "D": 32,
+        "K": 8,
+        "case_id": "pressure_D32"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D32\\clock.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_capd_r1.py",
+        "--stage",
+        "run",
+        "--job-id",
+        "r1:data:dedup_pressure:pressure_D64"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 scripts/run_capd_r1.py --stage run --job-id r1:data:dedup_pressure:pressure_D64",
+      "dependencies": [],
+      "dependency_fingerprints": {},
+      "input_fingerprints": {
+        "dataset/jsonl/finals_v3_official/dedup_pressure/B64/resolved_config.json": "6efd54a1fa03f57aa8d6ca8c1a86878e32c591e01387b725416c19f1cd13d38f"
+      },
+      "job_fingerprint": "eeb89fa545c78a95255b84d0e5cf8aff185050cc3c738b1cfbe4534277a04f5c",
+      "job_id": "r1:data:dedup_pressure:pressure_D64",
+      "kind": "data",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu_memory_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\variant_manifest.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_oracle.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\oracle.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/pressure_oracle.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\oracle.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D64": "eeb89fa545c78a95255b84d0e5cf8aff185050cc3c738b1cfbe4534277a04f5c"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "c381388d12e2258eb5180b6b2ae91a9fd068f99ccfc467adb4cbaaf588851091",
+      "job_id": "r1:oracle:dedup_pressure:pressure_D64",
+      "kind": "oracle",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\oracle.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/pressure_headroom.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json",
+        "--selector_params",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\selector_params.json",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\opportunity_audit.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/pressure_headroom.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json' --selector_params 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\selector_params.json' --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\opportunity_audit.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D64": "eeb89fa545c78a95255b84d0e5cf8aff185050cc3c738b1cfbe4534277a04f5c"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "66f0424c6975607eebf57d1363f6a937013380dc65494f48ee83b8ce3fc88e3d",
+      "job_id": "r1:opportunity:dedup_pressure:pressure_D64",
+      "kind": "opportunity",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "resource": "cpu_compute_bound",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\opportunity_audit.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "lru",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\lru.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json' --evaluation_split valid --policy lru --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\lru.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D64": "eeb89fa545c78a95255b84d0e5cf8aff185050cc3c738b1cfbe4534277a04f5c"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "9bf2d06ce24fad7a4c23615318079469d3898698453dd2d5ca671bbc34718dd1",
+      "job_id": "r1:baseline:dedup_pressure:pressure_D64:lru",
+      "kind": "baseline",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "policy": "lru",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\lru.json",
+      "workload": "dedup_pressure"
+    },
+    {
+      "argv": [
+        "python3",
+        "qmap/qmap_eval.py",
+        "--config",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json",
+        "--evaluation_split",
+        "valid",
+        "--policy",
+        "clock",
+        "--json_output",
+        "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\clock.json"
+      ],
+      "case_id": "pressure_D64",
+      "command": "python3 qmap/qmap_eval.py --config 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\dataset\\jsonl\\capd_r1_pressure_headroom\\pressure_D64\\dedup_pressure\\resolved_config.json' --evaluation_split valid --policy clock --json_output 'D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\clock.json'",
+      "dependencies": [
+        "r1:data:dedup_pressure:pressure_D64"
+      ],
+      "dependency_fingerprints": {
+        "r1:data:dedup_pressure:pressure_D64": "eeb89fa545c78a95255b84d0e5cf8aff185050cc3c738b1cfbe4534277a04f5c"
+      },
+      "input_fingerprints": {},
+      "job_fingerprint": "ca2f1cd5f5d65a3a72bf8f0b0d9438b17f2c2def30feea1d8915f57f9ab77d45",
+      "job_id": "r1:baseline:dedup_pressure:pressure_D64:clock",
+      "kind": "baseline",
+      "point": {
+        "B": 64,
+        "D": 64,
+        "K": 8,
+        "case_id": "pressure_D64"
+      },
+      "policy": "clock",
+      "resource": "cpu",
+      "result_path": "D:\\wenjian\\其他\\比赛\\计算机系统\\codex\\project_for_code_1\\Q-former-for-OS\\outputs\\results\\capd_r1_pressure_headroom\\raw\\dedup_pressure\\pressure_D64\\clock.json",
+      "workload": "dedup_pressure"
+    }
+  ],
+  "method_contract_changed": false,
+  "method_selection_performed": false,
+  "official_stage6_replaced": false,
+  "pressure_points": [
+    {
+      "B": 16,
+      "D": 16,
+      "K": 8,
+      "case_id": "pressure_D16"
+    },
+    {
+      "B": 32,
+      "D": 32,
+      "K": 8,
+      "case_id": "pressure_D32"
+    },
+    {
+      "B": 64,
+      "D": 64,
+      "K": 8,
+      "case_id": "pressure_D64"
+    }
+  ],
+  "profile_id": "capd_r1_pressure_headroom_v1",
+  "required_jobs": 45,
+  "schema_version": "capd_r1_execution_plan_1",
+  "scientific_role": "train_valid_only_pressure_opportunity_diagnostic",
+  "status": "PLANNED",
+  "test_trace_opened": false,
+  "test_used_for_selection": false,
+  "training_jobs": 0,
+  "workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure"
+  ]
+}

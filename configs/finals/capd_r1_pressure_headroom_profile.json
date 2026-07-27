@@ -1,0 +1,76 @@
+{
+  "schema_version": "capd_r1_pressure_headroom_profile_1",
+  "profile_id": "capd_r1_pressure_headroom_v1",
+  "status": "PROTOCOL_DECLARED",
+  "contract_id": "CAPD-MIC-1.0",
+  "scientific_role": "train_valid_only_pressure_opportunity_diagnostic",
+  "method_contract_changed": false,
+  "method_selection_performed": false,
+  "official_stage6_replaced": false,
+  "bridge_test_used_for_selection": false,
+  "test_used_for_selection": false,
+  "workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure"
+  ],
+  "pressure_points": [
+    {
+      "case_id": "pressure_D16",
+      "D": 16,
+      "B": 16,
+      "K": 8
+    },
+    {
+      "case_id": "pressure_D32",
+      "D": 32,
+      "B": 32,
+      "K": 8
+    },
+    {
+      "case_id": "pressure_D64",
+      "D": 64,
+      "B": 64,
+      "K": 8
+    }
+  ],
+  "frozen_method": {
+    "H": 10,
+    "Hc": 256,
+    "L": 256,
+    "Lres": 256,
+    "loss": "QMAPCostAwareRankingLoss",
+    "selector": "CAPD B-to-K selector",
+    "architecture": "QMAP-CrossAttn",
+    "cost_profile": "official",
+    "training_scope": "per_workload"
+  },
+  "classical_policies": [
+    "lru",
+    "clock"
+  ],
+  "allowed_inputs": [
+    "official train trace",
+    "official valid trace",
+    "official source metadata and fingerprints"
+  ],
+  "forbidden_inputs": [
+    "official test rows",
+    "official test metrics",
+    "Bridge test metrics for selection",
+    "fresh final holdout rows",
+    "fresh final holdout metrics"
+  ],
+  "reported_metrics": [
+    "best classical valid weighted_access_cost",
+    "bounded-label oracle valid weighted_access_cost",
+    "absolute and relative oracle headroom",
+    "total and complete-window eviction decisions",
+    "counterfactual-cost distinguishable decision rate",
+    "proxy-label distinguishable decision rate",
+    "future-write-label distinguishable decision rate",
+    "mixed clean/dirty retained-candidate decision rate",
+    "counterfactual cost spread"
+  ],
+  "completion_status": "R1_PRESSURE_HEADROOM_VERIFIED"
+}

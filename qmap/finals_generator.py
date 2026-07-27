@@ -536,10 +536,16 @@ def fit_selector_and_generate(args):
   config = finals_config.load_config(
       args.config, require_resolved=True, project_root=PROJECT_ROOT,
       verify_manifest_files=not metadata_only_test)
+  pressure_metadata_only = (
+      config.get("run_profile") == finals_config.DIAGNOSTIC_PROFILE and
+      config.get("pressure_variant", {}).get("family") ==
+      "frozen_method_pressure_headroom")
   if (metadata_only_test and
-      config.get("run_profile") != finals_config.OPTIMIZATION_PROFILE):
+      config.get("run_profile") != finals_config.OPTIMIZATION_PROFILE and
+      not pressure_metadata_only):
     raise ValueError(
-        "--metadata-only-test is restricted to post-Stage-6 optimization.")
+        "--metadata-only-test is restricted to post-Stage-6 optimization "
+        "and the R1 pressure-headroom diagnostic.")
   is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
   configured_page_shift = int(config.get("trace", {}).get("page_shift", 12))
   if args.page_shift is not None and args.page_shift != configured_page_shift:
