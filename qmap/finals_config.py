@@ -342,6 +342,10 @@ def _validate_v3_config(config, require_resolved=False):
         config["schema_version"]))
   if config["contract"]["id"] != CONTRACT_ID:
     raise ValueError("CAPD v3 requires contract.id={}.".format(CONTRACT_ID))
+  use_page_id_embedding = config.get(
+      "model", {}).get("use_page_id_embedding", True)
+  if not isinstance(use_page_id_embedding, bool):
+    raise ValueError("model.use_page_id_embedding must be boolean.")
 
   profile = config["run_profile"]
   if profile not in (
@@ -806,6 +810,12 @@ def contract_from_config(config):
   return contract
 
 
+def use_page_id_embedding(config):
+  """Returns the backward-compatible absolute page-ID embedding switch."""
+  validate_config(config)
+  return bool(config.get("model", {}).get("use_page_id_embedding", True))
+
+
 def assert_contract_matches(expected, actual, context):
   missing = [key for key in expected if key not in actual]
   mismatches = {
@@ -933,7 +943,8 @@ def validate_selector_params(config, selector_params):
 
 
 def validate_result_contract(config, result, selector_params=None,
-                             checkpoint_fingerprint=None):
+                             checkpoint_fingerprint=None,
+                             selector_config=None):
   validate_artifact_identity(config, result, "result")
   if config["schema_version"] == SCHEMA_VERSION:
     required = (
@@ -978,7 +989,7 @@ def validate_result_contract(config, result, selector_params=None,
   assert_contract_matches(
       expected_contract, result.get("experiment_contract", {}), "result")
   if selector_params is not None:
-    validate_selector_params(config, selector_params)
+    validate_selector_params(selector_config or config, selector_params)
     if result.get("selector_fingerprint") != selector_fingerprint(
         selector_params):
       raise ValueError("result/selector fingerprint mismatch.")

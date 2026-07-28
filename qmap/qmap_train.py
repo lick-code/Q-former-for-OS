@@ -26,6 +26,7 @@ from policy_learning.cache_model import embed
 from policy_learning.cache_model import model
 from policy_learning.cache_model import qmap_loss
 from qmap import finals_config
+from qmap import no_vpn_ablation
 from qmap.qmap_generator import read_trace
 
 
@@ -232,6 +233,9 @@ def build_arg_parser():
       help=(
           "Also save qmap_epoch_N.pth for validation-replay checkpoint "
           "selection. Defaults off, preserving the official Stage-5/6 path."))
+  parser.add_argument(
+      "--resume_checkpoint", default=None,
+      help="Resume an interrupted run from qmap_last.pth.")
   parser.add_argument("--ablation", choices=ABLATION_CHOICES,
                       default="cross_attention")
   return parser
@@ -279,7 +283,8 @@ def _training_code_fingerprint():
       "qmap/qmap_train.py", "qmap/candidate_filter.py",
       "qmap/finals_generator.py", "policy_learning/cache_model/embed.py",
       "policy_learning/cache_model/model.py",
-      "policy_learning/cache_model/qmap_loss.py")
+      "policy_learning/cache_model/qmap_loss.py",
+      "qmap/finals_config.py", "qmap/no_vpn_ablation.py")
   return finals_config.fingerprint_value({
       path: finals_config.fingerprint_file(os.path.join(PROJECT_ROOT, path))
       for path in paths})
@@ -290,8 +295,12 @@ def _validate_finals_artifacts(config, config_path, selector_path,
   if not selector_path or not valid_path:
     raise ValueError(
         "--selector_params and --valid_data are required with --config.")
+  data_config = (
+      no_vpn_ablation.load_data_config(
+          train_path, PROJECT_ROOT, config)
+      if "experiment_name" in config else config)
   selector_params = finals_config.load_json(selector_path)
-  finals_config.validate_selector_params(config, selector_params)
+  finals_config.validate_selector_params(data_config, selector_params)
   expected_config_fingerprint = finals_config.config_fingerprint(config)
   selector_fingerprint = finals_config.selector_fingerprint(selector_params)
   selector_holdout = selector_params.get("decision_holdout")
@@ -315,7 +324,8 @@ def _validate_finals_artifacts(config, config_path, selector_path,
   metadata_by_split = {}
   for split, path in (("train", train_path), ("valid", valid_path)):
     metadata = finals_config.load_jsonl_metadata(
-        path, config=config, split=split, selector_params=selector_params)
+        path, config=data_config, split=split,
+        selector_params=selector_params)
     expected_partition = (
         "independent_{}_trace".format(split)
         if uses_independent_validation else
@@ -363,6 +373,9 @@ def _validate_finals_artifacts(config, config_path, selector_path,
       "decision_holdout": selector_holdout,
       "decision_holdout_fingerprint": holdout_fingerprint,
       "metadata": metadata_by_split,
+      "data_config": data_config,
+      "data_config_fingerprint": finals_config.config_fingerprint(
+          data_config),
       "expected_shape": expected_shape,
       "sample_identity": ({
           "schema_version": config["schema_version"],
@@ -400,6 +413,7 @@ def apply_finals_config(args, explicit_seed=None):
       "approx_ndcg_alpha", 10.0))
   args.position_encoding = config.get("model", {}).get(
       "position_encoding", "none")
+  args.use_page_id_embedding = finals_config.use_page_id_embedding(config)
   args.shared_page_embedding = (
       config.get("embedding", {}).get("page", {}).get("shared", False))
   if config["schema_version"] == finals_config.SCHEMA_VERSION:
@@ -466,7 +480,8 @@ def evaluate_loss(dataloader, device, feature_embedder, extractor, scorer,
 
 def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
                        validation_loss, args, finals_context,
-                       best_epoch=None, best_validation_loss=None):
+                       best_epoch=None, best_validation_loss=None,
+                       loss_curve=None, training_duration_seconds=0.0):
   payload = {
       "epoch": epoch,
       "validation_loss": validation_loss,
@@ -477,6 +492,14 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
       "extractor": extractor.state_dict(),
       "scorer": scorer.state_dict(),
       "optimizer": optimizer.state_dict(),
+      "loss_curve": list(loss_curve or []),
+      "training_duration_seconds": float(training_duration_seconds),
+      "rng_state": {
+          "python": random.getstate(),
+          "torch": torch.get_rng_state(),
+          "cuda": (torch.cuda.get_rng_state_all()
+                   if torch.cuda.is_available() else None),
+      },
   }
   if finals_context:
     config = finals_context["config"]
@@ -491,7 +514,11 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
             "decision_holdout_fingerprint"],
         "workload": config["run"]["workload"],
         "workload_id": config["run"]["workload"],
+        "variant": no_vpn_ablation.variant_from_config(config),
         "seed": args.seed,
+        "config_path": finals_context["config_path"],
+        "data_config_fingerprint": finals_context[
+            "data_config_fingerprint"],
         "training_seed_source": args.training_seed_source,
         "jsonl_fingerprints": {
             split: metadata["data_fingerprint"]
@@ -522,6 +549,54 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
           },
       })
   return payload
+
+
+def _load_resume_checkpoint(path, device, feature_embedder, extractor, scorer,
+                            optimizer, args, finals_context):
+  checkpoint = torch.load(path, map_location=device)
+  if finals_context:
+    config = finals_context["config"]
+    finals_config.validate_artifact_identity(
+        config, checkpoint, "resume checkpoint")
+    finals_config.assert_contract_matches(
+        finals_context["contract"],
+        checkpoint.get("experiment_contract", {}),
+        "resume checkpoint")
+    if checkpoint.get("selector_fingerprint") != finals_context[
+        "selector_fingerprint"]:
+      raise ValueError("Resume checkpoint selector mismatch.")
+  model_args = checkpoint.get("model_args", {})
+  if int(checkpoint.get("seed", args.seed)) != int(args.seed):
+    raise ValueError("Resume checkpoint seed mismatch.")
+  if bool(model_args.get("use_page_id_embedding", True)) != bool(
+      getattr(args, "use_page_id_embedding", True)):
+    raise ValueError("Resume checkpoint page-ID embedding mode mismatch.")
+  feature_embedder.load_state_dict(checkpoint["feature_embedder"])
+  extractor.load_state_dict(checkpoint["extractor"])
+  scorer.load_state_dict(checkpoint["scorer"])
+  optimizer.load_state_dict(checkpoint["optimizer"])
+  rng_state = checkpoint.get("rng_state", {})
+  if rng_state.get("python") is not None:
+    random.setstate(rng_state["python"])
+  if rng_state.get("torch") is not None:
+    torch.set_rng_state(rng_state["torch"].cpu())
+  if torch.cuda.is_available() and rng_state.get("cuda") is not None:
+    torch.cuda.set_rng_state_all(
+        [state.cpu() for state in rng_state["cuda"]])
+  completed_epoch = int(checkpoint.get("epoch", 0))
+  if completed_epoch >= int(args.epochs):
+    raise ValueError(
+        "Resume checkpoint already completed configured epochs.")
+  return {
+      "start_epoch": completed_epoch + 1,
+      "best_epoch": checkpoint.get("best_epoch"),
+      "best_loss": float(checkpoint.get(
+          "best_validation_loss", checkpoint.get(
+              "validation_loss", float("inf")))),
+      "loss_curve": list(checkpoint.get("loss_curve", [])),
+      "training_duration_seconds": float(
+          checkpoint.get("training_duration_seconds", 0.0)),
+  }
 
 
 def main():
@@ -581,7 +656,9 @@ def main():
           max_vocab_size=args.address_vocab_size),
       pc_embedder=embed.DynamicVocabEmbedder(
           embed_dim=args.pc_embed_dim, max_vocab_size=args.pc_vocab_size),
-      rw_embedder=embed.RWFlagEmbedder(embed_dim=args.rw_embed_dim)).to(device)
+      rw_embedder=embed.RWFlagEmbedder(embed_dim=args.rw_embed_dim),
+      use_page_id_embedding=getattr(
+          args, "use_page_id_embedding", True)).to(device)
   is_v3 = bool(
       finals_context and finals_context["config"]["schema_version"] ==
       finals_config.SCHEMA_VERSION)
@@ -616,7 +693,9 @@ def main():
       scoring_input=args.scoring_input,
       shared_page_embedding=getattr(
           args, "shared_page_embedding", False),
-      context_mode=getattr(args, "context_mode", "cross_attention")).to(device)
+      context_mode=getattr(args, "context_mode", "cross_attention"),
+      use_page_id_embedding=getattr(
+          args, "use_page_id_embedding", True)).to(device)
   loss_fn = qmap_loss.QMAPCostAwareRankingLoss(
       lambda_1=args.inactivity_weight,
       lambda_2=args.coldness_weight,
@@ -630,14 +709,29 @@ def main():
   optimizer = optim.AdamW(
       parameters, lr=args.lr, weight_decay=args.weight_decay)
 
-  training_started = time.time()
+  start_epoch = 1
+  previous_training_duration = 0.0
   best_loss = float("inf")
   best_epoch = None
   loss_curve = []
+  if args.resume_checkpoint:
+    resume_state = _load_resume_checkpoint(
+        args.resume_checkpoint, device, feature_embedder, extractor, scorer,
+        optimizer, args, finals_context)
+    start_epoch = resume_state["start_epoch"]
+    best_loss = resume_state["best_loss"]
+    best_epoch = resume_state["best_epoch"]
+    loss_curve = resume_state["loss_curve"]
+    previous_training_duration = resume_state[
+        "training_duration_seconds"]
+    print("QMAP resume: checkpoint={} next_epoch={}".format(
+        args.resume_checkpoint, start_epoch), flush=True)
+
+  training_started = time.time()
   global_iteration = 0
   last_path = os.path.join(args.output_dir, "qmap_last.pth")
   best_path = os.path.join(args.output_dir, "qmap_best.pth")
-  for epoch in range(1, args.epochs + 1):
+  for epoch in range(start_epoch, args.epochs + 1):
     feature_embedder.train()
     extractor.train()
     scorer.train()
@@ -677,7 +771,10 @@ def main():
     payload = checkpoint_payload(
         feature_embedder, extractor, scorer, optimizer, epoch,
         validation_loss, args, finals_context,
-        best_epoch=best_epoch, best_validation_loss=best_loss)
+        best_epoch=best_epoch, best_validation_loss=best_loss,
+        loss_curve=loss_curve,
+        training_duration_seconds=(
+            previous_training_duration + time.time() - training_started))
     torch.save(payload, last_path)
     if finals_context is None or args.save_every_epoch:
       # Preserve historical experiment-script checkpoint names outside the
@@ -697,12 +794,16 @@ def main():
       "final_train_loss": loss_curve[-1]["train_loss"],
       "loss_curve": loss_curve,
       "seed": args.seed,
+      "variant": (
+          no_vpn_ablation.variant_from_config(finals_context["config"])
+          if finals_context else "legacy"),
       "training_seed_source": args.training_seed_source,
       "selection_criterion": (
           "minimum_valid_loss_only" if valid_loader else
           "minimum_train_loss_no_validation"),
       "per_epoch_checkpoints_saved": bool(args.save_every_epoch),
-      "training_duration_seconds": time.time() - training_started,
+      "training_duration_seconds": (
+          previous_training_duration + time.time() - training_started),
       "nan_or_inf_detected": False,
       "checkpoints": {
           "last": {"path": os.path.abspath(last_path),
@@ -712,6 +813,11 @@ def main():
       },
       "config_fingerprint": (finals_context["config_fingerprint"]
                              if finals_context else None),
+      "config_path": (
+          finals_context["config_path"] if finals_context else None),
+      "data_config_fingerprint": (
+          finals_context["data_config_fingerprint"]
+          if finals_context else None),
       "decision_holdout_fingerprint": (
           finals_context["decision_holdout_fingerprint"]
           if finals_context else None),
@@ -753,6 +859,8 @@ def main():
               args.output_dir, "qmap_epoch_{}.pth".format(epoch))),
       } for epoch in range(1, args.epochs + 1)]
     manifest["model_contract"] = {
+        "use_page_id_embedding": getattr(
+            args, "use_page_id_embedding", True),
         "position_encoding": getattr(
             args, "position_encoding", "sinusoidal"),
         "context_mode": getattr(args, "context_mode", "cross_attention"),
@@ -761,6 +869,8 @@ def main():
                 args, "stage5_variant_id", None) == "no_candidate_state"
             else "observed_4d"),
         "page_embedding_retained": True,
+        "page_embedding_active": getattr(
+            args, "use_page_id_embedding", True),
         "write_sensitivity_weight": args.write_sensitivity_weight,
     }
   finals_config.write_json(

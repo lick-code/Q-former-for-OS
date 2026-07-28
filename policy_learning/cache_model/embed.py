@@ -43,7 +43,8 @@ def from_config(config):
     return QMAPAccessFeatureEmbedder(
         from_config(config.get("address_embedder")),
         from_config(config.get("pc_embedder")),
-        from_config(config.get("rw_embedder")))
+        from_config(config.get("rw_embedder")),
+        use_page_id_embedding=config.get("use_page_id_embedding", True))
   else:
     raise ValueError("{} not a supported embedding type.".format(embedder_type))
 
@@ -275,13 +276,15 @@ class QMAPAccessFeatureEmbedder(Embedder):
   这里不再接收 Cache Set、Cache Way 或 set 内 cache line 列表。
   """
 
-  def __init__(self, address_embedder, pc_embedder, rw_embedder):
+  def __init__(self, address_embedder, pc_embedder, rw_embedder,
+               use_page_id_embedding=True):
     embed_dim = (address_embedder.embed_dim + pc_embedder.embed_dim +
                  rw_embedder.embed_dim)
     super(QMAPAccessFeatureEmbedder, self).__init__(embed_dim)
     self._address_embedder = address_embedder
     self._pc_embedder = pc_embedder
     self._rw_embedder = rw_embedder
+    self._use_page_id_embedding = bool(use_page_id_embedding)
 
   @property
   def page_embedder(self):
@@ -293,7 +296,12 @@ class QMAPAccessFeatureEmbedder(Embedder):
     return self._pc_embedder
 
   def embed_pages(self, page_ids):
-    return self._address_embedder(page_ids)
+    page_embeddings = self._address_embedder(page_ids)
+    if not self._use_page_id_embedding:
+      # Keep the tensor shape and downstream architecture checkpoint-compatible
+      # while severing every score/loss gradient path to absolute page identity.
+      page_embeddings = torch.zeros_like(page_embeddings)
+    return page_embeddings
 
   def forward(self, page_ids, pcs, rw_flags):
     """Returns unified QMAP access embeddings.
@@ -306,7 +314,7 @@ class QMAPAccessFeatureEmbedder(Embedder):
     Returns:
       torch.FloatTensor: [batch_size, sequence_length, hidden_dim]。
     """
-    address_embeddings = self._address_embedder(page_ids)
+    address_embeddings = self.embed_pages(page_ids)
     pc_embeddings = self._pc_embedder(pcs)
     rw_embeddings = self._rw_embedder(rw_flags)
 

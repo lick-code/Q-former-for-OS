@@ -46,7 +46,8 @@ class QMAPFeatureModel(nn.Module):
     qmap_feature_embedder = embed.QMAPAccessFeatureEmbedder(
         embed.from_config(config.get("address_embedder")),
         embed.from_config(config.get("pc_embedder")),
-        embed.from_config(config.get("rw_embedder")))
+        embed.from_config(config.get("rw_embedder")),
+        use_page_id_embedding=config.get("use_page_id_embedding", True))
     return cls(qmap_feature_embedder)
 
   def __init__(self, qmap_feature_embedder):
@@ -363,7 +364,8 @@ class QMAPCandidateScorer(nn.Module):
                page_vocab_size=100000, num_heads=2, mlp_hidden_dim=None,
                dropout=0.0, page_dim=None, scoring_input="concat",
                shared_page_embedding=False,
-               context_mode="cross_attention"):
+               context_mode="cross_attention",
+               use_page_id_embedding=True):
     super(QMAPCandidateScorer, self).__init__()
     if hidden_dim % num_heads != 0:
       raise ValueError("hidden_dim must be divisible by num_heads.")
@@ -376,6 +378,7 @@ class QMAPCandidateScorer(nn.Module):
     self._scoring_input = scoring_input
     self._context_mode = context_mode
     self._shared_page_embedding = bool(shared_page_embedding)
+    self._use_page_id_embedding = bool(use_page_id_embedding)
     self._page_embedder = None
     if not self._shared_page_embedding:
       self._page_embedder = embed.DynamicVocabEmbedder(
@@ -441,6 +444,10 @@ class QMAPCandidateScorer(nn.Module):
           raise ValueError(
               "External page embeddings require shared_page_embedding=True.")
         page_embeddings = self._page_embedder(candidate_pages.long())
+      if not self._use_page_id_embedding:
+        # This also guards non-shared and externally supplied embedding paths.
+        # Candidate state features remain intact and dimensions do not change.
+        page_embeddings = torch.zeros_like(page_embeddings)
       candidate_inputs = torch.cat(
           (page_embeddings, candidate_state_features), dim=-1)
       u = self._candidate_projector(candidate_inputs)

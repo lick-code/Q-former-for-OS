@@ -45,6 +45,7 @@ if PROJECT_ROOT not in sys.path:
 
 from qmap import candidate_filter
 from qmap import finals_config
+from qmap import no_vpn_ablation
 
 
 DRAM_READ_COST = 1.0
@@ -542,12 +543,14 @@ def is_learned_policy(policy):
   return policy in ("kleio_lite", "patterns_lite")
 
 
-def validate_checkpoint_config_contract(checkpoint, config, selector_params):
+def validate_checkpoint_config_contract(
+    checkpoint, config, selector_params, selector_config=None):
   """Rejects every frozen Generator/Trainer/Replay contract mismatch."""
+  selector_config = selector_config or config
   if checkpoint.get("schema_version") != config["schema_version"]:
     raise ValueError("Checkpoint/config schema mismatch.")
   finals_config.validate_artifact_identity(config, checkpoint, "checkpoint")
-  finals_config.validate_selector_params(config, selector_params)
+  finals_config.validate_selector_params(selector_config, selector_params)
   expected_contract = finals_config.contract_from_config(config)
   finals_config.assert_contract_matches(
       expected_contract, checkpoint.get("experiment_contract", {}),
@@ -563,7 +566,7 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
     embedded_selector = checkpoint.get("selector_params")
     if embedded_selector is None:
       raise ValueError("Checkpoint is missing embedded selector_params.")
-    finals_config.validate_selector_params(config, embedded_selector)
+    finals_config.validate_selector_params(selector_config, embedded_selector)
     if finals_config.selector_fingerprint(
         embedded_selector) != expected_selector_fingerprint:
       raise ValueError("Checkpoint embedded selector mismatch.")
@@ -595,6 +598,10 @@ def validate_checkpoint_config_contract(checkpoint, config, selector_params):
     model_args = checkpoint.get("model_args", {})
     if model_args.get("shared_page_embedding") is not True:
       raise ValueError("Checkpoint does not use the shared page embedding.")
+    expected_page_id_embedding = finals_config.use_page_id_embedding(config)
+    if bool(model_args.get("use_page_id_embedding", True)) != (
+        expected_page_id_embedding):
+      raise ValueError("Checkpoint page-ID embedding mode mismatch.")
     expected_position = config["model"]["position_encoding"]
     if model_args.get("position_encoding") != expected_position:
       raise ValueError("Checkpoint position encoding mismatch.")
@@ -680,6 +687,10 @@ def apply_replay_finals_config(args):
     if not getattr(args, "selector_params", None):
       raise ValueError("--selector_params is required for finals QMAP replay.")
     args.candidate_count = int(config["candidate"]["retained_K"])
+    args._data_config = (
+        no_vpn_ablation.load_data_config(
+            args.selector_params, PROJECT_ROOT, config)
+        if "experiment_name" in config else config)
   return config
 
 
@@ -726,7 +737,8 @@ class QMAPPolicy(object):
   def __init__(self, checkpoint_path, device, history_length, candidate_count,
                lookahead=256, ablation=None, rank_guard=0,
                rank_score_penalty=0.0, config=None, selector_params=None,
-               stage6_profile=False, bridge_diagnostics=False):
+               stage6_profile=False, bridge_diagnostics=False,
+               data_config=None):
     if checkpoint_path is None:
       raise ValueError("--checkpoint is required when --policy=qmap.")
     if candidate_count <= 0:
@@ -762,7 +774,8 @@ class QMAPPolicy(object):
       if selector_params is None:
         raise ValueError("Finals QMAP requires selector_params.")
       contract = validate_checkpoint_config_contract(
-          checkpoint, config, selector_params)
+          checkpoint, config, selector_params,
+          selector_config=data_config)
       self._is_v3 = config["schema_version"] == finals_config.SCHEMA_VERSION
       self._history_length = contract["H"]
       self._candidate_count = contract["K"]
@@ -786,7 +799,9 @@ class QMAPPolicy(object):
             embed_dim=model_args.get("pc_embed_dim", 8),
             max_vocab_size=model_args.get("pc_vocab_size", 50000)),
         rw_embedder=embed.RWFlagEmbedder(
-            embed_dim=model_args.get("rw_embed_dim", 2))).to(device)
+            embed_dim=model_args.get("rw_embed_dim", 2)),
+        use_page_id_embedding=model_args.get(
+            "use_page_id_embedding", True)).to(device)
     self._extractor = model.QMAPMacroscopicPatternExtractor(
         hidden_dim=model_args.get("hidden_dim", 18),
         num_queries=model_args.get("num_queries", 4),
@@ -811,7 +826,9 @@ class QMAPPolicy(object):
         shared_page_embedding=model_args.get(
             "shared_page_embedding", False),
         context_mode=model_args.get(
-            "context_mode", "cross_attention")).to(device)
+            "context_mode", "cross_attention"),
+        use_page_id_embedding=model_args.get(
+            "use_page_id_embedding", True)).to(device)
     self._feature_embedder.load_state_dict(checkpoint["feature_embedder"])
     self._extractor.load_state_dict(extractor_state)
     self._scorer.load_state_dict(scorer_state)
@@ -1038,15 +1055,16 @@ def replay(args, finals_replay_config=None):
       device = "cuda" if torch.cuda.is_available() else "cpu"
     selector_params = None
     if finals_replay_config is not None:
+      data_config = getattr(args, "_data_config", finals_replay_config)
       selector_params = finals_config.load_json(args.selector_params)
       if selector_params.get("config_fingerprint") != (
-          finals_config.config_fingerprint(finals_replay_config)):
+          finals_config.config_fingerprint(data_config)):
         raise ValueError("Replay selector/config fingerprint mismatch.")
       if selector_params.get("workload") != finals_replay_config[
           "run"]["workload"]:
         raise ValueError("Replay selector/workload mismatch.")
       finals_config.validate_selector_params(
-          finals_replay_config, selector_params)
+          data_config, selector_params)
       if (finals_replay_config["schema_version"] ==
           finals_config.SCHEMA_VERSION and
           finals_config.uses_independent_validation(
@@ -1072,7 +1090,8 @@ def replay(args, finals_replay_config=None):
         config=finals_replay_config,
         selector_params=selector_params,
         stage6_profile=getattr(args, "stage6_profile", False),
-        bridge_diagnostics=getattr(args, "bridge_diagnostics", False))
+        bridge_diagnostics=getattr(args, "bridge_diagnostics", False),
+        data_config=getattr(args, "_data_config", finals_replay_config))
     qmap_policy.reset_profile_memory()
   elif is_learned_policy(args.policy):
     if args.learned_model is None:
@@ -1351,6 +1370,7 @@ def main():
       finals_config.validate_result_contract(
           replay_config, metrics,
           selector_params=validation_selector,
+          selector_config=getattr(args, "_data_config", replay_config),
           checkpoint_fingerprint=(
               metrics.get("checkpoint_fingerprint") if args.checkpoint
               else None))
