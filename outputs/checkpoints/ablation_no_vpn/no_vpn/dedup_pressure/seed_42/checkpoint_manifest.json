@@ -1,0 +1,116 @@
+{
+  "artifact_class": "official",
+  "audit_input_scope": "train_jsonl_and_valid_jsonl_only",
+  "best_epoch": 1,
+  "best_validation_loss": -0.0011782899319407452,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "be294b0acbacdab9c3444defa59c5863e030e2b2f911b522da34329de9462a2c",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/ablation_no_vpn/no_vpn/dedup_pressure/seed_42/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "b4a5beb69391b30f0855a7ce781c5bdb731e853dac083fd7168bea730d71c65d",
+      "path": "/home/likc/Q-former-for-OS/outputs/checkpoints/ablation_no_vpn/no_vpn/dedup_pressure/seed_42/qmap_last.pth"
+    }
+  },
+  "code_fingerprint": "0ac0b99eabc0900e4179832710242975144faccc492e7a150bf9c6cf7ad69b12",
+  "command": "/home/likc/Q-former-for-OS/qmap/qmap_train.py --config /home/likc/Q-former-for-OS/outputs/logs/ablation_no_vpn/no_vpn/resolved_configs/dedup_pressure_B64.json --selector_params /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/selector_params.json --train_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/train.jsonl --valid_data /home/likc/Q-former-for-OS/dataset/jsonl/finals_v3_official/dedup_pressure/B64/valid.jsonl --output_dir /home/likc/Q-former-for-OS/outputs/checkpoints/ablation_no_vpn/no_vpn/dedup_pressure/seed_42 --seed 42 --device cuda --ablation cross_attention",
+  "config_fingerprint": "e7692034695b281eb031722477868a84059476e4eb06079a59965506526048be",
+  "config_generation_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "config_path": "/home/likc/Q-former-for-OS/outputs/logs/ablation_no_vpn/no_vpn/resolved_configs/dedup_pressure_B64.json",
+  "contract_id": "CAPD-MIC-1.0",
+  "data_config_fingerprint": "bb1f255f64fee0706bff0dbbdb45f712f1754d82f76b2f895663ea32ad62a816",
+  "data_quality_profile_fingerprint": "fd9f3359900bdf868d9e985f967428aa6588c79b6d4944d08864b09cfbc51589",
+  "data_quality_profile_id": "capd_finals_v3_official_data_v1",
+  "data_quality_report_fingerprint": "d42012b4222091383fc3dfd7eb084dfe4c714512f067aaf7620d37dc844f4fa8",
+  "decision_holdout_fingerprint": null,
+  "final_train_loss": 0.0,
+  "git_commit": "2bd07f29a639d54db5180b57651842ce95dd3014",
+  "jsonl_fingerprints": {
+    "train": "26c1b4544fd3457e96c139db482cf7e372cf5d0d3f1a03d1c01c77017d28b495",
+    "valid": "1719f54388de1b2428d0e0699a996d19b36296043e9f7799848160f824ac6b0e"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.0,
+      "valid_loss": -0.0011782899319407452
+    }
+  ],
+  "model_contract": {
+    "candidate_state_mode": "observed_4d",
+    "context_mode": "cross_attention",
+    "page_embedding_active": false,
+    "page_embedding_retained": true,
+    "position_encoding": "sinusoidal",
+    "use_page_id_embedding": false,
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "optimization_variant": null,
+  "per_epoch_checkpoints_saved": false,
+  "run_profile": "official",
+  "schema_version": "capd_finals_v3_0",
+  "seed": 42,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_fingerprint": "7fe88114f67649e6810039d39682ccfa6ffd54ab5b28e2677b710d7a1b8298b2",
+  "source_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+  "source_manifest_fingerprint": "1c04935e3188eed4d2e7d6217b2e156253448b2967c26905353476190dd8f439",
+  "split_fingerprints": {
+    "test": "02290e3d22516bffdf9025b740c4c955b1021f9255f2a3f795835296b3bd1b3e",
+    "train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "valid": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+  },
+  "stage5_variant": null,
+  "stage6_variant": null,
+  "test_trace_opened": false,
+  "training_duration_seconds": 36.93811058998108,
+  "training_seed_source": "explicit_cli",
+  "variant": "no_vpn",
+  "workload_id": "dedup_pressure"
+}

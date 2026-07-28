@@ -1,0 +1,865 @@
+{
+  "delta_definition": "no_vpn - full",
+  "per_seed": [
+    {
+      "avg_decision_time_ms_absolute_delta": 0.03653334397349095,
+      "avg_decision_time_ms_relative_delta_percent": 0.9860653190613572,
+      "demotions_absolute_delta": -158.0,
+      "demotions_relative_delta_percent": -5.993930197268589,
+      "full_avg_decision_time_ms": 3.704961858740485,
+      "full_best_epoch": 10,
+      "full_demotions": 2636.0,
+      "full_hit_rate": 0.9865,
+      "full_nvm_reads": 2684.0,
+      "full_nvm_writes": 16.0,
+      "full_training_time_seconds": 54.68676543235779,
+      "full_validation_metric": -0.03559597897032896,
+      "full_weighted_access_cost": 229156.0,
+      "hit_rate_absolute_delta": 0.0007899999999999574,
+      "hit_rate_relative_delta_percent": 0.08008109477951925,
+      "no_vpn_avg_decision_time_ms": 3.741495202713976,
+      "no_vpn_best_epoch": 10,
+      "no_vpn_demotions": 2478.0,
+      "no_vpn_hit_rate": 0.98729,
+      "no_vpn_nvm_reads": 2526.0,
+      "no_vpn_nvm_writes": 16.0,
+      "no_vpn_training_time_seconds": 51.83288097381592,
+      "no_vpn_validation_metric": -0.03514109241465727,
+      "no_vpn_weighted_access_cost": 227418.0,
+      "nvm_reads_absolute_delta": -158.0,
+      "nvm_reads_relative_delta_percent": -5.886736214605067,
+      "nvm_writes_absolute_delta": 0.0,
+      "nvm_writes_relative_delta_percent": 0.0,
+      "seed": 3136859,
+      "weighted_access_cost_absolute_delta": -1738.0,
+      "weighted_access_cost_relative_delta_percent": -0.7584353017158617,
+      "workload": "canneal"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": 0.21620644630816077,
+      "avg_decision_time_ms_relative_delta_percent": 5.990588362395729,
+      "demotions_absolute_delta": 98.0,
+      "demotions_relative_delta_percent": 4.121110176619007,
+      "full_avg_decision_time_ms": 3.6091020318694786,
+      "full_best_epoch": 10,
+      "full_demotions": 2378.0,
+      "full_hit_rate": 0.98779,
+      "full_nvm_reads": 2426.0,
+      "full_nvm_writes": 16.0,
+      "full_training_time_seconds": 53.66214060783386,
+      "full_validation_metric": -0.03504671519001325,
+      "full_weighted_access_cost": 226318.0,
+      "hit_rate_absolute_delta": -0.0004899999999999904,
+      "hit_rate_relative_delta_percent": -0.0496056854189646,
+      "no_vpn_avg_decision_time_ms": 3.8253084781776394,
+      "no_vpn_best_epoch": 10,
+      "no_vpn_demotions": 2476.0,
+      "no_vpn_hit_rate": 0.9873,
+      "no_vpn_nvm_reads": 2524.0,
+      "no_vpn_nvm_writes": 16.0,
+      "no_vpn_training_time_seconds": 53.276540756225586,
+      "no_vpn_validation_metric": -0.03519641155997912,
+      "no_vpn_weighted_access_cost": 227396.0,
+      "nvm_reads_absolute_delta": 98.0,
+      "nvm_reads_relative_delta_percent": 4.03957131079967,
+      "nvm_writes_absolute_delta": 0.0,
+      "nvm_writes_relative_delta_percent": 0.0,
+      "seed": 42,
+      "weighted_access_cost_absolute_delta": 1078.0,
+      "weighted_access_cost_relative_delta_percent": 0.47632092895836836,
+      "workload": "canneal"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": 0.07590419025556949,
+      "avg_decision_time_ms_relative_delta_percent": 2.0746656527171385,
+      "demotions_absolute_delta": 245.0,
+      "demotions_relative_delta_percent": 10.036870135190496,
+      "full_avg_decision_time_ms": 3.6586227836837057,
+      "full_best_epoch": 10,
+      "full_demotions": 2441.0,
+      "full_hit_rate": 0.987475,
+      "full_nvm_reads": 2489.0,
+      "full_nvm_writes": 16.0,
+      "full_training_time_seconds": 54.329885482788086,
+      "full_validation_metric": -0.03549373390773932,
+      "full_weighted_access_cost": 227011.0,
+      "hit_rate_absolute_delta": -0.0012250000000000316,
+      "hit_rate_relative_delta_percent": -0.12405377351325671,
+      "no_vpn_avg_decision_time_ms": 3.7345269739392752,
+      "no_vpn_best_epoch": 10,
+      "no_vpn_demotions": 2686.0,
+      "no_vpn_hit_rate": 0.98625,
+      "no_vpn_nvm_reads": 2734.0,
+      "no_vpn_nvm_writes": 16.0,
+      "no_vpn_training_time_seconds": 54.48431968688965,
+      "no_vpn_validation_metric": -0.03506837440033754,
+      "no_vpn_weighted_access_cost": 229706.0,
+      "nvm_reads_absolute_delta": 245.0,
+      "nvm_reads_relative_delta_percent": 9.843310566492567,
+      "nvm_writes_absolute_delta": 0.0,
+      "nvm_writes_relative_delta_percent": 0.0,
+      "seed": 2026,
+      "weighted_access_cost_absolute_delta": 2695.0,
+      "weighted_access_cost_relative_delta_percent": 1.187167141680359,
+      "workload": "canneal"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": 3.320391489149385,
+      "avg_decision_time_ms_relative_delta_percent": 89.77394165683664,
+      "demotions_absolute_delta": 102.0,
+      "demotions_relative_delta_percent": 3.6717062634989204,
+      "full_avg_decision_time_ms": 3.698613904958827,
+      "full_best_epoch": 10,
+      "full_demotions": 2778.0,
+      "full_hit_rate": 0.98579,
+      "full_nvm_reads": 2841.0,
+      "full_nvm_writes": 1.0,
+      "full_training_time_seconds": 65.32202816009521,
+      "full_validation_metric": -0.046988382893666795,
+      "full_weighted_access_cost": 230628.0,
+      "hit_rate_absolute_delta": -0.0005100000000000104,
+      "hit_rate_relative_delta_percent": -0.05173515657493081,
+      "no_vpn_avg_decision_time_ms": 7.019005394108212,
+      "no_vpn_best_epoch": 10,
+      "no_vpn_demotions": 2880.0,
+      "no_vpn_hit_rate": 0.98528,
+      "no_vpn_nvm_reads": 2943.0,
+      "no_vpn_nvm_writes": 1.0,
+      "no_vpn_training_time_seconds": 64.73145604133606,
+      "no_vpn_validation_metric": -0.04552332129789872,
+      "no_vpn_weighted_access_cost": 231750.0,
+      "nvm_reads_absolute_delta": 102.0,
+      "nvm_reads_relative_delta_percent": 3.5902851108764517,
+      "nvm_writes_absolute_delta": 0.0,
+      "nvm_writes_relative_delta_percent": 0.0,
+      "seed": 3136859,
+      "weighted_access_cost_absolute_delta": 1122.0,
+      "weighted_access_cost_relative_delta_percent": 0.4864977366148083,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": 0.05652177209328224,
+      "avg_decision_time_ms_relative_delta_percent": 1.5420161094374254,
+      "demotions_absolute_delta": 102.0,
+      "demotions_relative_delta_percent": 3.6717062634989204,
+      "full_avg_decision_time_ms": 3.665446278243041,
+      "full_best_epoch": 8,
+      "full_demotions": 2778.0,
+      "full_hit_rate": 0.98579,
+      "full_nvm_reads": 2841.0,
+      "full_nvm_writes": 1.0,
+      "full_training_time_seconds": 64.84398484230042,
+      "full_validation_metric": -0.047048337987802,
+      "full_weighted_access_cost": 230628.0,
+      "hit_rate_absolute_delta": -0.0005100000000000104,
+      "hit_rate_relative_delta_percent": -0.05173515657493081,
+      "no_vpn_avg_decision_time_ms": 3.721968050336323,
+      "no_vpn_best_epoch": 10,
+      "no_vpn_demotions": 2880.0,
+      "no_vpn_hit_rate": 0.98528,
+      "no_vpn_nvm_reads": 2943.0,
+      "no_vpn_nvm_writes": 1.0,
+      "no_vpn_training_time_seconds": 71.42924642562866,
+      "no_vpn_validation_metric": -0.045525511391879464,
+      "no_vpn_weighted_access_cost": 231750.0,
+      "nvm_reads_absolute_delta": 102.0,
+      "nvm_reads_relative_delta_percent": 3.5902851108764517,
+      "nvm_writes_absolute_delta": 0.0,
+      "nvm_writes_relative_delta_percent": 0.0,
+      "seed": 42,
+      "weighted_access_cost_absolute_delta": 1122.0,
+      "weighted_access_cost_relative_delta_percent": 0.4864977366148083,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": -0.07614631334924038,
+      "avg_decision_time_ms_relative_delta_percent": -2.0366411656100096,
+      "demotions_absolute_delta": 102.0,
+      "demotions_relative_delta_percent": 3.6717062634989204,
+      "full_avg_decision_time_ms": 3.7388183365346657,
+      "full_best_epoch": 10,
+      "full_demotions": 2778.0,
+      "full_hit_rate": 0.98579,
+      "full_nvm_reads": 2841.0,
+      "full_nvm_writes": 1.0,
+      "full_training_time_seconds": 56.48830771446228,
+      "full_validation_metric": -0.04697556287217676,
+      "full_weighted_access_cost": 230628.0,
+      "hit_rate_absolute_delta": -0.0005100000000000104,
+      "hit_rate_relative_delta_percent": -0.05173515657493081,
+      "no_vpn_avg_decision_time_ms": 3.6626720231854253,
+      "no_vpn_best_epoch": 10,
+      "no_vpn_demotions": 2880.0,
+      "no_vpn_hit_rate": 0.98528,
+      "no_vpn_nvm_reads": 2943.0,
+      "no_vpn_nvm_writes": 1.0,
+      "no_vpn_training_time_seconds": 64.63652276992798,
+      "no_vpn_validation_metric": -0.04552884000154694,
+      "no_vpn_weighted_access_cost": 231750.0,
+      "nvm_reads_absolute_delta": 102.0,
+      "nvm_reads_relative_delta_percent": 3.5902851108764517,
+      "nvm_writes_absolute_delta": 0.0,
+      "nvm_writes_relative_delta_percent": 0.0,
+      "seed": 2026,
+      "weighted_access_cost_absolute_delta": 1122.0,
+      "weighted_access_cost_relative_delta_percent": 0.4864977366148083,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": 0.02815554870480863,
+      "avg_decision_time_ms_relative_delta_percent": 0.7593818308466308,
+      "demotions_absolute_delta": 2.0,
+      "demotions_relative_delta_percent": 0.06069802731411229,
+      "full_avg_decision_time_ms": 3.7076932263994458,
+      "full_best_epoch": 1,
+      "full_demotions": 3295.0,
+      "full_hit_rate": 0.996641,
+      "full_nvm_reads": 1818.0,
+      "full_nvm_writes": 1541.0,
+      "full_training_time_seconds": 39.00928354263306,
+      "full_validation_metric": -0.0011781647980931293,
+      "full_weighted_access_cost": 1045555.0,
+      "hit_rate_absolute_delta": -1.999999999946489e-06,
+      "hit_rate_relative_delta_percent": -0.0002006740641762168,
+      "no_vpn_avg_decision_time_ms": 3.7358487751042544,
+      "no_vpn_best_epoch": 1,
+      "no_vpn_demotions": 3297.0,
+      "no_vpn_hit_rate": 0.996639,
+      "no_vpn_nvm_reads": 1819.0,
+      "no_vpn_nvm_writes": 1542.0,
+      "no_vpn_training_time_seconds": 37.822673082351685,
+      "no_vpn_validation_metric": -0.0011783382709485938,
+      "no_vpn_weighted_access_cost": 1045583.0,
+      "nvm_reads_absolute_delta": 1.0,
+      "nvm_reads_relative_delta_percent": 0.055005500550055,
+      "nvm_writes_absolute_delta": 1.0,
+      "nvm_writes_relative_delta_percent": 0.06489292667099286,
+      "seed": 3136859,
+      "weighted_access_cost_absolute_delta": 28.0,
+      "weighted_access_cost_relative_delta_percent": 0.0026780035483547015,
+      "workload": "dedup_pressure"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": 0.061356540149456684,
+      "avg_decision_time_ms_relative_delta_percent": 1.6777389309386797,
+      "demotions_absolute_delta": 3.0,
+      "demotions_relative_delta_percent": 0.09177118384827164,
+      "full_avg_decision_time_ms": 3.657097002280817,
+      "full_best_epoch": 1,
+      "full_demotions": 3269.0,
+      "full_hit_rate": 0.996667,
+      "full_nvm_reads": 1791.0,
+      "full_nvm_writes": 1542.0,
+      "full_training_time_seconds": 37.63125133514404,
+      "full_validation_metric": -0.001178629831018218,
+      "full_weighted_access_cost": 1045275.0,
+      "hit_rate_absolute_delta": -2.9999999999752447e-06,
+      "hit_rate_relative_delta_percent": -0.00030100324380914035,
+      "no_vpn_avg_decision_time_ms": 3.718453542430274,
+      "no_vpn_best_epoch": 1,
+      "no_vpn_demotions": 3272.0,
+      "no_vpn_hit_rate": 0.996664,
+      "no_vpn_nvm_reads": 1794.0,
+      "no_vpn_nvm_writes": 1542.0,
+      "no_vpn_training_time_seconds": 36.93811058998108,
+      "no_vpn_validation_metric": -0.0011782899319407452,
+      "no_vpn_weighted_access_cost": 1045308.0,
+      "nvm_reads_absolute_delta": 3.0,
+      "nvm_reads_relative_delta_percent": 0.16750418760469013,
+      "nvm_writes_absolute_delta": 0.0,
+      "nvm_writes_relative_delta_percent": 0.0,
+      "seed": 42,
+      "weighted_access_cost_absolute_delta": 33.0,
+      "weighted_access_cost_relative_delta_percent": 0.0031570639305445935,
+      "workload": "dedup_pressure"
+    },
+    {
+      "avg_decision_time_ms_absolute_delta": 0.03567481893121238,
+      "avg_decision_time_ms_relative_delta_percent": 0.9653262772667157,
+      "demotions_absolute_delta": 15.0,
+      "demotions_relative_delta_percent": 0.45676004872107184,
+      "full_avg_decision_time_ms": 3.6956228967706406,
+      "full_best_epoch": 1,
+      "full_demotions": 3284.0,
+      "full_hit_rate": 0.996652,
+      "full_nvm_reads": 1807.0,
+      "full_nvm_writes": 1541.0,
+      "full_training_time_seconds": 35.98260760307312,
+      "full_validation_metric": -0.0011781742684094302,
+      "full_weighted_access_cost": 1045434.0,
+      "hit_rate_absolute_delta": -1.4999999999987246e-05,
+      "hit_rate_relative_delta_percent": -0.0015050388701359396,
+      "no_vpn_avg_decision_time_ms": 3.731297715701853,
+      "no_vpn_best_epoch": 1,
+      "no_vpn_demotions": 3299.0,
+      "no_vpn_hit_rate": 0.996637,
+      "no_vpn_nvm_reads": 1821.0,
+      "no_vpn_nvm_writes": 1542.0,
+      "no_vpn_training_time_seconds": 40.625990867614746,
+      "no_vpn_validation_metric": -0.0011781763779111654,
+      "no_vpn_weighted_access_cost": 1045605.0,
+      "nvm_reads_absolute_delta": 14.0,
+      "nvm_reads_relative_delta_percent": 0.774764803541782,
+      "nvm_writes_absolute_delta": 1.0,
+      "nvm_writes_relative_delta_percent": 0.06489292667099286,
+      "seed": 2026,
+      "weighted_access_cost_absolute_delta": 171.0,
+      "weighted_access_cost_relative_delta_percent": 0.016356843186657408,
+      "workload": "dedup_pressure"
+    }
+  ],
+  "schema_version": "capd_no_vpn_ablation_summary_1",
+  "seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "std_definition": "sample standard deviation, ddof=1",
+  "summary": [
+    {
+      "absolute_delta": {
+        "max": 2695.0,
+        "mean": 678.3333333333334,
+        "min": -1738.0,
+        "std": 2243.3618373622508
+      },
+      "full": {
+        "max": 229156.0,
+        "mean": 227495.0,
+        "min": 226318.0,
+        "std": 1479.6124492582508
+      },
+      "metric": "weighted_access_cost",
+      "metric_label": "weighted cost",
+      "no_vpn": {
+        "max": 229706.0,
+        "mean": 228173.33333333334,
+        "min": 227396.0,
+        "std": 1327.3738483687755
+      },
+      "relative_delta_percent": {
+        "max": 1.187167141680359,
+        "mean": 0.3016842563076219,
+        "min": -0.7584353017158617,
+        "std": 0.9844875278606781
+      },
+      "seed_count": 3,
+      "workload": "canneal"
+    },
+    {
+      "absolute_delta": {
+        "max": 0.0007899999999999574,
+        "mean": -0.0003083333333333549,
+        "min": -0.0012250000000000316,
+        "std": 0.0010197099260737408
+      },
+      "full": {
+        "max": 0.98779,
+        "mean": 0.987255,
+        "min": 0.9865,
+        "std": 0.0006725511132991576
+      },
+      "metric": "hit_rate",
+      "metric_label": "hit rate",
+      "no_vpn": {
+        "max": 0.9873,
+        "mean": 0.9869466666666666,
+        "min": 0.98625,
+        "std": 0.0006033517492585447
+      },
+      "relative_delta_percent": {
+        "max": 0.08008109477951925,
+        "mean": -0.03119278805090069,
+        "min": -0.12405377351325671,
+        "std": 0.10330555263557901
+      },
+      "seed_count": 3,
+      "workload": "canneal"
+    },
+    {
+      "absolute_delta": {
+        "max": 245.0,
+        "mean": 61.666666666666664,
+        "min": -158.0,
+        "std": 203.94198521475008
+      },
+      "full": {
+        "max": 2684.0,
+        "mean": 2533.0,
+        "min": 2426.0,
+        "std": 134.510222659841
+      },
+      "metric": "nvm_reads",
+      "metric_label": "NVM reads",
+      "no_vpn": {
+        "max": 2734.0,
+        "mean": 2594.6666666666665,
+        "min": 2524.0,
+        "std": 120.67034985170687
+      },
+      "relative_delta_percent": {
+        "max": 9.843310566492567,
+        "mean": 2.6653818875623903,
+        "min": -5.886736214605067,
+        "std": 7.95455155002989
+      },
+      "seed_count": 3,
+      "workload": "canneal"
+    },
+    {
+      "absolute_delta": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "full": {
+        "max": 16.0,
+        "mean": 16.0,
+        "min": 16.0,
+        "std": 0.0
+      },
+      "metric": "nvm_writes",
+      "metric_label": "NVM writes",
+      "no_vpn": {
+        "max": 16.0,
+        "mean": 16.0,
+        "min": 16.0,
+        "std": 0.0
+      },
+      "relative_delta_percent": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "seed_count": 3,
+      "workload": "canneal"
+    },
+    {
+      "absolute_delta": {
+        "max": 245.0,
+        "mean": 61.666666666666664,
+        "min": -158.0,
+        "std": 203.94198521475008
+      },
+      "full": {
+        "max": 2636.0,
+        "mean": 2485.0,
+        "min": 2378.0,
+        "std": 134.510222659841
+      },
+      "metric": "demotions",
+      "metric_label": "demotions",
+      "no_vpn": {
+        "max": 2686.0,
+        "mean": 2546.6666666666665,
+        "min": 2476.0,
+        "std": 120.67034985170687
+      },
+      "relative_delta_percent": {
+        "max": 10.036870135190496,
+        "mean": 2.721350038180305,
+        "min": -5.993930197268589,
+        "std": 8.106548967264926
+      },
+      "seed_count": 3,
+      "workload": "canneal"
+    },
+    {
+      "absolute_delta": {
+        "max": 0.21620644630816077,
+        "mean": 0.10954799351240707,
+        "min": 0.03653334397349095,
+        "std": 0.09444329012073743
+      },
+      "full": {
+        "max": 3.704961858740485,
+        "mean": 3.6575622247645563,
+        "min": 3.6091020318694786,
+        "std": 0.04793871286184646
+      },
+      "metric": "avg_decision_time_ms",
+      "metric_label": "average decision time (ms)",
+      "no_vpn": {
+        "max": 3.8253084781776394,
+        "mean": 3.7671102182769634,
+        "min": 3.7345269739392752,
+        "std": 0.050521452321406084
+      },
+      "relative_delta_percent": {
+        "max": 5.990588362395729,
+        "mean": 3.0171064447247415,
+        "min": 0.9860653190613572,
+        "std": 2.6320065933895607
+      },
+      "seed_count": 3,
+      "workload": "canneal"
+    },
+    {
+      "absolute_delta": {
+        "max": 1122.0,
+        "mean": 1122.0,
+        "min": 1122.0,
+        "std": 0.0
+      },
+      "full": {
+        "max": 230628.0,
+        "mean": 230628.0,
+        "min": 230628.0,
+        "std": 0.0
+      },
+      "metric": "weighted_access_cost",
+      "metric_label": "weighted cost",
+      "no_vpn": {
+        "max": 231750.0,
+        "mean": 231750.0,
+        "min": 231750.0,
+        "std": 0.0
+      },
+      "relative_delta_percent": {
+        "max": 0.4864977366148083,
+        "mean": 0.4864977366148083,
+        "min": 0.4864977366148083,
+        "std": 0.0
+      },
+      "seed_count": 3,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": -0.0005100000000000104,
+        "mean": -0.0005100000000000104,
+        "min": -0.0005100000000000104,
+        "std": 0.0
+      },
+      "full": {
+        "max": 0.98579,
+        "mean": 0.98579,
+        "min": 0.98579,
+        "std": 0.0
+      },
+      "metric": "hit_rate",
+      "metric_label": "hit rate",
+      "no_vpn": {
+        "max": 0.98528,
+        "mean": 0.98528,
+        "min": 0.98528,
+        "std": 0.0
+      },
+      "relative_delta_percent": {
+        "max": -0.05173515657493081,
+        "mean": -0.05173515657493081,
+        "min": -0.05173515657493081,
+        "std": 0.0
+      },
+      "seed_count": 3,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 102.0,
+        "mean": 102.0,
+        "min": 102.0,
+        "std": 0.0
+      },
+      "full": {
+        "max": 2841.0,
+        "mean": 2841.0,
+        "min": 2841.0,
+        "std": 0.0
+      },
+      "metric": "nvm_reads",
+      "metric_label": "NVM reads",
+      "no_vpn": {
+        "max": 2943.0,
+        "mean": 2943.0,
+        "min": 2943.0,
+        "std": 0.0
+      },
+      "relative_delta_percent": {
+        "max": 3.5902851108764517,
+        "mean": 3.5902851108764517,
+        "min": 3.5902851108764517,
+        "std": 0.0
+      },
+      "seed_count": 3,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "full": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "std": 0.0
+      },
+      "metric": "nvm_writes",
+      "metric_label": "NVM writes",
+      "no_vpn": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "std": 0.0
+      },
+      "relative_delta_percent": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "seed_count": 3,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 102.0,
+        "mean": 102.0,
+        "min": 102.0,
+        "std": 0.0
+      },
+      "full": {
+        "max": 2778.0,
+        "mean": 2778.0,
+        "min": 2778.0,
+        "std": 0.0
+      },
+      "metric": "demotions",
+      "metric_label": "demotions",
+      "no_vpn": {
+        "max": 2880.0,
+        "mean": 2880.0,
+        "min": 2880.0,
+        "std": 0.0
+      },
+      "relative_delta_percent": {
+        "max": 3.6717062634989204,
+        "mean": 3.6717062634989204,
+        "min": 3.6717062634989204,
+        "std": 0.0
+      },
+      "seed_count": 3,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 3.320391489149385,
+        "mean": 1.1002556492978088,
+        "min": -0.07614631334924038,
+        "std": 1.9238379780451478
+      },
+      "full": {
+        "max": 3.7388183365346657,
+        "mean": 3.7009595065788443,
+        "min": 3.665446278243041,
+        "std": 0.03674222529607142
+      },
+      "metric": "avg_decision_time_ms",
+      "metric_label": "average decision time (ms)",
+      "no_vpn": {
+        "max": 7.019005394108212,
+        "mean": 4.801215155876653,
+        "min": 3.6626720231854253,
+        "std": 1.9208915014402463
+      },
+      "relative_delta_percent": {
+        "max": 89.77394165683664,
+        "mean": 29.759772200221352,
+        "min": -2.0366411656100096,
+        "std": 52.00458728466715
+      },
+      "seed_count": 3,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 171.0,
+        "mean": 77.33333333333333,
+        "min": 28.0,
+        "std": 81.15622793928593
+      },
+      "full": {
+        "max": 1045555.0,
+        "mean": 1045421.3333333334,
+        "min": 1045275.0,
+        "std": 140.4291042958451
+      },
+      "metric": "weighted_access_cost",
+      "metric_label": "weighted cost",
+      "no_vpn": {
+        "max": 1045605.0,
+        "mean": 1045498.6666666666,
+        "min": 1045308.0,
+        "std": 165.48816674715243
+      },
+      "relative_delta_percent": {
+        "max": 0.016356843186657408,
+        "mean": 0.007397303555185568,
+        "min": 0.0026780035483547015,
+        "std": 0.007762885257324231
+      },
+      "seed_count": 3,
+      "workload": "dedup_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": -1.999999999946489e-06,
+        "mean": -6.666666666636327e-06,
+        "min": -1.4999999999987246e-05,
+        "std": 7.234178138086422e-06
+      },
+      "full": {
+        "max": 0.996667,
+        "mean": 0.9966533333333333,
+        "min": 0.996641,
+        "std": 1.3051181300286667e-05
+      },
+      "metric": "hit_rate",
+      "metric_label": "hit rate",
+      "no_vpn": {
+        "max": 0.996664,
+        "mean": 0.9966466666666667,
+        "min": 0.996637,
+        "std": 1.504437879518059e-05
+      },
+      "relative_delta_percent": {
+        "max": -0.0002006740641762168,
+        "mean": -0.000668905392707099,
+        "min": -0.0015050388701359396,
+        "std": 0.0007258483864619306
+      },
+      "seed_count": 3,
+      "workload": "dedup_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 14.0,
+        "mean": 6.0,
+        "min": 1.0,
+        "std": 7.0
+      },
+      "full": {
+        "max": 1818.0,
+        "mean": 1805.3333333333333,
+        "min": 1791.0,
+        "std": 13.576941236277534
+      },
+      "metric": "nvm_reads",
+      "metric_label": "NVM reads",
+      "no_vpn": {
+        "max": 1821.0,
+        "mean": 1811.3333333333333,
+        "min": 1794.0,
+        "std": 15.044378795195678
+      },
+      "relative_delta_percent": {
+        "max": 0.774764803541782,
+        "mean": 0.33242483056550903,
+        "min": 0.055005500550055,
+        "std": 0.3871853269646741
+      },
+      "seed_count": 3,
+      "workload": "dedup_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 1.0,
+        "mean": 0.6666666666666666,
+        "min": 0.0,
+        "std": 0.5773502691896257
+      },
+      "full": {
+        "max": 1542.0,
+        "mean": 1541.3333333333333,
+        "min": 1541.0,
+        "std": 0.5773502691896257
+      },
+      "metric": "nvm_writes",
+      "metric_label": "NVM writes",
+      "no_vpn": {
+        "max": 1542.0,
+        "mean": 1542.0,
+        "min": 1542.0,
+        "std": 0.0
+      },
+      "relative_delta_percent": {
+        "max": 0.06489292667099286,
+        "mean": 0.043261951113995244,
+        "min": 0.0,
+        "std": 0.03746594868200037
+      },
+      "seed_count": 3,
+      "workload": "dedup_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 15.0,
+        "mean": 6.666666666666667,
+        "min": 2.0,
+        "std": 7.234178138070234
+      },
+      "full": {
+        "max": 3295.0,
+        "mean": 3282.6666666666665,
+        "min": 3269.0,
+        "std": 13.051181300301261
+      },
+      "metric": "demotions",
+      "metric_label": "demotions",
+      "no_vpn": {
+        "max": 3299.0,
+        "mean": 3289.3333333333335,
+        "min": 3272.0,
+        "std": 15.044378795195676
+      },
+      "relative_delta_percent": {
+        "max": 0.45676004872107184,
+        "mean": 0.20307641996115192,
+        "min": 0.06069802731411229,
+        "std": 0.22024514271567883
+      },
+      "seed_count": 3,
+      "workload": "dedup_pressure"
+    },
+    {
+      "absolute_delta": {
+        "max": 0.061356540149456684,
+        "mean": 0.0417289692618259,
+        "min": 0.02815554870480863,
+        "std": 0.017408791181358605
+      },
+      "full": {
+        "max": 3.7076932263994458,
+        "mean": 3.686804375150301,
+        "min": 3.657097002280817,
+        "std": 0.026425730196948577
+      },
+      "metric": "avg_decision_time_ms",
+      "metric_label": "average decision time (ms)",
+      "no_vpn": {
+        "max": 3.7358487751042544,
+        "mean": 3.728533344412127,
+        "min": 3.718453542430274,
+        "std": 0.009021077619446363
+      },
+      "relative_delta_percent": {
+        "max": 1.6777389309386797,
+        "mean": 1.1341490130173422,
+        "min": 0.7593818308466308,
+        "std": 0.48189291123870426
+      },
+      "seed_count": 3,
+      "workload": "dedup_pressure"
+    }
+  ],
+  "workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure"
+  ]
+}
