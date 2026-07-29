@@ -71,7 +71,7 @@ class ProactiveReplayStage1Test(unittest.TestCase):
     fixture = finals_config.load_json(STAGE1_FIXTURE)
     proactive_replay.validate_stage1_fixture(fixture, self.stage0)
     self.assertEqual(
-        "pending", self.stage0["freeze_status"]["stage1_replay"])
+        "frozen", self.stage0["freeze_status"]["stage1_replay"])
     self.assertIsNone(self.stage0["active_demotion"]["F_low"])
     self.assertEqual("disabled", self.stage0["method"]["selector"])
     self.assertEqual(

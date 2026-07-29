@@ -2,7 +2,7 @@
 
 日期：2026-07-29
 
-状态：`STAGE1_IMPLEMENTED_AWAITING_SERVER_VALIDATION`
+状态：`STAGE1_VERIFIED`
 
 权威方案：`CAPD_主动降级版本_完整实验实施方案(1).md`
 
@@ -15,13 +15,13 @@
 正式训练样本，没有训练或修改 CAPD 模型，没有运行正式 workload，也没有
 进入阶段 2。
 
-当前代码实现已经完成；由于本地没有 Python 项目运行环境，服务器验收尚未
-执行。因此：
+阶段 1 代码实现和服务器验收均已完成。2026-07-29 服务器验收脚本输出：
 
-- `freeze_status.stage1_replay` 仍保持 `pending`；
-- 本报告暂不声称相关测试已经通过；
-- 只有服务器脚本输出 `STAGE1_VERIFIED` 后，才能把报告状态和门禁更新为
-  `frozen`。
+```text
+[FINAL] STAGE1_VERIFIED
+```
+
+因此 `freeze_status.stage1_replay` 已从 `pending` 更新为 `frozen`。
 
 用户已确认阶段 0 执行完毕。仓库中的阶段 0 报告仍带有
 `STAGE0_IMPLEMENTED_AWAITING_SERVER_VALIDATION` 旧文字，仓库内未发现对应
@@ -312,7 +312,7 @@ fixture 至少包含两个不同合成访问模式：
 
 另外包含 emergency recovery 和 deterministic stub Top-b 场景。
 
-## 13. 验证状态
+## 13. 验证状态与证据
 
 本地已完成：
 
@@ -322,32 +322,41 @@ fixture 至少包含两个不同合成访问模式：
 - JSON 文件的本地结构解析；
 - `git diff --check` 静态检查。
 
-本地未执行：
+由于本地没有 Python 项目运行环境，本地未执行：
 
 - Python 单元测试；
 - Python 语法编译；
 - 合成 Replay 试运行；
 - 任何正式 workload、训练或模型推理。
 
-服务器统一入口：
+服务器实际执行入口：
 
 ```bash
 REPO=/path/to/cache_replacement \
   bash scripts/validate_capd_proactive_stage1_server.sh
 ```
 
-脚本只运行阶段 0/1 契约测试、合成 fixture Replay、输出契约检查、
-Python 语法检查和 `git diff --check`，不运行正式 workload。
-
-当前等待服务器输出：
+服务器于 2026-07-29 07:14:53Z 至 07:14:54Z 完成验收。全部检查结果为：
 
 ```text
-[FINAL] STAGE1_VERIFIED
+targeted_contract_and_replay_tests  exit_code=0
+stage1_fixture_replay               exit_code=0
+stage1_output_contract              exit_code=0
+syntax_check                        exit_code=0
+diff_check                          exit_code=0
 ```
+
+服务器证据目录：
+
+```text
+/tmp/capd-proactive-stage1.zHDT4X
+```
+
+最终输出为 `STAGE1_VERIFIED`。脚本没有运行正式 workload、训练或模型
+推理。
 
 ## 14. 仍为 pending 的字段
 
-- 阶段 1：在服务器验收前，`freeze_status.stage1_replay`；
 - 阶段 2：Cost profile；
 - 阶段 3：working-set 口径、DRAM/working-set ratio、
   `F_low/F_target/b_max`；
@@ -359,11 +368,13 @@ Python 语法检查和 `git diff --check`，不运行正式 workload。
 
 ## 15. 阶段 2 输入条件
 
-进入阶段 2 前必须同时具备：
+阶段 2 的以下输入条件现已满足：
 
-1. 服务器脚本输出 `STAGE1_VERIFIED`；
-2. 阶段 0 配置与历史配置回归继续通过；
-3. Replay 状态、三类事件、round/cycle/summary 日志和原始计数冻结；
-4. `freeze_status.stage1_replay` 有验证证据后更新为 `frozen`；
-5. 保留所有原始事件数，使阶段 2 能独立标定 Cost profile；
-6. 不使用本阶段合成 fixture 值作为阶段 3/4 的正式默认值。
+1. 服务器脚本已经输出 `STAGE1_VERIFIED`；
+2. 阶段 0 配置与历史配置回归通过；
+3. Replay 状态、三类事件、round/cycle/summary 日志和原始计数已冻结；
+4. `freeze_status.stage1_replay` 已更新为 `frozen`；
+5. 原始事件数均保留，可供阶段 2 独立标定 Cost profile；
+6. 阶段 1 合成 fixture 值继续与阶段 3/4 正式参数隔离。
+
+本报告只确认阶段 1 验收完成，不代表已授权或开始执行阶段 2。
