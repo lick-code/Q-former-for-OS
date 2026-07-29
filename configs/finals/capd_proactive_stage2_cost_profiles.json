@@ -1,0 +1,76 @@
+{
+  "calibration_mode": "parameterized_profile_set",
+  "contract_version": "capd_proactive_raw_events_v1_0",
+  "default_profile": "default",
+  "normalization_basis": "dram_hit_equals_1",
+  "profiles": {
+    "default": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    },
+    "migration_expensive": {
+      "demotion": 20,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    },
+    "read_light": {
+      "demotion": 8,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 4
+    },
+    "write_expensive": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 12
+    }
+  },
+  "provenance": {
+    "default_rationale": "该配置位于所考察参数区间的中部，用于表示目标分层存储系统的一组中间相对代价假设。",
+    "platform_availability": "no_real_nvm_platform",
+    "profile_source": "parameterized_relative_cost_assumptions",
+    "selection_constraint": "predeclared_before_capd_results"
+  },
+  "raw_event_contract": {
+    "count_type": "non_negative_integer",
+    "demotion_breakdown_fields": [
+      "proactive_demotions",
+      "reactive_demotions",
+      "emergency_demotions"
+    ],
+    "demotion_rule": "total_or_complete_breakdown; when both are present total_must_equal_breakdown_sum",
+    "demotion_total_field": "total_demotions",
+    "identity_fields_preserved": [
+      "workload",
+      "policy",
+      "seed",
+      "capacity_ratio",
+      "run_id",
+      "schema_version"
+    ],
+    "required_base_fields": [
+      "dram_hits",
+      "nvm_reads",
+      "nvm_writes"
+    ],
+    "stage1_adapter_status": "awaiting_stage1_field_freeze"
+  },
+  "schema_name": "capd_proactive_stage2_cost_profiles",
+  "schema_version": "capd_proactive_stage2_cost_profiles_v1_0",
+  "stage1_integration_completed": false,
+  "stage_status": "stage2_implemented_awaiting_stage1_integration",
+  "weighted_cost_formula": {
+    "components": {
+      "demotion_cost": "demotion * total_demotions",
+      "dram_hit_cost": "dram_hit * dram_hits",
+      "nvm_read_cost": "nvm_read * nvm_reads",
+      "nvm_write_cost": "nvm_write * nvm_writes"
+    },
+    "expression": "dram_hit * dram_hits + nvm_read * nvm_reads + nvm_write * nvm_writes + demotion * total_demotions",
+    "integer_arithmetic": true
+  }
+}
