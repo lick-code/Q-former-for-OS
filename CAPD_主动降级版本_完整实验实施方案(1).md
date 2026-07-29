@@ -4,6 +4,8 @@
 > **文档用途**  
 > 本文用于指导 CAPD 决赛阶段后续实验实施。当前不再继续扩展候选池筛选器，也不进行完整 Linux 内核集成，而是围绕最新的“水位触发、后台主动降级、有界批量选择”版本 CAPD，构建一套完整、可复现、边界清晰的 Trace Replay 实验体系。
 >
+> 正式主线采用收缩后的六种方法：Reactive-LRU、Proactive-LRU、Proactive-CLOCK、TPP-inspired、CAPD 和 Oracle。已有的 Kleio-lite、PatternS-lite 仅作为时间允许时的扩展结果，不阻塞主实验；不再实现 FlexMem-Demotion-inspired。
+>
 > **最终目标**  
 > 证明 CAPD 不仅能够对候选页面进行更准确的主动降级排序，而且能够：
 >
@@ -83,6 +85,8 @@ CAPD 从当前 DRAM 驻留页面的 LRU 尾部构造固定规模候选集合 \(K
 → F_t = F_t - 1
 ```
 
+这里的 `page_enter_dram` 是实验层面的统一容量事件。无论页面在真实系统中属于首次进入、重新装入或其他来源，只要该事件使一个页面进入 DRAM，就统一记为占用一个空闲页框。Replay 不记录、区分或讨论该事件是否属于 promotion，也不为不同来源设置不同处理路径。
+
 主动或紧急降级一个 DRAM 页面：
 
 ```text
@@ -104,6 +108,8 @@ Replay 只需要处理两个与容量有关的基本事件：
 page_enter_dram
 page_demote_from_dram
 ```
+
+因此，本实验只评价 DRAM 容量占用和 DRAM→NVM 主动降级，不评价 promotion 策略本身，也不报告依赖 promotion 语义的迁移往返指标。
 
 ---
 
@@ -202,7 +208,7 @@ LRU tail 扩大到 B
 - 短期重新访问率；
 - NVM read/write；
 - 总降级数；
-- ping-pong 或无效迁移。
+- 无效主动降级及其后续 NVM 访问。
 
 ---
 
@@ -276,15 +282,15 @@ Replay 事件数量
         ↓
 阶段 2：标定最终评价 Cost 模型
         ↓
-阶段 3：选择训练标签权重与 lookahead
+阶段 3：预冻结 working set、容量、水位与批量机制
         ↓
-阶段 4：选择水位、批量大小及必要模型参数
+阶段 4：在冻结主动机制下选择训练标签、lookahead 与模型配置
         ↓
 阶段 5：实现统一 Replay Baseline
         ↓
-阶段 6：实现 TPP-inspired 与 FlexMem-Demotion-inspired
+阶段 6：实现 TPP-inspired
         ↓
-阶段 7：扩大 workload、working set 和 DRAM 容量
+阶段 7：完成正式 workload、working set 和 DRAM 容量配置
         ↓
 阶段 8：运行正式同步 Replay 主实验
         ↓
@@ -297,7 +303,7 @@ Replay 事件数量
 阶段 12：整理最终图表与文档
 ```
 
-前四个阶段会影响训练数据、checkpoint 和全部下游结果，必须优先完成并冻结。
+前四个阶段会影响训练数据、checkpoint 和全部下游结果，必须优先完成并冻结。特别是 \(F_{\mathrm{low}}\)、\(F_{\mathrm{target}}\) 和 \(b_{\max}\) 会改变主动降级决策点及后续状态轨迹，因此必须先用规则策略和页面进入突发统计预冻结，再生成用于标签与模型选择的正式训练样本。
 
 ---
 
@@ -455,10 +461,11 @@ F_{\mathrm{target}}-F_t,
 
 ## 5.3 降级类型
 
-只记录两类：
+记录三类：
 
 ```text
 proactive_demotion
+reactive_demotion
 emergency_fallback_demotion
 ```
 
@@ -467,13 +474,12 @@ emergency_fallback_demotion
 ```text
 Proactive-LRU
 Proactive-CLOCK
-Proactive-Kleio-lite
-Proactive-PatternS-lite
 TPP-inspired
-FlexMem-Demotion-inspired
 CAPD
 Oracle
 ```
+
+Reactive-LRU 在无空闲页框时执行的正常按需降级记录为 `reactive_demotion`；主动策略意外耗尽空闲页框后调用 LRU 的安全回退记录为 `emergency_fallback_demotion`，两者不能混为同一事件。
 
 ---
 
@@ -639,38 +645,6 @@ Cost 权重：
 
 ## 6.4 可执行的标定方案
 
-### 方案 A：有可用延迟模拟或内存平台
-
-分别测量：
-
-```text
-DRAM hit
-NVM read
-NVM write
-单页 DRAM→NVM migration
-```
-
-测量：
-
-```text
-平均 latency
-P95 latency
-CPU cycles
-```
-
-以 DRAM hit 为 1 归一化。
-
-若结果近似落在：
-
-```text
-1 : 2 : 7~9 : 9~12
-```
-
-则将其整数化为：
-
-```text
-1 : 2 : 8 : 10
-```
 
 ### 方案 B：没有真实 NVM 平台
 
@@ -712,9 +686,128 @@ sensitivity_profiles = 预先定义的其他三组
 
 ---
 
-# 7. 阶段 3：训练标签权重与 Lookahead 选择
+# 7. 阶段 3：预冻结 Working Set、容量、水位与批量机制
 
-## 7.1 当前标签
+本阶段先固定会改变训练决策点和状态轨迹的主动控制参数。此时不使用 CAPD 模型结果选择水位或批量大小，而是基于 Train/Validation 的页面进入突发统计和 Proactive-LRU 确定统一默认配置，从而避免“先用未冻结水位生成训练样本，再根据模型结果修改水位”的循环依赖。
+
+## 7.1 预冻结 Working Set 与容量口径
+
+先在 Train/Validation 上确定统一的 active working-set 统计口径，并为代表 workload 建立：
+
+```text
+working-set page 数
+DRAM/working-set ratio
+对应的 DRAM 绝对页面数
+page_enter_dram 事件序列
+```
+
+默认容量候选沿用：
+
+```text
+20% / 40% / 60% working set
+```
+
+若该组比例无法形成可区分的压力层次，可仅根据 Train/Validation 改为：
+
+```text
+10% / 20% / 40%
+```
+
+一旦确定 working-set 口径和容量比例规则，后续训练样本生成、Validation、Test 及所有 baseline 均使用同一规则。
+
+---
+
+## 7.2 页面进入 DRAM 的突发性统计
+
+在代表 Train/Validation workload 上统计：
+
+```text
+每 100 次访问的 page_enter_dram 数
+每 500 次访问的 page_enter_dram 数
+每 1000 次访问的 page_enter_dram 数
+```
+
+每种窗口报告：
+
+```text
+mean
+P50
+P95
+P99
+max
+```
+
+这些数据只用于确定默认页框储备规模，不使用 Test 数据，也不查看 CAPD 的效果。
+
+---
+
+## 7.3 水位候选
+
+根据页面进入突发和 DRAM 绝对页面数构造 Small、Medium、Large 三种储备强度，例如：
+
+```text
+(F_low, F_target) =
+(4, 8)
+(8, 16)
+(16, 32)
+```
+
+使用 Proactive-LRU 在 Validation 上比较：
+
+```text
+free-frame exhaustion
+emergency fallback
+total demotions
+early-reuse rate
+NVM read/write
+```
+
+选择能够维持基本页框储备、且不过度增加提前降级的统一默认水位。不得根据 CAPD 相对 baseline 的提升幅度选择水位，也不为不同策略单独设置统一比较实验中的水位。
+
+---
+
+## 7.4 批量大小
+
+在已经选定的默认水位下，使用 Proactive-LRU 测试：
+
+```text
+b_max = 1 / 2 / 4
+```
+
+评价：
+
+```text
+weighted cost
+NVM read/write
+early-reuse rate
+round count
+emergency fallback
+```
+
+此阶段选择的是训练数据生成和正式统一比较所使用的默认 \(b_{\max}\)，不使用 CAPD 推理延迟或 CAPD Test 结果作为选择依据。
+
+---
+
+## 7.5 主动机制预冻结输出
+
+本阶段结束时冻结：
+
+```text
+working-set 统计口径
+DRAM/working-set ratio 规则
+F_low
+F_target
+b_max
+训练数据生成所用的 Proactive-LRU 状态推进规则
+```
+
+随后才在该固定主动机制下重新生成主动降级训练样本，并进入标签与模型配置选择。后续水位和批量实验属于敏感性分析，不再用于反向修改正式训练样本。
+
+---
+
+# 8. 阶段 4：在冻结主动机制下选择训练标签、Lookahead 与模型配置
+
+## 8.1 当前标签
 
 \[
 y_t(l)
@@ -742,7 +835,7 @@ y_t(l)
 
 ---
 
-## 7.2 权重选择必须在 Validation 完成
+## 8.2 权重选择必须在 Validation 完成
 
 候选网格建议控制在小范围：
 
@@ -758,6 +851,8 @@ y_t(l)
 每一组都需要：
 
 ```text
+使用阶段 3 冻结的水位、批量和状态推进规则生成样本
+→
 重新生成 label
 → 重新训练模型
 → 在 Validation 上评估
@@ -767,7 +862,7 @@ y_t(l)
 
 ---
 
-## 7.3 主动降级下的训练指标
+## 8.3 主动降级下的训练指标
 
 由于在线选择 Top-\(b_t\)，Validation 不应只看 Top-1。
 
@@ -796,7 +891,7 @@ Early-reuse rate
 
 ---
 
-## 7.4 统一权重选择规则
+## 8.4 统一权重选择规则
 
 推荐使用统一全局配置，不允许每个 workload 单独选择标签权重。
 
@@ -814,7 +909,7 @@ Early-reuse rate
 
 ---
 
-## 7.5 Lookahead \(L\)
+## 8.5 Lookahead \(L\)
 
 筛选器分析发现 \(L=256\) 下可能存在较多标签并列。
 
@@ -846,111 +941,7 @@ oracle set size
 
 ---
 
-# 8. 阶段 4：水位、批量大小与模型配置
-
-## 8.1 需要冻结的参数
-
-```text
-F_low
-F_target
-b_max
-K
-H
-```
-
-这些参数一旦确定，后续全部 baseline 和 workload 必须统一使用同一规则。
-
----
-
-## 8.2 页面进入 DRAM 的突发性统计
-
-在 Train/Validation 上统计：
-
-```text
-每 100 次访问的 page_enter_dram 数
-每 500 次访问的 page_enter_dram 数
-每 1000 次访问的 page_enter_dram 数
-```
-
-每种窗口报告：
-
-```text
-mean
-P50
-P95
-P99
-max
-```
-
-这些数据用于判断需要保留多少页框储备。
-
----
-
-## 8.3 水位候选
-
-不要求 \(F_{\mathrm{low}}\) 和 \(F_{\mathrm{target}}\) 与 DRAM 容量按相同比例扩大。
-
-建议先构造三种储备强度：
-
-```text
-Small reserve
-Medium reserve
-Large reserve
-```
-
-例如对某个扩大后的 DRAM 容量测试：
-
-```text
-(F_low, F_target) =
-(4, 8)
-(8, 16)
-(16, 32)
-```
-
-具体值根据 page-entry burst 和 DRAM 绝对页数调整。
-
-关键是：
-
-- 所有方法使用相同水位；
-- 水位只在 Validation 上选择；
-- 不为不同策略单独调水位。
-
----
-
-## 8.4 批量大小
-
-建议测试：
-
-```text
-b_max = 1 / 2 / 4
-```
-
-评价：
-
-```text
-weighted cost
-NVM read/write
-early-reuse rate
-round count
-amortized latency/page
-emergency fallback
-```
-
-预期权衡：
-
-```text
-b_max 太小
-→ 模型调用频繁
-→ 单页摊销开销高
-
-b_max 太大
-→ 提前误降风险高
-→ NVM 访问可能增加
-```
-
----
-
-## 8.5 候选数 \(K\)
+## 8.6 候选数 \(K\)
 
 只做必要范围：
 
@@ -975,7 +966,7 @@ K = 16
 
 ---
 
-## 8.6 历史窗口 \(H\)
+## 8.7 历史窗口 \(H\)
 
 建议仅测试：
 
@@ -995,17 +986,29 @@ H = 5 / 10 / 20
 
 ---
 
-## 8.7 参数冻结顺序
+## 8.8 阶段 4 完成标准
 
-建议：
+本阶段只在阶段 3 已冻结的主动机制下选择模型相关配置：
 
 ```text
 先确定 L 和标签权重
 → 再确定 K/H
-→ 再确定 F_low/F_target/b_max
+→ 重新生成完整主动降级训练样本
+→ 训练最终 checkpoint
 ```
 
-因为标签和模型输入变化会影响水位参数实验结果。
+本阶段结束时冻结：
+
+```text
+L
+lambda_1 / lambda_2 / lambda_3
+K
+H
+最终训练数据版本
+最终 checkpoint 选择规则
+```
+
+不得因为模型在某个 Test 配置上的结果而返回阶段 3 修改水位或批量大小。水位与批量的其他取值只作为后续敏感性实验，不参与重新选择正式模型。
 
 ---
 
@@ -1013,45 +1016,45 @@ H = 5 / 10 / 20
 
 ## 9.1 最终 Baseline 数量与组成
 
-最终主实验固定使用以下 8 种方法：
+最终主线固定使用以下 6 种方法：
 
 | 类型 | 方法 |
 |---|---|
+| 主动机制对照 | Reactive-LRU |
 | 基础规则主动降级 | Proactive-LRU |
 | 基础规则主动降级 | Proactive-CLOCK |
 | 原生主动降级思想适配 | TPP-inspired |
-| 原生自适应主动降级思想适配 | FlexMem-Demotion-inspired |
-| 学习型 Replay 适配 | Proactive-Kleio-lite |
-| 学习型 Replay 适配 | Proactive-PatternS-lite |
 | 本项目方法 | CAPD |
 | 分析上界 | Oracle |
 
-不再加入：
+以下方法不属于正式主线：
 
 ```text
 Random
 LFU
 AutoNUMA-inspired
 PET-inspired
+FlexMem-Demotion-inspired
 Reactive-CAPD
 旧 CAPD
 ```
 
 原因如下：
 
-1. 8 种方法已经覆盖基础规则、原生主动降级、学习型策略、本项目方法和理论上界；
-2. Random 和 LFU 提供的新增信息有限，可减少主实验规模；
-3. TPP 和 FlexMem 本身与主动降级问题更直接相关，比 AutoNUMA-inspired 更符合当前研究主题；
-4. PET 依赖更复杂的分配单元或块级信息，当前 Trace 难以忠实复现；
-5. 当前项目只评价最新主动 CAPD，不与历史版本比较。
+1. Reactive-LRU 与 Proactive-LRU 用于隔离主动储备机制的贡献；
+2. Proactive-LRU 与 Proactive-CLOCK 提供轻量规则基线；
+3. TPP-inspired 作为唯一正式的原生主动降级强基线；
+4. CAPD 与 Oracle 分别代表本项目方法和候选集合内分析上界；
+5. Random、LFU 和第二个原生 inspired baseline 提供的新增信息不足以抵消实现与全量实验成本；
+6. 当前项目只评价最新主动 CAPD，不与历史 CAPD 版本比较。
+
+已有的 Proactive-Kleio-lite 和 Proactive-PatternS-lite 可在其实现已经稳定、且不影响主实验进度时放入扩展表。它们不是正式主线的完成条件，不参与主结论所依赖的最小 baseline 集合。
 
 ---
 
-## 9.2 两层比较原则
+## 9.2 两类比较原则
 
-原生主动降级论文不仅包含页面选择规则，还可能包含自己的水位、反馈信号和降级速率控制。若所有方法都被强制使用完全相同的触发和批量机制，可能无法体现文献方法本身的特点；但若允许每个方法使用完全不同的机制，又难以判断收益究竟来自页面选择还是触发策略。
-
-因此建议设置两层比较。
+正式实验分别隔离页面排序质量和主动储备机制，避免将两类收益混在同一比较中。
 
 ### 实验 A：统一主动框架下的页面选择比较（必须完成）
 
@@ -1076,35 +1079,55 @@ Reactive-CAPD
 - Proactive-LRU 使用 LRU 顺序；
 - Proactive-CLOCK 使用 CLOCK/reference-bit 规则；
 - TPP-inspired 使用其冷热状态排序；
-- FlexMem-Demotion-inspired 使用其采样热度排序，但暂不启用动态降级速率；
-- Kleio-lite、PatternS-lite 和 CAPD 使用各自评分；
+- CAPD 使用上下文感知评分；
 - Oracle 使用未来标签。
 
 该实验用于隔离：
 
 > **页面选择质量本身的差异。**
 
-### 实验 B：完整 Replay-compatible 主动策略比较（高优先级）
+### 实验 B：主动储备机制比较（必须完成）
 
-允许 TPP-inspired 和 FlexMem-Demotion-inspired 保留各自的主动控制特征：
+比较：
 
-- TPP-inspired 使用主动 headroom 与冷热页识别机制；
-- FlexMem-Demotion-inspired 根据近期页面进入压力动态调整本轮降级数量；
-- CAPD 使用当前的固定低水位、目标水位和有界 Top-\(b_t\) 多轮机制；
-- LRU、CLOCK、Kleio-lite 和 PatternS-lite 继续使用统一主动框架；
-- Oracle 使用与 CAPD 相同的主动框架，仅替换为未来最优排序。
+```text
+Reactive-LRU
+vs
+Proactive-LRU
+```
 
-所有方法的可调参数只能在同一 Validation 数据上确定，Test 不参与调参。
+两者使用相同的：
 
-该实验用于回答：
+```text
+DRAM/NVM 容量
+页面进入规则
+LRU 页面顺序
+Trace、数据区间和 Cost profile
+```
 
-> **将页面选择与各自主动控制机制组合后，完整 Replay-compatible 策略的最终效果如何？**
+区别仅在于：
 
-若比赛时间不足，实验 A 必须完成；实验 B 至少完成 CAPD、TPP-inspired、FlexMem-Demotion-inspired、Proactive-LRU 和 Proactive-CLOCK 五种方法。
+```text
+Reactive-LRU：
+只在无空闲页框且页面需要进入 DRAM 时降级一页
+
+Proactive-LRU：
+使用阶段 3 冻结的 F_low / F_target / b_max 主动建立页框储备
+```
+
+该实验用于隔离：
+
+> **低水位主动储备机制本身相对于按需反应式降级的作用。**
+
+TPP-inspired、Proactive-CLOCK、CAPD 和 Oracle 继续使用统一主动框架。已有 Kleio-lite/PatternS-lite 若进入扩展表，也只参加实验 A，不改变正式主线。
 
 ---
 
 ## 9.3 基础规则方法
+
+### Reactive-LRU
+
+Reactive-LRU 不设置主动水位，也不启动主动降级周期。仅当空闲页框不足且当前 `page_enter_dram` 事件需要占用页框时，选择 LRU 尾部页面降级，以释放一个页框。该方法是主动储备机制的外部对照，不是旧 CAPD 或 Reactive-CAPD。
 
 ### Proactive-LRU
 
@@ -1124,7 +1147,9 @@ Reactive-CAPD
 
 ---
 
-## 9.4 学习型 Replay Baseline
+## 9.4 可选的学习型 Replay 扩展 Baseline
+
+本节方法不属于主实验完成条件。只有在现有实现能够直接适配统一主动水位和 Top-\(b_t\) 框架，且不会延误六种正式方法时才运行。
 
 ### Proactive-Kleio-lite
 
@@ -1141,7 +1166,7 @@ Reactive-CAPD
 
 采用相同说明方式，明确其为统一 Replay 环境下的适配版本。
 
-Kleio-lite 和 PatternS-lite 不能与完整原论文系统实现混称。
+Kleio-lite 和 PatternS-lite 不能与完整原论文系统实现混称，结果仅放入扩展表或附录，不作为主结论的必要证据。
 
 ---
 
@@ -1190,21 +1215,19 @@ Oracle 只用于分析：
 是否在 Test 前冻结参数
 ```
 
-对于实验 B，额外保存每个方法自己的：
+对于 Reactive-LRU，额外检查：
 
 ```text
-触发水位
-目标水位
-动态降级预算
-采样窗口
-冷热阈值
+是否只在 page_enter_dram 无可用页框时触发
+是否每次只释放满足当前进入事件所需的页框
+是否未创建 proactive cycle
 ```
 
-避免将参数差异隐藏在实现内部。
+对于 TPP-inspired，保存 sampling epoch 和冷热阈值，避免将参数差异隐藏在实现内部。
 
 ---
 
-# 10. 阶段 6：实现 TPP-inspired 与 FlexMem-Demotion-inspired
+# 10. 阶段 6：实现 TPP-inspired
 
 ## 10.1 命名与复现边界
 
@@ -1212,21 +1235,19 @@ Oracle 只用于分析：
 
 ```text
 TPP-inspired
-FlexMem-Demotion-inspired
 ```
 
 不能写成：
 
 ```text
 Linux TPP
-完整 FlexMem
 ```
 
 统一声明：
 
 > 当前实验平台只复现相关论文中与主动降级、快速内存 headroom、页面冷热识别和降级速率控制有关的核心思想，不复现完整 Linux 内核中的页面提升、hint fault、NUMA/CXL 节点管理、并发回收、锁开销和任务调度机制。
 
-这两个方法属于 Replay-compatible adaptation，作用是提供更贴近原生主动降级研究的强 baseline。
+该方法属于 Replay-compatible adaptation，作用是提供更贴近原生主动降级研究的强 baseline。
 
 ---
 
@@ -1316,7 +1337,7 @@ Cold + clean
 
 作为 tie-break。
 
-完整策略实验中，TPP-inspired 使用与其 headroom 思想一致的主动触发方式，但仍需遵守项目统一边界：
+正式主实验中，TPP-inspired 使用阶段 3 冻结的统一水位与批量机制，仅用上述 epoch 冷热状态替换候选页排序规则。这样可以把 TPP-inspired 作为强主动降级排序基线，同时避免再次引入一套独立控制器。它仍需遵守项目统一边界：
 
 - 只进行 DRAM→NVM 降级；
 - 不进行 promotion；
@@ -1348,191 +1369,7 @@ TPP-inspired 的 proactive cycle 和 demotion 数量
 
 ---
 
-## 10.6 FlexMem-Demotion-inspired：保留的核心思想
-
-FlexMem-Demotion-inspired 主要保留：
-
-1. 通过周期性页面访问统计区分 cold、warm 和 hot 页面；
-2. 根据当前快速内存压力动态调整主动降级强度；
-3. 避免使用固定降级速率处理所有运行阶段；
-4. 优先选择低热度页面，并在高压力阶段释放更多页框。
-
-原系统中与 promotion 反馈相关的部分不适用于当前项目边界，因此不直接复现。
-
-当前适配使用可观测的：
-
-```text
-近期 page_enter_dram 速率
-当前空闲页框缺口
-近期 emergency fallback
-页面近期访问热度
-```
-
-替代完整系统中的 promotion feedback。
-
-因此必须使用名称：
-
-```text
-FlexMem-Demotion-inspired
-```
-
-而不是完整 FlexMem。
-
----
-
-## 10.7 FlexMem-Demotion-inspired 页面热度
-
-为每个页面维护指数衰减热度：
-
-\[
-h_t(l)=
-\beta h_{t-1}(l)
-+
-(1-\beta)a_t(l),
-\]
-
-其中：
-
-- \(a_t(l)\)：当前采样窗口内页面的归一化访问次数；
-- \(\beta\)：历史热度衰减系数；
-- \(h_t(l)\) 越小，页面越冷。
-
-也可以根据热度分位数划分：
-
-```text
-Cold：最低热度区间
-Warm：中间热度区间
-Hot：最高热度区间
-```
-
-统一页面选择实验中，在相同 \(K\) 和相同 \(b_t\) 下，按：
-
-```text
-更低 h_t(l)
-→ 更久未访问
-→ clean page
-```
-
-排序。
-
----
-
-## 10.8 FlexMem-Demotion-inspired 动态降级预算
-
-完整策略实验中，FlexMem-Demotion-inspired 可以动态决定本轮降级页面数量，但仍受统一上限约束：
-
-\[
-1\leq b_t^{\mathrm{flex}}\leq b_{\max}.
-\]
-
-先计算两个压力量：
-
-### 空闲页框缺口
-
-\[
-d_t=F_{\mathrm{target}}-F_t.
-\]
-
-### 近期页面进入压力
-
-设长度为 \(W_{\mathrm{in}}\) 的窗口内有 \(n_{\mathrm{in}}\) 个页面进入 DRAM，定义：
-
-\[
-p_t=
-\min\left(
-1,
-\frac{n_{\mathrm{in}}}{P_{95}^{\mathrm{in}}+\epsilon}
-\right),
-\]
-
-其中 \(P_{95}^{\mathrm{in}}\) 来自 Train/Validation 上相同窗口的页面进入数量 P95。
-
-推荐的简化预算为：
-
-\[
-b_t^{\mathrm{flex}}
-=
-\min\left(
-K,
-b_{\max},
-\max\left(
-1,
-\left\lceil
-\eta d_t+(1-\eta)p_tb_{\max}
-\right\rceil
-\right)
-\right).
-\]
-
-其中 \(\eta\) 在 Validation 上选择。
-
-若近期发生 emergency fallback，可以额外将下一轮预算提高 1，但仍不得超过 \(b_{\max}\)。
-
-该设计表达的是：
-
-```text
-压力低
-→ 保守降级，减少提前误降
-
-压力高
-→ 提高本轮降级数量，尽快恢复 headroom
-```
-
----
-
-## 10.9 FlexMem-Demotion-inspired 参数
-
-Validation 中测试：
-
-```text
-sampling window = 64 / 256 / 1024 accesses
-beta = 0.5 / 0.8 / 0.9
-eta = 0.25 / 0.5 / 0.75
-hotness statistic = access count / normalized frequency
-```
-
-参数选择指标：
-
-```text
-weighted cost
-NVM read/write
-Early-Reuse Rate
-fallback rate
-total demotions
-```
-
-所有 workload 使用同一参数规则。
-
----
-
-## 10.10 两个原生主动降级 Baseline 的差异
-
-| 方法 | 页面冷热表示 | 主动控制特点 | 当前适配重点 |
-|---|---|---|---|
-| TPP-inspired | 离散 Hot/Warm/Cold 状态 | 维护快速内存 headroom | 冷页识别与主动回收 |
-| FlexMem-Demotion-inspired | 连续衰减热度 | 随页面进入压力动态调整降级数量 | 热度排序与自适应 demotion rate |
-
-两者不能实现成同一个 LFU 的不同名字。
-
-TPP-inspired 的主要区别应体现在：
-
-```text
-离散 epoch 状态
-连续未访问判冷
-headroom-oriented reclaim
-```
-
-FlexMem-Demotion-inspired 的主要区别应体现在：
-
-```text
-连续热度分数
-近期页面进入压力
-动态 b_t
-```
-
----
-
-## 10.11 实现正确性检查
+## 10.6 实现正确性检查
 
 ### TPP-inspired
 
@@ -1545,35 +1382,23 @@ epoch 切换是否正确清零 reference 状态
 批量选择是否严格遵循冷热优先级
 ```
 
-### FlexMem-Demotion-inspired
-
-检查：
-
-```text
-热度是否随访问增加
-热度是否随时间衰减
-压力升高时 b_t 是否非递减
-b_t 是否始终位于 [1, b_max]
-低压力时是否避免不必要的大批量降级
-```
-
----
-
-## 10.12 最终 Baseline 说明表
+## 10.7 最终 Baseline 说明表
 
 | 方法 | 保留的核心机制 | 省略或不研究的部分 |
 |---|---|---|
+| Reactive-LRU | 无空闲页框时按需降级 LRU 页 | 主动水位与页框储备 |
 | Proactive-LRU | LRU 冷页顺序 | 无学习、无动态冷热建模 |
 | Proactive-CLOCK | reference bit 与 CLOCK 扫描 | 完整 OS 回收路径 |
 | TPP-inspired | 主动 headroom、epoch 冷热状态、冷页降级 | promotion、完整 Linux reclaim、CXL/NUMA 内核机制 |
-| FlexMem-Demotion-inspired | 采样热度、压力感知动态降级数量 | promotion feedback、hint fault、完整系统 profiling |
-| Proactive-Kleio-lite | 原方法中与降级选择相关的轻量机制 | 完整原系统实现 |
-| Proactive-PatternS-lite | 访问模式相关的候选排序机制 | 完整原系统实现 |
 | CAPD | 上下文感知排序与有界批量主动降级 | 真实 Linux runtime |
 | Oracle | 候选集合内未来最优 Top-b | 在线不可部署 |
 
+若时间允许加入扩展结果，可在附表中另列 Proactive-Kleio-lite 和 Proactive-PatternS-lite，但不得改变上述六种正式主线方法。
+
 ---
 # 11. 阶段 7：Workload、Working Set 与容量
+
+阶段 3 已经基于 Train/Validation 建立统一 working-set 口径、容量比例规则和默认主动机制。本阶段不重新选择这些规则，而是将冻结规则应用到六个正式 workload，补齐全部 workload 描述、绝对容量和正式运行配置。
 
 ## 11.1 Workload 范围
 
@@ -1591,10 +1416,10 @@ b_t 是否始终位于 [1, b_max]
 
 ## 11.2 Workload 数量
 
-建议最终至少：
+正式主实验固定使用：
 
 ```text
-6～8 个有效 workload
+6 个有效 workload
 ```
 
 覆盖：
@@ -1609,6 +1434,8 @@ b_t 是否始终位于 [1, b_max]
 | CAPD 负面 workload | 如实展示适用边界 |
 
 不要求每个 workload 都获胜。
+
+若已有额外 workload 且无需新增适配，可放入扩展结果；不得因为追求 workload 数量而延迟六个正式 workload 的完整容量、seed 和开销实验。
 
 ---
 
@@ -1717,15 +1544,13 @@ mean ± standard deviation
 
 ## 12.1 主结果方法
 
-正式主结果固定包含 8 种方法：
+正式主结果固定包含 6 种方法：
 
 ```text
+Reactive-LRU
 Proactive-LRU
 Proactive-CLOCK
 TPP-inspired
-FlexMem-Demotion-inspired
-Proactive-Kleio-lite
-Proactive-PatternS-lite
 CAPD
 Oracle
 ```
@@ -1744,11 +1569,21 @@ b_max / b_t
 
 用于比较页面排序质量。
 
-### 表 B：完整 Replay-compatible 策略结果
+该表不包含 Reactive-LRU，因为 Reactive-LRU 不使用主动水位。表中固定包含：
 
-TPP-inspired 和 FlexMem-Demotion-inspired 启用各自的主动控制特征，CAPD 使用当前正式水位与批量机制。
+```text
+Proactive-LRU
+Proactive-CLOCK
+TPP-inspired
+CAPD
+Oracle
+```
 
-该表用于比较完整策略效果。
+### 表 B：主动储备机制对照
+
+比较 Reactive-LRU 与 Proactive-LRU，在页面排序同为 LRU 的条件下隔离低水位主动储备机制的作用。表 B 同时报告页面代价、fallback、空闲页框和主动降级事件，不与旧 CAPD 进行比较。
+
+Proactive-Kleio-lite 和 Proactive-PatternS-lite 若完成，只放入扩展表，不改变表 A、表 B 及主结论结构。
 
 ---
 
@@ -1831,20 +1666,30 @@ wasted demotion count
 
 ---
 
-## 12.5 统计显著性
+## 12.5 稳定性与不确定性
 
-CAPD 与学习 baseline 使用配对 seed 和相同 Test 区间。
+CAPD 使用至少 3 个 seed，并与确定性 baseline 使用相同 Test 区间、容量比例和事件配置进行配对比较。
 
-建议报告：
+预先指定：
 
 ```text
-mean
-standard deviation
-相对最佳 baseline 改善
-逐 workload 结果
+页面排序主比较对象：TPP-inspired
+主动机制主比较对象：Proactive-LRU / Reactive-LRU
+主指标：weighted cost
+辅助指标：NVM read/write、demotion、Early-Reuse、fallback
 ```
 
-不要只给总体平均。
+报告：
+
+```text
+每个 workload × capacity 的逐项结果
+CAPD 三个 seed 的 mean ± standard deviation
+相对 TPP-inspired 的配对差值
+跨 workload × capacity 配对差值的 95% bootstrap confidence interval
+相对最佳非 Oracle baseline 的描述性改善
+```
+
+三个 seed 主要用于评价模型随机性，不单独作为强统计显著性证据。最终不根据单一 \(p\)-value 下结论，而结合配对差值、95% 置信区间、逐 workload 方向和实际效应量解释稳定性。不得只报告总体平均。
 
 ---
 
@@ -2276,10 +2121,10 @@ Memory overhead
 选择代表 workload，绘制：
 
 ```text
+Reactive-LRU
 Proactive-LRU
 Proactive-CLOCK
 TPP-inspired
-FlexMem-Demotion-inspired
 CAPD
 ```
 
@@ -2371,10 +2216,12 @@ blocking time
 ## P1：正式训练前必须完成
 
 - [ ] 冻结默认 Cost profile；
+- [ ] 冻结 active working-set 统计口径和 DRAM/working-set ratio 规则；
+- [ ] 完成 page_enter_dram 突发性统计；
+- [ ] 使用 Proactive-LRU 预冻结 \(F_{\mathrm{low}}/F_{\mathrm{target}}/b_{\max}\)；
 - [ ] 完成标签权重小网格；
 - [ ] 完成 \(L\) 的标签饱和分析；
 - [ ] 确定 \(K/H\)；
-- [ ] 确定 \(F_{\mathrm{low}}/F_{\mathrm{target}}/b_{\max}\)；
 - [ ] 重新生成主动降级训练样本；
 - [ ] 训练最终 checkpoint。
 
@@ -2382,17 +2229,15 @@ blocking time
 
 ## P2：主实验必须完成
 
+- [ ] Reactive-LRU；
 - [ ] Proactive-LRU；
 - [ ] Proactive-CLOCK；
 - [ ] TPP-inspired；
-- [ ] FlexMem-Demotion-inspired；
-- [ ] Proactive-Kleio-lite；
-- [ ] Proactive-PatternS-lite；
 - [ ] CAPD；
 - [ ] Oracle；
 - [ ] 统一主动机制页面选择对比；
-- [ ] 完整 Replay-compatible 策略对比；
-- [ ] 6～8 个 workload；
+- [ ] Reactive-LRU 与 Proactive-LRU 主动机制对比；
+- [ ] 6 个正式 workload；
 - [ ] 3 seeds；
 - [ ] 多个 DRAM/working-set ratio。
 
@@ -2413,6 +2258,8 @@ blocking time
 
 ## P4：时间允许后完成
 
+- [ ] Proactive-Kleio-lite 扩展结果；
+- [ ] Proactive-PatternS-lite 扩展结果；
 - [ ] NoContext/NoPageState；
 - [ ] 额外 Cost profile；
 - [ ] 额外标签权重；
@@ -2429,7 +2276,22 @@ blocking time
 
 状态机、日志、事件计数通过测试后，不再改变页面进入和降级语义。
 
-## 18.2 冻结点二：训练配置冻结
+## 18.2 冻结点二：主动机制预冻结
+
+确定：
+
+```text
+active working-set 统计口径
+DRAM/working-set ratio 规则
+F_low
+F_target
+b_max
+训练状态推进规则
+```
+
+后再生成主动降级训练样本。不得先用临时水位训练 CAPD，再根据 CAPD 结果反向修改正式水位。
+
+## 18.3 冻结点三：训练配置冻结
 
 确定：
 
@@ -2438,21 +2300,11 @@ lambda
 L
 H
 K
+训练数据版本
+checkpoint 选择规则
 ```
 
-后再生成全量训练数据。
-
-## 18.3 冻结点三：主动机制冻结
-
-确定：
-
-```text
-F_low
-F_target
-b_max
-```
-
-后再运行全部 baseline。
+后再生成全量训练数据、训练最终 checkpoint 并运行全部 baseline。水位与批量的其他取值只进入敏感性分析。
 
 ## 18.4 冻结点四：Test 冻结
 
@@ -2468,8 +2320,8 @@ b_max
 
 若实验支持，可以写：
 
-- CAPD 在统一主动降级 Replay 中优于基础规则、学习型以及 TPP/FlexMem 主动降级 inspired baseline；
-- CAPD 能减少紧急降级并维持更稳定的空闲页框储备；
+- CAPD 在统一主动降级 Replay 中优于 Proactive-LRU、Proactive-CLOCK 和 TPP-inspired；
+- Proactive-LRU 相比 Reactive-LRU 能减少空闲页框耗尽，并维持更稳定的页框储备；
 - Top-\(b_t\) 能降低平均单页推理开销；
 - CAPD 在高内存压力场景下更有价值；
 - CAPD 的主要结果在多个 Cost profile 和标签权重附近保持稳定；
@@ -2483,7 +2335,6 @@ b_max
 
 - 已完成真实 Linux 系统集成；
 - 已完整复现 Linux TPP；
-- 已完整复现 FlexMem；
 - 已测得真实程序端到端加速；
 - 已支持多进程/mixed workload；
 - 已处理完整 promotion 机制；
@@ -2524,4 +2375,4 @@ CAPD 后台运行是否具有可行性？
 
 最终正式结论应表述为：
 
-> CAPD 在 DRAM 空闲页框低于触发水位时，利用近期访存上下文和候选页面状态进行主动页面降级排序，并通过有界批量选择逐步恢复目标页框储备。实验从页面选择质量、空闲页框保障、提前误降风险、批量摊销开销、容量扩展、TPP/FlexMem 等原生主动降级 inspired baseline 和异步后台能力等方面进行验证，从而证明 CAPD 在单线程、单进程、单 workload 的统一 Trace Replay 场景下具有更完整的系统有效性和可实现性证据。
+> CAPD 在 DRAM 空闲页框低于触发水位时，利用近期访存上下文和候选页面状态进行主动页面降级排序，并通过有界批量选择逐步恢复目标页框储备。实验通过 Reactive-LRU 与 Proactive-LRU 隔离主动储备机制的作用，并从页面选择质量、空闲页框保障、提前误降风险、批量摊销开销、容量扩展、TPP-inspired 强基线和异步后台能力等方面进行验证，从而证明 CAPD 在单线程、单进程、单 workload 的统一 Trace Replay 场景下具有更完整的系统有效性和可实现性证据。

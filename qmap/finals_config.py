@@ -4,6 +4,11 @@
 ``capd_finals_v3_0`` implements frozen contract ``CAPD-MIC-1.0``. The legacy
 v2.1 validator remains available only so the isolated v2 runner can reject or
 consume its own historical artifacts; v2.1 and v3 artifacts never cross-load.
+
+``capd_proactive_v1_0`` is the stage-0 contract for the current proactive
+demotion method.  It deliberately permits explicitly pending values before
+their declared freeze stages, while rejecting formal Test requests until every
+upstream freeze gate has been satisfied.
 """
 
 from __future__ import print_function
@@ -13,11 +18,62 @@ import hashlib
 import json
 import math
 import os
+import re
 import subprocess
 
 
 SCHEMA_VERSION = "capd_finals_v3_0"
 LEGACY_SCHEMA_VERSION = "capd_finals_v2_1"
+PROACTIVE_SCHEMA_VERSION = "capd_proactive_v1_0"
+PROACTIVE_CONFIG_VERSION = 1
+PROACTIVE_CONTRACT_ID = "CAPD-PROACTIVE-STAGE0-1.0"
+PROACTIVE_PROVENANCE_SCHEMA_VERSION = "capd_proactive_provenance_v1_0"
+PROACTIVE_RESOLVED_CONFIG_FILENAME = "resolved_config.json"
+PROACTIVE_PROVENANCE_FILENAME = "provenance.json"
+PROACTIVE_PROVENANCE_REQUIRED_FIELDS = (
+    "schema_version",
+    "config_schema_version",
+    "config_version",
+    "contract_id",
+    "run_id",
+    "created_at",
+    "resolved_config_filename",
+    "resolved_config_fingerprint",
+    "code_commit",
+    "dirty_worktree",
+    "dirty_diff_fingerprint",
+    "machine_information",
+    "command",
+    "model_checkpoint",
+    "input_artifacts",
+    "output_artifacts",
+    "status",
+)
+PROACTIVE_MINIMUM_OUTPUT_LAYOUT = (
+    PROACTIVE_RESOLVED_CONFIG_FILENAME,
+    PROACTIVE_PROVENANCE_FILENAME,
+    "artifacts/",
+    "logs/",
+)
+PROACTIVE_OFFICIAL_POLICIES = (
+    "reactive_lru",
+    "proactive_lru",
+    "proactive_clock",
+    "tpp_inspired",
+    "capd",
+    "oracle",
+)
+PROACTIVE_POLICY_METHODS = {
+    "reactive_lru": "reactive_lru",
+    "proactive_lru": "proactive_lru",
+    "proactive_clock": "proactive_clock",
+    "tpp_inspired": "tpp_inspired",
+    "capd": "capd_proactive",
+    "oracle": "oracle",
+}
+PROACTIVE_ACTIVE_POLICIES = frozenset(
+    policy for policy in PROACTIVE_OFFICIAL_POLICIES
+    if policy != "reactive_lru")
 CONTRACT_ID = "CAPD-MIC-1.0"
 OFFICIAL_PROFILE = "official"
 SMOKE_PROFILE = "smoke"
@@ -77,6 +133,94 @@ V3_CONTRACT_FIELDS = (
     ("model", "position_encoding"),
     ("loss", "approx_ndcg_alpha"),
     ("training", "scope"),
+)
+
+PROACTIVE_REQUIRED_FIELDS = (
+    ("schema_version",),
+    ("config_version",),
+    ("contract", "id"),
+    ("contract", "status"),
+    ("experiment_stage",),
+    ("method", "name"),
+    ("method", "selector"),
+    ("method", "candidate_source"),
+    ("method", "candidate_size_K"),
+    ("method", "trigger_mode"),
+    ("method", "fallback_policy"),
+    ("scope", "single_process"),
+    ("scope", "single_thread"),
+    ("scope", "single_workload"),
+    ("scope", "trace_execution"),
+    ("scope", "page_enter_dram_semantics"),
+    ("scope", "promotion_mode"),
+    ("scope", "linux_kernel_integration"),
+    ("data", "workload"),
+    ("data", "trace_path"),
+    ("data", "trace_range", "start"),
+    ("data", "trace_range", "end"),
+    ("data", "trace_range", "interval"),
+    ("data", "splits", "train", "start"),
+    ("data", "splits", "train", "end"),
+    ("data", "splits", "train", "role"),
+    ("data", "splits", "validation", "start"),
+    ("data", "splits", "validation", "end"),
+    ("data", "splits", "validation", "role"),
+    ("data", "splits", "test", "start"),
+    ("data", "splits", "test", "end"),
+    ("data", "splits", "test", "role"),
+    ("data", "parameter_selection_splits"),
+    ("data", "test_used_for_parameter_selection"),
+    ("memory", "page_size_bytes"),
+    ("memory", "working_set_definition"),
+    ("memory", "working_set_size_pages"),
+    ("memory", "dram_pages"),
+    ("memory", "dram_working_set_ratio"),
+    ("memory", "nvm_capacity_model"),
+    ("active_demotion", "F_low"),
+    ("active_demotion", "F_target"),
+    ("active_demotion", "b_max"),
+    ("model", "history_H"),
+    ("model", "lookahead_L"),
+    ("model", "label_weights", "lambda_1"),
+    ("model", "label_weights", "lambda_2"),
+    ("model", "label_weights", "lambda_3"),
+    ("model", "model_checkpoint", "status"),
+    ("model", "model_checkpoint", "path"),
+    ("model", "model_checkpoint", "fingerprint"),
+    ("evaluation", "cost_profile", "status"),
+    ("evaluation", "cost_profile", "name"),
+    ("evaluation", "cost_profile", "weights"),
+    ("evaluation", "policy_name"),
+    ("evaluation", "random_seed"),
+    ("freeze_status", "stage0_scope"),
+    ("freeze_status", "stage1_replay"),
+    ("freeze_status", "stage2_cost_profile"),
+    ("freeze_status", "stage3_active_mechanism"),
+    ("freeze_status", "stage4_candidate"),
+    ("freeze_status", "stage4_training"),
+    ("freeze_status", "stage7_workload"),
+    ("freeze_status", "formal_test"),
+    ("execution", "mode"),
+    ("execution", "requested_split"),
+    ("execution", "formal"),
+    ("run", "run_id"),
+    ("run", "output_directory"),
+    ("run", "created_at"),
+    ("run", "resolved_config_filename"),
+    ("run", "provenance_filename"),
+    ("run", "resolved_config_fingerprint"),
+    ("run", "code_commit"),
+    ("run", "dirty_worktree"),
+    ("run", "machine_information"),
+    ("run", "command"),
+    ("outputs", "resolved_config", "filename"),
+    ("outputs", "resolved_config", "format"),
+    ("outputs", "resolved_config", "must_be_complete"),
+    ("outputs", "provenance", "filename"),
+    ("outputs", "provenance", "format"),
+    ("outputs", "provenance", "schema_version"),
+    ("outputs", "provenance", "required_fields"),
+    ("outputs", "minimum_layout"),
 )
 
 
@@ -718,12 +862,462 @@ def _validate_optimization_variant_config(
         "actual={}.".format(variant_id, expected, actual))
 
 
+def _is_number(value):
+  return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _require_positive_integer(value, field):
+  if (not isinstance(value, int) or isinstance(value, bool) or value <= 0):
+    raise ValueError("{} must be a positive integer.".format(field))
+  return value
+
+
+def _require_pending_nulls(config, paths, freeze_name):
+  populated = [
+      ".".join(path) for path in paths if _get(config, path) is not None]
+  if populated:
+    raise ValueError(
+        "{} is pending, so these fields must remain null: {}.".format(
+            freeze_name, populated))
+
+
+def _validate_proactive_intervals(data, require_defined=False):
+  if data["trace_range"]["interval"] != "half_open":
+    raise ValueError(
+        "Proactive trace and split ranges must use half-open [start, end).")
+  expected_roles = {
+      "train": "training_and_fit",
+      "validation": "parameter_selection",
+      "test": "final_evaluation_only",
+  }
+  for split, expected_role in expected_roles.items():
+    if data["splits"][split]["role"] != expected_role:
+      raise ValueError(
+          "{} split role must remain {}.".format(split, expected_role))
+  if data["parameter_selection_splits"] != ["train", "validation"]:
+    raise ValueError(
+        "Only Train and Validation may be used for parameter selection.")
+  if data["test_used_for_parameter_selection"] is not False:
+    raise ValueError("Test must never be used for parameter selection.")
+
+  range_values = [
+      data["trace_range"]["start"], data["trace_range"]["end"]]
+  for split in ("train", "validation", "test"):
+    range_values.extend([
+        data["splits"][split]["start"],
+        data["splits"][split]["end"],
+    ])
+  defined = [value is not None for value in range_values]
+  if not any(defined):
+    if require_defined:
+      raise ValueError("Frozen workload data requires all trace ranges.")
+    return
+  if not all(defined):
+    raise ValueError(
+        "Trace and Train/Validation/Test boundaries must be all null or all "
+        "defined.")
+  if any(not isinstance(value, int) or isinstance(value, bool)
+         for value in range_values):
+    raise ValueError("Trace boundaries must be integer access indices.")
+
+  trace_start, trace_end = range_values[:2]
+  train = data["splits"]["train"]
+  validation = data["splits"]["validation"]
+  test = data["splits"]["test"]
+  if trace_start < 0 or trace_start >= trace_end:
+    raise ValueError("trace_range must be a non-empty half-open interval.")
+  for split_name, split in (
+      ("train", train), ("validation", validation), ("test", test)):
+    if split["start"] < trace_start or split["end"] > trace_end:
+      raise ValueError("{} range lies outside trace_range.".format(
+          split_name))
+    if split["start"] >= split["end"]:
+      raise ValueError("{} range must be non-empty.".format(split_name))
+  if train["end"] > validation["start"]:
+    raise ValueError("Train and Validation ranges overlap or are out of order.")
+  if validation["end"] > test["start"]:
+    raise ValueError("Validation and Test ranges overlap or are out of order.")
+
+
+def _validate_proactive_run_metadata(config):
+  run = config["run"]
+  if not isinstance(run["run_id"], str) or not re.match(
+      r"^\d{8}T\d{6}Z__[a-z0-9_]+__[a-z0-9_.-]+__seed-(?:\d+|na)__"
+      r"[0-9a-f]{12}$", run["run_id"]):
+    raise ValueError(
+        "run.run_id does not match the frozen stage-0 representation.")
+  if not isinstance(run["output_directory"], str) or not (
+      run["output_directory"].strip()):
+    raise ValueError("Resolved runs require run.output_directory.")
+  if not isinstance(run["created_at"], str) or not re.match(
+      r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$", run["created_at"]):
+    raise ValueError("run.created_at must be an ISO-8601 UTC timestamp.")
+  if not isinstance(run["code_commit"], str) or not re.match(
+      r"^[0-9a-f]{7,64}$", run["code_commit"]):
+    raise ValueError("Resolved runs require a hexadecimal code commit.")
+  if not isinstance(run["dirty_worktree"], bool):
+    raise ValueError("run.dirty_worktree must be boolean.")
+  if not isinstance(run["command"], list) or not run["command"] or any(
+      not isinstance(item, str) or not item for item in run["command"]):
+    raise ValueError("Resolved runs require a non-empty command argv list.")
+  machine = run["machine_information"]
+  required_machine_fields = (
+      "hostname", "operating_system", "architecture", "cpu_model",
+      "logical_cpu_count", "memory_bytes", "runtime", "runtime_version")
+  if not isinstance(machine, dict):
+    raise ValueError("Resolved runs require run.machine_information.")
+  missing = [key for key in required_machine_fields
+             if machine.get(key) in (None, "")]
+  if missing:
+    raise ValueError(
+        "machine_information missing fields: {}.".format(missing))
+  if not run["resolved_config_fingerprint"]:
+    raise ValueError(
+        "Resolved runs require run.resolved_config_fingerprint.")
+
+
+def _validate_proactive_config(config, require_resolved=False):
+  """Validates the stage-0 proactive experiment contract.
+
+  Null values are permitted only while the freeze stage that owns them is
+  explicitly pending.  This lets stage 0 define one durable shape without
+  inventing stage-2/3/4/7 parameter values.
+  """
+  for path in PROACTIVE_REQUIRED_FIELDS:
+    _get(config, path)
+  if config["schema_version"] != PROACTIVE_SCHEMA_VERSION:
+    raise ValueError("Unsupported proactive schema_version: {}".format(
+        config["schema_version"]))
+  if config["config_version"] != PROACTIVE_CONFIG_VERSION:
+    raise ValueError(
+        "Proactive config_version must be {}.".format(
+            PROACTIVE_CONFIG_VERSION))
+  if config["contract"]["id"] != PROACTIVE_CONTRACT_ID:
+    raise ValueError(
+        "Proactive contract.id must be {}.".format(PROACTIVE_CONTRACT_ID))
+  if config["contract"]["status"] != "stage0_frozen":
+    raise ValueError("Proactive contract.status must be stage0_frozen.")
+  allowed_stages = tuple(
+      "stage{}".format(index) for index in range(13))
+  if config["experiment_stage"] not in allowed_stages:
+    raise ValueError(
+        "experiment_stage must be one of stage0 through stage12.")
+
+  scope = config["scope"]
+  for field in ("single_process", "single_thread", "single_workload"):
+    if scope[field] is not True:
+      raise ValueError(
+          "Formal proactive experiments require scope.{}=true.".format(
+              field))
+  expected_scope = {
+      "trace_execution": "single_application_sequential_access",
+      "page_enter_dram_semantics":
+          "occupies_one_free_frame_regardless_of_source",
+      "promotion_mode": "not_studied",
+      "linux_kernel_integration": "out_of_scope",
+  }
+  for field, expected in expected_scope.items():
+    if scope[field] != expected:
+      raise ValueError("scope.{} must be {}.".format(field, expected))
+
+  policy = config["evaluation"]["policy_name"]
+  if policy not in PROACTIVE_OFFICIAL_POLICIES:
+    raise ValueError(
+        "Unsupported policy_name {}; expected one of {}.".format(
+            policy, PROACTIVE_OFFICIAL_POLICIES))
+  method = config["method"]
+  expected_method = PROACTIVE_POLICY_METHODS[policy]
+  if method["name"] != expected_method:
+    raise ValueError(
+        "policy_name={} requires method.name={}.".format(
+            policy, expected_method))
+  if method["selector"] != "disabled":
+    raise ValueError("The candidate-page selector must remain disabled.")
+  if method["candidate_source"] != "lru_tail":
+    raise ValueError("candidate_source must remain lru_tail.")
+
+  freeze = config["freeze_status"]
+  allowed_states = ("pending", "frozen", "not_applicable")
+  invalid_states = {
+      key: value for key, value in freeze.items()
+      if value not in allowed_states}
+  if invalid_states:
+    raise ValueError("Invalid freeze_status values: {}.".format(
+        invalid_states))
+  if freeze["stage0_scope"] != "frozen":
+    raise ValueError("freeze_status.stage0_scope must be frozen.")
+  if freeze["stage1_replay"] == "not_applicable":
+    raise ValueError("Replay freezing applies to every official policy.")
+  if freeze["stage2_cost_profile"] == "not_applicable":
+    raise ValueError("Cost-profile freezing applies to every official policy.")
+  if freeze["stage3_active_mechanism"] == "not_applicable":
+    raise ValueError(
+        "Stage 3 also freezes the shared working-set/capacity contract.")
+  if freeze["stage7_workload"] == "not_applicable":
+    raise ValueError("Workload freezing applies to every official policy.")
+
+  memory = config["memory"]
+  if memory["page_size_bytes"] != 4096:
+    raise ValueError("Formal proactive experiments freeze 4 KiB pages.")
+  if memory["nvm_capacity_model"] != "unbounded_backing_tier":
+    raise ValueError(
+        "nvm_capacity_model must be unbounded_backing_tier.")
+
+  active = config["active_demotion"]
+  stage3_paths = (
+      ("memory", "working_set_definition"),
+      ("memory", "dram_working_set_ratio"),
+  )
+  if freeze["stage3_active_mechanism"] == "pending":
+    _require_pending_nulls(
+        config, stage3_paths + (
+            ("active_demotion", "F_low"),
+            ("active_demotion", "F_target"),
+            ("active_demotion", "b_max"),
+        ), "freeze_status.stage3_active_mechanism")
+  elif freeze["stage3_active_mechanism"] == "frozen":
+    if not isinstance(memory["working_set_definition"], str) or not (
+        memory["working_set_definition"].strip()):
+      raise ValueError(
+          "Frozen stage 3 requires memory.working_set_definition.")
+    ratio = memory["dram_working_set_ratio"]
+    if not _is_number(ratio) or not (0.0 < float(ratio) <= 1.0):
+      raise ValueError(
+          "Frozen stage 3 requires 0 < dram_working_set_ratio <= 1.")
+    if policy in PROACTIVE_ACTIVE_POLICIES:
+      low = _require_positive_integer(active["F_low"], "active_demotion.F_low")
+      target = _require_positive_integer(
+          active["F_target"], "active_demotion.F_target")
+      _require_positive_integer(active["b_max"], "active_demotion.b_max")
+      if low >= target:
+        raise ValueError("Proactive policies require 0 < F_low < F_target.")
+    elif any(active[key] is not None for key in ("F_low", "F_target", "b_max")):
+      raise ValueError(
+          "Reactive-LRU must not define proactive watermarks or b_max.")
+
+  if policy in PROACTIVE_ACTIVE_POLICIES:
+    if method["trigger_mode"] != "low_watermark":
+      raise ValueError("Proactive policies require trigger_mode=low_watermark.")
+    if method["fallback_policy"] != "lru":
+      raise ValueError("Proactive policies require fallback_policy=lru.")
+    if freeze["stage4_candidate"] == "not_applicable":
+      raise ValueError("Active policies require the stage-4 candidate gate.")
+    if freeze["stage4_candidate"] == "pending":
+      if method["candidate_size_K"] is not None:
+        raise ValueError(
+            "Pending stage 4 requires method.candidate_size_K=null.")
+    else:
+      candidate_size = _require_positive_integer(
+          method["candidate_size_K"], "method.candidate_size_K")
+      if (freeze["stage3_active_mechanism"] == "frozen" and
+          active["b_max"] >= candidate_size):
+        raise ValueError("Active policies require 1 <= b_max < K.")
+  else:
+    if method["trigger_mode"] != "on_demand_no_free_frame":
+      raise ValueError(
+          "Reactive-LRU requires trigger_mode=on_demand_no_free_frame.")
+    if method["fallback_policy"] != "not_applicable":
+      raise ValueError(
+          "Reactive-LRU requires fallback_policy=not_applicable.")
+    if method["candidate_size_K"] is not None:
+      raise ValueError("Reactive-LRU must not define candidate_size_K.")
+    if freeze["stage4_candidate"] != "not_applicable":
+      raise ValueError(
+          "Reactive-LRU requires stage4_candidate=not_applicable.")
+    if any(active[key] is not None for key in ("F_low", "F_target", "b_max")):
+      raise ValueError(
+          "Reactive-LRU must not define proactive watermarks or b_max.")
+
+  cost_profile = config["evaluation"]["cost_profile"]
+  if freeze["stage2_cost_profile"] == "pending":
+    if cost_profile != {
+        "status": "pending_stage2", "name": None, "weights": None}:
+      raise ValueError(
+          "Pending stage 2 requires an explicit null cost profile.")
+  elif freeze["stage2_cost_profile"] == "frozen":
+    if cost_profile["status"] != "frozen":
+      raise ValueError("Frozen stage 2 requires cost_profile.status=frozen.")
+    if not isinstance(cost_profile["name"], str) or not cost_profile["name"]:
+      raise ValueError("Frozen cost profile requires a name.")
+    weights = cost_profile["weights"]
+    expected_weights = ("dram_hit", "nvm_read", "nvm_write", "demotion")
+    if not isinstance(weights, dict) or set(weights) != set(expected_weights):
+      raise ValueError(
+          "Cost weights must define dram_hit/nvm_read/nvm_write/demotion.")
+    if any(not _is_number(weights[key]) or float(weights[key]) <= 0.0
+           for key in expected_weights):
+      raise ValueError("All frozen cost weights must be positive.")
+
+  model = config["model"]
+  label_weights = model["label_weights"]
+  checkpoint = model["model_checkpoint"]
+  training_policies = ("capd", "oracle")
+  if policy in training_policies:
+    if freeze["stage4_training"] == "not_applicable":
+      raise ValueError(
+          "{} requires the stage-4 training/label gate.".format(policy))
+    if freeze["stage4_training"] == "pending":
+      _require_pending_nulls(
+          config, (
+              ("model", "history_H"),
+              ("model", "lookahead_L"),
+              ("model", "label_weights", "lambda_1"),
+              ("model", "label_weights", "lambda_2"),
+              ("model", "label_weights", "lambda_3"),
+              ("evaluation", "random_seed"),
+          ), "freeze_status.stage4_training")
+      expected_checkpoint_status = (
+          "pending_stage4" if policy == "capd" else "not_applicable")
+      if checkpoint != {
+          "status": expected_checkpoint_status,
+          "path": None,
+          "fingerprint": None,
+      }:
+        raise ValueError(
+            "Pending stage 4 has an invalid model_checkpoint representation.")
+    else:
+      if policy == "capd":
+        _require_positive_integer(model["history_H"], "model.history_H")
+        _require_positive_integer(model["lookahead_L"], "model.lookahead_L")
+        if (not isinstance(config["evaluation"]["random_seed"], int) or
+            isinstance(config["evaluation"]["random_seed"], bool)):
+          raise ValueError("Frozen CAPD requires an integer random_seed.")
+        if (checkpoint["status"] != "frozen" or
+            not checkpoint["path"] or not checkpoint["fingerprint"]):
+          raise ValueError(
+              "Frozen CAPD Test requires a fingerprinted model checkpoint.")
+      else:
+        if model["history_H"] is not None:
+          raise ValueError("Oracle does not use model.history_H.")
+        _require_positive_integer(model["lookahead_L"], "model.lookahead_L")
+        if checkpoint != {
+            "status": "not_applicable", "path": None, "fingerprint": None}:
+          raise ValueError("Oracle checkpoint must be not_applicable/null.")
+        if config["evaluation"]["random_seed"] is not None:
+          raise ValueError("Oracle random_seed must be null/not applicable.")
+      for key, value in label_weights.items():
+        if not _is_number(value):
+          raise ValueError(
+              "Frozen label weight {} must be numeric.".format(key))
+  else:
+    if freeze["stage4_training"] != "not_applicable":
+      raise ValueError(
+          "{} requires stage4_training=not_applicable.".format(policy))
+    if any(value is not None for value in (
+        model["history_H"], model["lookahead_L"],
+        label_weights["lambda_1"], label_weights["lambda_2"],
+        label_weights["lambda_3"], config["evaluation"]["random_seed"])):
+      raise ValueError(
+          "{} must not define model/label/seed fields.".format(policy))
+    if checkpoint != {
+        "status": "not_applicable", "path": None, "fingerprint": None}:
+      raise ValueError(
+          "{} checkpoint must be not_applicable/null.".format(policy))
+
+  data = config["data"]
+  if freeze["stage7_workload"] == "pending":
+    _require_pending_nulls(
+        config, (
+            ("data", "workload"),
+            ("data", "trace_path"),
+            ("memory", "working_set_size_pages"),
+            ("memory", "dram_pages"),
+        ), "freeze_status.stage7_workload")
+    _validate_proactive_intervals(data, require_defined=False)
+  elif freeze["stage7_workload"] == "frozen":
+    if not isinstance(data["workload"], str) or not data["workload"]:
+      raise ValueError("Frozen stage 7 requires data.workload.")
+    if not isinstance(data["trace_path"], str) or not data["trace_path"]:
+      raise ValueError("Frozen stage 7 requires data.trace_path.")
+    working_set_size = _require_positive_integer(
+        memory["working_set_size_pages"], "memory.working_set_size_pages")
+    dram_pages = _require_positive_integer(
+        memory["dram_pages"], "memory.dram_pages")
+    if dram_pages > working_set_size:
+      raise ValueError("memory.dram_pages cannot exceed working-set pages.")
+    if (policy in PROACTIVE_ACTIVE_POLICIES and
+        freeze["stage3_active_mechanism"] == "frozen" and
+        active["F_target"] > dram_pages):
+      raise ValueError("F_target cannot exceed memory.dram_pages.")
+    _validate_proactive_intervals(data, require_defined=True)
+
+  execution = config["execution"]
+  if execution["mode"] not in (
+      "contract_validation", "train", "validation", "test", "formal_test"):
+    raise ValueError("Unsupported execution.mode.")
+  if execution["requested_split"] not in (
+      None, "train", "validation", "test"):
+    raise ValueError("execution.requested_split is invalid.")
+  if not isinstance(execution["formal"], bool):
+    raise ValueError("execution.formal must be boolean.")
+  if (execution["mode"] == "formal_test" and
+      (execution["requested_split"] != "test" or
+       execution["formal"] is not True)):
+    raise ValueError(
+        "formal_test mode requires requested_split=test and formal=true.")
+  if (execution["mode"] == "test" and
+      execution["requested_split"] != "test"):
+    raise ValueError("test mode requires requested_split=test.")
+  test_requested = (
+      execution["mode"] in ("test", "formal_test") or
+      execution["requested_split"] == "test")
+  if test_requested:
+    required_frozen = (
+        "stage1_replay", "stage2_cost_profile",
+        "stage3_active_mechanism", "stage7_workload", "formal_test")
+    missing_freezes = [
+        key for key in required_frozen if freeze[key] != "frozen"]
+    if policy in PROACTIVE_ACTIVE_POLICIES:
+      if freeze["stage4_candidate"] != "frozen":
+        missing_freezes.append("stage4_candidate")
+    if policy in training_policies:
+      if freeze["stage4_training"] != "frozen":
+        missing_freezes.append("stage4_training")
+    if missing_freezes:
+      raise ValueError(
+          "Test requested before parameter freeze: {}.".format(
+              missing_freezes))
+    _validate_proactive_run_metadata(config)
+
+  run = config["run"]
+  if run["resolved_config_filename"] != PROACTIVE_RESOLVED_CONFIG_FILENAME:
+    raise ValueError("Resolved config filename is frozen to {}.".format(
+        PROACTIVE_RESOLVED_CONFIG_FILENAME))
+  if run["provenance_filename"] != PROACTIVE_PROVENANCE_FILENAME:
+    raise ValueError("Provenance filename is frozen to {}.".format(
+        PROACTIVE_PROVENANCE_FILENAME))
+  resolved_contract = config["outputs"]["resolved_config"]
+  if resolved_contract != {
+      "filename": PROACTIVE_RESOLVED_CONFIG_FILENAME,
+      "format": "json",
+      "must_be_complete": True,
+  }:
+    raise ValueError("outputs.resolved_config violates the stage-0 contract.")
+  provenance_contract = config["outputs"]["provenance"]
+  if provenance_contract != {
+      "filename": PROACTIVE_PROVENANCE_FILENAME,
+      "format": "json",
+      "schema_version": PROACTIVE_PROVENANCE_SCHEMA_VERSION,
+      "required_fields": list(PROACTIVE_PROVENANCE_REQUIRED_FIELDS),
+  }:
+    raise ValueError("outputs.provenance violates the stage-0 contract.")
+  if tuple(config["outputs"]["minimum_layout"]) != (
+      PROACTIVE_MINIMUM_OUTPUT_LAYOUT):
+    raise ValueError("outputs.minimum_layout violates the stage-0 contract.")
+  if require_resolved:
+    _validate_proactive_run_metadata(config)
+  return config
+
+
 def validate_config(config, require_resolved=False):
   schema = config.get("schema_version")
   if schema == LEGACY_SCHEMA_VERSION:
     return _validate_legacy_config(config, require_resolved=require_resolved)
   if schema == SCHEMA_VERSION:
     return _validate_v3_config(config, require_resolved=require_resolved)
+  if schema == PROACTIVE_SCHEMA_VERSION:
+    return _validate_proactive_config(
+        config, require_resolved=require_resolved)
   raise ValueError("Unsupported schema_version: {}".format(schema))
 
 
@@ -746,8 +1340,34 @@ def load_config(path, require_resolved=False, project_root=None,
   return config
 
 
+def proactive_contract_from_config(config):
+  """Returns the immutable method/scope/data contract for proactive runs."""
+  _validate_proactive_config(config)
+  return {
+      "schema_version": config["schema_version"],
+      "config_version": config["config_version"],
+      "contract_id": config["contract"]["id"],
+      "method": copy.deepcopy(config["method"]),
+      "scope": copy.deepcopy(config["scope"]),
+      "page_size_bytes": config["memory"]["page_size_bytes"],
+      "nvm_capacity_model": config["memory"]["nvm_capacity_model"],
+      "data_interval": config["data"]["trace_range"]["interval"],
+      "split_roles": {
+          split: config["data"]["splits"][split]["role"]
+          for split in ("train", "validation", "test")
+      },
+      "parameter_selection_splits": copy.deepcopy(
+          config["data"]["parameter_selection_splits"]),
+      "test_used_for_parameter_selection":
+          config["data"]["test_used_for_parameter_selection"],
+      "policy_name": config["evaluation"]["policy_name"],
+  }
+
+
 def contract_from_config(config):
   validate_config(config)
+  if config["schema_version"] == PROACTIVE_SCHEMA_VERSION:
+    return proactive_contract_from_config(config)
   contract = {
       "schema_version": config["schema_version"],
       "D": int(config["memory"]["dram_capacity_pages"]),

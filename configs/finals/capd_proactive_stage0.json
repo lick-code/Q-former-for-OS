@@ -1,0 +1,157 @@
+{
+  "active_demotion": {
+    "F_low": null,
+    "F_target": null,
+    "b_max": null
+  },
+  "config_version": 1,
+  "contract": {
+    "id": "CAPD-PROACTIVE-STAGE0-1.0",
+    "status": "stage0_frozen"
+  },
+  "data": {
+    "parameter_selection_splits": [
+      "train",
+      "validation"
+    ],
+    "splits": {
+      "test": {
+        "end": null,
+        "role": "final_evaluation_only",
+        "start": null
+      },
+      "train": {
+        "end": null,
+        "role": "training_and_fit",
+        "start": null
+      },
+      "validation": {
+        "end": null,
+        "role": "parameter_selection",
+        "start": null
+      }
+    },
+    "test_used_for_parameter_selection": false,
+    "trace_path": null,
+    "trace_range": {
+      "end": null,
+      "interval": "half_open",
+      "start": null
+    },
+    "workload": null
+  },
+  "evaluation": {
+    "cost_profile": {
+      "name": null,
+      "status": "pending_stage2",
+      "weights": null
+    },
+    "policy_name": "capd",
+    "random_seed": null
+  },
+  "execution": {
+    "formal": false,
+    "mode": "contract_validation",
+    "requested_split": null
+  },
+  "experiment_stage": "stage0",
+  "freeze_status": {
+    "formal_test": "pending",
+    "stage0_scope": "frozen",
+    "stage1_replay": "pending",
+    "stage2_cost_profile": "pending",
+    "stage3_active_mechanism": "pending",
+    "stage4_candidate": "pending",
+    "stage4_training": "pending",
+    "stage7_workload": "pending"
+  },
+  "memory": {
+    "dram_pages": null,
+    "dram_working_set_ratio": null,
+    "nvm_capacity_model": "unbounded_backing_tier",
+    "page_size_bytes": 4096,
+    "working_set_definition": null,
+    "working_set_size_pages": null
+  },
+  "method": {
+    "candidate_size_K": null,
+    "candidate_source": "lru_tail",
+    "fallback_policy": "lru",
+    "name": "capd_proactive",
+    "selector": "disabled",
+    "trigger_mode": "low_watermark"
+  },
+  "model": {
+    "history_H": null,
+    "label_weights": {
+      "lambda_1": null,
+      "lambda_2": null,
+      "lambda_3": null
+    },
+    "lookahead_L": null,
+    "model_checkpoint": {
+      "fingerprint": null,
+      "path": null,
+      "status": "pending_stage4"
+    }
+  },
+  "outputs": {
+    "minimum_layout": [
+      "resolved_config.json",
+      "provenance.json",
+      "artifacts/",
+      "logs/"
+    ],
+    "provenance": {
+      "filename": "provenance.json",
+      "format": "json",
+      "required_fields": [
+        "schema_version",
+        "config_schema_version",
+        "config_version",
+        "contract_id",
+        "run_id",
+        "created_at",
+        "resolved_config_filename",
+        "resolved_config_fingerprint",
+        "code_commit",
+        "dirty_worktree",
+        "dirty_diff_fingerprint",
+        "machine_information",
+        "command",
+        "model_checkpoint",
+        "input_artifacts",
+        "output_artifacts",
+        "status"
+      ],
+      "schema_version": "capd_proactive_provenance_v1_0"
+    },
+    "resolved_config": {
+      "filename": "resolved_config.json",
+      "format": "json",
+      "must_be_complete": true
+    }
+  },
+  "run": {
+    "code_commit": null,
+    "command": null,
+    "created_at": null,
+    "dirty_worktree": null,
+    "machine_information": null,
+    "output_directory": null,
+    "provenance_filename": "provenance.json",
+    "resolved_config_filename": "resolved_config.json",
+    "resolved_config_fingerprint": null,
+    "run_id": null
+  },
+  "schema_version": "capd_proactive_v1_0",
+  "scope": {
+    "linux_kernel_integration": "out_of_scope",
+    "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+    "promotion_mode": "not_studied",
+    "single_process": true,
+    "single_thread": true,
+    "single_workload": true,
+    "trace_execution": "single_application_sequential_access"
+  }
+}
