@@ -152,7 +152,9 @@ cost = dram_hits + 2*nvm_reads + 8*nvm_writes + 10*total_demotions
 <output_root>/stage3/<run_id>/
 ```
 
-目录包含 resolved config、provenance、resolved manifest、Working Set、容量压力、burst 汇总与原始窗口、水位与 b_max JSONL/CSV、选择决定、freeze candidate、日志目录和 Markdown 报告。JSON/JSONL 使用 UTF-8，禁止 NaN/Infinity。已有 run 默认拒绝覆盖；执行过程先写 `.incomplete` 临时目录，失败时清理，成功后原子改名，避免留下伪成功产物。
+目录包含 resolved config、provenance、resolved manifest、Working Set、容量压力、burst 汇总与原始窗口、水位与 b_max JSONL/CSV、选择决定、freeze candidate、日志目录、逐 replay checkpoint 和 Markdown 报告。JSON/JSONL 使用 UTF-8，禁止 NaN/Infinity。已有完整 run 默认拒绝覆盖；执行过程先写 `.incomplete` 临时目录，每个 replay 完成后原子写入 checkpoint，并向 `logs/progress.jsonl` 追加进度。中断或失败时保留 `.incomplete`，成功后原子改名，既不产生伪成功目录，也不丢失已完成计算。
+
+Stage 3 大 trace 使用 primitive-array 紧凑输入、O(1) LRU 更新和轻量日志模式。热路径执行常数时间局部守卫；每个 replay 结束时仍执行一次全量状态不变量与计数审计。Stage 1 的默认全日志、逐访问全量检查接口保持不变。
 
 ## 11. 状态转换
 
@@ -178,6 +180,22 @@ cd ~/Q-former-for-OS
 STAGE3_INPUT_MANIFEST=/absolute/path/stage3_manifest.json \
 STAGE3_RUN_ID=stage3-real-001 \
 bash scripts/validate_capd_proactive_stage3_server.sh
+```
+
+如果同一 `run_id` 的 `.incomplete` 已由新版程序建立，或是旧版留下的空目录，可原地恢复：
+
+```bash
+cd ~/Q-former-for-OS
+STAGE3_INPUT_MANIFEST=/absolute/path/stage3_manifest.json \
+STAGE3_RUN_ID=stage3-real-001 \
+STAGE3_RESUME=1 \
+bash scripts/validate_capd_proactive_stage3_server.sh
+```
+
+恢复前会核对配置、manifest、Stage 0/2 配置和所有 trace fingerprint；任一输入变化都会拒绝复用 checkpoint。运行时终端会逐项打印 `start/done/checkpoint reuse`，状态可查看：
+
+```bash
+tail -f outputs/capd_proactive_calibration/stage3/stage3-real-001.incomplete/logs/progress.jsonl
 ```
 
 默认日志写入仓库根目录 `stage3_validation.log`。合成验收期望最后输出 `STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS`；真实输入成功运行后输出 `STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE`。脚本不运行 Test、不训练 CAPD、不需要 GPU。

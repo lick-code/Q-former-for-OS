@@ -97,7 +97,18 @@ Small/Medium/Large 根据 Validation 的 100 访问窗口 P50/P95/P99 机器生�
 python -m unittest tests.test_capd_proactive_stage3 -v
 ```
 
-结果：15 passed，0 failed。测试包含完整 synthetic Stage 3 smoke。`py_compile` 在本机默认写仓库 `qmap/__pycache__` 时因目录权限被拒绝；服务器脚本已通过 `PYTHONPYCACHEPREFIX` 将字节码重定向到临时目录，不影响正式验收。
+结果：20 passed，0 failed。测试包含完整 synthetic Stage 3 smoke、O(1) LRU 顺序等价、完整/轻量 replay 汇总等价，以及故障注入后的 checkpoint 恢复与干净运行结果一致性。`py_compile` 在本机默认写仓库 `qmap/__pycache__` 时因目录权限被拒绝；服务器脚本已通过 `PYTHONPYCACHEPREFIX` 将字节码重定向到临时目录，不影响正式验收。
+
+正式 `canneal/validation`（200,000 次访问，20% Working Set，512 页 DRAM）的本地基准：
+
+- Reactive-LRU：4.148 s（开启 `tracemalloc`，峰值 6.99 MiB）；
+- Proactive-LRU：约 0.85 s（`b_max=1/4`）；
+- 每个 Stage 3 replay：1 次结束态全量不变量检查；
+- 旧实现同一 Reactive-LRU replay 在 60 s 内未完成。
+
+全部 6 个正式 Train/Validation trace 共 3,600,000 次访问，紧凑加载的 `tracemalloc` 峰值为 62.64 MiB；中断日志中的旧进程 RSS 约为 2.3 GiB。三类 Validation 的无内存跟踪基准为 4.17–5.21 μs/access。按当前完整矩阵外推，服务器正常应在约 5–15 分钟内完成；具体时间仍以 `logs/progress.jsonl` 的逐 replay 实测为准。
+
+该基准只用于运行时间和复杂度验收，不进入水位或 `b_max` 选择证据。
 
 ## 服务器运行
 
@@ -109,7 +120,14 @@ python -m unittest tests.test_capd_proactive_stage3 -v
 cd ~/Q-former-for-OS
 STAGE3_INPUT_MANIFEST=/absolute/path/stage3_manifest.json \
 STAGE3_RUN_ID=stage3-real-001 \
+STAGE3_RESUME=1 \
 bash scripts/validate_capd_proactive_stage3_server.sh
+```
+
+`STAGE3_RESUME=1` 会复用同一 `.incomplete` 下已完成的 replay；若旧目录为空，新版会安全接管。若 checkpoint 已存在但配置、manifest 或 trace fingerprint 改变，程序会拒绝恢复。实时进度位于：
+
+```text
+outputs/capd_proactive_calibration/stage3/stage3-real-001.incomplete/logs/progress.jsonl
 ```
 
 期望日志：仓库根目录 `stage3_validation.log`。期望最终标志：

@@ -9,6 +9,7 @@ Proactive-LRU to calibrate watermarks and ``b_max``.
 
 from __future__ import annotations
 
+import array
 import collections
 import copy
 import csv
@@ -18,15 +19,15 @@ import hashlib
 import json
 import math
 import os
-import shutil
 import statistics
 import subprocess
+import time
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from qmap import finals_config
 from qmap import proactive_cost
 from qmap import proactive_replay
-from qmap.qmap_generator import read_trace
+from qmap.qmap_generator import is_header_row, parse_header, parse_int, parse_rw
 
 
 SCHEMA_NAME = "capd_proactive_stage3_active_mechanism"
@@ -56,6 +57,115 @@ RAW_METRICS = (
 
 class Stage3ContractError(ValueError):
   """Raised when stage-3 data or configuration violates the frozen boundary."""
+
+
+class _CompactAccess(tuple):
+  _FIELDS = {"page": 0, "rw": 1, "pc": 2}
+
+  def __new__(cls, page, rw, pc):
+    return tuple.__new__(cls, (page, rw, pc))
+
+  def __getitem__(self, index):
+    if isinstance(index, str):
+      index = self._FIELDS[index]
+    return tuple.__getitem__(self, index)
+
+  def get(self, key, default=None):
+    index = self._FIELDS.get(key)
+    return default if index is None else tuple.__getitem__(self, index)
+
+
+class CompactTrace(Sequence[Mapping[str, Any]]):
+  """Reiterable trace backed by primitive arrays instead of millions of dicts."""
+
+  def __init__(self):
+    self.pages = array.array("Q")
+    self.rws = bytearray()
+    self.pcs = array.array("Q")
+
+  def append(self, page: int, rw: int, pc: int) -> None:
+    self.pages.append(page)
+    self.rws.append(rw)
+    self.pcs.append(pc)
+
+  def __len__(self) -> int:
+    return len(self.pages)
+
+  def __iter__(self):
+    return (
+        _CompactAccess(
+            self.pages[index], self.rws[index], self.pcs[index])
+        for index in range(len(self.pages)))
+
+  def __getitem__(self, index):
+    if isinstance(index, slice):
+      return [
+          {"page": page, "rw": rw, "pc": pc}
+          for page, rw, pc in zip(
+              self.pages[index], self.rws[index], self.pcs[index])]
+    return {
+        "page": self.pages[index],
+        "rw": self.rws[index],
+        "pc": self.pcs[index],
+    }
+
+  def unique_pages(self):
+    return set(self.pages)
+
+
+def _read_compact_trace(csv_path: str, page_shift: int) -> Tuple[CompactTrace, str]:
+  trace = CompactTrace()
+  rw_source = None
+  header_indices = None
+  with open(csv_path, "r", encoding="utf-8", newline="") as input_file:
+    reader = csv.reader(input_file)
+    for row_number, row in enumerate(reader, start=1):
+      if not row:
+        continue
+      if row_number == 1 and is_header_row(row):
+        header_indices = parse_header(row)
+        rw_source = (
+            "real trace RW column" if header_indices[2] is not None
+            else "fallback simulated rw = page & 1")
+        continue
+      if header_indices is not None:
+        pc_index, address_index, rw_index = header_indices
+        required_index = max(
+            pc_index, address_index,
+            -1 if rw_index is None else rw_index)
+        _require(
+            len(row) > required_index,
+            "Line {} lacks a required CSV column: {}.".format(
+                row_number, csv_path))
+        pc = parse_int(row[pc_index])
+        address = parse_int(row[address_index])
+      else:
+        _require(
+            len(row) in (2, 3),
+            "Line {} must have pc,address[,rw]: {}.".format(
+                row_number, csv_path))
+        if rw_source is None:
+          rw_source = (
+              "real trace RW column" if len(row) == 3
+              else "fallback simulated rw = page & 1")
+        _require(
+            (len(row) == 3) == (rw_source == "real trace RW column"),
+            "Inconsistent RW columns at line {}: {}.".format(
+                row_number, csv_path))
+        pc = parse_int(row[0])
+        address = parse_int(row[1])
+      page = address >> page_shift
+      if header_indices is not None and header_indices[2] is not None:
+        rw = parse_rw(row[header_indices[2]])
+      elif header_indices is None and rw_source == "real trace RW column":
+        rw = parse_rw(row[2])
+      else:
+        rw = page & 1
+      _require(
+          page >= 0 and pc >= 0,
+          "Negative page/pc at line {}: {}.".format(row_number, csv_path))
+      trace.append(page, rw, pc)
+  return trace, rw_source or "fallback simulated rw = page & 1"
 
 
 def _reject_json_constant(value: str) -> None:
@@ -372,31 +482,20 @@ def _resolve_trace_path(
 
 def load_inputs(
     manifest_path: str, project_root: str
-) -> Tuple[Mapping[str, Any], Dict[str, Dict[str, List[Dict[str, Any]]]], List[Dict[str, Any]]]:
+) -> Tuple[Mapping[str, Any], Dict[str, Dict[str, Sequence[Any]]], List[Dict[str, Any]]]:
   manifest = validate_manifest(load_json(manifest_path))
-  traces: Dict[str, Dict[str, List[Dict[str, Any]]]] = collections.defaultdict(dict)
+  traces: Dict[str, Dict[str, Sequence[Any]]] = collections.defaultdict(dict)
   resolved_entries = []
   for entry in manifest["entries"]:
     path = _resolve_trace_path(entry, manifest, manifest_path, project_root)
-    trace, rw_source = read_trace(path, entry["page_shift"])
+    trace, rw_source = _read_compact_trace(path, entry["page_shift"])
     _require(trace, "Empty trace is forbidden: {}".format(path))
-    normalized = []
-    for access_index, access in enumerate(trace):
-      page = access.get("page")
-      _require(
-          isinstance(page, int) and not isinstance(page, bool) and page >= 0,
-          "Illegal page at {}:{}.".format(path, access_index))
-      rw = access.get("rw")
-      _require(rw in (0, 1), "Illegal rw at {}:{}.".format(path, access_index))
-      normalized.append({
-          "page": page, "rw": rw, "pc": access.get("pc"),
-      })
-    traces[entry["workload"]][entry["split"]] = normalized
+    traces[entry["workload"]][entry["split"]] = trace
     resolved = copy.deepcopy(entry)
     resolved.update({
         "resolved_trace_path": path,
         "trace_fingerprint": finals_config.fingerprint_file(path),
-        "trace_accesses": len(normalized),
+        "trace_accesses": len(trace),
         "rw_source": rw_source,
     })
     resolved_entries.append(resolved)
@@ -404,7 +503,7 @@ def load_inputs(
 
 
 def working_set_summary(
-    traces: Mapping[str, Mapping[str, Sequence[Mapping[str, Any]]]],
+    traces: Mapping[str, Mapping[str, Sequence[Any]]],
     page_size_bytes: int = 4096
 ) -> List[Dict[str, Any]]:
   results = []
@@ -414,8 +513,12 @@ def working_set_summary(
     validation = traces[workload].get("validation")
     _require(train is not None and validation is not None, "{} lacks Train/Validation.".format(workload))
     _require(train and validation, "{} has an empty split.".format(workload))
-    train_pages = {item["page"] for item in train}
-    validation_pages = {item["page"] for item in validation}
+    train_pages = (
+        train.unique_pages() if isinstance(train, CompactTrace)
+        else {item["page"] for item in train})
+    validation_pages = (
+        validation.unique_pages() if isinstance(validation, CompactTrace)
+        else {item["page"] for item in validation})
     union = train_pages | validation_pages
     _require(union, "{} has an empty Working Set.".format(workload))
     results.append({
@@ -529,7 +632,7 @@ def _default_cost(summary: Mapping[str, Any]) -> Tuple[int, Dict[str, int]]:
 
 
 def _replay_row(
-    stage0: Mapping[str, Any], trace: Sequence[Mapping[str, Any]],
+    stage0: Mapping[str, Any], trace: Sequence[Any],
     workload: str, split: str, capacity: Mapping[str, Any], policy: str,
     F_low: Optional[int] = None, F_target: Optional[int] = None,
     b_max: Optional[int] = None, candidate_bound: Optional[int] = None,
@@ -548,7 +651,10 @@ def _replay_row(
         F_low=F_low, F_target=F_target, b_max=b_max,
         candidate_size_K=candidate_bound,
         history_window_size=10, early_reuse_window=64)
-  result = proactive_replay.ProactiveReplay(stage0, parameters).run(trace)
+  result = proactive_replay.ProactiveReplay(
+      stage0, parameters, invariant_mode="boundary", record_details=False,
+      capture_page_enter_flags=(policy == PRE_WATERMARK_POLICY)).run(
+          trace, copy_trace=False, compact=True)
   summary = result["summary"]
   cost, components = _default_cost(summary)
   early_rate, early_status = _early_reuse(summary)
@@ -574,10 +680,13 @@ def _replay_row(
   }
   for metric in RAW_METRICS:
     row[metric] = summary[metric]
-  candidate_counts = [len(item["candidate_pages"]) for item in result["rounds"]]
-  row["actual_candidate_counts_by_round"] = candidate_counts
-  row["actual_candidate_count_min"] = min(candidate_counts) if candidate_counts else None
-  row["actual_candidate_count_max"] = max(candidate_counts) if candidate_counts else None
+  row["actual_candidate_round_count"] = result[
+      "actual_candidate_round_count"]
+  row["actual_candidate_counts_by_round"] = result[
+      "actual_candidate_counts_by_round"]
+  row["actual_candidate_count_min"] = result["actual_candidate_count_min"]
+  row["actual_candidate_count_max"] = result["actual_candidate_count_max"]
+  row["full_invariant_checks"] = result["full_invariant_checks"]
   row["state_invariants_passed"] = True
   return row, result
 
@@ -938,15 +1047,161 @@ def _report_markdown(payload: Mapping[str, Any]) -> str:
   return "\n".join(lines)
 
 
+def _write_json_atomic(path: str, value: Any) -> None:
+  temporary = "{}.tmp-{}".format(path, os.getpid())
+  write_json(temporary, value)
+  os.replace(temporary, path)
+
+
+def _append_jsonl(path: str, value: Mapping[str, Any]) -> None:
+  directory = os.path.dirname(os.path.abspath(path))
+  if directory:
+    os.makedirs(directory, exist_ok=True)
+  with open(path, "a", encoding="utf-8", newline="\n") as output_file:
+    output_file.write(json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+        allow_nan=False))
+    output_file.write("\n")
+    output_file.flush()
+    os.fsync(output_file.fileno())
+
+
+class _RunJournal(object):
+  """Durable per-replay checkpoints for interruption-safe calibration."""
+
+  def __init__(
+      self, directory: str, identity: Mapping[str, Any], resume: bool
+  ) -> None:
+    self.directory = directory
+    self.state_path = os.path.join(directory, "run_state.json")
+    self.log_path = os.path.join(directory, "logs", "progress.jsonl")
+    self.checkpoint_directory = os.path.join(directory, "checkpoints")
+    self.identity = copy.deepcopy(identity)
+    self.resumed = False
+    if os.path.exists(directory):
+      _require(resume, "Incomplete run already exists; pass --resume: {}".format(
+          directory))
+      if os.path.isfile(self.state_path):
+        state = load_json(self.state_path)
+        _require(
+            state.get("identity") == self.identity,
+            "Resume refused because config, manifest, or inputs changed.")
+        self.state = state
+        self.resumed = True
+        self.state["status"] = "running"
+        self.state["resumed_at"] = _utc_now()
+        self.state.pop("error_type", None)
+        self.state.pop("error_message", None)
+      else:
+        _require(
+            not os.listdir(directory),
+            "Cannot adopt a non-empty legacy run without run_state.json.")
+        os.makedirs(self.checkpoint_directory)
+        os.makedirs(os.path.dirname(self.log_path))
+        self.state = {
+            "schema_version": RESULT_SCHEMA,
+            "status": "running",
+            "created_at": _utc_now(),
+            "identity": self.identity,
+            "completed_replay_tasks": 0,
+            "last_task_id": None,
+            "adopted_empty_legacy_directory": True,
+        }
+        self.resumed = True
+    else:
+      os.makedirs(self.checkpoint_directory)
+      os.makedirs(os.path.dirname(self.log_path))
+      self.state = {
+          "schema_version": RESULT_SCHEMA,
+          "status": "running",
+          "created_at": _utc_now(),
+          "identity": self.identity,
+          "completed_replay_tasks": 0,
+          "last_task_id": None,
+      }
+    _write_json_atomic(self.state_path, self.state)
+    self.record("run_resumed" if self.resumed else "run_started", {
+        "completed_replay_tasks": self.state["completed_replay_tasks"]})
+
+  @staticmethod
+  def task_id(phase: str, metadata: Mapping[str, Any]) -> str:
+    return "{}-{}".format(phase, _fingerprint_value(metadata)[:20])
+
+  def record(self, event: str, fields: Mapping[str, Any]) -> None:
+    row = {
+        "schema_version": RESULT_SCHEMA,
+        "timestamp": _utc_now(),
+        "event": event,
+    }
+    row.update(fields)
+    _append_jsonl(self.log_path, row)
+
+  def run_task(
+      self, phase: str, metadata: Mapping[str, Any], callback
+  ) -> Mapping[str, Any]:
+    task_id = self.task_id(phase, metadata)
+    checkpoint_path = os.path.join(
+        self.checkpoint_directory, task_id + ".json")
+    if os.path.isfile(checkpoint_path):
+      checkpoint = load_json(checkpoint_path)
+      _require(
+          checkpoint.get("metadata") == metadata,
+          "Checkpoint metadata mismatch: {}".format(task_id))
+      self.record("replay_skipped_checkpoint", {
+          "task_id": task_id, "phase": phase})
+      print("[stage3] checkpoint reuse {}".format(task_id), flush=True)
+      return checkpoint["payload"]
+    self.record("replay_started", {
+        "task_id": task_id, "phase": phase, "metadata": metadata})
+    print(
+        "[stage3] start {} workload={} split={} capacity={} ratio={}".format(
+            phase, metadata.get("workload"), metadata.get("split"),
+            metadata.get("dram_capacity_pages"),
+            metadata.get("capacity_ratio")),
+        flush=True)
+    started = time.monotonic()
+    payload = callback()
+    elapsed = time.monotonic() - started
+    checkpoint = {
+        "schema_version": RESULT_SCHEMA,
+        "task_id": task_id,
+        "phase": phase,
+        "metadata": copy.deepcopy(metadata),
+        "elapsed_seconds": elapsed,
+        "payload": payload,
+    }
+    _write_json_atomic(checkpoint_path, checkpoint)
+    self.state["completed_replay_tasks"] += 1
+    self.state["last_task_id"] = task_id
+    self.state["updated_at"] = _utc_now()
+    _write_json_atomic(self.state_path, self.state)
+    self.record("replay_completed", {
+        "task_id": task_id, "phase": phase,
+        "elapsed_seconds": elapsed,
+        "completed_replay_tasks": self.state["completed_replay_tasks"]})
+    print(
+        "[stage3] done {} {:.3f}s completed={}".format(
+            task_id, elapsed, self.state["completed_replay_tasks"]),
+        flush=True)
+    return payload
+
+  def finish(self, status: str) -> None:
+    self.state["status"] = status
+    self.state["finished_at"] = _utc_now()
+    _write_json_atomic(self.state_path, self.state)
+    self.record("run_{}".format(status), {
+        "completed_replay_tasks": self.state["completed_replay_tasks"]})
+
+
 def run_calibration(
     config: Mapping[str, Any], stage0: Mapping[str, Any],
     stage2: proactive_cost.CostConfiguration,
     manifest: Mapping[str, Any],
     traces: Mapping[str, Mapping[str, Sequence[Mapping[str, Any]]]],
     resolved_entries: Sequence[Mapping[str, Any]],
-    run_id: str, output_root: str, project_root: str
+    run_id: str, output_root: str, project_root: str, resume: bool = False
 ) -> Dict[str, Any]:
-  """Runs stage 3 and atomically writes one immutable run directory."""
+  """Runs stage 3 with durable replay checkpoints and an immutable final dir."""
   validate_config(config, stage0=stage0, stage2=stage2)
   validate_manifest(manifest)
   _require(isinstance(run_id, str) and run_id.strip(), "run_id is required.")
@@ -954,8 +1209,17 @@ def run_calibration(
   final_directory = os.path.join(output_root, "stage3", run_id)
   _require(not os.path.exists(final_directory), "run_id already exists: {}".format(final_directory))
   temporary_directory = final_directory + ".incomplete"
-  _require(not os.path.exists(temporary_directory), "Incomplete run already exists: {}".format(temporary_directory))
-  os.makedirs(temporary_directory)
+  identity = {
+      "run_id": run_id,
+      "config_fingerprint": _fingerprint_value(config),
+      "manifest_fingerprint": _fingerprint_value(manifest),
+      "stage0_config_fingerprint": finals_config.config_fingerprint(stage0),
+      "stage2_config_fingerprint": _fingerprint_value(stage2.source),
+      "input_fingerprints": sorted(
+          [item["workload"], item["split"], item["trace_fingerprint"]]
+          for item in resolved_entries),
+  }
+  journal = _RunJournal(temporary_directory, identity, bool(resume))
   try:
     working_sets = working_set_summary(traces, config["page_size_bytes"])
     profiles = config["capacity_profile_candidates"]
@@ -970,15 +1234,38 @@ def run_calibration(
       for workload in sorted(traces):
         for capacity in capacity_matrices[profile_name][workload]:
           for split in ALLOWED_SPLITS:
-            row, result = _replay_row(
-                stage0, traces[workload][split], workload, split, capacity,
-                PRE_WATERMARK_POLICY)
+            metadata = {
+                "workload": workload,
+                "split": split,
+                "capacity_ratio": capacity["capacity_ratio"],
+                "dram_capacity_pages": capacity["dram_capacity_pages"],
+                "policy": PRE_WATERMARK_POLICY,
+            }
+
+            def reactive_task():
+              row_value, replay_result = _replay_row(
+                  stage0, traces[workload][split], workload, split, capacity,
+                  PRE_WATERMARK_POLICY)
+              statistics_rows = []
+              window_rows = []
+              for window_size in config["burst_windows"]:
+                stats_value, windows_value = burst_statistics(
+                    replay_result["page_enter_flags"], window_size)
+                statistics_rows.append(stats_value)
+                window_rows.extend(windows_value)
+              return {
+                  "row": row_value,
+                  "burst_statistics": statistics_rows,
+                  "burst_windows": window_rows,
+              }
+
+            replay_payload = journal.run_task(
+                "reactive", metadata, reactive_task)
+            row = copy.deepcopy(replay_payload["row"])
             row["capacity_profile"] = profile_name
             reactive_rows.append(row)
-            flags = [
-                access["page_entered_dram"] for access in result["accesses"]]
-            for window_size in config["burst_windows"]:
-              stats, windows = burst_statistics(flags, window_size)
+            for stats_value in replay_payload["burst_statistics"]:
+              stats = copy.deepcopy(stats_value)
               stats.update({
                   "schema_version": RESULT_SCHEMA,
                   "workload": workload,
@@ -988,16 +1275,26 @@ def run_calibration(
                   "dram_capacity_pages": capacity["dram_capacity_pages"],
               })
               burst_stats_rows.append(stats)
-              for item in windows:
-                item.update({
-                    "schema_version": RESULT_SCHEMA,
-                    "workload": workload,
-                    "split": split,
-                    "capacity_profile": profile_name,
-                    "capacity_ratio": capacity["capacity_ratio"],
-                    "dram_capacity_pages": capacity["dram_capacity_pages"],
-                })
-                burst_window_rows.append(item)
+            for window_value in replay_payload["burst_windows"]:
+              item = copy.deepcopy(window_value)
+              item.update({
+                  "schema_version": RESULT_SCHEMA,
+                  "workload": workload,
+                  "split": split,
+                  "capacity_profile": profile_name,
+                  "capacity_ratio": capacity["capacity_ratio"],
+                  "dram_capacity_pages": capacity["dram_capacity_pages"],
+              })
+              burst_window_rows.append(item)
+    write_jsonl(
+        os.path.join(temporary_directory, "reactive_results.jsonl"),
+        reactive_rows)
+    write_json(
+        os.path.join(temporary_directory, "burst_statistics.json"),
+        burst_stats_rows)
+    write_jsonl(
+        os.path.join(temporary_directory, "burst_windows.jsonl"),
+        burst_window_rows)
 
     primary_audit = audit_pressure(
         [row for row in reactive_rows if row["capacity_profile"] == "primary"],
@@ -1041,15 +1338,37 @@ def run_calibration(
                   "state_invariants_passed": False,
               })
               continue
-            row, _ = _replay_row(
-                stage0, traces[workload]["validation"], workload,
-                "validation", capacity, CALIBRATION_POLICY,
-                F_low=candidate["F_low"], F_target=candidate["F_target"],
-                b_max=1, candidate_bound=proxy_bound)
+            metadata = {
+                "workload": workload,
+                "split": "validation",
+                "capacity_ratio": capacity["capacity_ratio"],
+                "dram_capacity_pages": capacity["dram_capacity_pages"],
+                "policy": CALIBRATION_POLICY,
+                "phase_candidate": "watermark",
+                "watermark_label": candidate["label"],
+                "F_low": candidate["F_low"],
+                "F_target": candidate["F_target"],
+                "b_max": 1,
+                "candidate_bound": proxy_bound,
+            }
+
+            def watermark_task():
+              row_value, _ = _replay_row(
+                  stage0, traces[workload]["validation"], workload,
+                  "validation", capacity, CALIBRATION_POLICY,
+                  F_low=candidate["F_low"], F_target=candidate["F_target"],
+                  b_max=1, candidate_bound=proxy_bound)
+              return {"row": row_value}
+
+            row = copy.deepcopy(journal.run_task(
+                "watermark", metadata, watermark_task)["row"])
             row.update({
                 "watermark_label": candidate["label"],
                 "legal": True, "illegal_reason": None})
             watermark_rows.append(row)
+    write_jsonl(
+        os.path.join(temporary_directory, "watermark_results.jsonl"),
+        watermark_rows)
 
     primary_proxy = config["stage3_calibration_candidate_bound"]
     watermark_primary_rows = [
@@ -1083,13 +1402,34 @@ def run_calibration(
                     "state_invariants_passed": False,
                 })
                 continue
-              row, _ = _replay_row(
-                  stage0, traces[workload]["validation"], workload,
-                  "validation", capacity, CALIBRATION_POLICY,
-                  F_low=chosen["F_low"], F_target=chosen["F_target"],
-                  b_max=b_max, candidate_bound=proxy_bound)
+              metadata = {
+                  "workload": workload,
+                  "split": "validation",
+                  "capacity_ratio": capacity["capacity_ratio"],
+                  "dram_capacity_pages": capacity["dram_capacity_pages"],
+                  "policy": CALIBRATION_POLICY,
+                  "phase_candidate": "bmax",
+                  "F_low": chosen["F_low"],
+                  "F_target": chosen["F_target"],
+                  "b_max": b_max,
+                  "candidate_bound": proxy_bound,
+              }
+
+              def bmax_task():
+                row_value, _ = _replay_row(
+                    stage0, traces[workload]["validation"], workload,
+                    "validation", capacity, CALIBRATION_POLICY,
+                    F_low=chosen["F_low"], F_target=chosen["F_target"],
+                    b_max=b_max, candidate_bound=proxy_bound)
+                return {"row": row_value}
+
+              row = copy.deepcopy(journal.run_task(
+                  "bmax", metadata, bmax_task)["row"])
               row.update({"legal": True, "illegal_reason": None})
               bmax_rows.append(row)
+    write_jsonl(
+        os.path.join(temporary_directory, "bmax_results.jsonl"),
+        bmax_rows)
     bmax_primary_rows = [
         row for row in bmax_rows
         if row["stage3_calibration_candidate_bound"] == primary_proxy]
@@ -1179,6 +1519,8 @@ def run_calibration(
         "test_used": False,
         "capd_used_for_selection": False,
         "candidate_filter": "disabled",
+        "resumed_from_checkpoints": journal.resumed,
+        "completed_replay_tasks": journal.state["completed_replay_tasks"],
     }
     provenance.update(_git_state(project_root))
     resolved_config = copy.deepcopy(config)
@@ -1243,11 +1585,12 @@ def run_calibration(
          "emergency_demotions", "free_frame_exhaustion_count"))
     write_json(os.path.join(temporary_directory, "selection_decision.json"), selection_decision)
     write_json(os.path.join(temporary_directory, "freeze_candidate.json"), freeze_candidate)
-    os.makedirs(os.path.join(temporary_directory, "logs"))
+    os.makedirs(os.path.join(temporary_directory, "logs"), exist_ok=True)
     with open(
         os.path.join(temporary_directory, "report.md"), "w",
         encoding="utf-8", newline="\n") as output_file:
       output_file.write(_report_markdown(payload))
+    journal.finish("completed")
     output_artifacts = []
     for name in sorted(os.listdir(temporary_directory)):
       path = os.path.join(temporary_directory, name)
@@ -1264,6 +1607,10 @@ def run_calibration(
     os.replace(temporary_directory, final_directory)
     payload["output_directory"] = final_directory
     return payload
-  except Exception:
-    shutil.rmtree(temporary_directory, ignore_errors=True)
+  except BaseException as error:
+    status = (
+        "interrupted" if isinstance(error, KeyboardInterrupt) else "failed")
+    journal.state["error_type"] = type(error).__name__
+    journal.state["error_message"] = str(error)
+    journal.finish(status)
     raise

@@ -17,6 +17,7 @@ if PROJECT_ROOT not in sys.path:
 
 from qmap import finals_config
 from qmap import proactive_cost
+from qmap import proactive_replay
 from qmap import proactive_stage3
 
 
@@ -305,6 +306,103 @@ class Stage3Test(unittest.TestCase):
     self.assertTrue(
         result["selection_decision"]["capacity"][
             "requires_user_confirmation"])
+
+  def test_stage3_compact_replay_matches_full_replay_exactly(self):
+    trace = self.trace()[:300]
+    capacity = proactive_stage3.capacity_pages(40, 0.2)
+    parameters = proactive_replay.ReplayParameters(
+        policy_name="proactive_lru",
+        dram_capacity_pages=capacity["dram_capacity_pages"],
+        F_low=2, F_target=4, b_max=2, candidate_size_K=8,
+        history_window_size=10, early_reuse_window=64)
+    full = proactive_replay.ProactiveReplay(
+        self.stage0, parameters).run(trace)
+    compact = proactive_replay.ProactiveReplay(
+        self.stage0, parameters, invariant_mode="boundary",
+        record_details=False).run(
+            trace, copy_trace=False, compact=True)
+    self.assertEqual(full["summary"], compact["summary"])
+    self.assertEqual(1, compact["full_invariant_checks"])
+    self.assertEqual(
+        min(len(item["candidate_pages"]) for item in full["rounds"]),
+        compact["actual_candidate_count_min"])
+    self.assertEqual(
+        max(len(item["candidate_pages"]) for item in full["rounds"]),
+        compact["actual_candidate_count_max"])
+    self.assertEqual(
+        [len(item["candidate_pages"]) for item in full["rounds"]],
+        compact["actual_candidate_counts_by_round"])
+
+  def test_lru_order_matches_legacy_list_operations(self):
+    optimized = proactive_replay._LRUOrder()
+    legacy = []
+    for page in (1, 2, 3, 4):
+      optimized.insert(0, page)
+      legacy.insert(0, page)
+    for page in (2, 4, 1, 3, 2):
+      optimized.remove(page)
+      optimized.insert(0, page)
+      legacy.remove(page)
+      legacy.insert(0, page)
+      self.assertEqual(legacy, list(optimized))
+      self.assertEqual(legacy[-1], optimized[-1])
+      self.assertEqual(
+          list(reversed(legacy[-3:])),
+          optimized.tail_oldest_first(3))
+
+  def test_interrupted_run_resumes_and_matches_clean_run(self):
+    traces = {
+        "synthetic_locality": {
+            "train": self.trace()[:200],
+            "validation": self.trace(100)[:200],
+        }}
+    output_root = tempfile.mkdtemp(prefix="capd-stage3-resume-")
+    self.addCleanup(shutil.rmtree, output_root, True)
+    original = proactive_stage3._replay_row
+    calls = {"count": 0}
+
+    def fail_after_three(*args, **kwargs):
+      calls["count"] += 1
+      if calls["count"] == 4:
+        raise RuntimeError("injected interruption")
+      return original(*args, **kwargs)
+
+    proactive_stage3._replay_row = fail_after_three
+    try:
+      with self.assertRaisesRegex(RuntimeError, "injected interruption"):
+        proactive_stage3.run_calibration(
+            self.config, self.stage0, self.stage2, self.manifest(),
+            traces, [], "resume-case", output_root, PROJECT_ROOT)
+    finally:
+      proactive_stage3._replay_row = original
+    incomplete = os.path.join(
+        output_root, "stage3", "resume-case.incomplete")
+    self.assertTrue(os.path.isdir(incomplete))
+    with open(
+        os.path.join(incomplete, "run_state.json"),
+        encoding="utf-8") as input_file:
+      state = json.load(input_file)
+    self.assertEqual("failed", state["status"])
+    self.assertEqual(3, state["completed_replay_tasks"])
+
+    resumed = proactive_stage3.run_calibration(
+        self.config, self.stage0, self.stage2, self.manifest(),
+        traces, [], "resume-case", output_root, PROJECT_ROOT, resume=True)
+    clean = proactive_stage3.run_calibration(
+        self.config, self.stage0, self.stage2, self.manifest(),
+        traces, [], "clean-case", output_root, PROJECT_ROOT)
+    self.assertEqual(
+        clean["selection_decision"], resumed["selection_decision"])
+    self.assertEqual(
+        clean["watermark_results"], resumed["watermark_results"])
+    self.assertEqual(clean["bmax_results"], resumed["bmax_results"])
+    self.assertFalse(os.path.exists(incomplete))
+    with open(
+        os.path.join(resumed["output_directory"], "run_state.json"),
+        encoding="utf-8") as input_file:
+      final_state = json.load(input_file)
+    self.assertEqual("completed", final_state["status"])
+    self.assertGreater(final_state["completed_replay_tasks"], 3)
 
 
 if __name__ == "__main__":

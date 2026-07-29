@@ -16,10 +16,12 @@ LRU ordering follows the existing repository convention:
 from __future__ import print_function
 
 import argparse
+import array
 import collections
 import copy
 import datetime
 import hashlib
+import itertools
 import json
 import os
 import platform
@@ -118,6 +120,58 @@ class ReplayConfigurationError(ValueError):
 
 class ReplayInvariantError(RuntimeError):
   """Raised immediately when replay state conservation is violated."""
+
+
+class _LRUOrder(object):
+  """O(1) MRU/LRU updates with the legacy list-facing order."""
+
+  def __init__(self):
+    self._pages = collections.OrderedDict()
+
+  def __bool__(self):
+    return bool(self._pages)
+
+  def __iter__(self):
+    return iter(self._pages)
+
+  def __len__(self):
+    return len(self._pages)
+
+  def __getitem__(self, index):
+    if isinstance(index, slice):
+      return list(self._pages)[index]
+    if not isinstance(index, int):
+      raise TypeError("LRU index must be an integer or slice.")
+    if index == -1:
+      try:
+        return next(reversed(self._pages))
+      except StopIteration:
+        raise IndexError("LRU index out of range")
+    if index == 0:
+      try:
+        return next(iter(self._pages))
+      except StopIteration:
+        raise IndexError("LRU index out of range")
+    try:
+      return next(itertools.islice(
+          self._pages, index if index >= 0 else len(self) + index, None))
+    except StopIteration:
+      raise IndexError("LRU index out of range")
+
+  def insert(self, index, page):
+    if index != 0:
+      raise ReplayInvariantError("LRU insert only supports the MRU position.")
+    self._pages[page] = None
+    self._pages.move_to_end(page, last=False)
+
+  def remove(self, page):
+    try:
+      del self._pages[page]
+    except KeyError:
+      raise ValueError("{} is not in LRU".format(page))
+
+  def tail_oldest_first(self, count):
+    return list(itertools.islice(reversed(self._pages), 0, count))
 
 
 def _utc_now():
@@ -324,7 +378,10 @@ def select_top_b(ranking, b_t):
 class ProactiveReplay(object):
   """Synchronous deterministic Replay for stage-1 state validation."""
 
-  def __init__(self, stage0_config, parameters, ranking_policy=None):
+  def __init__(
+      self, stage0_config, parameters, ranking_policy=None,
+      invariant_mode="full", record_details=True,
+      capture_page_enter_flags=False):
     finals_config.validate_config(stage0_config)
     if stage0_config["schema_version"] != (
         finals_config.PROACTIVE_SCHEMA_VERSION):
@@ -340,12 +397,18 @@ class ProactiveReplay(object):
     if not isinstance(parameters, ReplayParameters):
       raise ReplayConfigurationError(
           "parameters must be ReplayParameters.")
+    if invariant_mode not in ("full", "boundary"):
+      raise ReplayConfigurationError(
+          "invariant_mode must be full or boundary.")
 
     self.stage0_contract = finals_config.proactive_contract_from_config(
         stage0_config)
     self.stage0_config_fingerprint = finals_config.config_fingerprint(
         stage0_config)
     self.parameters = parameters
+    self.invariant_mode = invariant_mode
+    self.record_details = bool(record_details)
+    self.capture_page_enter_flags = bool(capture_page_enter_flags)
     self.is_reactive = parameters.policy_name == "reactive_lru"
     if self.is_reactive:
       if ranking_policy is not None:
@@ -362,7 +425,7 @@ class ProactiveReplay(object):
         ranking_policy = ProactiveLRURanking()
       self.ranking_policy = ranking_policy
 
-    self.dram_lru = []
+    self.dram_lru = _LRUOrder()
     self.dram_resident = set()
     self.nvm_resident = set()
     self.residency_state = {}
@@ -383,7 +446,16 @@ class ProactiveReplay(object):
     self._decision_id = 0
     self._cycle_id = 0
     self._round_id = 0
-    self._free_frame_samples = []
+    self._round_count = 0
+    self._cycle_count = 0
+    self._b_t_sum = 0
+    self._candidate_count_min = None
+    self._candidate_count_max = None
+    self._candidate_counts_by_round = array.array("I")
+    self._free_frame_sample_count = 0
+    self._free_frame_sample_sum = 0
+    self._full_invariant_checks = 0
+    self.page_enter_flags = []
     self._minimum_free_frames = parameters.dram_capacity_pages
     self._last_observed_free_frames = parameters.dram_capacity_pages
     self._proactively_demoted_at = {}
@@ -416,30 +488,35 @@ class ProactiveReplay(object):
       self.counters["free_frame_exhaustion_count"] += 1
     self._last_observed_free_frames = current
     if access_sample:
-      self._free_frame_samples.append(current)
+      self._free_frame_sample_count += 1
+      self._free_frame_sample_sum += current
 
   def assert_invariants(self, candidates=None, selected=None, b_t=None,
-                        F_before=None):
+                        F_before=None, force_full=False):
     capacity = self.parameters.dram_capacity_pages
     if self.free_frames != capacity - len(self.dram_resident):
       raise ReplayInvariantError("F_t/DRAM resident conservation failed.")
     if not (0 <= self.free_frames <= capacity):
       raise ReplayInvariantError("F_t lies outside [0, DRAM capacity].")
-    if self.dram_resident & self.nvm_resident:
-      raise ReplayInvariantError("DRAM and NVM resident sets overlap.")
-    if len(self.dram_lru) != len(set(self.dram_lru)):
-      raise ReplayInvariantError("LRU contains duplicate pages.")
-    if set(self.dram_lru) != self.dram_resident:
-      raise ReplayInvariantError("LRU contains a non-DRAM or missing page.")
-    for page, location in self.residency_state.items():
-      in_dram = page in self.dram_resident
-      in_nvm = page in self.nvm_resident
-      if in_dram == in_nvm:
-        raise ReplayInvariantError(
-            "Resident page {} does not have a unique location.".format(page))
-      if location != ("dram" if in_dram else "nvm"):
-        raise ReplayInvariantError(
-            "residency_state disagrees for page {}.".format(page))
+    if len(self.dram_lru) != len(self.dram_resident):
+      raise ReplayInvariantError("LRU/DRAM resident count differs.")
+    if force_full or self.invariant_mode == "full":
+      self._full_invariant_checks += 1
+      if self.dram_resident & self.nvm_resident:
+        raise ReplayInvariantError("DRAM and NVM resident sets overlap.")
+      if len(self.dram_lru) != len(set(self.dram_lru)):
+        raise ReplayInvariantError("LRU contains duplicate pages.")
+      if set(self.dram_lru) != self.dram_resident:
+        raise ReplayInvariantError("LRU contains a non-DRAM or missing page.")
+      for page, location in self.residency_state.items():
+        in_dram = page in self.dram_resident
+        in_nvm = page in self.nvm_resident
+        if in_dram == in_nvm:
+          raise ReplayInvariantError(
+              "Resident page {} does not have a unique location.".format(page))
+        if location != ("dram" if in_dram else "nvm"):
+          raise ReplayInvariantError(
+              "residency_state disagrees for page {}.".format(page))
     if selected is not None:
       candidates = list(candidates or ())
       selected = list(selected)
@@ -500,23 +577,25 @@ class ProactiveReplay(object):
     self.dirty_state[page] = False
     self.dram_entry_index.pop(page, None)
     self._event_id += 1
-    event = {
-        "schema_version": STAGE1_LOG_SCHEMA_VERSION,
-        "event_id": self._event_id,
-        "event_type": event_type,
-        "access_index": self.access_index,
-        "page": page,
-        "policy_name": self.parameters.policy_name,
-        "ranking_policy": (
-            None if self.ranking_policy is None
-            else self.ranking_policy.policy_name),
-        "cycle_id": cycle_id,
-        "round_id": round_id,
-        "F_before": F_before,
-        "F_after": self.free_frames,
-        "dirty_before": dirty_before,
-    }
-    self.event_logs.append(event)
+    event = None
+    if self.record_details:
+      event = {
+          "schema_version": STAGE1_LOG_SCHEMA_VERSION,
+          "event_id": self._event_id,
+          "event_type": event_type,
+          "access_index": self.access_index,
+          "page": page,
+          "policy_name": self.parameters.policy_name,
+          "ranking_policy": (
+              None if self.ranking_policy is None
+              else self.ranking_policy.policy_name),
+          "cycle_id": cycle_id,
+          "round_id": round_id,
+          "F_before": F_before,
+          "F_after": self.free_frames,
+          "dirty_before": dirty_before,
+      }
+      self.event_logs.append(event)
     self.counters["total_demotions"] += 1
     counter = {
         PROACTIVE_DEMOTION: "proactive_demotions",
@@ -553,8 +632,8 @@ class ProactiveReplay(object):
     """Builds the current actual LRU-tail candidate set without padding."""
     if self.is_reactive:
       return []
-    oldest_first = list(reversed(
-        self.dram_lru[-self.parameters.candidate_size_K:]))
+    oldest_first = self.dram_lru.tail_oldest_first(
+        self.parameters.candidate_size_K)
     return [
         page for page in oldest_first
         if page not in self.parameters.non_demotable_pages
@@ -595,6 +674,22 @@ class ProactiveReplay(object):
       ranking, selected, F_before, termination_reason):
     self._decision_id += 1
     self._round_id += 1
+    self._round_count += 1
+    self._b_t_sum += len(selected)
+    candidate_count = len(candidates)
+    self._candidate_counts_by_round.append(candidate_count)
+    self._candidate_count_min = (
+        candidate_count if self._candidate_count_min is None
+        else min(self._candidate_count_min, candidate_count))
+    self._candidate_count_max = (
+        candidate_count if self._candidate_count_max is None
+        else max(self._candidate_count_max, candidate_count))
+    if not self.record_details:
+      return {
+          "round_id": self._round_id,
+          "b_t": len(selected),
+          "migration_count": len(selected),
+      }
     log = {
         "schema_version": STAGE1_LOG_SCHEMA_VERSION,
         "decision_id": self._decision_id,
@@ -645,7 +740,7 @@ class ProactiveReplay(object):
     cycle_id = self._cycle_id
     cycle_start_F = self.free_frames
     cycle_minimum_F = self.free_frames
-    cycle_start_round_count = len(self.round_logs)
+    cycle_start_round_count = self._round_count
     cycle_start_demotions = self.counters["proactive_demotions"]
     self.active_proactive_cycle = {
         "cycle_id": cycle_id,
@@ -712,7 +807,7 @@ class ProactiveReplay(object):
 
     if termination_reason is None:
       termination_reason = "target_already_reached"
-    rounds = len(self.round_logs) - cycle_start_round_count
+    rounds = self._round_count - cycle_start_round_count
     pages_demoted = (
         self.counters["proactive_demotions"] - cycle_start_demotions)
     cycle_log = {
@@ -735,15 +830,27 @@ class ProactiveReplay(object):
     if missing:
       raise ReplayInvariantError(
           "Cycle log missing fields: {}.".format(sorted(missing)))
-    self.cycle_logs.append(cycle_log)
+    self._cycle_count += 1
+    if self.record_details:
+      self.cycle_logs.append(cycle_log)
     self.active_proactive_cycle = None
     self.assert_invariants()
     return cycle_log
 
+  @staticmethod
+  def _access_values(access):
+    if isinstance(access, dict):
+      _require_keys(access, ("page", "rw"), "trace access")
+      return int(access["page"]), int(access["rw"]), access.get("pc")
+    if isinstance(access, (tuple, list)) and len(access) in (2, 3):
+      return (
+          int(access[0]), int(access[1]),
+          None if len(access) == 2 else access[2])
+    raise ReplayConfigurationError(
+        "Trace access must be a mapping or (page,rw[,pc]) tuple.")
+
   def process_access(self, access):
-    _require_keys(access, ("page", "rw"), "trace access")
-    page = int(access["page"])
-    rw = int(access["rw"])
+    page, rw, pc = self._access_values(access)
     if rw not in (0, 1):
       raise ReplayConfigurationError("Trace rw must be 0 or 1.")
 
@@ -789,7 +896,7 @@ class ProactiveReplay(object):
     self.history_window.append({
         "page": page,
         "rw": rw,
-        "pc": access.get("pc"),
+        "pc": pc,
     })
     self.assert_invariants()
 
@@ -802,7 +909,9 @@ class ProactiveReplay(object):
           emergency_fallback_occurred=emergency_occurred)
     self._observe_free_frames(access_sample=True)
 
-    new_events = self.event_logs[event_start:]
+    if self.capture_page_enter_flags:
+      self.page_enter_flags.append(entered_dram)
+    new_events = self.event_logs[event_start:] if self.record_details else []
     access_log = {
         "schema_version": STAGE1_LOG_SCHEMA_VERSION,
         "access_index": self.access_index,
@@ -818,21 +927,23 @@ class ProactiveReplay(object):
             event["event_type"] for event in new_events],
         "emergency_fallback_occurred": emergency_occurred,
     }
-    self.access_logs.append(access_log)
+    if self.record_details:
+      self.access_logs.append(access_log)
     self.assert_invariants()
     return access_log
 
-  def run(self, trace):
-    trace = [copy.deepcopy(access) for access in trace]
-    self.register_backing_pages(access["page"] for access in trace)
+  def run(self, trace, copy_trace=True, compact=False):
+    if copy_trace:
+      trace = [copy.deepcopy(access) for access in trace]
+    self.register_backing_pages(
+        self._access_values(access)[0] for access in trace)
     for access in trace:
       self.process_access(access)
-    return self.result()
+    return self.compact_result() if compact else self.result()
 
   def summary(self):
-    round_count = len(self.round_logs)
-    cycle_count = len(self.cycle_logs)
-    b_values = [log["b_t"] for log in self.round_logs]
+    round_count = self._round_count
+    cycle_count = self._cycle_count
     summary = {
         "schema_version": STAGE1_LOG_SCHEMA_VERSION,
         "policy_name": self.parameters.policy_name,
@@ -852,14 +963,14 @@ class ProactiveReplay(object):
         "number_of_proactive_cycles": cycle_count,
         "number_of_proactive_rounds": round_count,
         "mean_b_t": (
-            sum(b_values) / float(len(b_values)) if b_values else None),
+            self._b_t_sum / float(round_count) if round_count else None),
         "rounds_per_cycle": (
             round_count / float(cycle_count) if cycle_count else None),
         "minimum_free_frames": self._minimum_free_frames,
         "average_free_frames": (
-            sum(self._free_frame_samples) /
-            float(len(self._free_frame_samples))
-            if self._free_frame_samples else None),
+            self._free_frame_sample_sum /
+            float(self._free_frame_sample_count)
+            if self._free_frame_sample_count else None),
         "free_frame_exhaustion_count":
             self.counters["free_frame_exhaustion_count"],
         "accesses_below_F_low": self.counters["accesses_below_F_low"],
@@ -880,6 +991,20 @@ class ProactiveReplay(object):
 
   def validate_log_accounting(self):
     summary = self.summary()
+    if not self.record_details:
+      if summary["total_accesses"] != (
+          summary["dram_hits"] + summary["nvm_reads"] +
+          summary["nvm_writes"]):
+        raise ReplayInvariantError("Compact access accounting mismatch.")
+      if summary["page_enter_dram_count"] != (
+          summary["nvm_reads"] + summary["nvm_writes"]):
+        raise ReplayInvariantError("Compact page-enter accounting mismatch.")
+      if summary["total_demotions"] != (
+          summary["proactive_demotions"] +
+          summary["reactive_demotions"] +
+          summary["emergency_demotions"]):
+        raise ReplayInvariantError("Compact demotion accounting mismatch.")
+      return True
     event_counts = collections.Counter(
         event["event_type"] for event in self.event_logs)
     expected = {
@@ -950,7 +1075,7 @@ class ProactiveReplay(object):
     }
 
   def result(self):
-    self.assert_invariants()
+    self.assert_invariants(force_full=True)
     self.validate_log_accounting()
     return {
         "schema_version": STAGE1_RESULT_SCHEMA_VERSION,
@@ -963,6 +1088,22 @@ class ProactiveReplay(object):
         "cycles": copy.deepcopy(self.cycle_logs),
         "accesses": copy.deepcopy(self.access_logs),
         "summary": self.summary(),
+    }
+
+  def compact_result(self):
+    """Returns only the aggregates Stage 3 needs after a final full audit."""
+    self.assert_invariants(force_full=True)
+    self.validate_log_accounting()
+    return {
+        "schema_version": STAGE1_RESULT_SCHEMA_VERSION,
+        "summary": self.summary(),
+        "actual_candidate_round_count": self._round_count,
+        "actual_candidate_counts_by_round": list(
+            self._candidate_counts_by_round),
+        "actual_candidate_count_min": self._candidate_count_min,
+        "actual_candidate_count_max": self._candidate_count_max,
+        "page_enter_flags": list(self.page_enter_flags),
+        "full_invariant_checks": self._full_invariant_checks,
     }
 
 

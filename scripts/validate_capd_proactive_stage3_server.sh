@@ -128,10 +128,11 @@ root = sys.argv[1]
 required = [
     "resolved_config.json", "provenance.json", "input_manifest.json",
     "working_set_summary.json", "capacity_pressure_audit.json",
-    "burst_statistics.json", "burst_windows.jsonl",
+    "reactive_results.jsonl", "burst_statistics.json", "burst_windows.jsonl",
     "watermark_results.jsonl", "watermark_summary.csv",
     "bmax_results.jsonl", "bmax_summary.csv", "selection_decision.json",
-    "freeze_candidate.json", "logs", "report.md",
+    "freeze_candidate.json", "run_state.json", "checkpoints",
+    "logs/progress.jsonl", "report.md",
 ]
 runs = [os.path.join(root, "stage3", name)
         for name in ("synthetic-a", "synthetic-b")]
@@ -149,6 +150,10 @@ for run in runs:
   with open(os.path.join(run, "freeze_candidate.json"), encoding="utf-8") as f:
     freeze = json.load(f)
   assert freeze["main_config_updated"] is False
+  with open(os.path.join(run, "run_state.json"), encoding="utf-8") as f:
+    state = json.load(f)
+  assert state["status"] == "completed"
+  assert state["completed_replay_tasks"] > 0
 with open(os.path.join(runs[0], "selection_decision.json"), "rb") as f:
   first = f.read()
 with open(os.path.join(runs[1], "selection_decision.json"), "rb") as f:
@@ -187,12 +192,17 @@ if [[ -n "${STAGE3_INPUT_MANIFEST:-}" ]]; then
   real_run_id="${STAGE3_RUN_ID:-stage3-$(date -u +%Y%m%dT%H%M%SZ)}"
   real_output_root="${STAGE3_OUTPUT_ROOT:-${REPO_ROOT}/outputs/capd_proactive_calibration}"
   echo "[stage3] run real Train/Validation calibration run_id=${real_run_id}"
+  resume_args=()
+  if [[ "${STAGE3_RESUME:-0}" == "1" ]]; then
+    resume_args+=(--resume)
+  fi
   "${PYTHON_BIN}" scripts/run_capd_proactive_stage3_calibration.py \
     --config "${CONFIG}" \
     --input-manifest "${STAGE3_INPUT_MANIFEST}" \
     --run-id "${real_run_id}" \
     --output-root "${real_output_root}" \
-    --project-root "${REPO_ROOT}"
+    --project-root "${REPO_ROOT}" \
+    "${resume_args[@]}"
   echo "STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE"
 else
   echo "STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS"

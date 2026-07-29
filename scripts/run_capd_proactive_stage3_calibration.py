@@ -34,6 +34,9 @@ def parser():
   value.add_argument("--output-root")
   value.add_argument("--project-root", default=PROJECT_ROOT)
   value.add_argument("--validate-config", action="store_true")
+  value.add_argument(
+      "--resume", action="store_true",
+      help="Resume a matching <run-id>.incomplete directory from checkpoints")
   return value
 
 
@@ -54,7 +57,7 @@ def main(argv=None):
       args.project_root, config["output_root"])
   result = proactive_stage3.run_calibration(
       config, stage0, stage2, manifest, traces, resolved_entries,
-      args.run_id, output_root, args.project_root)
+      args.run_id, output_root, args.project_root, resume=args.resume)
   print(result["output_directory"])
   if result["stage_status"] == proactive_stage3.RESULTS_READY:
     print("STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE")
