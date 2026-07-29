@@ -4,11 +4,11 @@
 
 权威方案：`CAPD_主动降级版本_完整实验实施方案(1).md`
 
-当前状态：`stage2_implemented_awaiting_stage1_integration`
+当前状态：`stage2_verified`
 
 ## 1. 阶段目标与结论
 
-阶段 2 已完成不依赖阶段 1 Replay 的独立实现：
+阶段 2 已完成独立实现及阶段 1 Replay summary 联调：
 
 1. 冻结正式评价 Cost 公式；
 2. 冻结 default 及三组敏感性 Cost profile；
@@ -17,14 +17,21 @@
 5. 实现单 profile 与多 profile 的纯离线整数重算；
 6. 实现 JSON、JSONL 和 CSV 输入 CLI；
 7. 提供合成 fixture、单元测试和服务器验证脚本；
-8. 完成阶段 0、历史 Cost、历史 Replay 记账语义回归。
+8. 完成阶段 0、阶段 1、历史 Cost 和历史 Replay 记账语义回归；
+9. 使用阶段 1 正式 `capd_proactive_stage1_log_v1_0` summary 完成薄适配；
+10. 四个阶段 1 合成场景均通过 default 及三组敏感性 profile 重算；
+11. 将公共配置中的阶段 2 Cost profile 状态冻结。
 
-阶段 1 的主动 Replay 输出字段和小规模真实输出尚未冻结、接入，因此本
-阶段不能标记为 `stage2_verified`。合成 fixture 通过只证明阶段 2 独立
-功能成立，不代表已完成真实主动 Replay 集成。
+阶段 1 的主动 Replay 输出字段、三类 demotion 定义、汇总规则及 schema
+已经冻结。阶段 2 联调直接运行阶段 1 Replay，并消费其实际生成的 summary，
+不是手工构造或补写阶段 1 计数。因此当前代码和接口状态可标记为
+`stage2_verified`。
 
-本阶段没有修改 Replay 状态机、DRAM/NVM 页面位置语义、事件计数时机、
-训练标签、模型、正式 workload 或历史实验结果。
+本阶段没有改变 Replay 状态机、DRAM/NVM 页面位置语义、事件计数时机、
+训练标签、模型、正式 workload 或历史实验结果。对
+`qmap/proactive_replay.py` 的修改仅解除“公共 Cost 必须保持 pending”的
+历史门禁；阶段 1 输出仍保持 `weighted_cost=null` 和
+`weighted_cost_status=pending_stage2`，Cost 只由阶段 2 派生。
 
 ## 2. Cost 的用途边界
 
@@ -227,9 +234,9 @@ weighted_cost
 - 公式同时包含 NVM write 与 demotion 是有意识地评价两类不同事件，
   不是对同一次 dirty demotion 的重复计费。
 
-阶段 1 主动 Replay 接入时仍需重新核对其冻结输出是否保持这一边界。若
-阶段 1 改变该语义，必须先解决实验口径，不得由阶段 2 适配层静默修正
-计数。
+阶段 1 联调已经重新核对并保持这一边界：四个场景的 `nvm_writes`、
+`dirty_demotions` 和三类 demotion 原始计数均由 Replay 直接生成，阶段 2
+适配层不补数、不改数，也不把 dirty demotion 转换为 NVM write。
 
 ## 9. 历史 Cost 实现审计
 
@@ -293,29 +300,33 @@ python3 scripts/recompute_proactive_cost.py \
 | 文件 | 用途 |
 |---|---|
 | `configs/finals/capd_proactive_stage2_cost_profiles.json` | profile、schema、provenance、原始计数和公式冻结 |
-| `qmap/proactive_cost.py` | 纯数据结构、严格校验、单/多 profile 整数计算、结果序列化 |
-| `scripts/recompute_proactive_cost.py` | JSON/JSONL/CSV 离线重算 CLI |
+| `qmap/proactive_cost.py` | 纯数据结构、严格校验、单/多 profile 整数计算、阶段 1 summary 薄适配、结果序列化 |
+| `scripts/recompute_proactive_cost.py` | JSON/JSONL/CSV 离线重算 CLI；自动识别并走阶段 1 summary 薄适配 |
 | `tests/fixtures/capd_proactive_stage2_raw_events.json` | 合法合成原始事件记录 |
 | `tests/fixtures/capd_proactive_stage2_invalid_raw_events.json` | 非法输入失败 fixture |
 | `tests/test_capd_proactive_cost.py` | 阶段 2 冻结、算术、边界、不变性和 CLI 测试 |
+| `tests/test_capd_stage1_stage2_integration.py` | 阶段 1 Replay summary 到阶段 2 四 profile 的永久联调测试 |
 | `scripts/validate_capd_proactive_stage2_server.sh` | 服务器一键验收入口 |
 | `docs/CAPD_PROACTIVE_STAGE2_COST_FREEZE_REPORT_CN.md` | 本冻结报告 |
 
-没有修改阶段 0 主配置、`qmap/finals_config.py`、`qmap/qmap_eval.py` 或
-任何 Replay 文件。这样避免与并行阶段 1 发生文本和语义冲突。
+收尾阶段将 `configs/finals/capd_proactive_stage0.json` 中的默认 Cost
+profile 和 `freeze_status.stage2_cost_profile` 更新为 frozen。没有修改
+`qmap/finals_config.py`、`qmap/qmap_eval.py` 或 Replay 状态机语义。
 
 ## 12. 测试与验证结果
 
-Windows 本机最终使用 Python 3.11 执行：
+Windows 本机使用 Python 3.13.6 执行：
 
 ```text
-py -3.11 -m unittest discover -s tests -p test_capd_proactive_cost.py -v
-py -3.11 -m unittest discover -s tests -p test_capd_proactive_config.py -v
-py -3.11 -m unittest discover -s tests -p test_cost_weight_sensitivity.py -v
-py -3.11 -m unittest discover -s tests -p test_cost_weight_robustness.py -v
-py -3.11 -m unittest discover -s tests -p test_dirty_accounting.py -v
-py -3.11 -m unittest discover -s tests -p test_capd_stage6_results.py -v
-py -3.11 -m unittest discover -s tests -p test_capd_stage1_v3_semantics.py -v
+python -B -m unittest discover -s tests -p test_capd_proactive_cost.py -v
+python -B -m unittest discover -s tests -p test_capd_proactive_config.py -v
+python -B -m unittest discover -s tests -p test_capd_proactive_replay.py -v
+python -B -m unittest discover -s tests -p test_capd_stage1_stage2_integration.py -v
+python -B -m unittest discover -s tests -p test_cost_weight_sensitivity.py -v
+python -B -m unittest discover -s tests -p test_cost_weight_robustness.py -v
+python -B -m unittest discover -s tests -p test_dirty_accounting.py -v
+python -B -m unittest discover -s tests -p test_capd_stage6_results.py -v
+python -B -m unittest discover -s tests -p test_capd_stage1_v3_semantics.py -v
 ```
 
 最终结果：
@@ -323,12 +334,14 @@ py -3.11 -m unittest discover -s tests -p test_capd_stage1_v3_semantics.py -v
 | 测试组 | 通过 | 失败 |
 |---|---:|---:|
 | 阶段 2 Cost | 28 | 0 |
-| 阶段 0 配置回归 | 14 | 0 |
+| 阶段 0 配置回归 | 15 | 0 |
+| 阶段 1 Replay | 19 | 0 |
+| 阶段 1→2 联调 | 3 | 0 |
 | 历史 Cost sensitivity/robustness | 4 | 0 |
 | dirty/migration 记账 | 1 | 0 |
 | 历史阶段 6 Cost | 6 | 0 |
 | 历史 Replay/合同语义 | 17 | 0 |
-| 合计 | 70 | 0 |
+| 合计 | 93 | 0 |
 
 另执行了：
 
@@ -336,13 +349,15 @@ py -3.11 -m unittest discover -s tests -p test_capd_stage1_v3_semantics.py -v
 - 配置 CLI 校验；
 - default 合成手算，结果为 190；
 - 四 profile 同源计数批量重算；
+- 四个阶段 1 Replay 场景经冻结 summary 接口重算；
+- 阶段 1 schema、原始 pending Cost 状态和输入不变性检查；
 - 非法 fixture，退出码为 2 且未产生输出；
 - `git diff --check`；
-- `bash -n scripts/validate_capd_proactive_stage2_server.sh`。
+- Cost 配置 CLI 校验返回 `status=stage2_verified`。
 
-本机 WSL 整脚本执行因 WSL 环境无输出并在 120 秒超时，残留进程和
-临时目录已清理；脚本内各 Python/CLI 门禁已在 Windows 原生环境逐项
-执行并通过。服务器仍需按下列命令完整留存一次 Linux 退出码：
+脚本内各 Python/CLI 门禁已在 Windows 环境逐项执行并通过。Linux
+服务器仍需按下列命令完整执行，并留存退出码和日志；在日志返回
+`STAGE2_VERIFIED` 前，不宣称 Linux 环境验证已经完成：
 
 ```bash
 PYTHON_BIN=python3 bash scripts/validate_capd_proactive_stage2_server.sh
@@ -350,37 +365,26 @@ PYTHON_BIN=python3 bash scripts/validate_capd_proactive_stage2_server.sh
 
 验证过程没有运行正式 workload、训练、模型读取或 GPU 代码。
 
-## 13. 与阶段 1 的并行边界
+## 13. 阶段 1 联调完成情况
 
-阶段 2 已独立完成：
+阶段 1 已冻结并接入以下内容：
 
-- 规范化字段和严格类型契约；
-- total 与三分类 demotion 规则；
-- profile 配置与 provenance；
-- 纯离线计算、批量计算和 CLI；
-- 合成 fixture 测试及历史回归。
+1. `capd_proactive_stage1_log_v1_0` summary schema；
+2. `dram_hits`、`nvm_reads`、`nvm_writes`；
+3. proactive、reactive、emergency 和 total demotions；
+4. total 与三分类 demotion 之和一致；
+5. NVM read/write 访问级计数规则；
+6. `policy_name` 等原始身份字段；
+7. 原始 `weighted_cost=null`、`weighted_cost_status=pending_stage2`。
 
-仍等待阶段 1 冻结：
+薄适配入口为 `qmap.proactive_cost.recompute_stage1_summary()`。它先验证
+阶段 1 schema 和原始 Cost 占位状态，再调用 Replay 无关的计算函数。
+联调测试验证输入不被修改、三分类之和、default 手算结果、四 profile
+同源重算和错误 schema 立即失败。
 
-1. 原始事件真实字段名和类型；
-2. 各字段计数时机；
-3. proactive、reactive、emergency 的正式定义；
-4. total demotions 汇总规则；
-5. NVM read/write 计数规则；
-6. summary 文件格式；
-7. summary schema version；
-8. workload、policy、seed、capacity ratio、run_id 等身份字段位置；
-9. 一条真实小规模输出 fixture。
+## 14. 公共配置冻结
 
-阶段 1 完成后只增加薄适配层，将其字段映射到本报告规范字段；不修改
-Replay 状态机。联调测试必须验证字段不被修改、demotion 分类之和、
-default=手算结果以及四 profile 同源离线重算。
-
-## 14. 公共配置的后续最小合并
-
-为避免与阶段 1 冲突，本次没有修改
-`configs/finals/capd_proactive_stage0.json`。真实联调完成后，公共配置
-只需最小更新：
+联调完成后，`configs/finals/capd_proactive_stage0.json` 已完成最小更新：
 
 ```text
 freeze_status.stage2_cost_profile = frozen
@@ -389,26 +393,34 @@ evaluation.cost_profile.name = default
 evaluation.cost_profile.weights = 1:2:8:10 对应字段
 ```
 
-同时独立阶段 2 配置的 `stage1_integration_completed` 和
-`stage_status` 才能更新。未通过真实输出联调前不得提前更新。
+独立阶段 2 配置同时冻结为：
+
+```text
+raw_event_contract.stage1_adapter_status = verified_stage1_summary_v1_0
+stage1_integration_completed = true
+stage_status = stage2_verified
+```
 
 ## 15. 阶段 3 门禁
 
-进入阶段 3 前至少要求：
+阶段 3 的代码与接口门禁核对如下：
 
-1. 阶段 1 Replay 状态机及原始计数契约冻结；
-2. 阶段 1 小规模真实输出通过薄适配；
-3. NVM write/demotion 语义与本报告一致或已明确解决差异；
-4. default 和四 profile 对真实输出离线重算通过；
-5. 公共配置完成最小合并；
-6. 阶段 2 状态才能改为 `stage2_verified`；
+1. 阶段 1 Replay 状态机及原始计数契约已冻结；
+2. 阶段 1 Replay 生成的四个合成 summary 已通过薄适配；
+3. NVM write/demotion 语义已由用户确认并与代码一致；
+4. default 和四 profile 的同源离线重算已通过；
+5. 公共配置已完成最小合并；
+6. 阶段 2 状态已更新为 `stage2_verified`；
 7. Cost 仍只作评价，不参与阶段 3 水位、批量或训练决策。
+
+进入阶段 3 前仅需在目标 Linux 服务器执行第 12 节的一键验证脚本，
+确认环境内同样输出 `STAGE2_VERIFIED`。
 
 ## 16. 风险与阻塞
 
-当前阶段 2 独立实现不存在需要用户决定的 Cost 口径歧义。现有历史代码
-对 dirty demotion/NVM write 边界有明确配置和测试证据。
+用户已经确认沿用现有 Cost 记账边界：NVM write cost 表示 NVM 写访问
+成本，demotion cost 表示 DRAM→NVM 迁移成本；dirty demotion 不额外增加
+NVM write。当前不存在待用户决定的阶段 2 Cost 口径问题。
 
-唯一外部阻塞是阶段 1 主动 Replay 尚未冻结真实输出。若其记账规则与
-历史冻结语义不一致，必须作为明确实验口径问题处理；阶段 2 不会猜测、
-补数或重写 Replay 计数。
+剩余事项仅是目标 Linux 服务器上的可复现性验收和日志留存，不涉及方法、
+参数或记账语义调整。

@@ -70,6 +70,23 @@ class ProactiveStage0ConfigTest(unittest.TestCase):
         finals_config.PROACTIVE_SCHEMA_VERSION, loaded["schema_version"])
     self.assertEqual("capd_proactive", loaded["method"]["name"])
 
+  def test_stage2_default_cost_profile_is_frozen(self):
+    self.assertEqual(
+        "frozen", self.config["freeze_status"]["stage2_cost_profile"])
+    self.assertEqual(
+        {
+            "status": "frozen",
+            "name": "default",
+            "weights": {
+                "dram_hit": 1,
+                "nvm_read": 2,
+                "nvm_write": 8,
+                "demotion": 10,
+            },
+        },
+        self.config["evaluation"]["cost_profile"])
+    finals_config.validate_config(self.config)
+
   def test_capd_with_frozen_active_fields_is_accepted(self):
     self._freeze_stage3_and_candidate(self.config)
     finals_config.validate_config(self.config)

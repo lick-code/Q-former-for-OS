@@ -42,9 +42,14 @@
   },
   "evaluation": {
     "cost_profile": {
-      "name": null,
-      "status": "pending_stage2",
-      "weights": null
+      "name": "default",
+      "status": "frozen",
+      "weights": {
+        "demotion": 10,
+        "dram_hit": 1,
+        "nvm_read": 2,
+        "nvm_write": 8
+      }
     },
     "policy_name": "capd",
     "random_seed": null
@@ -59,7 +64,7 @@
     "formal_test": "pending",
     "stage0_scope": "frozen",
     "stage1_replay": "frozen",
-    "stage2_cost_profile": "pending",
+    "stage2_cost_profile": "frozen",
     "stage3_active_mechanism": "pending",
     "stage4_candidate": "pending",
     "stage4_training": "pending",

@@ -27,6 +27,16 @@ echo "[stage2] run stage-2 unit tests"
   -p 'test_capd_proactive_cost.py' \
   -v
 
+echo "[stage2] run frozen stage-1 Replay and stage-1 to stage-2 integration"
+"${PYTHON_BIN}" -m unittest discover \
+  -s tests \
+  -p 'test_capd_proactive_replay.py' \
+  -v
+"${PYTHON_BIN}" -m unittest discover \
+  -s tests \
+  -p 'test_capd_stage1_stage2_integration.py' \
+  -v
+
 echo "[stage2] run stage-0 and historical Cost/accounting regressions"
 "${PYTHON_BIN}" -m unittest discover \
   -s tests \
@@ -36,7 +46,8 @@ for pattern in \
     'test_cost_weight_sensitivity.py' \
     'test_cost_weight_robustness.py' \
     'test_dirty_accounting.py' \
-    'test_capd_stage6_results.py'; do
+    'test_capd_stage6_results.py' \
+    'test_capd_stage1_v3_semantics.py'; do
   "${PYTHON_BIN}" -m unittest discover \
     -s tests \
     -p "${pattern}" \
@@ -106,4 +117,4 @@ test ! -e "${TMP_DIR}/must_not_exist.json"
 echo "[stage2] repository whitespace validation"
 git diff --check
 
-echo "STAGE2_IMPLEMENTED_AWAITING_STAGE1_INTEGRATION"
+echo "STAGE2_VERIFIED"

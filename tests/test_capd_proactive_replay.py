@@ -72,6 +72,8 @@ class ProactiveReplayStage1Test(unittest.TestCase):
     proactive_replay.validate_stage1_fixture(fixture, self.stage0)
     self.assertEqual(
         "frozen", self.stage0["freeze_status"]["stage1_replay"])
+    self.assertEqual(
+        "frozen", self.stage0["freeze_status"]["stage2_cost_profile"])
     self.assertIsNone(self.stage0["active_demotion"]["F_low"])
     self.assertEqual("disabled", self.stage0["method"]["selector"])
     self.assertEqual(

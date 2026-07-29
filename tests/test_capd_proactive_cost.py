@@ -85,11 +85,14 @@ class CostProfileFreezeTest(unittest.TestCase):
     self.assertNotIn("real_nvm_measurement", rendered)
     self.assertNotIn("empirical_nvm_latency", rendered)
 
-  def test_awaiting_stage1_status_cannot_claim_verified(self):
+  def test_stage1_integration_and_verified_status_are_frozen(self):
     self.assertEqual(
-        "stage2_implemented_awaiting_stage1_integration",
+        "stage2_verified",
         self.config.stage_status)
-    self.assertFalse(self.config.stage1_integration_completed)
+    self.assertTrue(self.config.stage1_integration_completed)
+    self.assertEqual(
+        "verified_stage1_summary_v1_0",
+        self.config.source["raw_event_contract"]["stage1_adapter_status"])
 
   def test_unsupported_schema_version_is_rejected(self):
     invalid = copy.deepcopy(self.config.source)

@@ -130,9 +130,16 @@ def read_records(path: str, input_format: str = "auto"
 def recompute_records(records: Sequence[Dict[str, Any]], single: bool,
                       config: proactive_cost.CostConfiguration,
                       profile_names: Sequence[str]) -> Any:
-  outputs = [
-      proactive_cost.recompute_record(record, config, profile_names)
-      for record in records]
+  outputs = []
+  for record in records:
+    if record.get("schema_version") == (
+        proactive_cost.STAGE1_LOG_SCHEMA_VERSION):
+      output = proactive_cost.recompute_stage1_summary(
+          record, config, profile_names)
+    else:
+      output = proactive_cost.recompute_record(
+          record, config, profile_names)
+    outputs.append(output)
   value: Any = outputs[0] if single else outputs
   proactive_cost.assert_finite_json_tree(value)
   return value

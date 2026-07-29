@@ -57,12 +57,12 @@
       "nvm_reads",
       "nvm_writes"
     ],
-    "stage1_adapter_status": "awaiting_stage1_field_freeze"
+    "stage1_adapter_status": "verified_stage1_summary_v1_0"
   },
   "schema_name": "capd_proactive_stage2_cost_profiles",
   "schema_version": "capd_proactive_stage2_cost_profiles_v1_0",
-  "stage1_integration_completed": false,
-  "stage_status": "stage2_implemented_awaiting_stage1_integration",
+  "stage1_integration_completed": true,
+  "stage_status": "stage2_verified",
   "weighted_cost_formula": {
     "components": {
       "demotion_cost": "demotion * total_demotions",

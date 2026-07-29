@@ -967,7 +967,7 @@ class ProactiveReplay(object):
 
 
 def validate_stage1_fixture(fixture, stage0_config):
-  """Validates a synthetic fixture without populating formal pending fields."""
+  """Validates a synthetic fixture without consuming later-stage parameters."""
   required = (
       "schema_version",
       "fixture_status",
@@ -989,9 +989,9 @@ def validate_stage1_fixture(fixture, stage0_config):
   if fixture["base_contract_id"] != finals_config.PROACTIVE_CONTRACT_ID:
     raise ReplayConfigurationError("Fixture base contract id mismatch.")
   finals_config.validate_config(stage0_config)
-  if stage0_config["freeze_status"]["stage2_cost_profile"] != "pending":
-    raise ReplayConfigurationError(
-        "Stage-1 fixture expects Cost profile to remain pending_stage2.")
+  # Stage 1 emits raw counters and a pending Cost placeholder.  The enclosing
+  # shared configuration may subsequently freeze stage 2 without changing
+  # Replay behavior or the synthetic fixture.
   if stage0_config["method"]["selector"] != "disabled":
     raise ReplayConfigurationError("Selector must remain disabled.")
   if not isinstance(fixture["scenarios"], list) or not fixture["scenarios"]:

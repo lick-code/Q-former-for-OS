@@ -17,7 +17,9 @@ from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 SCHEMA_NAME = "capd_proactive_stage2_cost_profiles"
 SCHEMA_VERSION = "capd_proactive_stage2_cost_profiles_v1_0"
 CONTRACT_VERSION = "capd_proactive_raw_events_v1_0"
-STAGE_STATUS = "stage2_implemented_awaiting_stage1_integration"
+STAGE_STATUS = "stage2_verified"
+STAGE1_LOG_SCHEMA_VERSION = "capd_proactive_stage1_log_v1_0"
+STAGE1_ADAPTER_STATUS = "verified_stage1_summary_v1_0"
 NORMALIZATION_BASIS = "dram_hit_equals_1"
 CALIBRATION_MODE = "parameterized_profile_set"
 PROVENANCE_PLATFORM = "no_real_nvm_platform"
@@ -231,7 +233,7 @@ def validate_cost_config(value: Mapping[str, Any]) -> CostConfiguration:
       "normalization_basis": NORMALIZATION_BASIS,
       "calibration_mode": CALIBRATION_MODE,
       "stage_status": STAGE_STATUS,
-      "stage1_integration_completed": False,
+      "stage1_integration_completed": True,
   }
   for field, expected in expected_scalars.items():
     if value[field] != expected:
@@ -299,7 +301,7 @@ def validate_cost_config(value: Mapping[str, Any]) -> CostConfiguration:
       "identity_fields_preserved": [
           "workload", "policy", "seed", "capacity_ratio", "run_id",
           "schema_version"],
-      "stage1_adapter_status": "awaiting_stage1_field_freeze",
+      "stage1_adapter_status": STAGE1_ADAPTER_STATUS,
   }
   if raw_contract != expected_raw:
     raise CostContractError("raw_event_contract differs from the frozen v1.0 contract.")
@@ -504,6 +506,43 @@ def recompute_record(record: Mapping[str, Any], config: CostConfiguration,
     cost_payload["default_weighted_cost"] = results[
         config.default_profile].weighted_cost
   output[RESULT_NAMESPACE] = cost_payload
+  return output
+
+
+def recompute_stage1_summary(
+    summary: Mapping[str, Any],
+    config: CostConfiguration,
+    profile_names: Optional[Sequence[str]] = None) -> Dict[str, Any]:
+  """Validates and recomputes one frozen stage-1 Replay summary.
+
+  This is the deliberately thin stage-1 to stage-2 adapter.  It verifies the
+  stage-1 log schema identity and requires the untouched stage-1 Cost
+  placeholders before delegating to the replay-independent Cost calculator.
+  """
+  if not isinstance(summary, Mapping):
+    raise CostContractError("Stage-1 summary must be a mapping.")
+  if summary.get("schema_version") != STAGE1_LOG_SCHEMA_VERSION:
+    raise CostContractError(
+        "Stage-1 summary schema_version must be {!r}, got {!r}.".format(
+            STAGE1_LOG_SCHEMA_VERSION, summary.get("schema_version")))
+  if not isinstance(summary.get("policy_name"), str) or not (
+      summary["policy_name"]):
+    raise CostContractError(
+        "Stage-1 summary policy_name must be a non-empty string.")
+  if summary.get("weighted_cost") is not None:
+    raise CostContractError(
+        "Stage-1 summary weighted_cost must remain null before stage 2.")
+  if summary.get("weighted_cost_status") != "pending_stage2":
+    raise CostContractError(
+        "Stage-1 summary weighted_cost_status must be pending_stage2.")
+  if "dirty_demotions" in summary:
+    _require_non_negative_integer(
+        summary["dirty_demotions"], "dirty_demotions")
+
+  output = recompute_record(summary, config, profile_names)
+  output[RESULT_NAMESPACE]["stage1_log_schema_version"] = (
+      STAGE1_LOG_SCHEMA_VERSION)
+  output[RESULT_NAMESPACE]["stage1_adapter_status"] = STAGE1_ADAPTER_STATUS
   return output
 
 
