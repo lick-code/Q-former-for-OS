@@ -9,18 +9,377 @@ test_capd_and_candidate_filter_cannot_calibrate (test_capd_proactive_stage3.Stag
 test_config_is_predeclared_and_cross_stage_consistent (test_capd_proactive_stage3.Stage3Test) ... ok
 test_early_reuse_zero_denominator_is_null (test_capd_proactive_stage3.Stage3Test) ... ok
 test_empty_working_set_fails (test_capd_proactive_stage3.Stage3Test) ... ok
+test_interrupted_run_resumes_and_matches_clean_run (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
+[stage3] done reactive-bc579b7f80d4f7764ddf 0.004s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.004s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
+[stage3] done reactive-d83b0454d04902e3e883 0.004s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done reactive-8082ac34a5acd424517b 0.004s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.004s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.004s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
+[stage3] done reactive-080c825f9cfd11bb8c64 0.004s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
+[stage3] done reactive-21151477cd2df24f4ffe 0.004s completed=8
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] checkpoint reuse reactive-8082ac34a5acd424517b
+[stage3] start watermark workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done watermark-b07786a2dd8f2e0a144d 0.004s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-97e5457b8fff69a56825 0.004s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-10bbf6ff1491005c4af1 0.004s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-29529ea0d0f14f7ce52a 0.004s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-08c1a15833f6c63f4cb2 0.004s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-ba415b3edfda0231aac9 0.004s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-83f6fc92c74ffdbaf379 0.004s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done watermark-d5aa62aa8c72adbcc3a6 0.004s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-73b461cf882444eadd12 0.004s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-0dbc889f232602ae0c59 0.004s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-e48d0d95b9d58dcb4b5b 0.004s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-f934a2505453050770bd 0.004s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-935093b5184790c39c45 0.004s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-9af41fd1b1e1582b2b7b 0.004s completed=22
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-454f686973c741f043fe 0.004s completed=23
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-2b873a22ed73018901ec 0.004s completed=24
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-23ae3caa8bd386035761 0.004s completed=25
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-0249237599c93e231326 0.004s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-a71ae72799d4d31cd69c 0.004s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-19ea9699a6efbcfb45d3 0.004s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-a229645115e9c3a3d5f1 0.004s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-73283b4d9f7ec4034b22 0.004s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-53eb29d805fa296efe40 0.004s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-90ea673b91dcf34a5672 0.004s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-9be1a971ee5e07d4296b 0.004s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-cec1910d13f24b69beee 0.004s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-4c5af387f5c73e10b6d0 0.004s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-5a0510924ac5b44dac64 0.004s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-754341608532c10416c4 0.004s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-01ab8fa7329f4c6f004a 0.004s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-e3df419f09b83f12daf5 0.004s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-b4899bc225a24ddfab2a 0.004s completed=40
+[stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
+[stage3] done reactive-bc579b7f80d4f7764ddf 0.004s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.004s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
+[stage3] done reactive-d83b0454d04902e3e883 0.004s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done reactive-8082ac34a5acd424517b 0.004s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.004s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.004s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
+[stage3] done reactive-080c825f9cfd11bb8c64 0.004s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
+[stage3] done reactive-21151477cd2df24f4ffe 0.004s completed=8
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] checkpoint reuse reactive-8082ac34a5acd424517b
+[stage3] start watermark workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done watermark-b07786a2dd8f2e0a144d 0.005s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-97e5457b8fff69a56825 0.004s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-10bbf6ff1491005c4af1 0.004s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-29529ea0d0f14f7ce52a 0.004s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-08c1a15833f6c63f4cb2 0.004s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-ba415b3edfda0231aac9 0.004s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-83f6fc92c74ffdbaf379 0.004s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done watermark-d5aa62aa8c72adbcc3a6 0.004s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-73b461cf882444eadd12 0.004s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-0dbc889f232602ae0c59 0.004s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done watermark-e48d0d95b9d58dcb4b5b 0.004s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-f934a2505453050770bd 0.004s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-935093b5184790c39c45 0.004s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done watermark-9af41fd1b1e1582b2b7b 0.004s completed=22
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-454f686973c741f043fe 0.004s completed=23
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-2b873a22ed73018901ec 0.004s completed=24
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-23ae3caa8bd386035761 0.004s completed=25
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-0249237599c93e231326 0.004s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-a71ae72799d4d31cd69c 0.004s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-19ea9699a6efbcfb45d3 0.004s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-a229645115e9c3a3d5f1 0.003s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-73283b4d9f7ec4034b22 0.003s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-53eb29d805fa296efe40 0.004s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-90ea673b91dcf34a5672 0.004s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-9be1a971ee5e07d4296b 0.004s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done bmax-cec1910d13f24b69beee 0.004s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-4c5af387f5c73e10b6d0 0.004s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-5a0510924ac5b44dac64 0.004s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done bmax-754341608532c10416c4 0.004s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-01ab8fa7329f4c6f004a 0.004s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-e3df419f09b83f12daf5 0.004s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done bmax-b4899bc225a24ddfab2a 0.004s completed=40
+ok
+test_lru_order_matches_legacy_list_operations (test_capd_proactive_stage3.Stage3Test) ... ok
 test_manifest_loader_parses_raw_pages_and_fingerprints (test_capd_proactive_stage3.Stage3Test) ... ok
 test_nearest_rank_is_deterministic (test_capd_proactive_stage3.Stage3Test) ... ok
-test_real_manifest_stops_at_results_ready_not_verified (test_capd_proactive_stage3.Stage3Test) ... ok
+test_real_manifest_stops_at_results_ready_not_verified (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.016s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.015s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.015s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.015s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.016s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.016s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.016s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.015s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-e25ab00772b6a8c90601 0.017s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-c92fa19cd8780c1727f0 0.016s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-d5544e189374748c5680 0.016s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-edc9b326ad4a7515955e 0.016s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-59dc88267bd35635c07f 0.016s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-91e8a3c579ca4c0733bd 0.017s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-0cb632d7eb74cc8e2a6a 0.016s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-c09d9f4fc9c93de07534 0.015s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-1677ac3177eec27c2639 0.016s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-1407434336c549771d77 0.022s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-0c677d3cfd3623c9102d 0.017s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-9d13c6607ddf14b1ed7a 0.017s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-d332c706e745d9cdfd42 0.016s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-4fb48c91c9f9217a30b6 0.017s completed=22
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-8162a62f9cf02fe3c9bd 0.017s completed=23
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-054fb5e9cfc2a632ed6d 0.015s completed=24
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-a9cf1ca2b6d75cc1f80a 0.015s completed=25
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-e7d495dd43bd0de35fa9 0.017s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-b2de960806001f8481ec 0.028s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-c9352a7c9d9f5eb9f3ff 0.034s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-ca511c12ad8314a27532 0.018s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-2a2cb032ad1928faf4d4 0.019s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-98e45d16b940b0577a02 0.018s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-0c8a0ae1fe0a146baf5c 0.019s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b0ad6b66d051d3704242 0.019s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4d470a315b3e513613ae 0.030s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-a432d9ba3afd38e9b27c 0.016s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-f1d18f5cce334ffceefc 0.017s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-bb1de561fbd61a83f456 0.016s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-aaac7d285ce923b3981d 0.016s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-832588d9fde133b2b936 0.016s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-8ea304807482fd2e4818 0.016s completed=40
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-ad8c2ef8f5a3bc781f70 0.016s completed=41
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4a67b8e9c607514dc42a 0.016s completed=42
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b5b4e1339633ac8aeb33 0.015s completed=43
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-30dfd45cd3093b132b5b 0.016s completed=44
+ok
 test_stage2_must_be_verified (test_capd_proactive_stage3.Stage3Test) ... ok
-test_synthetic_end_to_end_is_awaiting_real_inputs (test_capd_proactive_stage3.Stage3Test) ... ok
+test_stage3_compact_replay_matches_full_replay_exactly (test_capd_proactive_stage3.Stage3Test) ... ok
+test_synthetic_end_to_end_is_awaiting_real_inputs (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.018s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.018s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.018s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.017s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.018s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.018s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.018s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.018s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-e25ab00772b6a8c90601 0.018s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-c92fa19cd8780c1727f0 0.018s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-d5544e189374748c5680 0.019s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-edc9b326ad4a7515955e 0.017s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-59dc88267bd35635c07f 0.018s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-91e8a3c579ca4c0733bd 0.019s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-0cb632d7eb74cc8e2a6a 0.017s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-c09d9f4fc9c93de07534 0.017s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-1677ac3177eec27c2639 0.016s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-1407434336c549771d77 0.018s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-0c677d3cfd3623c9102d 0.017s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-9d13c6607ddf14b1ed7a 0.017s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-d332c706e745d9cdfd42 0.016s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-4fb48c91c9f9217a30b6 0.016s completed=22
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-8162a62f9cf02fe3c9bd 0.016s completed=23
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-054fb5e9cfc2a632ed6d 0.018s completed=24
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-a9cf1ca2b6d75cc1f80a 0.015s completed=25
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-e7d495dd43bd0de35fa9 0.015s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-b2de960806001f8481ec 0.017s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-c9352a7c9d9f5eb9f3ff 0.017s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-ca511c12ad8314a27532 0.016s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-2a2cb032ad1928faf4d4 0.016s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-98e45d16b940b0577a02 0.016s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-0c8a0ae1fe0a146baf5c 0.016s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b0ad6b66d051d3704242 0.015s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4d470a315b3e513613ae 0.016s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-a432d9ba3afd38e9b27c 0.016s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-f1d18f5cce334ffceefc 0.018s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-bb1de561fbd61a83f456 0.017s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-aaac7d285ce923b3981d 0.016s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-832588d9fde133b2b936 0.016s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-8ea304807482fd2e4818 0.016s completed=40
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-ad8c2ef8f5a3bc781f70 0.016s completed=41
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4a67b8e9c607514dc42a 0.016s completed=42
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b5b4e1339633ac8aeb33 0.016s completed=43
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-30dfd45cd3093b132b5b 0.015s completed=44
+ok
 test_test_split_and_formal_test_are_rejected (test_capd_proactive_stage3.Stage3Test) ... ok
 test_watermark_generation_is_traceable_and_strict (test_capd_proactive_stage3.Stage3Test) ... ok
 test_watermark_tie_prefers_smaller_reserve (test_capd_proactive_stage3.Stage3Test) ... ok
 test_working_set_uses_train_validation_union (test_capd_proactive_stage3.Stage3Test) ... ok
 
 ----------------------------------------------------------------------
-Ran 17 tests in 7.645s
+Ran 20 tests in 2.690s
 
 OK
 [stage3] run frozen stage-0/1/2 regressions
@@ -65,7 +424,7 @@ test_stage1_does_not_compute_cost_or_require_checkpoint (test_capd_proactive_rep
 test_summary_matches_raw_events (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
 
 ----------------------------------------------------------------------
-Ran 19 tests in 0.040s
+Ran 19 tests in 0.042s
 
 OK
 test_cross_stage_contracts_are_frozen_and_consistent (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
@@ -73,7 +432,7 @@ test_every_stage1_fixture_summary_recomputes_all_profiles (test_capd_stage1_stag
 test_stage1_adapter_rejects_wrong_or_already_costed_summary (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
 
 ----------------------------------------------------------------------
-Ran 3 tests in 0.018s
+Ran 3 tests in 0.019s
 
 OK
 test_all_profiles_reuse_identical_counts (test_capd_proactive_cost.CostArithmeticTest) ... ok
@@ -106,47 +465,492 @@ test_partial_breakdown_never_silently_passes (test_capd_proactive_cost.RawEventC
 test_total_and_complete_breakdown_must_match (test_capd_proactive_cost.RawEventContractTest) ... ok
 
 ----------------------------------------------------------------------
-Ran 28 tests in 0.036s
+Ran 28 tests in 0.032s
 
 OK
 [stage3] compile without writing into the repository
 [stage3] create isolated synthetic Train/Validation traces
 [stage3] run the complete synthetic matrix twice
-/tmp/capd-stage3-vCPC6r/outputs/stage3/synthetic-a
+[stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.019s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.018s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.017s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.018s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.018s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.018s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.018s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.019s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-e25ab00772b6a8c90601 0.021s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-c92fa19cd8780c1727f0 0.020s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-d5544e189374748c5680 0.020s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-edc9b326ad4a7515955e 0.019s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-59dc88267bd35635c07f 0.019s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-91e8a3c579ca4c0733bd 0.020s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-0cb632d7eb74cc8e2a6a 0.019s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-c09d9f4fc9c93de07534 0.019s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-1677ac3177eec27c2639 0.019s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-1407434336c549771d77 0.020s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-0c677d3cfd3623c9102d 0.020s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-9d13c6607ddf14b1ed7a 0.020s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-d332c706e745d9cdfd42 0.020s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-4fb48c91c9f9217a30b6 0.019s completed=22
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-8162a62f9cf02fe3c9bd 0.020s completed=23
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-054fb5e9cfc2a632ed6d 0.019s completed=24
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-a9cf1ca2b6d75cc1f80a 0.019s completed=25
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-e7d495dd43bd0de35fa9 0.019s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-b2de960806001f8481ec 0.021s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-c9352a7c9d9f5eb9f3ff 0.020s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-ca511c12ad8314a27532 0.019s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-2a2cb032ad1928faf4d4 0.019s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-98e45d16b940b0577a02 0.019s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-0c8a0ae1fe0a146baf5c 0.019s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b0ad6b66d051d3704242 0.019s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4d470a315b3e513613ae 0.019s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-a432d9ba3afd38e9b27c 0.019s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-f1d18f5cce334ffceefc 0.020s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-bb1de561fbd61a83f456 0.020s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-aaac7d285ce923b3981d 0.019s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-832588d9fde133b2b936 0.019s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-8ea304807482fd2e4818 0.019s completed=40
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-ad8c2ef8f5a3bc781f70 0.018s completed=41
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4a67b8e9c607514dc42a 0.018s completed=42
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b5b4e1339633ac8aeb33 0.019s completed=43
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-30dfd45cd3093b132b5b 0.019s completed=44
+/tmp/capd-stage3-2GYWwK/outputs/stage3/synthetic-a
 STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS
-/tmp/capd-stage3-vCPC6r/outputs/stage3/synthetic-b
+[stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.021s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.022s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.021s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.018s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.019s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.018s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.018s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.019s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-e25ab00772b6a8c90601 0.020s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-c92fa19cd8780c1727f0 0.021s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-d5544e189374748c5680 0.020s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-edc9b326ad4a7515955e 0.019s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-59dc88267bd35635c07f 0.020s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-91e8a3c579ca4c0733bd 0.021s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-0cb632d7eb74cc8e2a6a 0.019s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-c09d9f4fc9c93de07534 0.019s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-1677ac3177eec27c2639 0.019s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-1407434336c549771d77 0.021s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-0c677d3cfd3623c9102d 0.021s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done watermark-9d13c6607ddf14b1ed7a 0.021s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-d332c706e745d9cdfd42 0.020s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-4fb48c91c9f9217a30b6 0.019s completed=22
+[stage3] start watermark workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done watermark-8162a62f9cf02fe3c9bd 0.020s completed=23
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-054fb5e9cfc2a632ed6d 0.020s completed=24
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-a9cf1ca2b6d75cc1f80a 0.019s completed=25
+[stage3] start watermark workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done watermark-e7d495dd43bd0de35fa9 0.018s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-b2de960806001f8481ec 0.022s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-c9352a7c9d9f5eb9f3ff 0.021s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-ca511c12ad8314a27532 0.020s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-2a2cb032ad1928faf4d4 0.024s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-98e45d16b940b0577a02 0.023s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-0c8a0ae1fe0a146baf5c 0.024s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b0ad6b66d051d3704242 0.022s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4d470a315b3e513613ae 0.019s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-a432d9ba3afd38e9b27c 0.019s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-f1d18f5cce334ffceefc 0.021s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-bb1de561fbd61a83f456 0.021s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done bmax-aaac7d285ce923b3981d 0.020s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-832588d9fde133b2b936 0.020s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-8ea304807482fd2e4818 0.020s completed=40
+[stage3] start bmax workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done bmax-ad8c2ef8f5a3bc781f70 0.019s completed=41
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-4a67b8e9c607514dc42a 0.019s completed=42
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-b5b4e1339633ac8aeb33 0.019s completed=43
+[stage3] start bmax workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done bmax-30dfd45cd3093b132b5b 0.020s completed=44
+/tmp/capd-stage3-2GYWwK/outputs/stage3/synthetic-b
 STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS
 [stage3] verify deterministic decisions, complete artifacts, and pending gates
 [stage3] verify formal Test input is rejected
 Traceback (most recent call last):
-  File "scripts/run_capd_proactive_stage3_calibration.py", line 67, in <module>
+  File "scripts/run_capd_proactive_stage3_calibration.py", line 70, in <module>
     raise SystemExit(main())
-  File "scripts/run_capd_proactive_stage3_calibration.py", line 52, in main
+  File "scripts/run_capd_proactive_stage3_calibration.py", line 55, in main
     args.input_manifest, args.project_root)
-  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 376, in load_inputs
+  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 486, in load_inputs
     manifest = validate_manifest(load_json(manifest_path))
-  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 339, in validate_manifest
+  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 449, in validate_manifest
     _require(entry["split"] in ALLOWED_SPLITS, "{} split must be Train/Validation.".format(context))
-  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 107, in _require
+  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 217, in _require
     raise Stage3ContractError(message)
 qmap.proactive_stage3.Stage3ContractError: entries[1] split must be Train/Validation.
 [stage3] repository whitespace validation
 [stage3] run real Train/Validation calibration run_id=stage3-real-001
-Traceback (most recent call last):
-  File "scripts/run_capd_proactive_stage3_calibration.py", line 67, in <module>
-    raise SystemExit(main())
-  File "scripts/run_capd_proactive_stage3_calibration.py", line 57, in main
-    args.run_id, output_root, args.project_root)
-  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 975, in run_calibration
-    PRE_WATERMARK_POLICY)
-  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 551, in _replay_row
-    result = proactive_replay.ProactiveReplay(stage0, parameters).run(trace)
-  File "/home/likc/Q-former-for-OS/qmap/proactive_replay.py", line 829, in run
-    self.process_access(access)
-  File "/home/likc/Q-former-for-OS/qmap/proactive_replay.py", line 752, in process_access
-    self.register_backing_pages([page])
-  File "/home/likc/Q-former-for-OS/qmap/proactive_replay.py", line 470, in register_backing_pages
-    self.assert_invariants()
-  File "/home/likc/Q-former-for-OS/qmap/proactive_replay.py", line 435, in assert_invariants
-    in_dram = page in self.dram_resident
-KeyboardInterrupt
+[stage3] start reactive workload=canneal split=train capacity=512 ratio=0.2
+[stage3] done reactive-52498118bee73c8160f4 10.489s completed=1
+[stage3] start reactive workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done reactive-75bbfa44484738586ac9 3.489s completed=2
+[stage3] start reactive workload=canneal split=train capacity=1024 ratio=0.4
+[stage3] done reactive-c4cca653a6fd2e3de89b 10.460s completed=3
+[stage3] start reactive workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done reactive-b120148b8c5a5eb61c80 3.513s completed=4
+[stage3] start reactive workload=canneal split=train capacity=1536 ratio=0.6
+[stage3] done reactive-b5597696171474cc04a8 10.550s completed=5
+[stage3] start reactive workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done reactive-3ba1649329db77c0377b 3.529s completed=6
+[stage3] start reactive workload=dedup_pressure split=train capacity=1389 ratio=0.2
+[stage3] done reactive-d0c5ad9aafe33e8a25a4 17.550s completed=7
+[stage3] start reactive workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done reactive-ce80c112629da2296008 17.053s completed=8
+[stage3] start reactive workload=dedup_pressure split=train capacity=2778 ratio=0.4
+[stage3] done reactive-f83feb57f3285dfce730 17.380s completed=9
+[stage3] start reactive workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done reactive-1f3551b7aa32aef13bed 17.418s completed=10
+[stage3] start reactive workload=dedup_pressure split=train capacity=4167 ratio=0.6
+[stage3] done reactive-e13cf2ae0f9fe5388186 17.513s completed=11
+[stage3] start reactive workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done reactive-1e72a0e2cd8d13dae03d 17.786s completed=12
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=1861 ratio=0.2
+[stage3] done reactive-c747c2d20b4ae468275d 10.790s completed=13
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done reactive-4c618c442beafab3b812 3.441s completed=14
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=3722 ratio=0.4
+[stage3] done reactive-8b49cce6fcc26290fa9e 10.311s completed=15
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done reactive-7b110165800be2032f3e 3.423s completed=16
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=5582 ratio=0.6
+[stage3] done reactive-364746c4c7cce6ddacef 10.406s completed=17
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done reactive-99347830f99e2add8103 3.461s completed=18
+[stage3] start reactive workload=canneal split=train capacity=256 ratio=0.1
+[stage3] done reactive-13cbc256c0a4e2ec2f62 10.107s completed=19
+[stage3] start reactive workload=canneal split=validation capacity=256 ratio=0.1
+[stage3] done reactive-ee31df87a9b434c22f8a 3.341s completed=20
+[stage3] checkpoint reuse reactive-52498118bee73c8160f4
+[stage3] checkpoint reuse reactive-75bbfa44484738586ac9
+[stage3] checkpoint reuse reactive-c4cca653a6fd2e3de89b
+[stage3] checkpoint reuse reactive-b120148b8c5a5eb61c80
+[stage3] start reactive workload=dedup_pressure split=train capacity=695 ratio=0.1
+[stage3] done reactive-6afb9871cf86107da87a 17.295s completed=21
+[stage3] start reactive workload=dedup_pressure split=validation capacity=695 ratio=0.1
+[stage3] done reactive-1cc99efd6f37f7e4c347 18.140s completed=22
+[stage3] checkpoint reuse reactive-d0c5ad9aafe33e8a25a4
+[stage3] checkpoint reuse reactive-ce80c112629da2296008
+[stage3] checkpoint reuse reactive-f83feb57f3285dfce730
+[stage3] checkpoint reuse reactive-1f3551b7aa32aef13bed
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=931 ratio=0.1
+[stage3] done reactive-e153b24ced479e488cb1 10.434s completed=23
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=931 ratio=0.1
+[stage3] done reactive-d3ff57452f7b98f7859a 3.380s completed=24
+[stage3] checkpoint reuse reactive-c747c2d20b4ae468275d
+[stage3] checkpoint reuse reactive-4c618c442beafab3b812
+[stage3] checkpoint reuse reactive-8b49cce6fcc26290fa9e
+[stage3] checkpoint reuse reactive-7b110165800be2032f3e
+[stage3] start watermark workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done watermark-f3f1dee96fd27a918ed6 3.588s completed=25
+[stage3] start watermark workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done watermark-f23cced6827f30419898 3.612s completed=26
+[stage3] start watermark workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done watermark-84a1ac5e23d1b74ada84 3.642s completed=27
+[stage3] start watermark workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done watermark-2676e6aa06c7aaedaad1 3.626s completed=28
+[stage3] start watermark workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done watermark-ced19df7d4b30f07f8e2 3.566s completed=29
+[stage3] start watermark workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done watermark-b28de07ed4548df2f765 3.565s completed=30
+[stage3] start watermark workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done watermark-da744733dc81a0d19738 3.593s completed=31
+[stage3] start watermark workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done watermark-3cb83b3e3cbb1344f290 3.568s completed=32
+[stage3] start watermark workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done watermark-41915f06b7474a685d93 3.598s completed=33
+[stage3] start watermark workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done watermark-29bdf825718dd94aaeeb 17.856s completed=34
+[stage3] start watermark workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done watermark-1c7bc2f4a6464cc8306b 18.079s completed=35
+[stage3] start watermark workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done watermark-7c0396092a71f11ea36d 18.231s completed=36
+[stage3] start watermark workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done watermark-ae80383d0a1c99a5e9ad 18.473s completed=37
+[stage3] start watermark workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done watermark-c6e244661d5a93604cc8 18.994s completed=38
+[stage3] start watermark workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done watermark-43fb4e6d7c24aa3a9c32 18.108s completed=39
+[stage3] start watermark workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done watermark-94f216271e0054654d54 18.208s completed=40
+[stage3] start watermark workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done watermark-f62a53b777a25732e89e 18.271s completed=41
+[stage3] start watermark workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done watermark-b157ee4a5fd929b37840 18.438s completed=42
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done watermark-a605f3a5ff3e6c0e8791 3.762s completed=43
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done watermark-a69e83b63d6e85dd0f66 3.698s completed=44
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done watermark-8dfbeb93b943fe319637 3.677s completed=45
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done watermark-08812b0f4ee13ae64a84 3.675s completed=46
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done watermark-ac6fc57f21e76c16d01b 3.664s completed=47
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done watermark-e3e9277eaa2dcf792765 3.713s completed=48
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done watermark-2e61ed5c7823e8b1f840 3.692s completed=49
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done watermark-a692e63be5117080c751 3.676s completed=50
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done watermark-c341460e4412d81feef8 3.684s completed=51
+[stage3] start watermark workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done watermark-2b6bb4e1980b039849cc 3.791s completed=52
+[stage3] start watermark workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done watermark-35cb982c1f946e94dcb0 3.725s completed=53
+[stage3] start watermark workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done watermark-020291da388a5bcb6d6b 3.664s completed=54
+[stage3] start watermark workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done watermark-7a0c4597ba4d778dedbc 3.655s completed=55
+[stage3] start watermark workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done watermark-14b06967e3e1bb918b8f 3.646s completed=56
+[stage3] start watermark workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done watermark-a24d47e1431289e58033 3.615s completed=57
+[stage3] start watermark workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done watermark-94e546902591fb26a50a 3.640s completed=58
+[stage3] start watermark workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done watermark-d22228b2f56d157b4c22 3.624s completed=59
+[stage3] start watermark workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done watermark-ecb0091fe964ad2d24f9 3.672s completed=60
+[stage3] start watermark workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done watermark-aa34548a26125153e06f 18.311s completed=61
+[stage3] start watermark workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done watermark-bbcb8667da38d68accb0 18.285s completed=62
+[stage3] start watermark workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done watermark-3e345cf657cc9012f545 18.382s completed=63
+[stage3] start watermark workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done watermark-d014479de374fa3899c7 18.370s completed=64
+[stage3] start watermark workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done watermark-82d8511730c008dc7e35 18.226s completed=65
+[stage3] start watermark workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done watermark-40852d2c3c7535e136f3 18.310s completed=66
+[stage3] start watermark workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done watermark-9434472291d1862ef90a 18.277s completed=67
+[stage3] start watermark workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done watermark-4caa607dcc5880e817fb 18.270s completed=68
+[stage3] start watermark workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done watermark-57ab53b81ae5d92065e4 18.243s completed=69
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done watermark-c28de23c18cb04f82ee7 3.743s completed=70
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done watermark-06adee24cb48ca139ac3 3.739s completed=71
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done watermark-9652ac496ff135af59d5 3.725s completed=72
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done watermark-a339085a067ac6b8c5a8 3.650s completed=73
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done watermark-bea506861a7759f80280 3.629s completed=74
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done watermark-3c3b7f7bec07f14d6043 3.666s completed=75
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done watermark-dfc26fc7f8118a0546b7 3.631s completed=76
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done watermark-61cf211b61960fbcd304 3.691s completed=77
+[stage3] start watermark workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done watermark-a4666ff9130c4dc36435 3.690s completed=78
+[stage3] start bmax workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done bmax-57a3645b953e936b28ae 3.655s completed=79
+[stage3] start bmax workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done bmax-fbc60022e308ace44362 3.656s completed=80
+[stage3] start bmax workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done bmax-98817f82d35101e92232 3.679s completed=81
+[stage3] start bmax workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done bmax-a86fbacdb791bbdc29c0 3.632s completed=82
+[stage3] start bmax workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done bmax-b2a8ad98f89ba9897b5c 3.659s completed=83
+[stage3] start bmax workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done bmax-08b449aca3ea6829e2b3 3.631s completed=84
+[stage3] start bmax workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done bmax-5a5bd76779105b6a7bca 3.852s completed=85
+[stage3] start bmax workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done bmax-27d079987f1e3e807b1b 3.757s completed=86
+[stage3] start bmax workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done bmax-9ccf1a5abc19c073ea62 3.807s completed=87
+[stage3] start bmax workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done bmax-e574a4b9d5d7b7841e27 18.662s completed=88
+[stage3] start bmax workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done bmax-3255cb0f3c342cee5cfc 18.597s completed=89
+[stage3] start bmax workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done bmax-19c02b0442f7153143cb 18.159s completed=90
+[stage3] start bmax workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done bmax-a9e58175ddd65276ad57 18.442s completed=91
+[stage3] start bmax workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done bmax-db8616ed5730cb2ec1a8 18.582s completed=92
+[stage3] start bmax workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done bmax-1a93663a046bb3228442 18.739s completed=93
+[stage3] start bmax workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done bmax-bec3f18cf257589e02d2 18.316s completed=94
+[stage3] start bmax workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done bmax-358df051cd842ed5ca5e 18.417s completed=95
+[stage3] start bmax workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done bmax-44c50acf7a81c73fd47b 18.455s completed=96
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done bmax-ef84b623478308b33afe 3.698s completed=97
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done bmax-a63ffea446e77a03cbb9 3.713s completed=98
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done bmax-fe26a91150a46fcdd2bd 3.788s completed=99
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done bmax-f6d9099418477676d7f7 3.705s completed=100
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done bmax-4b86fd48ff3c460e07aa 3.738s completed=101
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done bmax-66b2c84dc851800fb528 3.825s completed=102
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done bmax-20de5400c5e56297c739 3.747s completed=103
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done bmax-a17b7362e0d9335fc96b 3.732s completed=104
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done bmax-2371ba8c9e6ad5cd8145 3.721s completed=105
+[stage3] start bmax workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done bmax-b1a9bea437bb46d0007e 3.781s completed=106
+[stage3] start bmax workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done bmax-bdb339316dae08372641 3.754s completed=107
+[stage3] start bmax workload=canneal split=validation capacity=512 ratio=0.2
+[stage3] done bmax-68c46680eb5eb54660c2 3.749s completed=108
+[stage3] start bmax workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done bmax-66def69d7c9c25f5effa 3.744s completed=109
+[stage3] start bmax workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done bmax-d2c9aecf42a2e0ef1322 3.715s completed=110
+[stage3] start bmax workload=canneal split=validation capacity=1024 ratio=0.4
+[stage3] done bmax-248e7cd09218562f120d 3.638s completed=111
+[stage3] start bmax workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done bmax-31bbada8126478d78dfd 3.707s completed=112
+[stage3] start bmax workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done bmax-b678112890f697c1d4da 3.697s completed=113
+[stage3] start bmax workload=canneal split=validation capacity=1536 ratio=0.6
+[stage3] done bmax-b8890e5f120d1ed62a3e 3.657s completed=114
+[stage3] start bmax workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done bmax-7c5390a046344ffcd120 18.288s completed=115
+[stage3] start bmax workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done bmax-0b9517ec9a0d597ff49e 18.302s completed=116
+[stage3] start bmax workload=dedup_pressure split=validation capacity=1389 ratio=0.2
+[stage3] done bmax-8001e0c84ea5d77531fc 18.118s completed=117
+[stage3] start bmax workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done bmax-b67787b5512de37c1aac 18.214s completed=118
+[stage3] start bmax workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done bmax-3a605ffdfd5b7397d7df 18.535s completed=119
+[stage3] start bmax workload=dedup_pressure split=validation capacity=2778 ratio=0.4
+[stage3] done bmax-12dd756ef2096bff9dc3 18.289s completed=120
+[stage3] start bmax workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done bmax-56ea7ad02bc819f30530 18.396s completed=121
+[stage3] start bmax workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done bmax-888f8f117c80cc7fa10c 17.746s completed=122
+[stage3] start bmax workload=dedup_pressure split=validation capacity=4167 ratio=0.6
+[stage3] done bmax-942ef55944e44ca90eaa 17.652s completed=123
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done bmax-7326d104c5dca0401ba0 3.631s completed=124
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done bmax-8c1ae09afd210fbb2400 3.722s completed=125
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=1861 ratio=0.2
+[stage3] done bmax-092f6397f88914c13eb6 3.720s completed=126
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done bmax-116537e60ff9d36bf8f3 3.674s completed=127
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done bmax-48e31802c41ca80baff9 3.709s completed=128
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=3722 ratio=0.4
+[stage3] done bmax-9e75fef57922bfce0504 3.694s completed=129
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done bmax-d00027a103c0ada6a29d 3.691s completed=130
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done bmax-be870100fe5f6fd736f6 3.675s completed=131
+[stage3] start bmax workload=streamcluster_pressure split=validation capacity=5582 ratio=0.6
+[stage3] done bmax-a087020bc8847651682e 3.679s completed=132
+/home/likc/Q-former-for-OS/outputs/capd_proactive_calibration/stage3/stage3-real-001
+STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE
+STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE

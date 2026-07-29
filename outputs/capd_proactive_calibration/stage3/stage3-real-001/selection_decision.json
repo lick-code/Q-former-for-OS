@@ -1,0 +1,84 @@
+{
+  "b_max": {
+    "ranking": [
+      4,
+      2,
+      1
+    ],
+    "requires_user_confirmation": true,
+    "selected_b_max": 4,
+    "selection_key_order": [
+      "worst_exhaustion",
+      "macro_exhaustion",
+      "worst_emergency",
+      "macro_emergency",
+      "macro_default_cost_per_access",
+      "macro_nvm_writes",
+      "macro_early_reuse",
+      "macro_round_count",
+      "smaller_b_max"
+    ],
+    "status": "recommended_by_predeclared_bmax_rule"
+  },
+  "candidate_bound_invariance": {
+    "decisions": {
+      "16": {
+        "selected_b_max": 4,
+        "selected_watermark_label": "medium"
+      },
+      "8": {
+        "selected_b_max": 4,
+        "selected_watermark_label": "medium"
+      }
+    },
+    "enters_formal_candidate_size_K": false,
+    "proxy_values": [
+      8,
+      16
+    ],
+    "status": "passed"
+  },
+  "capacity": {
+    "reason": "neither_capacity_profile_passed_predeclared_pressure_rule",
+    "recommended_profile": null,
+    "recommended_ratios": null,
+    "requires_user_confirmation": true,
+    "status": "stage3_capacity_results_ready_for_freeze"
+  },
+  "capd_used_for_selection": false,
+  "schema_version": "capd_proactive_stage3_result_v1_0",
+  "stage4_candidate_status": "pending",
+  "test_used": false,
+  "watermark": {
+    "ranking": [
+      "medium",
+      "large",
+      "small"
+    ],
+    "requires_user_confirmation": true,
+    "selected_label": "medium",
+    "selected_watermark": {
+      "F_low": 2,
+      "F_target": 4,
+      "generation_rule": "target=max(2,ceil(source),previous_target+1);low=ceil(target/2)",
+      "label": "medium",
+      "source_aggregate": "maximum_across_workload_capacity_runs",
+      "source_quantile": "p95",
+      "source_split": "validation",
+      "source_value": 4,
+      "source_window": 100
+    },
+    "selection_key_order": [
+      "worst_exhaustion",
+      "macro_exhaustion",
+      "worst_emergency",
+      "macro_emergency",
+      "macro_early_reuse",
+      "macro_total_demotions",
+      "macro_nvm_io",
+      "smaller_F_target",
+      "smaller_F_low"
+    ],
+    "status": "recommended_by_predeclared_watermark_rule"
+  }
+}
