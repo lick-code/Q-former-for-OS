@@ -1,0 +1,148 @@
+[stage2] validate frozen Cost profile configuration
+VALID stage2 Cost config: capd_proactive_stage2_cost_profiles_v1_0 profiles=read_light,default,write_expensive,migration_expensive status=stage2_verified
+[stage2] run stage-2 unit tests
+test_all_profiles_reuse_identical_counts (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_cost_module_has_no_replay_model_or_gpu_import (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_default_hand_calculation_and_components (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_input_mapping_is_not_modified_and_repeated_runs_are_identical (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_only_stage2_namespace_is_added_and_identity_is_unchanged (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_other_profiles_match_hand_calculation (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_reserved_output_namespace_is_never_overwritten (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_switching_profile_changes_only_profile_and_cost_fields (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_all_four_profiles_are_frozen_exactly (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_default_and_parameterized_provenance_are_frozen (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_default_profile_must_exist_and_equal_default (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_duplicate_json_profile_name_is_rejected_before_validation (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_missing_or_illegal_weight_is_rejected (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_stage1_integration_and_verified_status_are_frozen (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_unsupported_schema_version_is_rejected (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_cli_refuses_input_output_alias (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_cli_writes_json_without_changing_input (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_csv_conversion_is_explicit_and_rejects_noncanonical_counts (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_invalid_cli_input_returns_nonzero_and_diagnostic (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_json_single_default_and_all_profiles (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_jsonl_and_csv_multiple_records_are_supported (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_validate_config_mode_needs_no_input (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_all_zero_counts_are_valid (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_complete_breakdown_alone_derives_total (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_missing_required_base_or_demotion_field_is_rejected (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_negative_float_string_boolean_and_nan_counts_are_rejected (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_partial_breakdown_never_silently_passes (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_total_and_complete_breakdown_must_match (test_capd_proactive_cost.RawEventContractTest) ... ok
+
+----------------------------------------------------------------------
+Ran 28 tests in 0.030s
+
+OK
+[stage2] run frozen stage-1 Replay and stage-1 to stage-2 integration
+test_F_at_or_above_low_does_not_trigger (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_actual_candidate_count_and_all_b_t_bounds (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_all_declared_fixture_scenarios_run (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_capd_without_checkpoint_is_not_faked_by_lru_ranker (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_early_reuse_is_counted_from_proactive_event (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_empty_candidate_set_terminates_without_loop (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_invalid_ranker_fails_instead_of_silently_repairing (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_low_watermark_starts_cycle_and_reaches_target (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_multi_round_rebuilds_current_candidates (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_no_free_frame_demotes_before_page_enter_and_never_negative (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_proactive_reactive_and_emergency_events_do_not_mix (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_reactive_lru_never_creates_proactive_logs (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_residency_lru_frequency_dirty_and_history_updates (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_round_cycle_and_summary_fields_are_complete (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_same_trace_and_config_are_fully_deterministic (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_single_round_top_b_uses_stub_ranking (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_stage0_contract_and_fixture_remain_separate (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_stage1_does_not_compute_cost_or_require_checkpoint (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_summary_matches_raw_events (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.036s
+
+OK
+test_cross_stage_contracts_are_frozen_and_consistent (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
+test_every_stage1_fixture_summary_recomputes_all_profiles (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
+test_stage1_adapter_rejects_wrong_or_already_costed_summary (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.019s
+
+OK
+[stage2] run stage-0 and historical Cost/accounting regressions
+test_active_policy_requires_fields_when_its_gate_is_frozen (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_capd_with_frozen_active_fields_is_accepted (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_illegal_policy_name_is_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_legal_stage0_capd_template_is_accepted (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_missing_required_field_is_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_non_learning_active_policy_requires_only_shared_active_fields (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_official_policy_set_is_frozen (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_overlapping_chronological_splits_are_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_reactive_lru_does_not_require_proactive_fields (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_selector_must_remain_disabled (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_single_process_thread_workload_boundary_is_enforced (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_split_roles_cannot_be_exchanged (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_stage2_default_cost_profile_is_frozen (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_test_cannot_be_used_for_parameter_selection (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_unfrozen_formal_test_request_is_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.005s
+
+OK
+test_build_summary_rows_compares_qmap_to_reweighted_best_baseline (test_cost_weight_sensitivity.CostWeightSensitivityTest) ... ok
+test_reweight_result_uses_existing_replay_counters (test_cost_weight_sensitivity.CostWeightSensitivityTest) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+test_build_summary_rows_compares_qmap_to_reweighted_best_baseline (test_cost_weight_robustness.CostWeightSensitivityTest) ... ok
+test_reweight_result_uses_existing_replay_counters (test_cost_weight_robustness.CostWeightSensitivityTest) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+test_dirty_and_clean_victim_each_migrate_once_without_writeback_count (test_dirty_accounting.DirtyAccountingTest) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK
+test_capacity_requires_three_qmap_seeds_for_every_point (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_cost_summary_keeps_negative_improvement (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_natural_rw_summary_marks_descriptive_boundary (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_profile_preserves_raw_samples_and_percentiles (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_profile_summarizes_throughput_and_system_effects (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_reweighted_cost_uses_exact_counters (test_capd_stage6_results.Stage6ResultTest) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.011s
+
+OK
+test_checkpoint_contract_config_workload_selector_mismatches_hard_fail (test_capd_stage1_v3_semantics.ArtifactIdentityTest) ... ok
+test_jsonl_metadata_and_result_mismatches_hard_fail (test_capd_stage1_v3_semantics.ArtifactIdentityTest) ... ok
+test_v2_and_v3_artifacts_are_mutually_incompatible (test_capd_stage1_v3_semantics.ArtifactIdentityTest) ... ok
+test_future_window_boundary_and_exact_label (test_capd_stage1_v3_semantics.FutureSplitAndSnapshotTest) ... ok
+test_official_sources_are_independent_and_holdout_is_smoke_only (test_capd_stage1_v3_semantics.FutureSplitAndSnapshotTest) ... ok
+test_triggering_request_only_enters_reranker_history (test_capd_stage1_v3_semantics.FutureSplitAndSnapshotTest) ... ok
+test_any_hit_and_tie_coverage_are_distinct_numeric_metrics (test_capd_stage1_v3_semantics.LruAndMetricSemanticsTest) ... ok
+test_lru_direction_uses_original_B_t_not_filtered_K_t (test_capd_stage1_v3_semantics.LruAndMetricSemanticsTest) ... ok
+test_pool_selector_end_to_end_and_regret_are_separate (test_capd_stage1_v3_semantics.LruAndMetricSemanticsTest) ... ok
+test_first_read_write_hit_nvm_revisit_and_demotion_costs (test_capd_stage1_v3_semantics.ReplayAccountingTest) ... ok
+test_exact_tie_uses_oldest_original_rank_not_tensor_position (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_invalid_mask_rank_and_shapes_hard_fail (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_padding_with_extreme_placeholder_score_cannot_win (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_selector_score_cannot_break_a_reranker_tie (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_selector_topk_tie_is_rank_ordered_and_page_id_independent (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_unique_highest_score_keeps_the_model_choice (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_valid_nan_and_positive_or_negative_inf_hard_fail (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.034s
+
+OK
+[stage2] recompute default and all profiles from one synthetic record
+[stage2] verify invalid input fails
+ERROR: nvm_writes must be greater than or equal to 0.
+[stage2] repository whitespace validation
+STAGE2_VERIFIED
