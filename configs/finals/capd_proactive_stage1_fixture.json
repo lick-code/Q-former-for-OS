@@ -1,0 +1,163 @@
+{
+  "base_config_schema_version": "capd_proactive_v1_0",
+  "base_contract_id": "CAPD-PROACTIVE-STAGE0-1.0",
+  "description": "Stage-1 deterministic synthetic fixtures only. Values here are not formal experiment parameters.",
+  "fixture_status": "non_formal_synthetic_only",
+  "scenarios": [
+    {
+      "name": "synthetic_locality_proactive_lru",
+      "policy_name": "proactive_lru",
+      "ranking": {
+        "type": "proactive_lru"
+      },
+      "replay_parameters": {
+        "F_low": 3,
+        "F_target": 5,
+        "b_max": 2,
+        "candidate_size_K": 4,
+        "dram_capacity_pages": 6,
+        "early_reuse_window": 4,
+        "history_window_size": 4
+      },
+      "trace": [
+        {
+          "page": 1,
+          "rw": 0
+        },
+        {
+          "page": 2,
+          "rw": 1
+        },
+        {
+          "page": 3,
+          "rw": 0
+        },
+        {
+          "page": 4,
+          "rw": 0
+        },
+        {
+          "page": 4,
+          "rw": 1
+        },
+        {
+          "page": 3,
+          "rw": 0
+        }
+      ]
+    },
+    {
+      "name": "synthetic_burst_reactive_lru",
+      "policy_name": "reactive_lru",
+      "ranking": {
+        "type": "not_applicable"
+      },
+      "replay_parameters": {
+        "dram_capacity_pages": 3,
+        "early_reuse_window": 4,
+        "history_window_size": 4
+      },
+      "trace": [
+        {
+          "page": 10,
+          "rw": 0
+        },
+        {
+          "page": 11,
+          "rw": 0
+        },
+        {
+          "page": 12,
+          "rw": 1
+        },
+        {
+          "page": 13,
+          "rw": 0
+        },
+        {
+          "page": 11,
+          "rw": 1
+        },
+        {
+          "page": 14,
+          "rw": 0
+        }
+      ]
+    },
+    {
+      "name": "synthetic_emergency_recovery",
+      "policy_name": "proactive_lru",
+      "ranking": {
+        "type": "proactive_lru"
+      },
+      "replay_parameters": {
+        "F_low": 1,
+        "F_target": 2,
+        "b_max": 1,
+        "candidate_size_K": 2,
+        "dram_capacity_pages": 3,
+        "early_reuse_window": 4,
+        "history_window_size": 4
+      },
+      "trace": [
+        {
+          "page": 20,
+          "rw": 0
+        },
+        {
+          "page": 21,
+          "rw": 0
+        },
+        {
+          "page": 22,
+          "rw": 0
+        },
+        {
+          "page": 23,
+          "rw": 1
+        }
+      ]
+    },
+    {
+      "name": "synthetic_deterministic_stub_top_b",
+      "policy_name": "proactive_lru",
+      "ranking": {
+        "scores": {
+          "1": 1.0,
+          "2": 8.0,
+          "3": 4.0,
+          "4": 10.0
+        },
+        "type": "deterministic_stub"
+      },
+      "replay_parameters": {
+        "F_low": 3,
+        "F_target": 5,
+        "b_max": 2,
+        "candidate_size_K": 4,
+        "dram_capacity_pages": 6,
+        "early_reuse_window": 4,
+        "history_window_size": 4
+      },
+      "trace": [
+        {
+          "page": 1,
+          "rw": 0
+        },
+        {
+          "page": 2,
+          "rw": 0
+        },
+        {
+          "page": 3,
+          "rw": 0
+        },
+        {
+          "page": 4,
+          "rw": 0
+        }
+      ]
+    }
+  ],
+  "schema_version": "capd_proactive_stage1_fixture_v1_0"
+}

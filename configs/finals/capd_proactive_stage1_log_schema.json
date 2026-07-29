@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Machine-readable minimum logging contract for CAPD proactive Replay stage 1.",
+  "properties": {
+    "access": {
+      "required": [
+        "schema_version",
+        "access_index",
+        "page",
+        "rw",
+        "location_before",
+        "page_entered_dram",
+        "F_before_access",
+        "F_before_watermark_check",
+        "F_after_access",
+        "demotion_event_ids",
+        "demotion_event_types",
+        "emergency_fallback_occurred"
+      ],
+      "type": "object"
+    },
+    "cycle": {
+      "required": [
+        "schema_version",
+        "cycle_id",
+        "start_access",
+        "end_access",
+        "start_F",
+        "target_F",
+        "number_of_rounds",
+        "number_of_pages_demoted",
+        "minimum_F",
+        "total_inference_time",
+        "total_selection_time",
+        "emergency_fallback_occurred",
+        "termination_reason"
+      ],
+      "type": "object"
+    },
+    "demotion_event": {
+      "properties": {
+        "event_type": {
+          "enum": [
+            "proactive_demotion",
+            "reactive_demotion",
+            "emergency_fallback_demotion"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "event_id",
+        "event_type",
+        "access_index",
+        "page",
+        "policy_name",
+        "cycle_id",
+        "round_id",
+        "F_before",
+        "F_after",
+        "dirty_before"
+      ],
+      "type": "object"
+    },
+    "round": {
+      "required": [
+        "schema_version",
+        "decision_id",
+        "cycle_id",
+        "round_id",
+        "cycle_round_index",
+        "access_index",
+        "policy_name",
+        "F_before",
+        "F_low",
+        "F_target",
+        "candidate_pages",
+        "candidate_features",
+        "policy_scores",
+        "selected_pages",
+        "b_t",
+        "F_after",
+        "feature_latency",
+        "inference_latency",
+        "selection_latency",
+        "migration_count",
+        "termination_reason"
+      ],
+      "type": "object"
+    },
+    "summary": {
+      "required": [
+        "schema_version",
+        "policy_name",
+        "total_accesses",
+        "dram_hits",
+        "nvm_reads",
+        "nvm_writes",
+        "page_enter_dram_count",
+        "total_demotions",
+        "proactive_demotions",
+        "reactive_demotions",
+        "emergency_demotions",
+        "number_of_proactive_cycles",
+        "number_of_proactive_rounds",
+        "mean_b_t",
+        "rounds_per_cycle",
+        "minimum_free_frames",
+        "average_free_frames",
+        "free_frame_exhaustion_count",
+        "accesses_below_F_low",
+        "early_reuse_count",
+        "decision_count",
+        "total_decision_time",
+        "decision_time_status",
+        "weighted_cost",
+        "weighted_cost_status"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "demotion_event",
+    "round",
+    "cycle",
+    "access",
+    "summary"
+  ],
+  "schema_version": "capd_proactive_stage1_log_schema_v1_0",
+  "title": "CAPD proactive stage-1 log contract",
+  "type": "object"
+}
