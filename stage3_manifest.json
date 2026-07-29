@@ -1,0 +1,62 @@
+{
+  "schema_version": "capd_proactive_stage3_input_manifest_v1_0",
+  "calibration_kind": "real_train_validation",
+  "path_base": "project_root",
+  "test_used_for_parameter_selection": false,
+  "entries": [
+    {
+      "workload": "canneal",
+      "split": "train",
+      "role": "training_and_fit",
+      "trace_path": "dataset/processed/finals_v3_official/canneal/train.csv",
+      "page_shift": 12,
+      "source_kind": "raw_access_trace",
+      "formal_test": false
+    },
+    {
+      "workload": "canneal",
+      "split": "validation",
+      "role": "parameter_selection",
+      "trace_path": "dataset/processed/finals_v3_official/canneal/valid.csv",
+      "page_shift": 12,
+      "source_kind": "raw_access_trace",
+      "formal_test": false
+    },
+    {
+      "workload": "streamcluster_pressure",
+      "split": "train",
+      "role": "training_and_fit",
+      "trace_path": "dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "page_shift": 12,
+      "source_kind": "raw_access_trace",
+      "formal_test": false
+    },
+    {
+      "workload": "streamcluster_pressure",
+      "split": "validation",
+      "role": "parameter_selection",
+      "trace_path": "dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv",
+      "page_shift": 12,
+      "source_kind": "raw_access_trace",
+      "formal_test": false
+    },
+    {
+      "workload": "dedup_pressure",
+      "split": "train",
+      "role": "training_and_fit",
+      "trace_path": "dataset/processed/finals_v3_official/dedup_pressure/train.csv",
+      "page_shift": 12,
+      "source_kind": "raw_access_trace",
+      "formal_test": false
+    },
+    {
+      "workload": "dedup_pressure",
+      "split": "validation",
+      "role": "parameter_selection",
+      "trace_path": "dataset/processed/finals_v3_official/dedup_pressure/valid.csv",
+      "page_shift": 12,
+      "source_kind": "raw_access_trace",
+      "formal_test": false
+    }
+  ]
+}
