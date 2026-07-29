@@ -1,0 +1,105 @@
+{
+  "allowed_splits": [
+    "train",
+    "validation"
+  ],
+  "b_max_candidates": [
+    1,
+    2,
+    4
+  ],
+  "b_max_selection_rule": {
+    "candidate_order": "state_invariants,exhaustion,emergency,validation_default_cost,nvm_write,early_reuse,rounds,smaller_b_max",
+    "capd_latency_used": false,
+    "capd_results_used": false,
+    "split": "validation",
+    "test_used": false,
+    "tie_break": "smaller_b_max"
+  },
+  "burst_profiler_policy": "reactive_lru",
+  "burst_windows": [
+    100,
+    500,
+    1000
+  ],
+  "candidate_bound_invariance_values": [
+    8,
+    16
+  ],
+  "capacity_profile_candidates": {
+    "fallback": [
+      0.1,
+      0.2,
+      0.4
+    ],
+    "primary": [
+      0.2,
+      0.4,
+      0.6
+    ]
+  },
+  "capacity_rounding_rule": "decimal_ceiling_ratio_times_working_set_minimum_one_no_clamp",
+  "contract_version": "CAPD-PROACTIVE-STAGE3-1.0",
+  "cost_profile": {
+    "name": "default",
+    "status": "stage2_frozen",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "early_reuse_window": 64,
+  "forbidden_splits": [
+    "test"
+  ],
+  "history_window_size": 10,
+  "input_manifest": null,
+  "output_root": "outputs/capd_proactive_calibration",
+  "page_size_bytes": 4096,
+  "pressure_distinguishability_rule": {
+    "chronic_exhaustion_rate": 0.1,
+    "min_accesses_per_run": 100,
+    "minimum_demotion_rate_range": 0.05,
+    "minimum_nvm_access_rate_range": 0.05,
+    "minimum_ordered_indicators": 3,
+    "monotonic_tolerance": 0.01,
+    "near_no_migration_rate": 0.01
+  },
+  "provenance": {
+    "candidate_filter": "disabled",
+    "capd_used_for_selection": false,
+    "selection_policy": "predeclared_before_results",
+    "test_used": false
+  },
+  "quantile_method": "nearest_rank",
+  "random_seed": 2026,
+  "ranking_policy": "proactive_lru",
+  "schema_name": "capd_proactive_stage3_active_mechanism",
+  "schema_version": "capd_proactive_stage3_v1_0",
+  "stage3_calibration_candidate_bound": 8,
+  "stage3_candidate_bound_status": "non_formal_calibration_proxy",
+  "stage_status": "stage3_implemented_awaiting_calibration_inputs",
+  "watermark_candidate_rule": {
+    "aggregate_across_runs": "maximum",
+    "burst_window": 100,
+    "large_source_quantile": "p99",
+    "low_rule": "ceil(F_target/2)",
+    "medium_source_quantile": "p95",
+    "overflow_rule": "mark_illegal_without_clamp",
+    "small_source_quantile": "p50",
+    "source_split": "validation",
+    "target_rule": "max(2,ceil(source)); enforce_strict_label_order_by_previous_plus_one"
+  },
+  "watermark_candidates": null,
+  "watermark_selection_rule": {
+    "candidate_order": "capacity_and_state,exhaustion,emergency,early_reuse,total_demotions,nvm_io,smaller_reserve",
+    "capd_results_used": false,
+    "macro_average": "unweighted_across_workload_capacity_runs",
+    "policy": "proactive_lru",
+    "test_used": false,
+    "worst_case_reported": true
+  },
+  "working_set_definition": "active_unique_pages_from_train_and_validation"
+}

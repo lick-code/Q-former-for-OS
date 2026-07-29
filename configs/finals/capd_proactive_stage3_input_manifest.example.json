@@ -1,0 +1,26 @@
+{
+  "calibration_kind": "real_train_validation",
+  "entries": [
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "training_and_fit",
+      "source_kind": "raw_access_trace",
+      "split": "train",
+      "trace_path": "data/stage3/WORKLOAD_A_train.csv",
+      "workload": "WORKLOAD_A"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "parameter_selection",
+      "source_kind": "raw_access_trace",
+      "split": "validation",
+      "trace_path": "data/stage3/WORKLOAD_A_validation.csv",
+      "workload": "WORKLOAD_A"
+    }
+  ],
+  "path_base": "project_root",
+  "schema_version": "capd_proactive_stage3_input_manifest_v1_0",
+  "test_used_for_parameter_selection": false
+}
