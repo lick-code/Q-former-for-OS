@@ -1,0 +1,17 @@
+[START] targeted_contract_and_replay_tests 2026-07-29T07:14:53Z
+[COMMAND] python3 -m pytest -q tests/test_capd_proactive_config.py tests/test_checkpoint_config_contract.py tests/test_capd_proactive_replay.py 
+[END] targeted_contract_and_replay_tests 2026-07-29T07:14:54Z exit_code=0 log=/tmp/capd-proactive-stage1.zHDT4X/logs/targeted_contract_and_replay_tests.log
+[START] stage1_fixture_replay 2026-07-29T07:14:54Z
+[COMMAND] python3 -m qmap.proactive_replay --config configs/finals/capd_proactive_stage0.json --fixture configs/finals/capd_proactive_stage1_fixture.json --output-root /tmp/capd-proactive-stage1.zHDT4X/fixture-output 
+[END] stage1_fixture_replay 2026-07-29T07:14:54Z exit_code=0 log=/tmp/capd-proactive-stage1.zHDT4X/logs/stage1_fixture_replay.log
+[START] stage1_output_contract 2026-07-29T07:14:54Z
+[COMMAND] python3 -c import\ glob\,json\,os\;\ runs=glob.glob\(os.path.join\(\'/tmp/capd-proactive-stage1.zHDT4X/fixture-output\'\,\'stage1\'\,\'\*\'\)\)\;\ assert\ len\(runs\)==1\,\ runs\;\ r=runs\[0\]\;\ required=\[\'resolved_config.json\'\,\'provenance.json\'\,\'artifacts\'\,\'logs\'\]\;\ assert\ all\(os.path.exists\(os.path.join\(r\,x\)\)\ for\ x\ in\ required\)\;\ summaries=glob.glob\(os.path.join\(r\,\'logs\'\,\'\*_summary.json\'\)\)\;\ assert\ len\(summaries\)\>=2\;\ rows=\[json.load\(open\(p\,encoding=\'utf-8\'\)\)\ for\ p\ in\ summaries\]\;\ assert\ all\(x\[\'weighted_cost\'\]\ is\ None\ and\ x\[\'weighted_cost_status\'\]==\'pending_stage2\'\ for\ x\ in\ rows\)\;\ assert\ all\(x\[\'selector_status\'\]==\'disabled\'\ and\ x\[\'checkpoint_status\'\]==\'not_required_stage1\'\ for\ x\ in\ rows\)\;\ print\(r\) 
+[END] stage1_output_contract 2026-07-29T07:14:54Z exit_code=0 log=/tmp/capd-proactive-stage1.zHDT4X/logs/stage1_output_contract.log
+[START] syntax_check 2026-07-29T07:14:54Z
+[COMMAND] python3 -m py_compile qmap/proactive_replay.py tests/test_capd_proactive_replay.py 
+[END] syntax_check 2026-07-29T07:14:54Z exit_code=0 log=/tmp/capd-proactive-stage1.zHDT4X/logs/syntax_check.log
+[START] diff_check 2026-07-29T07:14:54Z
+[COMMAND] git diff --check 
+[END] diff_check 2026-07-29T07:14:54Z exit_code=0 log=/tmp/capd-proactive-stage1.zHDT4X/logs/diff_check.log
+[INFO] acceptance evidence: /tmp/capd-proactive-stage1.zHDT4X
+[FINAL] STAGE1_VERIFIED
