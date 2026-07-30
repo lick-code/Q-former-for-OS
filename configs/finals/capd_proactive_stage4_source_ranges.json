@@ -1,0 +1,38 @@
+{
+  "canneal": {
+    "train": {
+      "source_trace_id": "canneal-20260722T125000",
+      "start": 0,
+      "end": 600000
+    },
+    "validation": {
+      "source_trace_id": "canneal-20260722T125000",
+      "start": 600000,
+      "end": 800000
+    }
+  },
+  "dedup_pressure": {
+    "train": {
+      "source_trace_id": "dedup_pressure-20260722T131403",
+      "start": 0,
+      "end": 1000000
+    },
+    "validation": {
+      "source_trace_id": "dedup_pressure-20260722T131403",
+      "start": 1000000,
+      "end": 2000000
+    }
+  },
+  "streamcluster_pressure": {
+    "train": {
+      "source_trace_id": "streamcluster_pressure-20260722T133000",
+      "start": 0,
+      "end": 600000
+    },
+    "validation": {
+      "source_trace_id": "streamcluster_pressure-20260722T133000",
+      "start": 600000,
+      "end": 800000
+    }
+  }
+}

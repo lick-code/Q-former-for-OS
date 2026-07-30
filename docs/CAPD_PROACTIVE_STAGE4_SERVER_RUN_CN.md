@@ -18,14 +18,18 @@ clean；其状态指纹会写入 provenance。
 
 ## 2. 选择非重叠证明方式
 
-若六个 Train/Validation 文件确实来自六次独立采集，显式声明：
+当前 `finals_v3_official` 的 Train/Validation 不是六次独立采集，而是每个
+workload 从同一次真实 RW 采集中按不重叠半开区间切分。来源身份和区间记录在
+`dataset/metadata/finals_v3_source_specs/*.json`，Stage 4 已将对应 Train/Validation
+区间固化到：
 
 ```bash
-export CAPD_STAGE4_ATTEST_DISTINCT_SOURCE_TRACES=1
+export CAPD_STAGE4_SOURCE_RANGES_JSON="$PWD/configs/finals/capd_proactive_stage4_source_ranges.json"
 ```
 
-只有在事实确实如此时才能使用该声明。如果 Train/Validation 是同一源轨迹的切片，
-准备一个 JSON，给出每个 workload/split 的源 ID 和真实半开区间：
+不得对当前 official 数据设置
+`CAPD_STAGE4_ATTEST_DISTINCT_SOURCE_TRACES=1`。若以后改用新的输入数据，才应根据
+新数据的真实来源重新生成区间 JSON；其结构为：
 
 ```json
 {
