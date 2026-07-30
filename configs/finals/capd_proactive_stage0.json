@@ -1,8 +1,8 @@
 {
   "active_demotion": {
-    "F_low": null,
-    "F_target": null,
-    "b_max": null
+    "F_low": 2,
+    "F_target": 4,
+    "b_max": 4
   },
   "config_version": 1,
   "contract": {
@@ -65,17 +65,17 @@
     "stage0_scope": "frozen",
     "stage1_replay": "frozen",
     "stage2_cost_profile": "frozen",
-    "stage3_active_mechanism": "pending",
+    "stage3_active_mechanism": "frozen",
     "stage4_candidate": "pending",
     "stage4_training": "pending",
     "stage7_workload": "pending"
   },
   "memory": {
     "dram_pages": null,
-    "dram_working_set_ratio": null,
+    "dram_working_set_ratio": 0.2,
     "nvm_capacity_model": "unbounded_backing_tier",
     "page_size_bytes": 4096,
-    "working_set_definition": null,
+    "working_set_definition": "active_unique_pages_from_train_and_validation",
     "working_set_size_pages": null
   },
   "method": {

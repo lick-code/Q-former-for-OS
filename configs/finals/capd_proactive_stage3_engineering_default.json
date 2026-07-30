@@ -1,0 +1,30 @@
+{
+  "schema_version": "capd_proactive_stage3_engineering_default_v1_0",
+  "decision_date": "2026-07-30",
+  "decision_status": "user_accepted_conditional_engineering_default",
+  "main_config_stage3_status": "frozen",
+  "formal_capacity_gate_passed": false,
+  "capacity_rule_v2_status": "not_freezable",
+  "test_used_for_parameter_selection": false,
+  "capd_used_for_parameter_selection": false,
+  "selected": {
+    "working_set_definition": "active_unique_pages_from_train_and_validation",
+    "dram_working_set_ratio": 0.2,
+    "F_low": 2,
+    "F_target": 4,
+    "b_max": 4,
+    "candidate_size_K": null
+  },
+  "remaining_gates": {
+    "stage4_candidate": "pending",
+    "stage4_training": "pending",
+    "stage7_workload": "pending",
+    "formal_test": "pending"
+  },
+  "evidence": {
+    "parameter_source": "outputs/capd_proactive_calibration/stage3/stage3-real-001/selection_decision.json",
+    "capacity_v2_failure": "outputs/capd_proactive_calibration/stage3/stage3-v2-real-003/selection_decision.json",
+    "fresh_collection_attempt": "blocked_before_collection_because_qmap_work_runtime_was_not_found"
+  },
+  "claim_boundary": "The values are frozen for project engineering progress by explicit user decision. This does not mean capacity_rule_v2 passed, and it is not evidence from Test."
+}

@@ -36,6 +36,14 @@ class Stage3Test(unittest.TestCase):
 
   def setUp(self):
     self.stage0 = finals_config.load_config(STAGE0)
+    self.stage0["freeze_status"]["stage3_active_mechanism"] = "pending"
+    self.stage0["memory"]["working_set_definition"] = None
+    self.stage0["memory"]["dram_working_set_ratio"] = None
+    self.stage0["active_demotion"].update({
+        "F_low": None,
+        "F_target": None,
+        "b_max": None,
+    })
     self.stage2 = proactive_cost.load_cost_config(STAGE2)
     self.config = proactive_stage3.load_json(STAGE3)
 

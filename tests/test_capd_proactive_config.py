@@ -56,6 +56,11 @@ class ProactiveStage0ConfigTest(unittest.TestCase):
         "trigger_mode": "on_demand_no_free_frame",
         "fallback_policy": "not_applicable",
     })
+    config["active_demotion"].update({
+        "F_low": None,
+        "F_target": None,
+        "b_max": None,
+    })
     config["freeze_status"]["stage4_candidate"] = "not_applicable"
     config["freeze_status"]["stage4_training"] = "not_applicable"
     config["model"]["model_checkpoint"] = {
@@ -69,6 +74,22 @@ class ProactiveStage0ConfigTest(unittest.TestCase):
     self.assertEqual(
         finals_config.PROACTIVE_SCHEMA_VERSION, loaded["schema_version"])
     self.assertEqual("capd_proactive", loaded["method"]["name"])
+
+  def test_stage3_conditional_engineering_default_is_frozen(self):
+    loaded = finals_config.load_config(TEMPLATE_PATH)
+    self.assertEqual(
+        "frozen",
+        loaded["freeze_status"]["stage3_active_mechanism"])
+    self.assertEqual(
+        "active_unique_pages_from_train_and_validation",
+        loaded["memory"]["working_set_definition"])
+    self.assertEqual(0.2, loaded["memory"]["dram_working_set_ratio"])
+    self.assertEqual(
+        {"F_low": 2, "F_target": 4, "b_max": 4},
+        loaded["active_demotion"])
+    self.assertIsNone(loaded["method"]["candidate_size_K"])
+    self.assertEqual(
+        "pending", loaded["freeze_status"]["stage4_candidate"])
 
   def test_stage2_default_cost_profile_is_frozen(self):
     self.assertEqual(
@@ -181,6 +202,11 @@ class ProactiveStage0ConfigTest(unittest.TestCase):
     self.config["memory"]["working_set_definition"] = (
         "active_unique_pages_from_train_and_validation")
     self.config["memory"]["dram_working_set_ratio"] = 0.4
+    self.config["active_demotion"].update({
+        "F_low": None,
+        "F_target": None,
+        "b_max": None,
+    })
     with self.assertRaises(ValueError):
       finals_config.validate_config(self.config)
 
