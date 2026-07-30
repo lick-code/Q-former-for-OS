@@ -26,6 +26,25 @@ Linux 验收脚本增加统一失败捕获。只要输出目录已经建立，�
 `stage5_not_verified`、失败步骤和失败历史。`stage5-baseline-r1` 现场保留，不续跑；
 修复后的验收必须使用新 run ID。
 
+## `stage5-baseline-r2` 服务器现场
+
+r2 已通过环境、CUDA、preflight、阶段 4 权威链和污染审计，并真实执行了阶段
+1～5 的 125 项回归测试。失败集中在阶段 5 Replay 的策略到 Stage-0 运行合同适配：
+
+- Proactive-LRU、Proactive-CLOCK 没有声明
+  `stage4_training=not_applicable`；
+- Reactive-LRU 继承了主动策略的 `F_low/F_target/b_max`；
+- Oracle 继承了 CAPD 的 `pending_stage4` checkpoint 表示。
+
+因此这 10 个 error 是同一适配器的三种缺失映射，不是 Replay 状态机、阶段 4
+checkpoint 或 Trace 损坏。r2 已由验收脚本正确原子标记为
+`stage5_not_verified`，发生在任何阶段 5 Replay、CAPD 推理、实验 A/B
+和性能结论之前。
+
+当前修复为五个可运行策略分别生成完整、可验证的 Stage-0 运行合同，并在正式回归前
+增加五策略映射自检。r2 保留现场且不得续跑；下一次验收使用
+`stage5-baseline-r3`。
+
 ## 进入阶段 6 的门禁
 
 当前尚未满足。必须在 Linux 服务器执行

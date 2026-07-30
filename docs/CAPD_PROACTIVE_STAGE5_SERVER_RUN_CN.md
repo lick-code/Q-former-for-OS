@@ -15,7 +15,7 @@ CPU：
 ```bash
 cd /home/likc/Q-former-for-OS
 export PYTHON_BIN=python3
-bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r2 cpu
+bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r3 cpu
 ```
 
 CUDA：
@@ -23,7 +23,7 @@ CUDA：
 ```bash
 cd /home/likc/Q-former-for-OS
 export PYTHON_BIN=python3
-bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r2 cuda:0
+bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r3 cuda:0
 ```
 
 脚本依次执行：
@@ -86,5 +86,6 @@ python3 scripts/run_capd_proactive_stage5.py fairness \
 - TPP 请求失败且显示 `pending_stage6`：这是阶段 5 的预期硬拒绝；
 - 任一失败均不得手工创建 verification 或打印最终标记。
 
-`stage5-baseline-r1` 已在历史工件污染自测处失败，必须保留现场，不得续跑或当作
-完成证据。修复后的首次运行使用 `stage5-baseline-r2`。
+`stage5-baseline-r1` 已在历史工件污染自测处失败，`stage5-baseline-r2` 已在
+Stage-0 策略运行合同映射回归处失败。两者都必须保留现场，不得续跑或当作完成证据。
+修复后的下一次运行使用 `stage5-baseline-r3`。

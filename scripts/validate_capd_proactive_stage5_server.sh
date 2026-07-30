@@ -94,13 +94,16 @@ mkdir -p "${LOG_DIR}"
 
 CURRENT_STEP="stage4_chain_and_contamination_audit"
 "${PYTHON_BIN}" - <<'PY'
-import json
 import os
+from qmap import proactive_stage4
 from qmap import proactive_stage5_contract as c
+from qmap import proactive_stage5_replay as stage5_replay
 
 root = os.getcwd()
 config = c.load_config("configs/finals/capd_proactive_stage5.json")
 authority = c.audit_stage4_authority(config, root, require_checkpoints=True)
+stage0 = proactive_stage4.load_json(
+    "configs/finals/capd_proactive_stage0.json")
 assert [row["seed"] for row in authority["checkpoints"]] == [3136859, 42, 2026]
 assert authority["selector_status"] == "disabled"
 assert authority["test_trace_opened"] is False
@@ -131,6 +134,22 @@ c.audit_no_legacy_stage_artifacts([
     "dataset/processed/finals_v3_official/canneal/valid.csv",
     "outputs/results/finals_v3_official/stage6/run_manifest.json",
 ])
+runtime_contracts = {
+    policy: stage5_replay._stage0_for_policy(
+        stage0, policy,
+        checkpoint=(authority["checkpoints"][0] if policy == "capd" else None))
+    for policy in c.RUNNABLE_POLICIES
+}
+assert runtime_contracts["reactive_lru"]["active_demotion"] == {
+    "F_low": None, "F_target": None, "b_max": None}
+assert runtime_contracts["proactive_lru"][
+    "freeze_status"]["stage4_training"] == "not_applicable"
+assert runtime_contracts["proactive_clock"][
+    "freeze_status"]["stage4_training"] == "not_applicable"
+assert runtime_contracts["oracle"]["model"]["model_checkpoint"][
+    "status"] == "not_applicable"
+assert runtime_contracts["capd"]["model"]["model_checkpoint"][
+    "fingerprint"] == authority["checkpoints"][0]["sha256"]
 print("stage4_chain_and_contamination_audit=passed")
 PY
 

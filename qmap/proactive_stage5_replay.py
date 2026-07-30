@@ -42,14 +42,111 @@ def _quantile(values: Sequence[float], probability: float) -> Optional[float]:
   return ordered[lower] * (1.0 - fraction) + ordered[upper] * fraction
 
 
-def _stage0_for_policy(stage0: Mapping[str, Any], policy: str) -> Dict[str, Any]:
+def _stage0_for_policy(
+    stage0: Mapping[str, Any], policy: str,
+    checkpoint: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
+  """Builds a policy-specific, fully frozen Stage-0 runtime contract."""
   value = copy.deepcopy(stage0)
   value["evaluation"]["policy_name"] = policy
   value["method"]["name"] = METHOD_NAMES[policy]
   value["method"]["selector"] = "disabled"
-  value["method"]["candidate_source"] = "lru_tail"
-  value["method"]["fallback_policy"] = "lru"
-  value["method"]["trigger_mode"] = "low_watermark"
+  value["evaluation"]["random_seed"] = None
+  value["model"].update({
+      "history_H": None,
+      "lookahead_L": None,
+      "label_weights": {
+          "lambda_1": None,
+          "lambda_2": None,
+          "lambda_3": None,
+      },
+      "model_checkpoint": {
+          "status": "not_applicable",
+          "path": None,
+          "fingerprint": None,
+      },
+  })
+
+  if policy == "reactive_lru":
+    if checkpoint is not None:
+      raise contract.Stage5ContractError(
+          "Reactive-LRU must not receive a checkpoint.")
+    value["active_demotion"].update({
+        "F_low": None,
+        "F_target": None,
+        "b_max": None,
+    })
+    value["method"].update({
+        "candidate_size_K": None,
+        # Stage-0 keeps this shared schema token even though Reactive-LRU
+        # never constructs a candidate set.
+        "candidate_source": "lru_tail",
+        "fallback_policy": "not_applicable",
+        "trigger_mode": "on_demand_no_free_frame",
+    })
+    value["freeze_status"]["stage4_candidate"] = "not_applicable"
+    value["freeze_status"]["stage4_training"] = "not_applicable"
+  else:
+    value["method"].update({
+        "candidate_size_K": 8,
+        "candidate_source": "lru_tail",
+        "fallback_policy": "lru",
+        "trigger_mode": "low_watermark",
+    })
+    value["freeze_status"]["stage4_candidate"] = "frozen"
+    if policy in ("proactive_lru", "proactive_clock"):
+      if checkpoint is not None:
+        raise contract.Stage5ContractError(
+            "{} must not receive a checkpoint.".format(policy))
+      value["freeze_status"]["stage4_training"] = "not_applicable"
+    elif policy == "oracle":
+      if checkpoint is not None:
+        raise contract.Stage5ContractError(
+            "Oracle must not receive a checkpoint.")
+      value["freeze_status"]["stage4_training"] = "frozen"
+      value["model"].update({
+          "lookahead_L": 256,
+          "label_weights": {
+              "lambda_1": 1.0,
+              "lambda_2": 1.0,
+              "lambda_3": 2.0,
+          },
+      })
+    elif policy == "capd":
+      if not isinstance(checkpoint, Mapping):
+        raise contract.Stage5ContractError(
+            "CAPD runtime contract requires a frozen checkpoint.")
+      missing = {"seed", "path", "sha256"} - set(checkpoint)
+      if missing:
+        raise contract.Stage5ContractError(
+            "CAPD checkpoint binding is incomplete: {}".format(
+                sorted(missing)))
+      digest = checkpoint["sha256"]
+      if (int(checkpoint["seed"]) not in contract.CAPD_SEEDS or
+          not isinstance(checkpoint["path"], str) or
+          not checkpoint["path"] or
+          not isinstance(digest, str) or len(digest) != 64 or
+          any(character not in "0123456789abcdef" for character in digest)):
+        raise contract.Stage5ContractError(
+            "CAPD checkpoint seed/path/SHA-256 binding is invalid.")
+      value["freeze_status"]["stage4_training"] = "frozen"
+      value["evaluation"]["random_seed"] = int(checkpoint["seed"])
+      value["model"].update({
+          "history_H": 20,
+          "lookahead_L": 256,
+          "label_weights": {
+              "lambda_1": 1.0,
+              "lambda_2": 1.0,
+              "lambda_3": 2.0,
+          },
+          "model_checkpoint": {
+              "status": "frozen",
+              "path": checkpoint["path"],
+              "fingerprint": checkpoint["sha256"],
+          },
+      })
+    else:
+      raise contract.Stage5ContractError(
+          "No Stage-0 runtime mapping for policy: " + policy)
   finals_config.validate_config(value)
   return value
 
@@ -166,7 +263,8 @@ def run_replay(
           "{} must not receive a CAPD checkpoint.".format(policy))
     seed = None
 
-  policy_stage0 = _stage0_for_policy(stage0_config, policy)
+  policy_stage0 = _stage0_for_policy(
+      stage0_config, policy, checkpoint=checkpoint)
   parameters = _parameters(policy, int(dram_capacity_pages))
   ranker = None if policy == "reactive_lru" else policies.build_ranker(
       policy, trace=trace, checkpoint=checkpoint, device=device)

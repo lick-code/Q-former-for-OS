@@ -51,6 +51,63 @@ class ProactiveStage5ReplayTest(unittest.TestCase):
         working_set_pages=len({row["page"] for row in self.trace}),
         measure_latency=False)
 
+  def test_all_runnable_policies_have_valid_frozen_stage0_mappings(self):
+    original_stage0 = copy.deepcopy(self.stage0)
+    fake_checkpoint = {
+        "seed": 3136859,
+        "path": "outputs/capd_proactive_stage4/checkpoints/qmap_best.pth",
+        "sha256": "a" * 64,
+    }
+    mapped = {}
+    for policy in contract.RUNNABLE_POLICIES:
+      checkpoint = fake_checkpoint if policy == "capd" else None
+      with self.subTest(policy=policy):
+        value = proactive_stage5_replay._stage0_for_policy(
+            self.stage0, policy, checkpoint=checkpoint)
+        self.assertEqual(policy, value["evaluation"]["policy_name"])
+        mapped[policy] = value
+
+    reactive = mapped["reactive_lru"]
+    self.assertEqual(
+        {"F_low": None, "F_target": None, "b_max": None},
+        reactive["active_demotion"])
+    self.assertEqual(
+        "not_applicable",
+        reactive["freeze_status"]["stage4_candidate"])
+    self.assertEqual(
+        "not_applicable",
+        reactive["freeze_status"]["stage4_training"])
+
+    for policy in ("proactive_lru", "proactive_clock"):
+      self.assertEqual(
+          "frozen", mapped[policy]["freeze_status"]["stage4_candidate"])
+      self.assertEqual(
+          "not_applicable",
+          mapped[policy]["freeze_status"]["stage4_training"])
+      self.assertEqual(8, mapped[policy]["method"]["candidate_size_K"])
+
+    oracle = mapped["oracle"]
+    self.assertEqual("frozen", oracle["freeze_status"]["stage4_training"])
+    self.assertEqual(
+        "not_applicable",
+        oracle["model"]["model_checkpoint"]["status"])
+    self.assertEqual(256, oracle["model"]["lookahead_L"])
+
+    capd = mapped["capd"]
+    self.assertEqual("frozen", capd["freeze_status"]["stage4_training"])
+    self.assertEqual(20, capd["model"]["history_H"])
+    self.assertEqual(256, capd["model"]["lookahead_L"])
+    self.assertEqual(3136859, capd["evaluation"]["random_seed"])
+    self.assertEqual(
+        "a" * 64, capd["model"]["model_checkpoint"]["fingerprint"])
+    with self.assertRaises(contract.Stage5ContractError):
+      proactive_stage5_replay._stage0_for_policy(
+          self.stage0, "capd", checkpoint=None)
+    with self.assertRaises(contract.Stage5ContractError):
+      proactive_stage5_replay._stage0_for_policy(
+          self.stage0, "proactive_clock", checkpoint=fake_checkpoint)
+    self.assertEqual(original_stage0, self.stage0)
+
   def test_reactive_lru_has_no_proactive_state_or_event_type(self):
     result = self.run_policy("reactive_lru")
     summary = result["summary"]
