@@ -75,7 +75,7 @@ class ProactiveReplayStage1Test(unittest.TestCase):
     self.assertEqual(
         "frozen", self.stage0["freeze_status"]["stage2_cost_profile"])
     self.assertEqual(
-        {"F_low": 2, "F_target": 4, "b_max": 4},
+        {"F_low": 8, "F_target": 16, "b_max": 4},
         self.stage0["active_demotion"])
     self.assertEqual("disabled", self.stage0["method"]["selector"])
     self.assertEqual(

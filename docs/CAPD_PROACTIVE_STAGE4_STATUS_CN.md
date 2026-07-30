@@ -35,7 +35,7 @@ loss 选 best、RNG 状态恢复、checkpoint manifest、统计工具和 SHA-256
 
 - Working Set 定义；
 - DRAM 比例 20%（条件工程默认，非容量门槛通过）；
-- `F_low=2`、`F_target=4`、`b_max=4`；
+- `F_low=8`、`F_target=16`、`b_max=4`（条件工程覆盖，未重跑新水位矩阵）；
 - LRU-tail 候选、selector disabled、low-watermark、LRU fallback；
 - 默认 Cost；
 - 候选网格、seed、阶段顺序、数值容差和 tie-break；
@@ -55,4 +55,3 @@ loss 选 best、RNG 状态恢复、checkpoint manifest、统计工具和 SHA-256
 真实 Train/Validation 的 4-B～4-E 完成并生成最终冻结候选后，状态为
 `stage4_results_ready_for_freeze`。阶段 1～4 回归测试、最终工件一致性、
 Test 污染和历史产物污染审计全部通过后，才可进入 `stage4_verified`。
-

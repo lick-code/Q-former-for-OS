@@ -85,7 +85,7 @@ class ProactiveStage0ConfigTest(unittest.TestCase):
         loaded["memory"]["working_set_definition"])
     self.assertEqual(0.2, loaded["memory"]["dram_working_set_ratio"])
     self.assertEqual(
-        {"F_low": 2, "F_target": 4, "b_max": 4},
+        {"F_low": 8, "F_target": 16, "b_max": 4},
         loaded["active_demotion"])
     self.assertIsNone(loaded["method"]["candidate_size_K"])
     self.assertEqual(

@@ -396,7 +396,7 @@ def _training_contract(config, metadata, parameters, seed, output_root):
           "validation": metadata["merged"]["validation"],
       },
       "method": {
-          "F_low": 2, "F_target": 4, "b_max": 4,
+          "F_low": 8, "F_target": 16, "b_max": 4,
           "candidate_source": "lru_tail", "selector": "disabled",
           "trajectory_policy": "proactive_lru",
       },

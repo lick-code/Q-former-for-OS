@@ -42,8 +42,8 @@ FORBIDDEN_SPLITS = ("test",)
 FROZEN_STAGE3 = {
     "working_set_definition": "active_unique_pages_from_train_and_validation",
     "dram_working_set_ratio": 0.2,
-    "F_low": 2,
-    "F_target": 4,
+    "F_low": 8,
+    "F_target": 16,
     "b_max": 4,
     "candidate_source": "lru_tail",
     "selector": "disabled",
@@ -331,7 +331,7 @@ def validate_config(
     _require(stage3_default.get("selected") == {
         "working_set_definition": FROZEN_STAGE3["working_set_definition"],
         "dram_working_set_ratio": 0.2,
-        "F_low": 2, "F_target": 4, "b_max": 4,
+        "F_low": 8, "F_target": 16, "b_max": 4,
         "candidate_size_K": None,
     }, "Stage-3 engineering-default inheritance mismatch.")
     _require(stage3_default.get("formal_capacity_gate_passed") is False,
@@ -945,7 +945,7 @@ def evaluate_checkpoint(
       checkpoint_path, device, trace, L, H, K, weights)
   parameters = proactive_replay.ReplayParameters(
       policy_name="capd", dram_capacity_pages=dram_capacity_pages,
-      F_low=2, F_target=4, b_max=4, candidate_size_K=K,
+      F_low=8, F_target=16, b_max=4, candidate_size_K=K,
       history_window_size=H, early_reuse_window=64)
   result = proactive_replay.ProactiveReplay(
       stage0, parameters, ranking_policy=ranker, invariant_mode="boundary",
@@ -1262,7 +1262,7 @@ def validate_training_contract(
     _positive_integer(item["sample_count"],
                       "data.{}.sample_count".format(split))
   _require(value["method"] == {
-      "F_low": 2, "F_target": 4, "b_max": 4,
+      "F_low": 8, "F_target": 16, "b_max": 4,
       "candidate_source": "lru_tail", "selector": "disabled",
       "trajectory_policy": "proactive_lru",
   }, "Training contract changed the proactive method.")

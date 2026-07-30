@@ -11,8 +11,8 @@
     "working_set_definition": "active_unique_pages_from_train_and_validation"
   },
   "active_demotion": {
-    "F_low": 2,
-    "F_target": 4,
+    "F_low": 8,
+    "F_target": 16,
     "b_max": 4
   },
   "method": {
@@ -25,7 +25,8 @@
 
 ## 证据与选择理由
 
-- `stage3-real-001` 的预声明水位规则选择 Medium 水位，即 `F_low=2`、`F_target=4`。
+- `stage3-real-001` 的历史预声明规则曾选择 `F_low=2`、`F_target=4`；后续审计发现该规则将 100-access burst 分位数作为 `F_target`，储备偏小。
+- 两轮 Validation burst 审计均支持 `(4,8)/(8,16)/(16,32)` 三档工程候选。项目按用户决策只覆盖水位为平衡档 `F_low=8`、`F_target=16`，未重新运行完整水位矩阵，因此该值属于保守工程覆盖而非新的矩阵最优结论。
 - 同一轮结果选择 `b_max=4`；代理 `K=8` 和 `K=16` 下选择一致，但代理结果不进入正式 `candidate_size_K`，因此 `K` 继续为 `null`，Stage 4 继续为 `pending`。
 - 20% 容量下三个 Validation workload 均出现非零降级压力，因此将 20% 作为工程默认。
 - `stage3-real-001` 的容量规则和后续 `capacity_rule_v2` 均未形成可正式冻结的容量结论。该限制必须保留，不得表述为“容量门槛验证通过”。
@@ -44,7 +45,7 @@
 - 环境：服务器回放产物已同步至本地；最后一次 fresh 尝试未进入采集或回放。
 - 随机性：本决策引用确定性 replay 输出；未新增随机实验。
 - 泄漏控制：Test 未参与参数选择。
-- 状态：`ANALYZED`，参数作为用户确认的条件工程默认写入主配置；不声称容量规则正式通过。
+- 状态：`ANALYZED`，参数作为用户确认的条件工程默认写入主配置；水位覆盖未重新运行矩阵，不声称容量规则或新水位正式验证通过。
 
 ## 后续边界
 

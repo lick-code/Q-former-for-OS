@@ -10,8 +10,8 @@
   "selected": {
     "working_set_definition": "active_unique_pages_from_train_and_validation",
     "dram_working_set_ratio": 0.2,
-    "F_low": 2,
-    "F_target": 4,
+    "F_low": 8,
+    "F_target": 16,
     "b_max": 4,
     "candidate_size_K": null
   },
@@ -26,5 +26,5 @@
     "capacity_v2_failure": "outputs/capd_proactive_calibration/stage3/stage3-v2-real-003/selection_decision.json",
     "fresh_collection_attempt": "blocked_before_collection_because_qmap_work_runtime_was_not_found"
   },
-  "claim_boundary": "The values are frozen for project engineering progress by explicit user decision. This does not mean capacity_rule_v2 passed, and it is not evidence from Test."
+  "claim_boundary": "The values are frozen for project engineering progress by explicit user decision. F_low=8 and F_target=16 are a conservative engineering override based on the audited Validation burst envelope, not a rerun watermark-matrix result. This does not mean capacity_rule_v2 passed, and it is not evidence from Test."
 }

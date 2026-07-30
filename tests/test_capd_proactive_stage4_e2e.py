@@ -109,7 +109,7 @@ class ProactiveStage4TrainingE2ETest(unittest.TestCase):
                   "sha256": proactive_stage4.fingerprint_file(valid_path)},
           },
           "method": {
-              "F_low": 2, "F_target": 4, "b_max": 4,
+              "F_low": 8, "F_target": 16, "b_max": 4,
               "candidate_source": "lru_tail", "selector": "disabled",
               "trajectory_policy": "proactive_lru",
           },
@@ -146,7 +146,7 @@ class ProactiveStage4TrainingE2ETest(unittest.TestCase):
           {"page": page, "rw": page % 2, "pc": page + 100}
           for page in range(1, 40)]
       row, details = proactive_stage4.evaluate_checkpoint(
-          stage0, trace, "synthetic", 12, checkpoint, "cpu", 42,
+          stage0, trace, "synthetic", 20, checkpoint, "cpu", 42,
           256, (1, 1, 4), 8, 5)
       self.assertEqual(row["seed"], 42)
       self.assertFalse(row["test_trace_opened"])

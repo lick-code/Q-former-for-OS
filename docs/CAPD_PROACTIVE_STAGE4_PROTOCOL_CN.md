@@ -15,15 +15,15 @@
 
 - Working Set：Train 与 Validation 活跃唯一页并集；
 - DRAM/Working Set：20%；
-- `F_low=2`、`F_target=4`、`b_max=4`；
+- `F_low=8`、`F_target=16`、`b_max=4`；
 - `candidate_source=lru_tail`；
 - `selector=disabled`；
 - `trigger_mode=low_watermark`；
 - `fallback_policy=lru`；
 - Cost：DRAM Hit 1、NVM Read 2、NVM Write 8、Demotion 10。
 
-20% 是用户接受的条件工程默认，不是 `capacity_rule_v2` 通过后得到的最优值。阶段 4
-不修改容量、水位或 `b_max`。
+20% 和 `(8,16)` 是用户接受的条件工程默认，不是 `capacity_rule_v2`
+或新水位矩阵通过后得到的最优值。阶段 4 不修改容量、水位或 `b_max`。
 
 当前正式 `H=10` 已由阶段 3 配置确认，因此历史窗口网格固定为 `5/10/20`。
 由于 `b_max=4` 且正式方法要求 `b_max<K`，旧实施方案示例中的 `K=4`
