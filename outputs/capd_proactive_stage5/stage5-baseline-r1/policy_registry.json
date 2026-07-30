@@ -1,0 +1,23 @@
+{
+  "formal_mainline": [
+    "reactive_lru",
+    "proactive_lru",
+    "proactive_clock",
+    "tpp_inspired",
+    "capd",
+    "oracle"
+  ],
+  "runnable_stage5": [
+    "reactive_lru",
+    "proactive_lru",
+    "proactive_clock",
+    "capd",
+    "oracle"
+  ],
+  "schema_version": "capd_proactive_stage5_v1_0",
+  "tpp_inspired": {
+    "fallback_allowed": false,
+    "result_artifact_allowed": false,
+    "status": "pending_stage6"
+  }
+}
