@@ -1,0 +1,27 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-30T14:15:17Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+  "job_identity": {
+    "accesses": 4096,
+    "checkpoint_sha256": null,
+    "job_name": "streamcluster_pressure__validation__oracle__seed-na",
+    "measure_latency": true,
+    "policy": "oracle",
+    "run_identity_sha256": "51dd77e10e2d5d12f00d6a84e36ace3ee95d065e97148696adf3314433970525",
+    "seed": null,
+    "source_interval": {
+      "end": 604096,
+      "start": 600000
+    },
+    "split": "validation",
+    "trace_sha256": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774",
+    "workload": "streamcluster_pressure"
+  },
+  "job_identity_sha256": "d2db3694d540b8e24164082d860faedecbf6e7eec891ca864689e448e34c088b",
+  "result_sha256": "39d8e1cb2f97ffb1323dce02cecde78040168c04860156e938d83aa5cf8b7071",
+  "schema_version": "capd_proactive_stage5_job_v1_0",
+  "semantic_result_sha256": "ff4f29f862e318cae896848ab8aa558cc3026934d32c6d94ceaf1e5edcd6458b",
+  "started_at": "2026-07-30T14:15:16Z",
+  "status": "completed"
+}

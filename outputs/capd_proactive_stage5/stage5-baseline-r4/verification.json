@@ -1,0 +1,38 @@
+{
+  "capd_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+  "evidence_sha256": {
+    "fairness_audit.json": "442dd11860fa49c9e6c467dc87ef133e9e7891a91fd2dadc16387d2e2897300e",
+    "server_test_receipt.json": "8d289958cea4fbb0e6b5c9d9b31e0ccef919b229f37128fc72eb4838c8b88880",
+    "synthetic_e2e_receipt.json": "ee582f2472a789129e0e2d5bc5e179aaf63e69b4ea86e78e55b2cbfbb718f60e"
+  },
+  "formal_mainline": [
+    "reactive_lru",
+    "proactive_lru",
+    "proactive_clock",
+    "tpp_inspired",
+    "capd",
+    "oracle"
+  ],
+  "framework_scope": "Train/Validation acceptance and synthetic E2E; no formal Test",
+  "old_finals_v3_stage_artifacts_used": false,
+  "performance_conclusion": null,
+  "runnable_policies": [
+    "reactive_lru",
+    "proactive_lru",
+    "proactive_clock",
+    "capd",
+    "oracle"
+  ],
+  "schema_version": "capd_proactive_stage5_verification_v1_0",
+  "selector_status": "disabled",
+  "stage6_entry_gate": "satisfied",
+  "status": "stage5_baseline_framework_verified",
+  "test_trace_opened": false,
+  "tpp_inspired_status": "pending_stage6",
+  "verified_at": "2026-07-30T14:16:00Z"
+}
