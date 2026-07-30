@@ -221,12 +221,36 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
       torch.FloatTensor: 编码后的访存序列或历史聚合结果。
     """
     sequence_length = access_features.shape[1]
+    original_history_mask = history_mask
+    restore_order = None
     if history_mask is not None:
       if history_mask.shape != access_features.shape[:2]:
         raise ValueError("history_mask must match [batch, sequence].")
       history_mask = history_mask.to(access_features.device)
+      if torch.any(history_mask.sum(dim=1) <= 0):
+        raise ValueError("Each history must contain at least one valid access.")
     if self._position_encoding is not None:
       access_features = self._position_encoding(access_features)
+    if history_mask is not None and torch.any(history_mask <= 0):
+      # A causal mask plus left padding gives early padded query rows no
+      # visible key.  Older PyTorch MultiheadAttention versions return NaNs
+      # for those rows; clearing the forward values afterwards is insufficient
+      # because their backward pass can still poison every parameter gradient.
+      # Pack valid accesses to the left (preserving their temporal order), so
+      # every padded query is after and can see at least one valid key.  Restore
+      # the original layout after the encoder for the downstream mask contract.
+      positions = torch.arange(
+          sequence_length, device=access_features.device).unsqueeze(0)
+      positions = positions.expand(history_mask.shape[0], -1)
+      packing_keys = positions + (
+          (history_mask <= 0).long() * sequence_length)
+      packing_order = torch.argsort(packing_keys, dim=1)
+      restore_order = torch.argsort(packing_order, dim=1)
+      access_features = torch.gather(
+          access_features, 1,
+          packing_order.unsqueeze(-1).expand(
+              -1, -1, access_features.shape[-1]))
+      history_mask = torch.gather(history_mask, 1, packing_order)
     causal_mask = self._causal_mask(
         sequence_length, device=access_features.device)
 
@@ -237,10 +261,14 @@ class QMAPMacroscopicPatternExtractor(nn.Module):
         src_key_padding_mask=(history_mask <= 0
                               if history_mask is not None else None))
     encoded = encoded.transpose(0, 1)
+    if restore_order is not None:
+      encoded = torch.gather(
+          encoded, 1,
+          restore_order.unsqueeze(-1).expand(-1, -1, encoded.shape[-1]))
+      history_mask = original_history_mask.to(encoded.device)
     if history_mask is not None:
-      # Left-padding queries can be fully masked by causal + key padding masks
-      # in some PyTorch versions. Replace any resulting padded-token NaNs and
-      # make the no-contribution contract explicit before later attention.
+      # Keep padded tokens an explicit no-contribution value for later
+      # attention and pooling, after restoring the caller-visible layout.
       encoded = encoded.masked_fill(
           (history_mask <= 0).unsqueeze(-1), 0.0)
     if self._use_qformer:

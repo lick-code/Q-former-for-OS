@@ -889,7 +889,11 @@ def main():
         raise ValueError("Non-finite batch training loss detected.")
       optimizer.zero_grad()
       loss.backward()
-      torch.nn.utils.clip_grad_norm_(parameters, max_norm=10.0)
+      gradient_norm = torch.nn.utils.clip_grad_norm_(
+          parameters, max_norm=10.0)
+      if not math.isfinite(float(gradient_norm)):
+        raise ValueError(
+            "Non-finite training gradient detected before optimizer step.")
       optimizer.step()
       global_iteration += 1
       iterations += 1

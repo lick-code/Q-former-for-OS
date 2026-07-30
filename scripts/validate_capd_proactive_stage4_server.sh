@@ -89,6 +89,7 @@ set +e
   tests.test_capd_proactive_replay \
   tests.test_capd_proactive_cost \
   tests.test_capd_proactive_stage3 \
+  tests.test_capd_stage1_v3_model \
   tests.test_capd_proactive_stage4 \
   tests.test_capd_proactive_stage4_e2e \
   2>&1 | tee "${TEST_LOG}"

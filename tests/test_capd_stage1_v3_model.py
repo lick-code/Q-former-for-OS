@@ -134,6 +134,29 @@ class PositionAndLossTest(unittest.TestCase):
         left_encoded[:, 2:, :], right_encoded[:, 2:, :],
         rtol=0.0, atol=1e-6))
 
+  def test_left_padded_causal_history_has_finite_backward_gradients(self):
+    torch.manual_seed(0)
+    extractor = model.QMAPMacroscopicPatternExtractor(
+        hidden_dim=6, num_layers=1, num_heads=2, dropout=0.0,
+        use_qformer=False, pooling_strategy="none",
+        position_encoding="none", max_sequence_length=5)
+    access = torch.randn(2, 5, 6, requires_grad=True)
+    history_mask = torch.tensor([
+        [0.0, 0.0, 1.0, 1.0, 1.0],
+        [0.0, 1.0, 1.0, 1.0, 1.0],
+    ])
+    encoded = extractor(access, history_mask=history_mask)
+    loss = encoded.square().sum()
+    loss.backward()
+    gradients = [
+        parameter.grad for parameter in extractor.parameters()
+        if parameter.grad is not None
+    ]
+    self.assertTrue(gradients)
+    self.assertTrue(torch.isfinite(access.grad).all())
+    self.assertTrue(all(
+        torch.isfinite(gradient).all() for gradient in gradients))
+
   def test_approx_positions_exclude_diagonal_and_padding_exactly(self):
     loss_fn = qmap_loss.QMAPCostAwareRankingLoss(alpha=10.0)
     scores = torch.tensor([[2.0, 0.0, 100.0]])
