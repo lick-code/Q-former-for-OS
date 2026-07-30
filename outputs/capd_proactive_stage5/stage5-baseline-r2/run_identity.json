@@ -1,0 +1,65 @@
+{
+  "acceptance": {
+    "failure_status": "stage5_not_verified",
+    "formal_test_allowed": false,
+    "max_accesses_per_workload": 4096,
+    "performance_conclusions_allowed": false,
+    "required_status_before_server_acceptance": "stage5_implemented",
+    "split": "validation",
+    "verified_status": "stage5_baseline_framework_verified"
+  },
+  "checkpoint_sha256": {
+    "2026": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b",
+    "3136859": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47",
+    "42": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+  },
+  "code_artifacts": {
+    "configs/finals/capd_proactive_stage5.json": "81bfc754ad194f02a62405f5c716eb8dfc65232da5d39801f667dacac387e609",
+    "configs/finals/capd_proactive_stage5_result_schema.json": "a1a1f5aed15dbd364d32140963747d7b6a16e74626f0be874e10619d6543c23c",
+    "docs/CAPD_PROACTIVE_STAGE5_PROTOCOL_CN.md": "13d9992725f5d516e7ab0915579a5e16b8946ee3ca9b6f9fcbf96ef86b4593c3",
+    "docs/CAPD_PROACTIVE_STAGE5_SERVER_RUN_CN.md": "4780e7d94eb993c4f088462ff52f527c2beb2d562cbd01a12197bab08ea31b6d",
+    "docs/CAPD_PROACTIVE_STAGE5_STATUS_CN.md": "36b8b41cfbfaf0f8a5d57f623e9d4b4a83ceba70db32452092f88c980d2593ca",
+    "policy_learning/cache_model/embed.py": "0700a90a6ba51958b5682a86fa51ff65cbdd1fb458dcd806e1747e93ce197485",
+    "policy_learning/cache_model/loss.py": "59f4f064bea7258c6a910ab0a8e51c8a59aa42ac71f422a547c4bbef5cdb3d22",
+    "policy_learning/cache_model/model.py": "597ef45be66affbcc6081fc60c4ef6b1b317a6cfd81118678cfed71066b8f854",
+    "qmap/candidate_filter.py": "a1553110de403642983695c30d4be32ac0a874c7bd6e520dd0712f353b406368",
+    "qmap/finals_config.py": "4b2b39cdce43762b6541215517642d5cec183a3154957a24dceab71a863d8de6",
+    "qmap/no_vpn_ablation.py": "56d1331d56fe0d45797ce279c7f02e2a7415a43150052f3f7ca7d4276d2589c9",
+    "qmap/proactive_cost.py": "acedf1d88f49a87d2bb60e61754328c04083443c58b7c95a847e41f58266e4a7",
+    "qmap/proactive_replay.py": "2a5d04ec6cbf7243623cf7e0aec1b457c62eb832cdeeab0235fd4c295cd10be1",
+    "qmap/proactive_stage4.py": "637cd6434f3771897fe8fd6f72e34dc6d753163032302f6a2454f0662a304240",
+    "qmap/proactive_stage5_contract.py": "a0b5b9775afb5ebf2be2125d57d415fadaf4bd445fcd165418de3754a5bd38e0",
+    "qmap/proactive_stage5_policies.py": "8a7e9476a57de7c090a026ad301af137df36b1200cbe5462d9164474775d83a5",
+    "qmap/proactive_stage5_replay.py": "c9c3b7abda47608896ed4455558595f51cc25055595b33b5c7b0277c50d2f44e",
+    "qmap/qmap_eval.py": "6583d53e63d1043c763539fe4447d8f167c0c0b0d07c44c11e93fe15674df177",
+    "qmap/qmap_generator.py": "b8c3c10003de2bc769286c8e00f6d150ab2dcd824cbbb9517704e8d5dbb6d01f",
+    "scripts/run_capd_proactive_stage5.py": "86faab555ab2093eb83ac54750dbc6c4e6ca733c76f2b2512e8c453fd712328e",
+    "scripts/validate_capd_proactive_stage5_server.sh": "82a65dccae1de922bff8f4ffca1246e8c6265e2ec4df941d5d117bd729c0524a",
+    "tests/test_capd_proactive_stage5_contract.py": "aa1f58b7f5e369081fe036914fa99b540678a9680fe9233e7a317c7ee9bb6ece",
+    "tests/test_capd_proactive_stage5_e2e.py": "fac025e6b7756e3bcc3fb0b191e44c31f3bd6da8aee85b69d1e26c9d16d39943",
+    "tests/test_capd_proactive_stage5_replay.py": "7ffe4bd9743d34b8903ce604b49d1dd0099217afcb16061d99ba8a8270299a4a"
+  },
+  "config_sha256": "81bfc754ad194f02a62405f5c716eb8dfc65232da5d39801f667dacac387e609",
+  "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+  "cost_config_sha256": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0",
+  "git": {
+    "commit": "36a57efc908f5615f1c7db07679256a04d22a90e",
+    "dirty_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dirty_worktree": false,
+    "status": []
+  },
+  "run_identity_sha256": "de2074d42d6b6ee850b5cd2f127ac966f7cc37486b2f235d64e663f92ea2e682",
+  "stage0_sha256": "2226bf05a401f90d093d6fbd5255011cab4af506714b790775908d4a373835c0",
+  "stage4_dataset_identity_sha256": "ff2504254cbbe666af51f51301e814b0b803da658c43c3ee6754d23b9b412bcb",
+  "stage4_dataset_manifest_sha256": "8a7629e00ddac74496e7fbe5e617889f6df4408716da432883770b47b6d32c34",
+  "stage4_freeze_candidate_sha256": "480d2d8a577a3b7d17a312f0a786f93e003c65160961cfb1d392a200baef3a93",
+  "stage4_verification_sha256": "5655a300c8ab27a00522067740c58e88e35bb5461dae7d66b617371470802db9",
+  "trace_sha256": {
+    "canneal:train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "canneal:validation": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142",
+    "dedup_pressure:train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "dedup_pressure:validation": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8",
+    "streamcluster_pressure:train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "streamcluster_pressure:validation": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  }
+}
