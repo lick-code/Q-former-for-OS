@@ -179,6 +179,12 @@ if [[ "${TEST_STATUS}" -ne 0 || "${TEE_STATUS}" -ne 0 ]]; then
   exit "${TEE_STATUS}"
 fi
 
+CURRENT_STEP="record_regression_receipt"
+"${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py record-tests \
+  "${COMMON_ARGS[@]}" \
+  --test-log "${TEST_LOG}" \
+  --test-exit-code "${TEST_STATUS}"
+
 CURRENT_STEP="synthetic_e2e"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py synthetic \
   "${COMMON_ARGS[@]}"
@@ -190,11 +196,6 @@ CURRENT_STEP="validation_acceptance_replays"
 CURRENT_STEP="fairness_audit"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py fairness \
   "${COMMON_ARGS[@]}"
-
-CURRENT_STEP="record_regression_receipt"
-"${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py record-tests \
-  "${COMMON_ARGS[@]}" \
-  --test-log "${TEST_LOG}"
 
 CURRENT_STEP="final_verification"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py verify \

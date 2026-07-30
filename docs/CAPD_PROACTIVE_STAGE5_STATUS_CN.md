@@ -45,6 +45,29 @@ checkpoint 或 Trace 损坏。r2 已由验收脚本正确原子标记为
 增加五策略映射自检。r2 保留现场且不得续跑；下一次验收使用
 `stage5-baseline-r3`。
 
+## `stage5-baseline-r3` 服务器现场
+
+r3 已真实完成并通过：
+
+- 126 项阶段 1～5 回归测试，标准 unittest 结果为 `OK`；
+- 含三个正式 checkpoint/seed 的 CAPD 合成 Replay；
+- 合成实验 A/B；
+- 三个 workload 共 21 个正式 Validation 验收 job；
+- 实验 A/B 公平性审计。
+
+r3 的 28 个 job manifest 全部为 `completed` 且结果 SHA 匹配，其中 21 个为
+workload 验收、7 个为合成 E2E；不存在 TPP 伪结果或错误 checkpoint 绑定。
+
+失败仅发生在 `record_tests`：旧代码要求整个日志文本以 `OK` 结尾，但 unittest
+打印标准 `OK` 后，测试夹具又打印了三行 job/续跑信息，导致真实成功日志被误判。
+该错误不影响已经完成的 Replay 或公平性结果，但按照不可自动续跑合同，r3 仍正确标记为
+`stage5_not_verified`。
+
+当前 receipt 改为同时验证测试进程退出码、标准 `Ran N tests`/`OK` 摘要和日志
+SHA-256；允许标准摘要之后存在测试输出。receipt 会在回归成功后立即记录，最终
+verification 会再次校验日志路径、SHA 和摘要。下一次验收使用
+`stage5-baseline-r4`。
+
 ## 进入阶段 6 的门禁
 
 当前尚未满足。必须在 Linux 服务器执行

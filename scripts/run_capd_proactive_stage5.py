@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import subprocess
 import sys
 from typing import Any, Dict, List, Mapping, Optional, Sequence
@@ -76,6 +77,14 @@ PREFLIGHT_EVIDENCE = (
     "policy_registry.json",
     "run_state.json",
 )
+UNITTEST_SUMMARY_RE = re.compile(
+    r"^Ran\s+(\d+)\s+tests?\s+in\s+([0-9]+(?:\.[0-9]+)?)s\s*$",
+    re.MULTILINE)
+UNITTEST_OK_RE = re.compile(
+    r"^OK(?:\s+\([^\r\n]*\))?\s*$", re.MULTILINE)
+UNITTEST_FAILURE_RE = re.compile(
+    r"^(?:FAILED\b|ERROR:|FAIL:|Traceback \(most recent call last\):)",
+    re.MULTILINE)
 
 
 def _utc_now() -> str:
@@ -610,25 +619,58 @@ def fairness(args) -> None:
   print("[OK] experiment A/B fairness audit")
 
 
+def _parse_successful_unittest_log(text: str) -> Dict[str, Any]:
+  """Returns the canonical unittest summary even if tests print afterwards."""
+  if UNITTEST_FAILURE_RE.search(text):
+    raise contract.Stage5ContractError(
+        "Regression log contains a unittest failure marker.")
+  summaries = list(UNITTEST_SUMMARY_RE.finditer(text))
+  if not summaries:
+    raise contract.Stage5ContractError(
+        "Regression log lacks the canonical 'Ran N tests' summary.")
+  summary = summaries[-1]
+  successes = [
+      match for match in UNITTEST_OK_RE.finditer(text)
+      if match.start() > summary.end()]
+  if not successes:
+    raise contract.Stage5ContractError(
+        "Regression log lacks canonical unittest OK after its summary.")
+  tests_run = int(summary.group(1))
+  if tests_run <= 0:
+    raise contract.Stage5ContractError(
+        "Regression log reports no executed tests.")
+  return {
+      "tests_run": tests_run,
+      "elapsed_seconds": float(summary.group(2)),
+      "summary_line": summary.group(0).strip(),
+      "success_line": successes[-1].group(0).strip(),
+  }
+
+
 def record_tests(args) -> None:
   run_root, _, _, _, _, _, _, _ = _loaded_run(args)
+  if args.test_exit_code != 0:
+    raise contract.Stage5ContractError(
+        "Regression runner exit code was not zero.")
   if not os.path.isfile(args.test_log):
     raise contract.Stage5ContractError("Test log does not exist.")
+  test_log = os.path.abspath(args.test_log)
+  if os.path.commonpath((test_log, run_root)) != run_root:
+    raise contract.Stage5ContractError(
+        "Regression log must be inside the current Stage-5 run.")
   with open(args.test_log, "r", encoding="utf-8", errors="replace") as source:
     text = source.read()
-  if ("FAILED" in text or "Traceback (most recent call last)" in text or
-      "ERRORS" in text):
-    raise contract.Stage5ContractError("Regression log contains failure.")
-  if "passed" not in text and not text.rstrip().endswith("OK"):
-    raise contract.Stage5ContractError(
-        "Regression log lacks a recognized success marker.")
+  unittest_summary = _parse_successful_unittest_log(text)
   proactive_stage4.write_json_atomic(os.path.join(
       run_root, "server_test_receipt.json"), {
           "schema_version": "capd_proactive_stage5_test_receipt_v1_0",
           "contract_id": contract.CONTRACT_ID,
           "status": "passed",
-          "log_path": os.path.abspath(args.test_log),
+          "log_path": os.path.relpath(
+              test_log, args.project_root).replace("\\", "/"),
           "log_sha256": proactive_stage4.fingerprint_file(args.test_log),
+          "runner_exit_code": int(args.test_exit_code),
+          "unittest": unittest_summary,
           "stage1_through_stage5_regression_requested": True,
           "test_trace_opened": False,
           "recorded_at": _utc_now(),
@@ -652,6 +694,26 @@ def verify(args) -> None:
     if evidence.get("test_trace_opened") is not False:
       raise contract.Stage5ContractError(
           "Verification evidence reports Test contamination.")
+  test_receipt = proactive_stage4.load_json(os.path.join(
+      run_root, "server_test_receipt.json"))
+  if (test_receipt.get("runner_exit_code") != 0 or
+      test_receipt.get("stage1_through_stage5_regression_requested")
+      is not True):
+    raise contract.Stage5ContractError(
+        "Regression receipt lacks a successful runner exit contract.")
+  test_log_path = contract.resolve_repository_path(
+      test_receipt.get("log_path"), args.project_root,
+      ("outputs/capd_proactive_stage5",), must_exist=True)
+  if proactive_stage4.fingerprint_file(test_log_path) != (
+      test_receipt.get("log_sha256")):
+    raise contract.Stage5ContractError(
+        "Regression log changed after its receipt was recorded.")
+  with open(test_log_path, "r", encoding="utf-8",
+            errors="replace") as source:
+    parsed_unittest = _parse_successful_unittest_log(source.read())
+  if parsed_unittest != test_receipt.get("unittest"):
+    raise contract.Stage5ContractError(
+        "Regression unittest summary differs from its receipt.")
   registry = proactive_stage4.load_json(os.path.join(
       run_root, "policy_registry.json"))
   if (registry["tpp_inspired"]["status"] != contract.PENDING_TPP or
@@ -739,9 +801,10 @@ def run_all(args) -> None:
   synthetic(args)
   run_acceptance(args)
   fairness(args)
-  if not args.test_log:
+  if not args.test_log or args.test_exit_code is None:
     raise contract.Stage5ContractError(
-        "all requires --test-log from a real successful regression run.")
+        "all requires --test-log and --test-exit-code from a real "
+        "regression run.")
   record_tests(args)
   verify(args)
 
@@ -766,6 +829,7 @@ def build_parser() -> argparse.ArgumentParser:
   parser.add_argument("--run-id", required=True)
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--test-log")
+  parser.add_argument("--test-exit-code", type=int)
   parser.add_argument("--failure-step")
   return parser
 
@@ -785,10 +849,14 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
       "all": run_all,
       "mark-not-verified": mark_not_verified,
   }
-  if args.command == "mark-not-verified" and not args.failure_step:
-    raise contract.Stage5ContractError(
-        "mark-not-verified requires --failure-step.")
   try:
+    if args.command == "mark-not-verified" and not args.failure_step:
+      raise contract.Stage5ContractError(
+          "mark-not-verified requires --failure-step.")
+    if args.command == "record-tests" and (
+        not args.test_log or args.test_exit_code is None):
+      raise contract.Stage5ContractError(
+          "record-tests requires --test-log and --test-exit-code.")
     commands[args.command](args)
   except Exception:
     try:

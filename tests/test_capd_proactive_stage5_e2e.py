@@ -134,6 +134,29 @@ class ProactiveStage5ResumeTest(unittest.TestCase):
     self.assertIn("checkpoint_sha256", runner.RUN_IDENTITY_BINDING_FIELDS)
     self.assertIn("code_artifacts", runner.RUN_IDENTITY_BINDING_FIELDS)
 
+  def test_unittest_log_parser_accepts_trailing_test_output(self):
+    value = runner._parse_successful_unittest_log(
+        "test_example ... ok\n\n"
+        "----------------------------------------------------------------------\n"
+        "Ran 126 tests in 6.020s\n\n"
+        "OK\n"
+        "[OK] fixture output printed after unittest summary\n")
+    self.assertEqual(126, value["tests_run"])
+    self.assertEqual("Ran 126 tests in 6.020s", value["summary_line"])
+    self.assertEqual("OK", value["success_line"])
+
+  def test_unittest_log_parser_rejects_failure_or_missing_summary(self):
+    invalid_logs = (
+        "Ran 1 test in 0.001s\nFAILED (errors=1)\n",
+        "ERROR: test_example\nRan 1 test in 0.001s\nOK\n",
+        "test_example ... ok\nOK\n",
+        "Ran 1 test in 0.001s\n[OK] not canonical\n",
+    )
+    for text in invalid_logs:
+      with self.subTest(text=text):
+        with self.assertRaises(contract.Stage5ContractError):
+          runner._parse_successful_unittest_log(text)
+
 
 if __name__ == "__main__":
   unittest.main()
