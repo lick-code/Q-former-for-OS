@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CAPD proactive Stage-5 unified Replay result",
+  "type": "object",
+  "schema_version": "capd_proactive_stage5_result_schema_v1_0",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "stage_status",
+    "policy",
+    "seed",
+    "workload",
+    "split",
+    "split_role",
+    "formal_test",
+    "test_used_for_selection",
+    "trace_sha256",
+    "trace_range",
+    "raw_access_event_count",
+    "dram_capacity_pages",
+    "nvm_capacity_model",
+    "page_size_bytes",
+    "working_set_definition",
+    "working_set_pages",
+    "dram_working_set_ratio",
+    "capacity_claim",
+    "page_enter_dram_semantics",
+    "initial_state_sha256",
+    "cost_profile",
+    "F_low",
+    "F_target",
+    "candidate_size_K",
+    "b_max",
+    "b_t_rule",
+    "fallback_policy",
+    "trigger_mode",
+    "candidate_source",
+    "candidate_contract_sha256",
+    "lru_contract_sha256",
+    "selector_status",
+    "checkpoint",
+    "future_information",
+    "summary",
+    "latency",
+    "events",
+    "rounds",
+    "cycles",
+    "accesses",
+    "final_state",
+    "policy_state",
+    "semantic_result_sha256",
+    "interpretation_boundary",
+    "performance_conclusion"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "capd_proactive_stage5_result_v1_0"
+    },
+    "contract_id": {
+      "const": "CAPD-PROACTIVE-STAGE5-1.0"
+    },
+    "formal_test": {
+      "const": false
+    },
+    "test_used_for_selection": {
+      "const": false
+    },
+    "selector_status": {
+      "const": "disabled"
+    },
+    "policy": {
+      "enum": [
+        "reactive_lru",
+        "proactive_lru",
+        "proactive_clock",
+        "capd",
+        "oracle"
+      ]
+    },
+    "performance_conclusion": {
+      "type": "null"
+    }
+  },
+  "additionalProperties": true
+}

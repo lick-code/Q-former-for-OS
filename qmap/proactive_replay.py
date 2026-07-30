@@ -27,6 +27,7 @@ import os
 import platform
 import subprocess
 import sys
+import time
 
 from qmap import finals_config
 
@@ -310,6 +311,18 @@ class CandidateRankingPolicy(object):
                       policy_context):
     raise NotImplementedError
 
+  # Stage-5 policies may keep lifecycle state (for example CLOCK reference
+  # bits).  These no-op hooks preserve the frozen stage-1 behavior for every
+  # existing ranker while avoiding a second Replay implementation.
+  def on_page_enter_dram(self, state, page):
+    del state, page
+
+  def on_page_access(self, state, page, rw):
+    del state, page, rw
+
+  def on_page_demoted(self, state, page, event_type):
+    del state, page, event_type
+
 
 class ProactiveLRURanking(CandidateRankingPolicy):
   """Ranks the current LRU-tail candidates from oldest to newest."""
@@ -381,7 +394,8 @@ class ProactiveReplay(object):
   def __init__(
       self, stage0_config, parameters, ranking_policy=None,
       invariant_mode="full", record_details=True,
-      capture_page_enter_flags=False):
+      capture_page_enter_flags=False, measure_decision_latency=False,
+      exclude_current_entering_page=False):
     finals_config.validate_config(stage0_config)
     if stage0_config["schema_version"] != (
         finals_config.PROACTIVE_SCHEMA_VERSION):
@@ -409,6 +423,10 @@ class ProactiveReplay(object):
     self.invariant_mode = invariant_mode
     self.record_details = bool(record_details)
     self.capture_page_enter_flags = bool(capture_page_enter_flags)
+    self.measure_decision_latency = bool(measure_decision_latency)
+    self.exclude_current_entering_page = bool(
+        exclude_current_entering_page)
+    self._current_entering_page = None
     self.is_reactive = parameters.policy_name == "reactive_lru"
     if self.is_reactive:
       if ranking_policy is not None:
@@ -449,6 +467,7 @@ class ProactiveReplay(object):
     self._round_count = 0
     self._cycle_count = 0
     self._b_t_sum = 0
+    self._decision_latencies = []
     self._candidate_count_min = None
     self._candidate_count_max = None
     self._candidate_counts_by_round = array.array("I")
@@ -576,6 +595,8 @@ class ProactiveReplay(object):
     self.residency_state[page] = "nvm"
     self.dirty_state[page] = False
     self.dram_entry_index.pop(page, None)
+    if self.ranking_policy is not None:
+      self.ranking_policy.on_page_demoted(self, page, event_type)
     self._event_id += 1
     event = None
     if self.record_details:
@@ -624,6 +645,8 @@ class ProactiveReplay(object):
     self.residency_state[page] = "dram"
     self.dirty_state.setdefault(page, False)
     self.dram_entry_index[page] = self.access_index
+    if self.ranking_policy is not None:
+      self.ranking_policy.on_page_enter_dram(self, page)
     self.counters["page_enter_dram_count"] += 1
     self._observe_free_frames()
     self.assert_invariants()
@@ -632,12 +655,13 @@ class ProactiveReplay(object):
     """Builds the current actual LRU-tail candidate set without padding."""
     if self.is_reactive:
       return []
-    oldest_first = self.dram_lru.tail_oldest_first(
-        self.parameters.candidate_size_K)
-    return [
+    oldest_first = self.dram_lru.tail_oldest_first(len(self.dram_lru))
+    eligible = [
         page for page in oldest_first
-        if page not in self.parameters.non_demotable_pages
+        if page not in self.parameters.non_demotable_pages and
+        page != self._current_entering_page
     ]
+    return eligible[:self.parameters.candidate_size_K]
 
   def _candidate_features(self, candidates):
     history_pages = [item["page"] for item in self.history_window]
@@ -671,7 +695,8 @@ class ProactiveReplay(object):
 
   def _round_log(
       self, cycle_id, cycle_round_index, candidates, candidate_features,
-      ranking, selected, F_before, termination_reason):
+      ranking, selected, F_before, termination_reason, timings=None,
+      candidate_state_sha256=None):
     self._decision_id += 1
     self._round_id += 1
     self._round_count += 1
@@ -690,6 +715,7 @@ class ProactiveReplay(object):
           "b_t": len(selected),
           "migration_count": len(selected),
       }
+    timings = timings or {}
     log = {
         "schema_version": STAGE1_LOG_SCHEMA_VERSION,
         "decision_id": self._decision_id,
@@ -703,14 +729,17 @@ class ProactiveReplay(object):
         "F_low": self.parameters.F_low,
         "F_target": self.parameters.F_target,
         "candidate_pages": list(candidates),
+        "candidate_pages_sha256": finals_config.fingerprint_value(
+            list(candidates)),
+        "candidate_state_sha256": candidate_state_sha256,
         "candidate_features": copy.deepcopy(candidate_features),
         "policy_scores": copy.deepcopy(ranking),
         "selected_pages": list(selected),
         "b_t": len(selected),
         "F_after": self.free_frames,
-        "feature_latency": None,
-        "inference_latency": None,
-        "selection_latency": None,
+        "feature_latency": timings.get("feature_latency"),
+        "inference_latency": timings.get("inference_latency"),
+        "selection_latency": timings.get("selection_latency"),
         "migration_count": len(selected),
         "termination_reason": termination_reason,
     }
@@ -757,13 +786,30 @@ class ProactiveReplay(object):
         break
       F_before = self.free_frames
       candidates = self.build_candidates()
+      candidate_state_sha256 = finals_config.fingerprint_value({
+          "access_index": self.access_index,
+          "F_t": F_before,
+          "dram_lru_mru_to_lru": list(self.dram_lru),
+          "dram_resident": sorted(self.dram_resident),
+          "excluded_current_entering_page": self._current_entering_page,
+      })
+      feature_started = (
+          time.perf_counter() if self.measure_decision_latency else None)
       candidate_features = self._candidate_features(candidates)
+      feature_latency = (
+          time.perf_counter() - feature_started
+          if feature_started is not None else None)
+      inference_started = (
+          time.perf_counter() if self.measure_decision_latency else None)
       ranking = self.ranking_policy.rank_candidates(
           self, candidates, candidate_features, {
               "cycle_id": cycle_id,
               "cycle_round_index": cycle_round_index,
               "access_index": self.access_index,
           })
+      inference_latency = (
+          time.perf_counter() - inference_started
+          if inference_started is not None else None)
       self._validate_ranking(candidates, ranking)
       b_t = min(
           self.parameters.b_max,
@@ -774,16 +820,31 @@ class ProactiveReplay(object):
         termination_reason = "candidate_set_empty"
         self._round_log(
             cycle_id, cycle_round_index, candidates, candidate_features,
-            ranking, [], F_before, termination_reason)
+            ranking, [], F_before, termination_reason, {
+                "feature_latency": feature_latency,
+                "inference_latency": inference_latency,
+                "selection_latency": 0.0
+                if self.measure_decision_latency else None,
+            }, candidate_state_sha256)
         break
       if b_t <= 0:
         termination_reason = "b_t_zero"
         self._round_log(
             cycle_id, cycle_round_index, candidates, candidate_features,
-            ranking, [], F_before, termination_reason)
+            ranking, [], F_before, termination_reason, {
+                "feature_latency": feature_latency,
+                "inference_latency": inference_latency,
+                "selection_latency": 0.0
+                if self.measure_decision_latency else None,
+            }, candidate_state_sha256)
         break
 
+      selection_started = (
+          time.perf_counter() if self.measure_decision_latency else None)
       selected = select_top_b(ranking, b_t)
+      selection_latency = (
+          time.perf_counter() - selection_started
+          if selection_started is not None else None)
       self.assert_invariants(
           candidates=candidates, selected=selected, b_t=b_t,
           F_before=F_before)
@@ -801,7 +862,14 @@ class ProactiveReplay(object):
         termination_reason = "continue_rebuild_candidates"
       self._round_log(
           cycle_id, cycle_round_index, candidates, candidate_features,
-          ranking, selected, F_before, termination_reason)
+          ranking, selected, F_before, termination_reason, {
+              "feature_latency": feature_latency,
+              "inference_latency": inference_latency,
+              "selection_latency": selection_latency,
+          }, candidate_state_sha256)
+      if self.measure_decision_latency:
+        self._decision_latencies.append(
+            feature_latency + inference_latency + selection_latency)
       if termination_reason != "continue_rebuild_candidates":
         break
 
@@ -820,8 +888,18 @@ class ProactiveReplay(object):
         "number_of_rounds": rounds,
         "number_of_pages_demoted": pages_demoted,
         "minimum_F": cycle_minimum_F,
-        "total_inference_time": None,
-        "total_selection_time": None,
+        "total_feature_time": (
+            sum(row["feature_latency"] for row in self.round_logs[
+                cycle_start_round_count:] if row["feature_latency"] is not None)
+            if self.measure_decision_latency and self.record_details else None),
+        "total_inference_time": (
+            sum(row["inference_latency"] for row in self.round_logs[
+                cycle_start_round_count:] if row["inference_latency"] is not None)
+            if self.measure_decision_latency and self.record_details else None),
+        "total_selection_time": (
+            sum(row["selection_latency"] for row in self.round_logs[
+                cycle_start_round_count:] if row["selection_latency"] is not None)
+            if self.measure_decision_latency and self.record_details else None),
         "emergency_fallback_occurred": bool(
             emergency_fallback_occurred),
         "termination_reason": termination_reason,
@@ -893,6 +971,8 @@ class ProactiveReplay(object):
     self.last_access_index[page] = self.access_index
     if rw == 1:
       self.dirty_state[page] = True
+    if self.ranking_policy is not None:
+      self.ranking_policy.on_page_access(self, page, rw)
     self.history_window.append({
         "page": page,
         "rw": rw,
@@ -904,9 +984,13 @@ class ProactiveReplay(object):
     if not self.is_reactive:
       if self.free_frames < self.parameters.F_low:
         self.counters["accesses_below_F_low"] += 1
+      self._current_entering_page = (
+          page if entered_dram and self.exclude_current_entering_page
+          else None)
       self._run_proactive_cycle(
           force_after_emergency=emergency_occurred,
           emergency_fallback_occurred=emergency_occurred)
+      self._current_entering_page = None
     self._observe_free_frames(access_sample=True)
 
     if self.capture_page_enter_flags:
