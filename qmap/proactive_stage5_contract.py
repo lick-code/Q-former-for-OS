@@ -33,8 +33,9 @@ FORBIDDEN_POLICY_TOKENS = (
     "random", "lfu", "old_capd", "reactive_capd", "autonuma", "pet",
     "flexmem")
 LEGACY_STAGE_ARTIFACT_RE = re.compile(
-    r"(?:^|/)(?:outputs/results/finals_v3_official/(?:stage4|stage5)"
-    r"|stage4_audits)(?:/|$)", re.IGNORECASE)
+    r"(?:^|/)(?:outputs/results/finals_v3_official/"
+    r"(?:stage4|stage5)(?:[_.-][^/]*)?|stage4_audits)(?:/|$)",
+    re.IGNORECASE)
 TEST_TOKEN_RE = re.compile(r"(?:^|[_./-])test(?:[_./-]|$)", re.IGNORECASE)
 
 FROZEN_METHOD = {

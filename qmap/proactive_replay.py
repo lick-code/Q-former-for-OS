@@ -655,7 +655,10 @@ class ProactiveReplay(object):
     """Builds the current actual LRU-tail candidate set without padding."""
     if self.is_reactive:
       return []
-    oldest_first = self.dram_lru.tail_oldest_first(len(self.dram_lru))
+    scan_count = (
+        len(self.dram_lru) if self.exclude_current_entering_page
+        else self.parameters.candidate_size_K)
+    oldest_first = self.dram_lru.tail_oldest_first(scan_count)
     eligible = [
         page for page in oldest_first
         if page not in self.parameters.non_demotable_pages and

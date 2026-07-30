@@ -81,9 +81,24 @@ class ProactiveStage5ContractTest(unittest.TestCase):
       contract.resolve_repository_path(
           "../../outside.pth", PROJECT_ROOT,
           ("outputs/capd_proactive_stage4",), must_exist=False)
-    with self.assertRaises(contract.Stage5ContractError):
-      contract.audit_no_legacy_stage_artifacts([
-          "outputs/results/finals_v3_official/stage5_main/run_manifest.json"])
+    forbidden = (
+        "outputs/results/finals_v3_official/stage4/run_manifest.json",
+        "outputs/results/finals_v3_official/stage4_audits/report.json",
+        "outputs/results/finals_v3_official/stage4-main/result.json",
+        "outputs/results/finals_v3_official/stage5/run_manifest.json",
+        "outputs/results/finals_v3_official/stage5_main/run_manifest.json",
+        "outputs/results/finals_v3_official/stage5_ablation/result.json",
+        "outputs/results/finals_v3_official/stage5.ablation/result.json",
+        "stage4_audits/legacy.json",
+    )
+    for path in forbidden:
+      with self.subTest(path=path):
+        with self.assertRaises(contract.Stage5ContractError):
+          contract.audit_no_legacy_stage_artifacts([path])
+    contract.audit_no_legacy_stage_artifacts([
+        "dataset/processed/finals_v3_official/canneal/valid.csv",
+        "outputs/results/finals_v3_official/stage6/run_manifest.json",
+    ])
 
   def test_tpp_is_registered_pending_and_never_falls_back(self):
     self.assertEqual(

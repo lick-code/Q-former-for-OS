@@ -12,10 +12,38 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${PROJECT_ROOT}"
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+export PYTHONHASHSEED=0
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
 RUN_ROOT="outputs/capd_proactive_stage5/${RUN_ID}"
 LOG_DIR="${RUN_ROOT}/logs"
 TEST_LOG="${LOG_DIR}/stage1_stage5_regression.log"
+CURRENT_STEP="bootstrap"
+COMMON_ARGS=(
+  --run-id "${RUN_ID}"
+  --project-root "${PROJECT_ROOT}"
+  --device "${DEVICE}"
+)
 
+record_failure() {
+  local failure_step="$1"
+  if [[ -d "${RUN_ROOT}" ]]; then
+    "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py \
+      mark-not-verified "${COMMON_ARGS[@]}" \
+      --failure-step "${failure_step}" >/dev/null 2>&1 || true
+  fi
+}
+
+on_error() {
+  local status="$?"
+  trap - ERR
+  record_failure "${CURRENT_STEP}"
+  echo "[FAILED] Stage-5 validation stopped at ${CURRENT_STEP}; evidence preserved in ${RUN_ROOT}" >&2
+  exit "${status}"
+}
+
+trap on_error ERR
+
+CURRENT_STEP="environment_and_frozen_input_files"
 command -v "${PYTHON_BIN}" >/dev/null
 command -v git >/dev/null
 test "$(git branch --show-current)" = "main"
@@ -37,6 +65,7 @@ print("cuda_available={}".format(torch.cuda.is_available()))
 PY
 
 if [[ "${DEVICE}" == cuda* ]]; then
+  CURRENT_STEP="cuda_device"
   "${PYTHON_BIN}" - "${DEVICE}" <<'PY'
 import sys
 import torch
@@ -48,6 +77,7 @@ print("cuda_device={}".format(torch.cuda.get_device_name(index)))
 PY
 fi
 
+CURRENT_STEP="python_compile"
 "${PYTHON_BIN}" -m py_compile \
   qmap/proactive_replay.py \
   qmap/proactive_cost.py \
@@ -56,17 +86,13 @@ fi
   qmap/proactive_stage5_replay.py \
   scripts/run_capd_proactive_stage5.py
 
-COMMON_ARGS=(
-  --run-id "${RUN_ID}"
-  --project-root "${PROJECT_ROOT}"
-  --device "${DEVICE}"
-)
-
+CURRENT_STEP="preflight"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py preflight \
   "${COMMON_ARGS[@]}"
 
 mkdir -p "${LOG_DIR}"
 
+CURRENT_STEP="stage4_chain_and_contamination_audit"
 "${PYTHON_BIN}" - <<'PY'
 import json
 import os
@@ -85,16 +111,30 @@ assert config["frozen_method"]["capacity_claim"] == (
 assert config["policies"]["tpp_inspired"]["implementation_status"] == (
     "pending_stage6")
 assert config["policies"]["tpp_inspired"]["fallback_allowed"] is False
-try:
-  c.audit_no_legacy_stage_artifacts([
-      "outputs/results/finals_v3_official/stage5_main/run_manifest.json"])
-except c.Stage5ContractError:
-  pass
-else:
-  raise AssertionError("historical Stage-5 artifact was not rejected")
+for forbidden in (
+    "outputs/results/finals_v3_official/stage4/run_manifest.json",
+    "outputs/results/finals_v3_official/stage4_audits/report.json",
+    "outputs/results/finals_v3_official/stage4-main/result.json",
+    "outputs/results/finals_v3_official/stage5/run_manifest.json",
+    "outputs/results/finals_v3_official/stage5_main/run_manifest.json",
+    "outputs/results/finals_v3_official/stage5.ablation/result.json",
+    "stage4_audits/legacy.json",
+):
+  try:
+    c.audit_no_legacy_stage_artifacts([forbidden])
+  except c.Stage5ContractError:
+    pass
+  else:
+    raise AssertionError(
+        "historical Stage-4/5 artifact was not rejected: " + forbidden)
+c.audit_no_legacy_stage_artifacts([
+    "dataset/processed/finals_v3_official/canneal/valid.csv",
+    "outputs/results/finals_v3_official/stage6/run_manifest.json",
+])
 print("stage4_chain_and_contamination_audit=passed")
 PY
 
+CURRENT_STEP="stage1_stage5_regression"
 set +e
 "${PYTHON_BIN}" -m unittest -v \
   tests.test_capd_proactive_config \
@@ -107,25 +147,36 @@ set +e
   tests.test_capd_proactive_stage5_replay \
   tests.test_capd_proactive_stage5_e2e \
   2>&1 | tee "${TEST_LOG}"
-TEST_STATUS="${PIPESTATUS[0]}"
+PIPE_STATUSES=("${PIPESTATUS[@]}")
+TEST_STATUS="${PIPE_STATUSES[0]}"
+TEE_STATUS="${PIPE_STATUSES[1]}"
 set -e
-if [[ "${TEST_STATUS}" -ne 0 ]]; then
+if [[ "${TEST_STATUS}" -ne 0 || "${TEE_STATUS}" -ne 0 ]]; then
+  record_failure "${CURRENT_STEP}"
   echo "Stage 1-5 regression failed; inspect ${TEST_LOG}" >&2
-  exit "${TEST_STATUS}"
+  if [[ "${TEST_STATUS}" -ne 0 ]]; then
+    exit "${TEST_STATUS}"
+  fi
+  exit "${TEE_STATUS}"
 fi
 
+CURRENT_STEP="synthetic_e2e"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py synthetic \
   "${COMMON_ARGS[@]}"
 
+CURRENT_STEP="validation_acceptance_replays"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py run-acceptance \
   "${COMMON_ARGS[@]}"
 
+CURRENT_STEP="fairness_audit"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py fairness \
   "${COMMON_ARGS[@]}"
 
+CURRENT_STEP="record_regression_receipt"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py record-tests \
   "${COMMON_ARGS[@]}" \
   --test-log "${TEST_LOG}"
 
+CURRENT_STEP="final_verification"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage5.py verify \
   "${COMMON_ARGS[@]}"

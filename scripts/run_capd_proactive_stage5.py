@@ -32,11 +32,20 @@ from qmap import proactive_stage5_replay as stage5_replay  # noqa: E402
 CODE_ARTIFACTS = (
     "configs/finals/capd_proactive_stage5.json",
     "configs/finals/capd_proactive_stage5_result_schema.json",
+    "qmap/finals_config.py",
+    "qmap/qmap_eval.py",
+    "qmap/qmap_generator.py",
+    "qmap/candidate_filter.py",
+    "qmap/no_vpn_ablation.py",
     "qmap/proactive_replay.py",
     "qmap/proactive_cost.py",
+    "qmap/proactive_stage4.py",
     "qmap/proactive_stage5_contract.py",
     "qmap/proactive_stage5_policies.py",
     "qmap/proactive_stage5_replay.py",
+    "policy_learning/cache_model/embed.py",
+    "policy_learning/cache_model/loss.py",
+    "policy_learning/cache_model/model.py",
     "scripts/run_capd_proactive_stage5.py",
     "scripts/validate_capd_proactive_stage5_server.sh",
     "tests/test_capd_proactive_stage5_contract.py",
@@ -45,6 +54,27 @@ CODE_ARTIFACTS = (
     "docs/CAPD_PROACTIVE_STAGE5_PROTOCOL_CN.md",
     "docs/CAPD_PROACTIVE_STAGE5_STATUS_CN.md",
     "docs/CAPD_PROACTIVE_STAGE5_SERVER_RUN_CN.md",
+)
+RUN_IDENTITY_BINDING_FIELDS = (
+    "contract_id",
+    "config_sha256",
+    "stage0_sha256",
+    "cost_config_sha256",
+    "stage4_verification_sha256",
+    "stage4_freeze_candidate_sha256",
+    "stage4_dataset_manifest_sha256",
+    "stage4_dataset_identity_sha256",
+    "trace_sha256",
+    "checkpoint_sha256",
+    "acceptance",
+    "code_artifacts",
+)
+PREFLIGHT_EVIDENCE = (
+    "resolved_config.json",
+    "input_manifest.json",
+    "working_set_summary.json",
+    "policy_registry.json",
+    "run_state.json",
 )
 
 
@@ -117,19 +147,71 @@ def _load(args):
   return config, stage0, cost
 
 
-def _write_state(run_root: str, status: str,
-                 completed: Sequence[str]) -> None:
-  proactive_stage4.write_json_atomic(os.path.join(
-      run_root, "run_state.json"), {
-          "schema_version": contract.RUN_MANIFEST_SCHEMA_VERSION,
-          "contract_id": contract.CONTRACT_ID,
-          "status": status,
-          "completed": list(completed),
-          "updated_at": _utc_now(),
-          "test_trace_opened": False,
-          "performance_conclusion": None,
-          "tpp_inspired_status": contract.PENDING_TPP,
+def _write_state(
+    run_root: str, status: str, completed: Sequence[str],
+    extra: Optional[Mapping[str, Any]] = None) -> None:
+  value = {
+      "schema_version": contract.RUN_MANIFEST_SCHEMA_VERSION,
+      "contract_id": contract.CONTRACT_ID,
+      "status": status,
+      "completed": list(completed),
+      "updated_at": _utc_now(),
+      "test_trace_opened": False,
+      "performance_conclusion": None,
+      "tpp_inspired_status": contract.PENDING_TPP,
+  }
+  if extra:
+    value.update(dict(extra))
+  proactive_stage4.write_json_atomic(
+      os.path.join(run_root, "run_state.json"), value)
+
+
+def _mark_run_not_verified(run_root: str, failure_step: str) -> None:
+  """Atomically records an external or runner failure without deleting evidence."""
+  if not failure_step:
+    raise contract.Stage5ContractError("Failure step must be non-empty.")
+  state_path = os.path.join(run_root, "run_state.json")
+  previous = {}
+  if os.path.isfile(state_path):
+    previous = proactive_stage4.load_json(state_path)
+  completed = list(previous.get("completed", []))
+  if "failure_evidence_preserved" not in completed:
+    completed.append("failure_evidence_preserved")
+  history = list(previous.get("failure_history", []))
+  if failure_step not in history:
+    history.append(failure_step)
+  _write_state(
+      run_root, contract.NOT_VERIFIED, completed, {
+          "failure_step": failure_step,
+          "failure_history": history,
+          "failure_recorded_at": _utc_now(),
+          "automatic_retry": False,
       })
+
+
+def _reject_failed_run_id(run_root: str) -> None:
+  state_path = os.path.join(run_root, "run_state.json")
+  if not os.path.isfile(state_path):
+    return
+  state = proactive_stage4.load_json(state_path)
+  if state.get("status") == contract.NOT_VERIFIED:
+    raise contract.Stage5ContractError(
+        "This run-id is stage5_not_verified; preserve it and use a new "
+        "run-id. Automatic retry is forbidden.")
+  if state.get("status") == contract.VERIFIED:
+    raise contract.Stage5ContractError(
+        "This run-id is already verified and must not be rerun.")
+
+
+def mark_not_verified(args) -> None:
+  config = contract.load_config(args.config)
+  run_root = _root(args, config)
+  if not os.path.isdir(run_root):
+    raise contract.Stage5ContractError(
+        "Cannot mark a Stage-5 run that has no output directory.")
+  _mark_run_not_verified(run_root, args.failure_step)
+  print("[NOT VERIFIED] {} failed at {}".format(
+      args.run_id, args.failure_step))
 
 
 def _load_inputs(args, config):
@@ -142,6 +224,7 @@ def _load_inputs(args, config):
 def preflight(args) -> str:
   config, _, _ = _load(args)
   run_root = _root(args, config)
+  _reject_failed_run_id(run_root)
   os.makedirs(os.path.join(run_root, "jobs"), exist_ok=True)
   os.makedirs(os.path.join(run_root, "artifacts"), exist_ok=True)
   os.makedirs(os.path.join(run_root, "logs"), exist_ok=True)
@@ -174,9 +257,20 @@ def preflight(args) -> str:
   identity["run_identity_sha256"] = proactive_stage4.fingerprint_value(identity)
   identity_path = os.path.join(run_root, "run_identity.json")
   if os.path.isfile(identity_path):
-    if proactive_stage4.load_json(identity_path) != identity:
+    existing_identity = proactive_stage4.load_json(identity_path)
+    if any(existing_identity.get(key) != identity.get(key)
+           for key in RUN_IDENTITY_BINDING_FIELDS):
       raise contract.Stage5ContractError(
           "Existing run-id has a different data/config/code identity.")
+    missing_evidence = [
+        filename for filename in PREFLIGHT_EVIDENCE
+        if not os.path.isfile(os.path.join(run_root, filename))]
+    if missing_evidence:
+      raise contract.Stage5ContractError(
+          "Existing preflight is incomplete; preserve it and use a new "
+          "run-id. Missing: " + ", ".join(missing_evidence))
+    print("[resume] exact preflight {}".format(run_root))
+    return run_root
   proactive_stage4.write_json_atomic(identity_path, identity)
   resolved = copy.deepcopy(config)
   resolved["run"] = {
@@ -239,11 +333,30 @@ def _loaded_run(args):
         "Stage-5 code changed after preflight; use a new run-id.")
   authority = contract.audit_stage4_authority(
       config, args.project_root, require_checkpoints=True)
-  if authority["freeze_candidate_sha256"] != (
-      expected["stage4_freeze_candidate_sha256"]):
+  authority_bindings = {
+      "stage4_verification_sha256": authority["verification_sha256"],
+      "stage4_freeze_candidate_sha256":
+          authority["freeze_candidate_sha256"],
+      "stage4_dataset_manifest_sha256":
+          authority["dataset_manifest_sha256"],
+      "stage4_dataset_identity_sha256":
+          authority["dataset_identity_sha256"],
+      "checkpoint_sha256": {
+          str(item["seed"]): item["sha256"]
+          for item in authority["checkpoints"]},
+  }
+  if any(expected.get(key) != value
+         for key, value in authority_bindings.items()):
     raise contract.Stage5ContractError(
-        "Stage-4 freeze authority changed after preflight.")
+        "Stage-4 verification/freeze/dataset/checkpoint authority changed "
+        "after preflight.")
   manifest, traces, entries, working_set = _load_inputs(args, config)
+  current_trace_sha256 = {
+      "{}:{}".format(item["workload"], item["split"]):
+          item["trace_sha256"] for item in entries}
+  if current_trace_sha256 != expected.get("trace_sha256"):
+    raise contract.Stage5ContractError(
+        "Train/Validation Trace identity changed after preflight.")
   del manifest
   return run_root, config, stage0, cost, authority, traces, entries, working_set
 
@@ -638,7 +751,7 @@ def build_parser() -> argparse.ArgumentParser:
   parser.add_argument(
       "command", choices=(
           "preflight", "synthetic", "run-acceptance", "fairness",
-          "record-tests", "verify", "all"))
+          "record-tests", "verify", "all", "mark-not-verified"))
   parser.add_argument("--project-root", default=PROJECT_ROOT)
   parser.add_argument(
       "--config", default=os.path.join(
@@ -653,6 +766,7 @@ def build_parser() -> argparse.ArgumentParser:
   parser.add_argument("--run-id", required=True)
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--test-log")
+  parser.add_argument("--failure-step")
   return parser
 
 
@@ -669,7 +783,11 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
       "record-tests": record_tests,
       "verify": verify,
       "all": run_all,
+      "mark-not-verified": mark_not_verified,
   }
+  if args.command == "mark-not-verified" and not args.failure_step:
+    raise contract.Stage5ContractError(
+        "mark-not-verified requires --failure-step.")
   try:
     commands[args.command](args)
   except Exception:
@@ -677,8 +795,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
       config = contract.load_config(args.config)
       run_root = _root(args, config)
       if os.path.isdir(run_root):
-        _write_state(run_root, contract.NOT_VERIFIED, [
-            "failure_evidence_preserved", args.command])
+        _mark_run_not_verified(run_root, args.command)
     except Exception:
       pass
     raise

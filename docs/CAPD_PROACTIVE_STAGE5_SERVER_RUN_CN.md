@@ -15,7 +15,7 @@ CPU：
 ```bash
 cd /home/likc/Q-former-for-OS
 export PYTHON_BIN=python3
-bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r1 cpu
+bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r2 cpu
 ```
 
 CUDA：
@@ -23,7 +23,7 @@ CUDA：
 ```bash
 cd /home/likc/Q-former-for-OS
 export PYTHON_BIN=python3
-bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r1 cuda:0
+bash scripts/validate_capd_proactive_stage5_server.sh stage5-baseline-r2 cuda:0
 ```
 
 脚本依次执行：
@@ -77,9 +77,14 @@ python3 scripts/run_capd_proactive_stage5.py fairness \
 
 ## 失败处理
 
+- 验收脚本失败：若 run 目录已经建立，脚本会原子记录
+  `status=stage5_not_verified`、`failure_step` 和 `failure_history`；
 - checkpoint/Trace SHA 失败：不要改冻结 JSON；先修复服务器文件同步；
 - 绝对路径解析失败：确认冻结路径中含仓库内的 `outputs/...` 或 `dataset/...` 后缀；
 - existing failed/running job：保留该 run 目录，使用新 run ID；
 - 公平性单字段失败：不得跳过检查或手改结果；
 - TPP 请求失败且显示 `pending_stage6`：这是阶段 5 的预期硬拒绝；
 - 任一失败均不得手工创建 verification 或打印最终标记。
+
+`stage5-baseline-r1` 已在历史工件污染自测处失败，必须保留现场，不得续跑或当作
+完成证据。修复后的首次运行使用 `stage5-baseline-r2`。

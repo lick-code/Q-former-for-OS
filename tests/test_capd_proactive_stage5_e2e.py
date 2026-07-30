@@ -89,7 +89,51 @@ class ProactiveStage5ResumeTest(unittest.TestCase):
     with self.assertRaises(contract.Stage5ContractError):
       self.call_job()
 
+  def test_external_validator_failure_is_atomically_marked(self):
+    runner._write_state(
+        self.run_root, contract.IMPLEMENTED, ["preflight"])
+    runner._mark_run_not_verified(
+        self.run_root, "stage4_chain_and_contamination_audit")
+    state = proactive_stage4.load_json(os.path.join(
+        self.run_root, "run_state.json"))
+    self.assertEqual(contract.NOT_VERIFIED, state["status"])
+    self.assertEqual(
+        "stage4_chain_and_contamination_audit", state["failure_step"])
+    self.assertEqual(
+        ["stage4_chain_and_contamination_audit"],
+        state["failure_history"])
+    with self.assertRaises(contract.Stage5ContractError):
+      runner._reject_failed_run_id(self.run_root)
+    self.assertIn("preflight", state["completed"])
+    self.assertIn("failure_evidence_preserved", state["completed"])
+    self.assertFalse(state["automatic_retry"])
+
+    runner._mark_run_not_verified(
+        self.run_root, "stage4_chain_and_contamination_audit")
+    state = proactive_stage4.load_json(os.path.join(
+        self.run_root, "run_state.json"))
+    self.assertEqual(
+        ["stage4_chain_and_contamination_audit"],
+        state["failure_history"])
+
+  def test_run_identity_covers_capd_runtime_dependencies(self):
+    required = {
+        "qmap/finals_config.py",
+        "qmap/qmap_eval.py",
+        "qmap/qmap_generator.py",
+        "qmap/proactive_replay.py",
+        "qmap/proactive_stage4.py",
+        "qmap/proactive_stage5_policies.py",
+        "policy_learning/cache_model/embed.py",
+        "policy_learning/cache_model/loss.py",
+        "policy_learning/cache_model/model.py",
+    }
+    self.assertTrue(required.issubset(set(runner.CODE_ARTIFACTS)))
+    self.assertNotIn("git", runner.RUN_IDENTITY_BINDING_FIELDS)
+    self.assertIn("trace_sha256", runner.RUN_IDENTITY_BINDING_FIELDS)
+    self.assertIn("checkpoint_sha256", runner.RUN_IDENTITY_BINDING_FIELDS)
+    self.assertIn("code_artifacts", runner.RUN_IDENTITY_BINDING_FIELDS)
+
 
 if __name__ == "__main__":
   unittest.main()
-

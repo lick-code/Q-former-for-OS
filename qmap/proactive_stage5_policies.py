@@ -6,6 +6,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
+from qmap import finals_config
 from qmap import proactive_replay
 from qmap import proactive_stage4
 from qmap import proactive_stage5_contract as contract
@@ -224,6 +225,10 @@ class CAPDRanker(proactive_replay.CandidateRankingPolicy):
       raise contract.Stage5ContractError("CAPD checkpoint SHA-256 mismatch.")
     from qmap import qmap_eval  # Lazy: rule policies do not require torch.
     import torch
+    torch.use_deterministic_algorithms(True)
+    if hasattr(torch.backends, "cudnn"):
+      torch.backends.cudnn.benchmark = False
+      torch.backends.cudnn.deterministic = True
     checkpoint = torch.load(
         checkpoint_path, map_location=torch.device("cpu"))
     if checkpoint.get("contract_id") != proactive_stage4.CONTRACT_ID:
@@ -262,6 +267,17 @@ class CAPDRanker(proactive_replay.CandidateRankingPolicy):
         checkpoint_path=checkpoint_path, device=torch.device(device),
         history_length=history_H, candidate_count=candidate_K,
         lookahead=lookahead, ablation="cross_attention")
+    page_vocab = self.predictor._feature_embedder.page_embedder
+    pc_vocab = self.predictor._feature_embedder.pc_embedder
+    if not page_vocab.frozen or not pc_vocab.frozen:
+      raise contract.Stage5ContractError(
+          "Loaded CAPD vocabularies are not frozen.")
+    if (finals_config.fingerprint_value(page_vocab.input_to_index) !=
+        vocab.get("page_vocab_fingerprint") or
+        finals_config.fingerprint_value(pc_vocab.input_to_index) !=
+        vocab.get("pc_vocab_fingerprint")):
+      raise contract.Stage5ContractError(
+          "Loaded CAPD vocabulary fingerprint mismatch.")
     self.seed = int(seed)
     self.checkpoint_path = checkpoint_path
     self.checkpoint_sha256 = checkpoint_sha256
@@ -288,6 +304,9 @@ class CAPDRanker(proactive_replay.CandidateRankingPolicy):
     if len(scores) != len(candidates):
       raise proactive_replay.ReplayInvariantError(
           "CAPD score count does not match current candidates.")
+    if any(not math.isfinite(float(score)) for score in scores):
+      raise proactive_replay.ReplayInvariantError(
+          "CAPD produced a non-finite candidate score.")
     ranked = sorted(
         enumerate(candidates),
         key=lambda item: (-float(scores[item[0]]), item[0], int(item[1])))
@@ -380,4 +399,3 @@ POLICY_REGISTRY = {
         "ranker": OracleRanker,
     },
 }
-
