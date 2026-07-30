@@ -100,8 +100,10 @@ if [[ "${TEST_STATUS}" -ne 0 ]]; then
   exit "${TEST_STATUS}"
 fi
 
-"${PYTHON_BIN}" scripts/run_capd_proactive_stage4.py all \
-  "${COMMON_ARGS[@]}"
+for PHASE_COMMAND in lookahead label-weights candidate-history finalize; do
+  "${PYTHON_BIN}" scripts/run_capd_proactive_stage4.py "${PHASE_COMMAND}" \
+    "${COMMON_ARGS[@]}"
+done
 
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage4.py record-tests \
   "${COMMON_ARGS[@]}" \

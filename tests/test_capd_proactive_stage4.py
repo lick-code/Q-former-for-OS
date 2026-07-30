@@ -244,6 +244,34 @@ class ProactiveStage4TrajectoryTest(unittest.TestCase):
         event_types.count(proactive_replay.PROACTIVE_DEMOTION))
 
 
+class ProactiveStage4ServerWorkflowTest(unittest.TestCase):
+
+  def test_validator_does_not_repeat_preflight_after_tests(self):
+    path = os.path.join(
+        PROJECT_ROOT, "scripts",
+        "validate_capd_proactive_stage4_server.sh")
+    with open(path, "r", encoding="utf-8") as source:
+      script = source.read()
+    self.assertEqual(
+        1, script.count(
+            "scripts/run_capd_proactive_stage4.py preflight"))
+    self.assertNotIn(
+        "scripts/run_capd_proactive_stage4.py all", script)
+    for command in (
+        "lookahead", "label-weights", "candidate-history", "finalize"):
+      self.assertIn(command, script)
+
+  def test_source_identity_excludes_runtime_output_and_deployment_paths(self):
+    path = os.path.join(
+        PROJECT_ROOT, "scripts", "run_capd_proactive_stage4.py")
+    with open(path, "r", encoding="utf-8") as source:
+      script = source.read()
+    for excluded in (
+        ":(exclude)outputs", ":(exclude)tmp",
+        ":(exclude)*.patch", ":(exclude)*.tar.gz"):
+      self.assertIn(excluded, script)
+
+
 class ProactiveStage4SelectionTest(unittest.TestCase):
 
   def _candidate(self, identity, cost, write, ndcg, complexity):

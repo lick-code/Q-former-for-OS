@@ -46,8 +46,17 @@ def _git_state(project_root):
     except (OSError, subprocess.CalledProcessError):
       return "unknown"
   commit = command("rev-parse", "HEAD")
-  status = command("status", "--porcelain")
-  diff = command("diff", "--binary", "--no-ext-diff")
+  # Runtime outputs and deployment bundles must not change the source-code
+  # identity. In particular, preflight writes into outputs before a resumed
+  # invocation rechecks identity.
+  source_scope = (
+      ".", ":(exclude)outputs", ":(exclude)tmp",
+      ":(exclude)*.patch", ":(exclude)*.tar.gz")
+  status = command(
+      "status", "--porcelain", "--untracked-files=all", "--",
+      *source_scope)
+  diff = command(
+      "diff", "--binary", "--no-ext-diff", "--", *source_scope)
   return {
       "commit": commit,
       "dirty_worktree": status not in ("", "unknown"),
