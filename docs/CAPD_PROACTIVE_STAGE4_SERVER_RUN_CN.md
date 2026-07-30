@@ -1,5 +1,12 @@
 # CAPD 主动降级阶段 4：Linux 服务器运行说明
 
+## 0. 已完成的正式验收
+
+2026-07-30，正式运行 `stage4-f8-f16-r3` 已完成服务器训练、113 项阶段 1～4
+回归测试和最终一致性审计，并输出 `[FINAL] STAGE4_VERIFIED`。正式工件已封存在
+`outputs/capd_proactive_stage4/stage4-f8-f16-r3/`。下列命令保留用于复现、
+新输入运行或故障定位；不得用相同 run ID 覆盖已封存的 `r3`。
+
 ## 1. 前提
 
 服务器仓库根目录应包含 PyTorch 环境以及阶段 3 使用的六个 Train/Validation
@@ -94,7 +101,7 @@ python3 scripts/prepare_capd_proactive_stage4_manifest.py \
   --source-manifest outputs/capd_proactive_calibration/stage3/stage3-real-001/input_manifest.json \
   --output outputs/capd_proactive_stage4/manifests/stage4-real-001.json \
   --project-root "$PWD" \
-  --attest-distinct-source-traces
+  --source-ranges-json "$CAPD_STAGE4_SOURCE_RANGES_JSON"
 
 COMMON=(
   --manifest outputs/capd_proactive_stage4/manifests/stage4-real-001.json
