@@ -1,0 +1,160 @@
+{
+  "audit_input_scope": "train_jsonl_and_validation_jsonl_only",
+  "best_epoch": 10,
+  "best_validation_loss": -0.0020727461268161907,
+  "checkpoints": {
+    "best": {
+      "fingerprint": "208129c3752ee1a0f124d97d8a8226d9fb78ac77e5019514685bad334f2a393d",
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_best.pth"
+    },
+    "last": {
+      "fingerprint": "415063996bfe3c000a654bcd5d7c59b5d126d6c7cf6d89041048786969d305a9",
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_last.pth"
+    },
+    "per_epoch": [
+      {
+        "epoch": 1,
+        "fingerprint": "dcd6fb8266145a7e81279b6aa8ac5d012cea5b6c153c3242aa8bfe5edd263b92",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_1.pth"
+      },
+      {
+        "epoch": 2,
+        "fingerprint": "87fbd27ec2a37475cf4c891e75efe4ab969079b7020adf25c8bb342e7a0cad6d",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_2.pth"
+      },
+      {
+        "epoch": 3,
+        "fingerprint": "0508f27d9c665973e9fc66f08cf4c95cda80b2891cfdfe3716ce3c446fa0fba9",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_3.pth"
+      },
+      {
+        "epoch": 4,
+        "fingerprint": "ccde5ba324e9f2079f5fe71056a2af5c743749c3a82c47c9533c9c7a0f646105",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_4.pth"
+      },
+      {
+        "epoch": 5,
+        "fingerprint": "cf96f89de10e830a84179fcb327aa5cafca4618cf080ba02482db134e262fcb6",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_5.pth"
+      },
+      {
+        "epoch": 6,
+        "fingerprint": "f61d04326ff0227215012d7c67916c7060b6fd1069a5bc25bb1869c011fc0a1c",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_6.pth"
+      },
+      {
+        "epoch": 7,
+        "fingerprint": "27d399bad0fb560622828193991097cd86b573864a85b40b054047548e7d4838",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_7.pth"
+      },
+      {
+        "epoch": 8,
+        "fingerprint": "e0943268dbc1a1fedb14a272f67a3665f893a23794d03071a5f738cdfb721468",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_8.pth"
+      },
+      {
+        "epoch": 9,
+        "fingerprint": "2c8c548ee1eccc5387e32fa1aae3de9b117cb0eaac11a9b9961db15139666c46",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_9.pth"
+      },
+      {
+        "epoch": 10,
+        "fingerprint": "cf460cd22242a625afefd5b1d7c93d3c2edee3eac8e918f6469790b29e7af2e8",
+        "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/qmap_epoch_10.pth"
+      }
+    ]
+  },
+  "code_fingerprint": "d5a268324128451ca8d02ee72b160bd05378964ed9ef0a5e7b0a6386b2b08bd4",
+  "command": "/home/likc/Q-former-for-OS/qmap/qmap_train.py --train_data /home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/dataset/all_train.jsonl --valid_data /home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/dataset/all_validation.jsonl --proactive_stage4_contract /home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/training_contract.json --output_dir /home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859 --seed 3136859 --device cuda --ablation cross_attention",
+  "config_fingerprint": null,
+  "config_generation_commit": null,
+  "config_path": null,
+  "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+  "data_config_fingerprint": null,
+  "decision_holdout_fingerprint": null,
+  "experiment_id": "L256_lam1-1-4_K8_H10",
+  "final_train_loss": -0.0016198349476326257,
+  "git_commit": "570742237a6ea07f3c50d2cb74db989a43630b42",
+  "jsonl_fingerprints": {
+    "train": "a4339bb3174b03d3ebdd323286ad75f6b0a437cc3687d96497102fce3d336d43",
+    "validation": "d2be0af971e5171610205caa7e6a85510920f29b5f3dda14e2bc3b923cff9c8f"
+  },
+  "loss_curve": [
+    {
+      "epoch": 1,
+      "train_loss": -0.0013517242041416466,
+      "valid_loss": -0.00174026679376076
+    },
+    {
+      "epoch": 2,
+      "train_loss": -0.0013794191181659698,
+      "valid_loss": -0.0018016923347423817
+    },
+    {
+      "epoch": 3,
+      "train_loss": -0.001421500972355716,
+      "valid_loss": -0.0018923195271656431
+    },
+    {
+      "epoch": 4,
+      "train_loss": -0.0014628022909164429,
+      "valid_loss": -0.0019479438919445563
+    },
+    {
+      "epoch": 5,
+      "train_loss": -0.001494975935202092,
+      "valid_loss": -0.001992498492372447
+    },
+    {
+      "epoch": 6,
+      "train_loss": -0.0015417095855809748,
+      "valid_loss": -0.002017332176709997
+    },
+    {
+      "epoch": 7,
+      "train_loss": -0.0015658365446142852,
+      "valid_loss": -0.0020346460414343865
+    },
+    {
+      "epoch": 8,
+      "train_loss": -0.0015921063895802945,
+      "valid_loss": -0.0020467762289376095
+    },
+    {
+      "epoch": 9,
+      "train_loss": -0.001607086815056391,
+      "valid_loss": -0.002060504180604014
+    },
+    {
+      "epoch": 10,
+      "train_loss": -0.0016198349476326257,
+      "valid_loss": -0.0020727461268161907
+    }
+  ],
+  "model_contract": {
+    "H": 10,
+    "K": 8,
+    "context_mode": "cross_attention",
+    "page_state_dim": 4,
+    "position_encoding": "none",
+    "use_page_id_embedding": true,
+    "write_sensitivity_weight": 4.0
+  },
+  "nan_or_inf_detected": false,
+  "per_epoch_checkpoints_saved": true,
+  "sample_identity": {
+    "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+    "experiment_id": "L256_lam1-1-4_K8_H10",
+    "schema_version": "capd_proactive_stage4_sample_v1_0"
+  },
+  "schema_version": "capd_proactive_stage4_training_contract_v1_0",
+  "seed": 3136859,
+  "selection_criterion": "minimum_valid_loss_only",
+  "selector_status": "disabled",
+  "stage4_training_contract_fingerprint": "bad8c8ae85c48d8471ea8a840ff835c18a93753447b6501b874cae84e87e517b",
+  "stage4_training_contract_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/checkpoints/seed_3136859/training_contract.json",
+  "test_trace_opened": false,
+  "training_duration_seconds": 31.12850832939148,
+  "training_seed_source": "explicit_cli_and_contract",
+  "variant": "capd_proactive_stage4"
+}

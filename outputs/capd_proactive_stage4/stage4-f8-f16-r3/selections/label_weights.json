@@ -1,0 +1,231 @@
+{
+  "candidate_result_paths": [
+    "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-1_K8_H10/experiment_result.json",
+    "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H10/experiment_result.json",
+    "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-4_K8_H10/experiment_result.json",
+    "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-8_K8_H10/experiment_result.json",
+    "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-2-4_K8_H10/experiment_result.json",
+    "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam2-1-4_K8_H10/experiment_result.json"
+  ],
+  "created_at": "2026-07-30T09:48:40.407527+00:00",
+  "evaluated": [
+    {
+      "complexity_rank": [
+        256,
+        8,
+        0,
+        10,
+        3.0
+      ],
+      "constraints_pass": true,
+      "experiment_id": "L256_lam1-1-1_K8_H10",
+      "macro_amortized_latency": 0.001441169042372562,
+      "macro_ndcg_at_b_t": 0.9997052396116978,
+      "macro_top_b_t_overlap": 0.9997685185185186,
+      "macro_top_b_t_regret": 0.000877097800925926,
+      "macro_weighted_cost_per_access": 1.0400873333333334,
+      "near_best": true,
+      "worst_nvm_write_relative_regression": 0.0,
+      "worst_workload_relative_regression": 0.0
+    },
+    {
+      "complexity_rank": [
+        256,
+        8,
+        0,
+        10,
+        4.0
+      ],
+      "constraints_pass": true,
+      "experiment_id": "L256_lam1-1-2_K8_H10",
+      "macro_amortized_latency": 0.0013737912902072574,
+      "macro_ndcg_at_b_t": 0.9997052396116978,
+      "macro_top_b_t_overlap": 0.9997685185185186,
+      "macro_top_b_t_regret": 0.000877097800925926,
+      "macro_weighted_cost_per_access": 1.0400873333333334,
+      "near_best": true,
+      "worst_nvm_write_relative_regression": 0.0,
+      "worst_workload_relative_regression": 0.0
+    },
+    {
+      "complexity_rank": [
+        256,
+        8,
+        0,
+        10,
+        6.0
+      ],
+      "constraints_pass": true,
+      "experiment_id": "L256_lam1-1-4_K8_H10",
+      "macro_amortized_latency": 0.001438956801578412,
+      "macro_ndcg_at_b_t": 0.9997052396116978,
+      "macro_top_b_t_overlap": 0.9997685185185186,
+      "macro_top_b_t_regret": 0.000877097800925926,
+      "macro_weighted_cost_per_access": 1.0400873333333334,
+      "near_best": true,
+      "worst_nvm_write_relative_regression": 0.0,
+      "worst_workload_relative_regression": 0.0
+    },
+    {
+      "complexity_rank": [
+        256,
+        8,
+        0,
+        10,
+        10.0
+      ],
+      "constraints_pass": true,
+      "experiment_id": "L256_lam1-1-8_K8_H10",
+      "macro_amortized_latency": 0.0013767379938430908,
+      "macro_ndcg_at_b_t": 0.9997052396116978,
+      "macro_top_b_t_overlap": 0.9997685185185186,
+      "macro_top_b_t_regret": 0.000877097800925926,
+      "macro_weighted_cost_per_access": 1.0400873333333334,
+      "near_best": true,
+      "worst_nvm_write_relative_regression": 0.0,
+      "worst_workload_relative_regression": 0.0
+    },
+    {
+      "complexity_rank": [
+        256,
+        8,
+        0,
+        10,
+        7.0
+      ],
+      "constraints_pass": true,
+      "experiment_id": "L256_lam1-2-4_K8_H10",
+      "macro_amortized_latency": 0.0013814404572823464,
+      "macro_ndcg_at_b_t": 0.9997052396116978,
+      "macro_top_b_t_overlap": 0.9997685185185186,
+      "macro_top_b_t_regret": 0.0008969907407407407,
+      "macro_weighted_cost_per_access": 1.0400873333333334,
+      "near_best": true,
+      "worst_nvm_write_relative_regression": 0.0,
+      "worst_workload_relative_regression": 0.0
+    },
+    {
+      "complexity_rank": [
+        256,
+        8,
+        0,
+        10,
+        7.0
+      ],
+      "constraints_pass": true,
+      "experiment_id": "L256_lam2-1-4_K8_H10",
+      "macro_amortized_latency": 0.0013775541891571576,
+      "macro_ndcg_at_b_t": 0.9997052396116978,
+      "macro_top_b_t_overlap": 0.9997685185185186,
+      "macro_top_b_t_regret": 0.001734302662037037,
+      "macro_weighted_cost_per_access": 1.0400873333333334,
+      "near_best": true,
+      "worst_nvm_write_relative_regression": 0.0,
+      "worst_workload_relative_regression": 0.0
+    }
+  ],
+  "fallback_used": false,
+  "paired_differences_vs_reference": {
+    "ndcg_at_b_t": {
+      "ci95_t": [
+        0.0,
+        0.0
+      ],
+      "count": 9,
+      "mean": 0.0,
+      "metric": "ndcg_at_b_t",
+      "sample_std": 0.0,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "nvm_writes": {
+      "ci95_t": [
+        0.0,
+        0.0
+      ],
+      "count": 9,
+      "mean": 0.0,
+      "metric": "nvm_writes",
+      "sample_std": 0.0,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "top_b_t_regret": {
+      "ci95_t": [
+        0.0,
+        0.0
+      ],
+      "count": 9,
+      "mean": 0.0,
+      "metric": "top_b_t_regret",
+      "sample_std": 0.0,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "weighted_cost_per_access": {
+      "ci95_t": [
+        0.0,
+        0.0
+      ],
+      "count": 9,
+      "mean": 0.0,
+      "metric": "weighted_cost_per_access",
+      "sample_std": 0.0,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "phase": "label_weights",
+  "reference_experiment_id": "L256_lam1-1-4_K8_H10",
+  "rule_fingerprint": "2880a43cf35dc693a77047d98a826fe476ecc54ee62046fa54ff4329e1b1c9cb",
+  "schema_version": "capd_proactive_stage4_selection_v1_0",
+  "selected_experiment_id": "L256_lam1-1-2_K8_H10",
+  "selected_parameters": {
+    "candidate_size_K": 8,
+    "history_H": 10,
+    "label_weights": [
+      1.0,
+      1.0,
+      2.0
+    ],
+    "lookahead_L": 256
+  },
+  "selection_scope": "global_across_all_validation_workloads_and_seeds",
+  "test_used": false
+}

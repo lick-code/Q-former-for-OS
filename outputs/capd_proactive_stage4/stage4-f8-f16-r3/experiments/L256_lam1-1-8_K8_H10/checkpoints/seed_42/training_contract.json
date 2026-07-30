@@ -1,0 +1,55 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+  "data": {
+    "train": {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-8_K8_H10/dataset/all_train.jsonl",
+      "sample_count": 4083,
+      "sha256": "655bfbbe866c3d0bc72ca164294594a3a36a07a79ae2cda618a16acf530f9f80"
+    },
+    "validation": {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-8_K8_H10/dataset/all_validation.jsonl",
+      "sample_count": 906,
+      "sha256": "dc5865b55836824f89deb398d0cff085296b2758997535e6d85dbb69b7ebc9c4"
+    }
+  },
+  "expected_shape": {
+    "H": 10,
+    "K": 8,
+    "page_state_dim": 4
+  },
+  "experiment_id": "L256_lam1-1-8_K8_H10",
+  "labels": {
+    "lambda_1": 1.0,
+    "lambda_2": 1.0,
+    "lambda_3": 8.0
+  },
+  "method": {
+    "F_low": 8,
+    "F_target": 16,
+    "b_max": 4,
+    "candidate_source": "lru_tail",
+    "selector": "disabled",
+    "trajectory_policy": "proactive_lru"
+  },
+  "output_directory": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-8_K8_H10/checkpoints/seed_42",
+  "sample_identity": {
+    "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+    "experiment_id": "L256_lam1-1-8_K8_H10",
+    "schema_version": "capd_proactive_stage4_sample_v1_0"
+  },
+  "schema_version": "capd_proactive_stage4_training_contract_v1_0",
+  "seed": 42,
+  "test_trace_opened": false,
+  "training": {
+    "approx_ndcg_alpha": 10.0,
+    "batch_size": 32,
+    "checkpoint_tie_break": "earliest_epoch",
+    "context_mode": "cross_attention",
+    "deterministic_algorithms": true,
+    "epochs": 10,
+    "learning_rate": 0.0001,
+    "position_encoding": "none",
+    "shared_page_embedding": false,
+    "use_page_id_embedding": true
+  }
+}

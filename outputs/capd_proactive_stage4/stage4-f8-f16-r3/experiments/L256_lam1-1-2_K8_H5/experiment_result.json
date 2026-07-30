@@ -1,0 +1,998 @@
+{
+  "aggregate": {
+    "by_workload": {
+      "canneal": {
+        "amortized_latency_per_page_seconds": {
+          "ci95_t": [
+            0.0006357029788879908,
+            0.002407051486413802
+          ],
+          "count": 3,
+          "mean": 0.0015213772326508964,
+          "sample_std": 0.0003565030923711372
+        },
+        "dram_hits": {
+          "ci95_t": [
+            198773.697,
+            198782.303
+          ],
+          "count": 3,
+          "mean": 198778.0,
+          "sample_std": 1.7320508075688772
+        },
+        "early_reuse_rate": {
+          "ci95_t": [
+            -0.0010662037037037038,
+            0.0029180555555555557
+          ],
+          "count": 3,
+          "mean": 0.000925925925925926,
+          "sample_std": 0.0008018753738744803
+        },
+        "emergency_fallback_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "exhaustion_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "ndcg_at_1": {
+          "ci95_t": [
+            0.9926347222222223,
+            1.0045875
+          ],
+          "count": 3,
+          "mean": 0.9986111111111111,
+          "sample_std": 0.0024056261216234324
+        },
+        "ndcg_at_b_t": {
+          "ci95_t": [
+            0.9970722664849136,
+            1.001159171185273
+          ],
+          "count": 3,
+          "mean": 0.9991157188350933,
+          "sample_std": 0.0008225338817934581
+        },
+        "nvm_reads": {
+          "ci95_t": [
+            1197.697,
+            1206.303
+          ],
+          "count": 3,
+          "mean": 1202.0,
+          "sample_std": 1.7320508075688772
+        },
+        "nvm_writes": {
+          "ci95_t": [
+            20.0,
+            20.0
+          ],
+          "count": 3,
+          "mean": 20.0,
+          "sample_std": 0.0
+        },
+        "proactive_cycle_count": {
+          "ci95_t": [
+            80.0,
+            80.0
+          ],
+          "count": 3,
+          "mean": 80.0,
+          "sample_std": 0.0
+        },
+        "proactive_demotions": {
+          "ci95_t": [
+            720.0,
+            720.0
+          ],
+          "count": 3,
+          "mean": 720.0,
+          "sample_std": 0.0
+        },
+        "proactive_round_count": {
+          "ci95_t": [
+            240.0,
+            240.0
+          ],
+          "count": 3,
+          "mean": 240.0,
+          "sample_std": 0.0
+        },
+        "top_b_t_overlap": {
+          "ci95_t": [
+            0.9978114583333333,
+            1.0007996527777778
+          ],
+          "count": 3,
+          "mean": 0.9993055555555556,
+          "sample_std": 0.0006014065304058901
+        },
+        "top_b_t_regret": {
+          "ci95_t": [
+            -0.0030360321267470227,
+            0.00829861893230258
+          ],
+          "count": 3,
+          "mean": 0.002631293402777778,
+          "sample_std": 0.0022812214176549258
+        },
+        "total_demotions": {
+          "ci95_t": [
+            720.0,
+            720.0
+          ],
+          "count": 3,
+          "mean": 720.0,
+          "sample_std": 0.0
+        },
+        "weighted_cost_per_access": {
+          "ci95_t": [
+            1.0426884849999998,
+            1.0427315150000003
+          ],
+          "count": 3,
+          "mean": 1.04271,
+          "sample_std": 8.660254037901123e-06
+        }
+      },
+      "dedup_pressure": {
+        "amortized_latency_per_page_seconds": {
+          "ci95_t": [
+            0.001312167599905061,
+            0.0013723197385005768
+          ],
+          "count": 3,
+          "mean": 0.001342243669202819,
+          "sample_std": 1.210627007103858e-05
+        },
+        "dram_hits": {
+          "ci95_t": [
+            997470.0,
+            997470.0
+          ],
+          "count": 3,
+          "mean": 997470.0,
+          "sample_std": 0.0
+        },
+        "early_reuse_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "emergency_fallback_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "exhaustion_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "ndcg_at_1": {
+          "ci95_t": [
+            1.0,
+            1.0
+          ],
+          "count": 3,
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "ndcg_at_b_t": {
+          "ci95_t": [
+            1.0,
+            1.0
+          ],
+          "count": 3,
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "nvm_reads": {
+          "ci95_t": [
+            1333.0,
+            1333.0
+          ],
+          "count": 3,
+          "mean": 1333.0,
+          "sample_std": 0.0
+        },
+        "nvm_writes": {
+          "ci95_t": [
+            1197.0,
+            1197.0
+          ],
+          "count": 3,
+          "mean": 1197.0,
+          "sample_std": 0.0
+        },
+        "proactive_cycle_count": {
+          "ci95_t": [
+            128.0,
+            128.0
+          ],
+          "count": 3,
+          "mean": 128.0,
+          "sample_std": 0.0
+        },
+        "proactive_demotions": {
+          "ci95_t": [
+            1152.0,
+            1152.0
+          ],
+          "count": 3,
+          "mean": 1152.0,
+          "sample_std": 0.0
+        },
+        "proactive_round_count": {
+          "ci95_t": [
+            384.0,
+            384.0
+          ],
+          "count": 3,
+          "mean": 384.0,
+          "sample_std": 0.0
+        },
+        "top_b_t_overlap": {
+          "ci95_t": [
+            1.0,
+            1.0
+          ],
+          "count": 3,
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "top_b_t_regret": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "total_demotions": {
+          "ci95_t": [
+            1152.0,
+            1152.0
+          ],
+          "count": 3,
+          "mean": 1152.0,
+          "sample_std": 0.0
+        },
+        "weighted_cost_per_access": {
+          "ci95_t": [
+            1.021232,
+            1.021232
+          ],
+          "count": 3,
+          "mean": 1.021232,
+          "sample_std": 0.0
+        }
+      },
+      "streamcluster_pressure": {
+        "amortized_latency_per_page_seconds": {
+          "ci95_t": [
+            0.0012491049505387777,
+            0.0014157945872299274
+          ],
+          "count": 3,
+          "mean": 0.0013324497688843525,
+          "sample_std": 3.354809665864148e-05
+        },
+        "dram_hits": {
+          "ci95_t": [
+            197298.0,
+            197298.0
+          ],
+          "count": 3,
+          "mean": 197298.0,
+          "sample_std": 0.0
+        },
+        "early_reuse_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "emergency_fallback_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "exhaustion_rate": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "ndcg_at_1": {
+          "ci95_t": [
+            1.0,
+            1.0
+          ],
+          "count": 3,
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "ndcg_at_b_t": {
+          "ci95_t": [
+            1.0,
+            1.0
+          ],
+          "count": 3,
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "nvm_reads": {
+          "ci95_t": [
+            2700.0,
+            2700.0
+          ],
+          "count": 3,
+          "mean": 2700.0,
+          "sample_std": 0.0
+        },
+        "nvm_writes": {
+          "ci95_t": [
+            2.0,
+            2.0
+          ],
+          "count": 3,
+          "mean": 2.0,
+          "sample_std": 0.0
+        },
+        "proactive_cycle_count": {
+          "ci95_t": [
+            95.0,
+            95.0
+          ],
+          "count": 3,
+          "mean": 95.0,
+          "sample_std": 0.0
+        },
+        "proactive_demotions": {
+          "ci95_t": [
+            855.0,
+            855.0
+          ],
+          "count": 3,
+          "mean": 855.0,
+          "sample_std": 0.0
+        },
+        "proactive_round_count": {
+          "ci95_t": [
+            285.0,
+            285.0
+          ],
+          "count": 3,
+          "mean": 285.0,
+          "sample_std": 0.0
+        },
+        "top_b_t_overlap": {
+          "ci95_t": [
+            1.0,
+            1.0
+          ],
+          "count": 3,
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "top_b_t_regret": {
+          "ci95_t": [
+            0.0,
+            0.0
+          ],
+          "count": 3,
+          "mean": 0.0,
+          "sample_std": 0.0
+        },
+        "total_demotions": {
+          "ci95_t": [
+            855.0,
+            855.0
+          ],
+          "count": 3,
+          "mean": 855.0,
+          "sample_std": 0.0
+        },
+        "weighted_cost_per_access": {
+          "ci95_t": [
+            1.05632,
+            1.05632
+          ],
+          "count": 3,
+          "mean": 1.05632,
+          "sample_std": 0.0
+        }
+      }
+    },
+    "macro_average": {
+      "amortized_latency_per_page_seconds": 0.001398690223579356,
+      "dram_hits": 464515.3333333333,
+      "early_reuse_rate": 0.00030864197530864197,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_rate": 0.0,
+      "ndcg_at_1": 0.999537037037037,
+      "ndcg_at_b_t": 0.9997052396116978,
+      "nvm_reads": 1745.0,
+      "nvm_writes": 406.3333333333333,
+      "proactive_cycle_count": 101.0,
+      "proactive_demotions": 909.0,
+      "proactive_round_count": 303.0,
+      "top_b_t_overlap": 0.9997685185185186,
+      "top_b_t_regret": 0.000877097800925926,
+      "total_demotions": 909.0,
+      "weighted_cost_per_access": 1.0400873333333334
+    },
+    "row_count": 9,
+    "schema_version": "capd_proactive_stage4_metrics_v1_0",
+    "seed_count": 3,
+    "uncertainty_note": "Three seeds describe stability; t intervals are descriptive, not strong significance claims.",
+    "workload_count": 3
+  },
+  "checkpoints": [
+    {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_3136859/qmap_best.pth",
+      "seed": 3136859,
+      "selection_criterion": "minimum_valid_loss_only",
+      "sha256": "507538f2126a02a9c18fa58e53897664d5079b608288e2b7a088aef5b2b1e767"
+    },
+    {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_42/qmap_best.pth",
+      "seed": 42,
+      "selection_criterion": "minimum_valid_loss_only",
+      "sha256": "248f37615ed0ca75788e0106c11f3e249be6c10ea793cce98b5185b8d9b8693e"
+    },
+    {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_2026/qmap_best.pth",
+      "seed": 2026,
+      "selection_criterion": "minimum_valid_loss_only",
+      "sha256": "f640ae784746196fcc49a4a553c17c4ed60be5777ee1438ee3d302f75f91fecd"
+    }
+  ],
+  "complexity_rank": [
+    256,
+    8,
+    5,
+    5,
+    4.0
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+  "dataset_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/dataset/dataset_manifest.json",
+  "experiment_id": "L256_lam1-1-2_K8_H5",
+  "parameters": {
+    "candidate_size_K": 8,
+    "history_H": 5,
+    "label_weights": [
+      1.0,
+      1.0,
+      2.0
+    ],
+    "lookahead_L": 256
+  },
+  "rows": [
+    {
+      "all_tied_rounds": 239,
+      "amortized_latency_per_page_seconds": 0.0019329827199423258,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_3136859/qmap_best.pth",
+      "checkpoint_sha256": "507538f2126a02a9c18fa58e53897664d5079b608288e2b7a088aef5b2b1e767",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 240,
+        "mean": 0.005093600804927215,
+        "p50": 0.002591530967038125,
+        "p95": 0.002995465029380282,
+        "p99": 0.0033990516146877774
+      },
+      "dram_hits": 198777,
+      "early_reuse_count": 1,
+      "early_reuse_rate": 0.001388888888888889,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 0,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 0.9958333333333333,
+      "ndcg_at_b_t": 0.9983734164583662,
+      "nvm_reads": 1203,
+      "nvm_writes": 20,
+      "proactive_cycle_count": 80,
+      "proactive_demotions": 720,
+      "proactive_round_count": 240,
+      "ranking_metric_rounds": 240,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_3136859/canneal_round_metrics.jsonl",
+      "round_metrics_sha256": "1cee7e7d2396c886cb78801d963c10220b3de55c1ae9c1b659f38c2101774656",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 3136859,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 0.9989583333333333,
+      "top_b_t_regret": 0.004052734375,
+      "total_accesses": 200000,
+      "total_demotions": 720,
+      "training_contract_sha256": "883ff375a265626ae2d9da4aa3645d0e9d7ecd67dbef4ccb8c04da10c083d7cf",
+      "weighted_cost": 208543,
+      "weighted_cost_per_access": 1.042715,
+      "workload": "canneal"
+    },
+    {
+      "all_tied_rounds": 384,
+      "amortized_latency_per_page_seconds": 0.0013326787128183544,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_3136859/qmap_best.pth",
+      "checkpoint_sha256": "507538f2126a02a9c18fa58e53897664d5079b608288e2b7a088aef5b2b1e767",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 384,
+        "mean": 0.002670332364990221,
+        "p50": 0.002649170986842364,
+        "p95": 0.0027554416301427405,
+        "p99": 0.003108620599959979
+      },
+      "dram_hits": 997470,
+      "early_reuse_count": 0,
+      "early_reuse_rate": 0.0,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 0,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 1.0,
+      "nvm_reads": 1333,
+      "nvm_writes": 1197,
+      "proactive_cycle_count": 128,
+      "proactive_demotions": 1152,
+      "proactive_round_count": 384,
+      "ranking_metric_rounds": 384,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_3136859/dedup_pressure_round_metrics.jsonl",
+      "round_metrics_sha256": "7afbc7a8d7ae085f24962b102acf99d787e5705df08ea6824b3ae1b7cbb0b716",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 3136859,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 1.0,
+      "top_b_t_regret": 0.0,
+      "total_accesses": 1000000,
+      "total_demotions": 1152,
+      "training_contract_sha256": "883ff375a265626ae2d9da4aa3645d0e9d7ecd67dbef4ccb8c04da10c083d7cf",
+      "weighted_cost": 1021232,
+      "weighted_cost_per_access": 1.021232,
+      "workload": "dedup_pressure"
+    },
+    {
+      "all_tied_rounds": 282,
+      "amortized_latency_per_page_seconds": 0.001311509715946669,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_3136859/qmap_best.pth",
+      "checkpoint_sha256": "507538f2126a02a9c18fa58e53897664d5079b608288e2b7a088aef5b2b1e767",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 285,
+        "mean": 0.0026232940036591077,
+        "p50": 0.002612589974887669,
+        "p95": 0.002669845218770206,
+        "p99": 0.002877393942326308
+      },
+      "dram_hits": 197298,
+      "early_reuse_count": 0,
+      "early_reuse_rate": 0.0,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 3,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 1.0,
+      "nvm_reads": 2700,
+      "nvm_writes": 2,
+      "proactive_cycle_count": 95,
+      "proactive_demotions": 855,
+      "proactive_round_count": 285,
+      "ranking_metric_rounds": 282,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_3136859/streamcluster_pressure_round_metrics.jsonl",
+      "round_metrics_sha256": "717de3da35944513984defc3279ceb04d8a2f1e05ad694fb3faf361a5e7d2b2c",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 3136859,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 1.0,
+      "top_b_t_regret": 0.0,
+      "total_accesses": 200000,
+      "total_demotions": 855,
+      "training_contract_sha256": "883ff375a265626ae2d9da4aa3645d0e9d7ecd67dbef4ccb8c04da10c083d7cf",
+      "weighted_cost": 211264,
+      "weighted_cost_per_access": 1.05632,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "all_tied_rounds": 239,
+      "amortized_latency_per_page_seconds": 0.0013100838611838602,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_42/qmap_best.pth",
+      "checkpoint_sha256": "248f37615ed0ca75788e0106c11f3e249be6c10ea793cce98b5185b8d9b8693e",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 240,
+        "mean": 0.002621227877292161,
+        "p50": 0.002598524995846674,
+        "p95": 0.0027776115864980968,
+        "p99": 0.0029333492001751434
+      },
+      "dram_hits": 198777,
+      "early_reuse_count": 1,
+      "early_reuse_rate": 0.001388888888888889,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 0,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 0.9989737400469136,
+      "nvm_reads": 1203,
+      "nvm_writes": 20,
+      "proactive_cycle_count": 80,
+      "proactive_demotions": 720,
+      "proactive_round_count": 240,
+      "ranking_metric_rounds": 240,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_42/canneal_round_metrics.jsonl",
+      "round_metrics_sha256": "ce59b82c5b68375793494d316bbab827c6ee98b9e0db26ce154ab510acbd4774",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 42,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 0.9989583333333333,
+      "top_b_t_regret": 0.003841145833333333,
+      "total_accesses": 200000,
+      "total_demotions": 720,
+      "training_contract_sha256": "f8bb04344e92dfeac886987157bc1b691004ea5caf926e5d857dab5d967c4e82",
+      "weighted_cost": 208543,
+      "weighted_cost_per_access": 1.042715,
+      "workload": "canneal"
+    },
+    {
+      "all_tied_rounds": 384,
+      "amortized_latency_per_page_seconds": 0.0013558548212510384,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_42/qmap_best.pth",
+      "checkpoint_sha256": "248f37615ed0ca75788e0106c11f3e249be6c10ea793cce98b5185b8d9b8693e",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 384,
+        "mean": 0.0027186806447995573,
+        "p50": 0.002659718011273071,
+        "p95": 0.0029627014155266806,
+        "p99": 0.0036881997640011853
+      },
+      "dram_hits": 997470,
+      "early_reuse_count": 0,
+      "early_reuse_rate": 0.0,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 0,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 1.0,
+      "nvm_reads": 1333,
+      "nvm_writes": 1197,
+      "proactive_cycle_count": 128,
+      "proactive_demotions": 1152,
+      "proactive_round_count": 384,
+      "ranking_metric_rounds": 384,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_42/dedup_pressure_round_metrics.jsonl",
+      "round_metrics_sha256": "695934be3a44bbbdfd4b3a9d46fd26766aa7ea5fa59729ace5d017e4a6b97621",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 42,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 1.0,
+      "top_b_t_regret": 0.0,
+      "total_accesses": 1000000,
+      "total_demotions": 1152,
+      "training_contract_sha256": "f8bb04344e92dfeac886987157bc1b691004ea5caf926e5d857dab5d967c4e82",
+      "weighted_cost": 1021232,
+      "weighted_cost_per_access": 1.021232,
+      "workload": "dedup_pressure"
+    },
+    {
+      "all_tied_rounds": 282,
+      "amortized_latency_per_page_seconds": 0.0013711440832386806,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_42/qmap_best.pth",
+      "checkpoint_sha256": "248f37615ed0ca75788e0106c11f3e249be6c10ea793cce98b5185b8d9b8693e",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 285,
+        "mean": 0.0027486420832901147,
+        "p50": 0.0026234170072712004,
+        "p95": 0.0032500131754204637,
+        "p99": 0.0038656007684767547
+      },
+      "dram_hits": 197298,
+      "early_reuse_count": 0,
+      "early_reuse_rate": 0.0,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 3,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 1.0,
+      "nvm_reads": 2700,
+      "nvm_writes": 2,
+      "proactive_cycle_count": 95,
+      "proactive_demotions": 855,
+      "proactive_round_count": 285,
+      "ranking_metric_rounds": 282,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_42/streamcluster_pressure_round_metrics.jsonl",
+      "round_metrics_sha256": "fb3f17580815861f649ba0db110bf0e2920f24c91e4eacf35e4e7c2b7f6655bc",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 42,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 1.0,
+      "top_b_t_regret": 0.0,
+      "total_accesses": 200000,
+      "total_demotions": 855,
+      "training_contract_sha256": "f8bb04344e92dfeac886987157bc1b691004ea5caf926e5d857dab5d967c4e82",
+      "weighted_cost": 211264,
+      "weighted_cost_per_access": 1.05632,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "all_tied_rounds": 240,
+      "amortized_latency_per_page_seconds": 0.001321065116826503,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_2026/qmap_best.pth",
+      "checkpoint_sha256": "f640ae784746196fcc49a4a553c17c4ed60be5777ee1438ee3d302f75f91fecd",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 240,
+        "mean": 0.0026431894264533186,
+        "p50": 0.002599447499960661,
+        "p95": 0.0028395672357873995,
+        "p99": 0.003482121609849854
+      },
+      "dram_hits": 198780,
+      "early_reuse_count": 0,
+      "early_reuse_rate": 0.0,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 0,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 1.0,
+      "nvm_reads": 1200,
+      "nvm_writes": 20,
+      "proactive_cycle_count": 80,
+      "proactive_demotions": 720,
+      "proactive_round_count": 240,
+      "ranking_metric_rounds": 240,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_2026/canneal_round_metrics.jsonl",
+      "round_metrics_sha256": "f503f6742b24ae546780506cf47e08e6b04fad9d926ccd5322501c9aea5fea4c",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 2026,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 1.0,
+      "top_b_t_regret": 0.0,
+      "total_accesses": 200000,
+      "total_demotions": 720,
+      "training_contract_sha256": "9df2150405400ee7b604aa7b61387f975a8e43c026caa277876ad15f5d090164",
+      "weighted_cost": 208540,
+      "weighted_cost_per_access": 1.0427,
+      "workload": "canneal"
+    },
+    {
+      "all_tied_rounds": 384,
+      "amortized_latency_per_page_seconds": 0.0013381974735390638,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_2026/qmap_best.pth",
+      "checkpoint_sha256": "f640ae784746196fcc49a4a553c17c4ed60be5777ee1438ee3d302f75f91fecd",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 384,
+        "mean": 0.0026791048150395604,
+        "p50": 0.0026523154811002314,
+        "p95": 0.002850583058898337,
+        "p99": 0.0030170739296590914
+      },
+      "dram_hits": 997470,
+      "early_reuse_count": 0,
+      "early_reuse_rate": 0.0,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 0,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 1.0,
+      "nvm_reads": 1333,
+      "nvm_writes": 1197,
+      "proactive_cycle_count": 128,
+      "proactive_demotions": 1152,
+      "proactive_round_count": 384,
+      "ranking_metric_rounds": 384,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_2026/dedup_pressure_round_metrics.jsonl",
+      "round_metrics_sha256": "992903ac1cbc3ed0af4abf143a8890bf762c83ae17882ba7e8d17387a92a0f0c",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 2026,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 1.0,
+      "top_b_t_regret": 0.0,
+      "total_accesses": 1000000,
+      "total_demotions": 1152,
+      "training_contract_sha256": "9df2150405400ee7b604aa7b61387f975a8e43c026caa277876ad15f5d090164",
+      "weighted_cost": 1021232,
+      "weighted_cost_per_access": 1.021232,
+      "workload": "dedup_pressure"
+    },
+    {
+      "all_tied_rounds": 282,
+      "amortized_latency_per_page_seconds": 0.001314695507467708,
+      "candidate_size_K": 8,
+      "checkpoint_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/checkpoints/seed_2026/qmap_best.pth",
+      "checkpoint_sha256": "f640ae784746196fcc49a4a553c17c4ed60be5777ee1438ee3d302f75f91fecd",
+      "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+      "decision_latency_seconds": {
+        "count": 285,
+        "mean": 0.0026317527427811896,
+        "p50": 0.0026207109913229942,
+        "p95": 0.0027073664008639754,
+        "p99": 0.00278856578283012
+      },
+      "dram_hits": 197298,
+      "early_reuse_count": 0,
+      "early_reuse_rate": 0.0,
+      "emergency_fallback_count": 0,
+      "emergency_fallback_rate": 0.0,
+      "exhaustion_count": 0,
+      "exhaustion_rate": 0.0,
+      "experiment_id": "L256_lam1-1-2_K8_H5",
+      "history_H": 5,
+      "incomplete_future_metric_rounds": 3,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "ndcg_at_1": 1.0,
+      "ndcg_at_b_t": 1.0,
+      "nvm_reads": 2700,
+      "nvm_writes": 2,
+      "proactive_cycle_count": 95,
+      "proactive_demotions": 855,
+      "proactive_round_count": 285,
+      "ranking_metric_rounds": 282,
+      "round_metrics_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/experiments/L256_lam1-1-2_K8_H5/validation/seed_2026/streamcluster_pressure_round_metrics.jsonl",
+      "round_metrics_sha256": "f42d3366cbf9bc1af839fae01373c8f2128bd8fefec67b5d7319aaec4fa9012e",
+      "schema_version": "capd_proactive_stage4_metrics_v1_0",
+      "seed": 2026,
+      "selector_status": "disabled",
+      "split": "validation",
+      "test_trace_opened": false,
+      "top_b_t_overlap": 1.0,
+      "top_b_t_regret": 0.0,
+      "total_accesses": 200000,
+      "total_demotions": 855,
+      "training_contract_sha256": "9df2150405400ee7b604aa7b61387f975a8e43c026caa277876ad15f5d090164",
+      "weighted_cost": 211264,
+      "weighted_cost_per_access": 1.05632,
+      "workload": "streamcluster_pressure"
+    }
+  ],
+  "schema_version": "capd_proactive_stage4_metrics_v1_0",
+  "scope": "experiments",
+  "test_trace_opened": false
+}

@@ -1,0 +1,46 @@
+{
+  "checkpoint_selection_rule": "minimum_validation_loss_only",
+  "checkpoint_tie_break": "earliest_epoch",
+  "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+  "created_at": "2026-07-30T10:14:31.389731+00:00",
+  "final_checkpoints": [
+    {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_3136859/qmap_best.pth",
+      "seed": 3136859,
+      "selection_criterion": "minimum_valid_loss_only",
+      "sha256": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47"
+    },
+    {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_42/qmap_best.pth",
+      "seed": 42,
+      "selection_criterion": "minimum_valid_loss_only",
+      "sha256": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+    },
+    {
+      "path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_2026/qmap_best.pth",
+      "seed": 2026,
+      "selection_criterion": "minimum_valid_loss_only",
+      "sha256": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b"
+    }
+  ],
+  "final_dataset_manifest": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/dataset/dataset_manifest.json",
+  "final_dataset_manifest_sha256": "8a7629e00ddac74496e7fbe5e617889f6df4408716da432883770b47b6d32c34",
+  "hyperparameter_selection_scope": "global_across_all_validation_workloads_and_seeds",
+  "report_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/report.md",
+  "report_sha256": "63b747dfd24165a2524431147f9434995f291c9d410764746005962204a94e78",
+  "schema_version": "capd_proactive_stage4_freeze_candidate_v1_0",
+  "selected_parameters": {
+    "candidate_size_K": 8,
+    "history_H": 20,
+    "label_weights": [
+      1.0,
+      1.0,
+      2.0
+    ],
+    "lookahead_L": 256
+  },
+  "selector_status": "disabled",
+  "stage3_capacity_claim": "conditional_engineering_default_not_capacity_rule_v2_pass",
+  "status": "stage4_results_ready_for_freeze",
+  "test_trace_opened": false
+}
