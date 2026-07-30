@@ -1,0 +1,310 @@
+test_active_policy_requires_fields_when_its_gate_is_frozen (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_capd_with_frozen_active_fields_is_accepted (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_illegal_policy_name_is_rejected (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_legal_stage0_capd_template_is_accepted (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_missing_required_field_is_rejected (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_non_learning_active_policy_requires_only_shared_active_fields (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_official_policy_set_is_frozen (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_overlapping_chronological_splits_are_rejected (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_reactive_lru_does_not_require_proactive_fields (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_selector_must_remain_disabled (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_single_process_thread_workload_boundary_is_enforced (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_split_roles_cannot_be_exchanged (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_stage2_default_cost_profile_is_frozen (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_stage3_conditional_engineering_default_is_frozen (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_test_cannot_be_used_for_parameter_selection (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_unfrozen_formal_test_request_is_rejected (tests.test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_F_at_or_above_low_does_not_trigger (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_actual_candidate_count_and_all_b_t_bounds (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_all_declared_fixture_scenarios_run (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_capd_without_checkpoint_is_not_faked_by_lru_ranker (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_early_reuse_is_counted_from_proactive_event (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_empty_candidate_set_terminates_without_loop (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_invalid_ranker_fails_instead_of_silently_repairing (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_low_watermark_starts_cycle_and_reaches_target (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_multi_round_rebuilds_current_candidates (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_no_free_frame_demotes_before_page_enter_and_never_negative (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_proactive_reactive_and_emergency_events_do_not_mix (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_reactive_lru_never_creates_proactive_logs (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_residency_lru_frequency_dirty_and_history_updates (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_round_cycle_and_summary_fields_are_complete (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_same_trace_and_config_are_fully_deterministic (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_single_round_top_b_uses_stub_ranking (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_stage0_contract_and_fixture_remain_separate (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_stage1_does_not_compute_cost_or_require_checkpoint (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_summary_matches_raw_events (tests.test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_all_profiles_reuse_identical_counts (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_cost_module_has_no_replay_model_or_gpu_import (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_default_hand_calculation_and_components (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_input_mapping_is_not_modified_and_repeated_runs_are_identical (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_only_stage2_namespace_is_added_and_identity_is_unchanged (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_other_profiles_match_hand_calculation (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_reserved_output_namespace_is_never_overwritten (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_switching_profile_changes_only_profile_and_cost_fields (tests.test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_all_four_profiles_are_frozen_exactly (tests.test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_default_and_parameterized_provenance_are_frozen (tests.test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_default_profile_must_exist_and_equal_default (tests.test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_duplicate_json_profile_name_is_rejected_before_validation (tests.test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_missing_or_illegal_weight_is_rejected (tests.test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_stage1_integration_and_verified_status_are_frozen (tests.test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_unsupported_schema_version_is_rejected (tests.test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_cli_refuses_input_output_alias (tests.test_capd_proactive_cost.OfflineCliTest) ... ok
+test_cli_writes_json_without_changing_input (tests.test_capd_proactive_cost.OfflineCliTest) ... ok
+test_csv_conversion_is_explicit_and_rejects_noncanonical_counts (tests.test_capd_proactive_cost.OfflineCliTest) ... ok
+test_invalid_cli_input_returns_nonzero_and_diagnostic (tests.test_capd_proactive_cost.OfflineCliTest) ... ok
+test_json_single_default_and_all_profiles (tests.test_capd_proactive_cost.OfflineCliTest) ... ok
+test_jsonl_and_csv_multiple_records_are_supported (tests.test_capd_proactive_cost.OfflineCliTest) ... ok
+test_validate_config_mode_needs_no_input (tests.test_capd_proactive_cost.OfflineCliTest) ... ok
+test_all_zero_counts_are_valid (tests.test_capd_proactive_cost.RawEventContractTest) ... ok
+test_complete_breakdown_alone_derives_total (tests.test_capd_proactive_cost.RawEventContractTest) ... ok
+test_missing_required_base_or_demotion_field_is_rejected (tests.test_capd_proactive_cost.RawEventContractTest) ... ok
+test_negative_float_string_boolean_and_nan_counts_are_rejected (tests.test_capd_proactive_cost.RawEventContractTest) ... ok
+test_partial_breakdown_never_silently_passes (tests.test_capd_proactive_cost.RawEventContractTest) ... ok
+test_total_and_complete_breakdown_must_match (tests.test_capd_proactive_cost.RawEventContractTest) ... ok
+test_bmax_tie_prefers_smaller_batch (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_burst_all_zero_and_all_enter (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_burst_windows_exclude_tail_from_quantiles (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_preflight_allows_pressure_capable_validation (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_preflight_blocks_phase_collapsed_validation (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_rounding_is_decimal_ceiling_and_never_zero (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_rule_v2_selects_fallback_from_validation_only (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_capd_and_candidate_filter_cannot_calibrate (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_config_is_predeclared_and_cross_stage_consistent (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_early_reuse_zero_denominator_is_null (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_empty_working_set_fails (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_fallback_profile_drives_fresh_proactive_matrix (tests.test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=480 ratio=0.2
+[stage3] done reactive-8fe59dd1f67c75f243a1 0.053s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done reactive-6e82d5538b02334d6635 0.011s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=960 ratio=0.4
+[stage3] done reactive-7dba43c1dba404114390 0.051s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done reactive-0ebd488f9897dc60bb60 0.010s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=1440 ratio=0.6
+[stage3] done reactive-7f8ef2156edc8b3f8f6a 0.043s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=1440 ratio=0.6
+[stage3] done reactive-9298da2fca8c60f70ea7 0.010s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=240 ratio=0.1
+[stage3] done reactive-20c936de31ca97e32799 0.050s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done reactive-e016917ff96bcb2d6b39 0.012s completed=8
+[stage3] checkpoint reuse reactive-8fe59dd1f67c75f243a1
+[stage3] checkpoint reuse reactive-6e82d5538b02334d6635
+[stage3] checkpoint reuse reactive-7dba43c1dba404114390
+[stage3] checkpoint reuse reactive-0ebd488f9897dc60bb60
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-5dd11486e4e582aef3e8 0.053s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-afe6c74241d45cde7538 0.057s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-1f4768e2c193cbb8c991 0.052s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-9e27489caee7af96e700 0.042s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-caadde22b818b828f6f7 0.045s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-84c7bbd328d854a04eb9 0.040s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-984e181dfd5a6c371699 0.011s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-31a89d07a8ce26d5689b 0.011s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-0284dff566fe0bc56bf5 0.011s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-dd75df317c7a9d7d4bd5 0.060s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-2e7a2adbc8f292df2151 0.061s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-beb8d037620fcdec8b49 0.059s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-9d2a0e4b177db708716d 0.047s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-193c3b5860ae4b446eb5 0.044s completed=22
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-3a82fc55a2e4cacea45a 0.044s completed=23
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-c2a89874ee45111ba6cb 0.011s completed=24
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-1202cb52fb6f727eb00e 0.011s completed=25
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-079372a9b17fe5c7d00f 0.011s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-d1a81f2232fd650366db 0.049s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-d621cdf87271ca9dd49b 0.031s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-08805214cdb6ccda1492 0.022s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-5a308eae757f483b55fa 0.039s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-e79ae795467782d99183 0.026s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-9f08e61e87c3187599dc 0.019s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-25f4d46f3eaa16ef9b59 0.011s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-487001a3d3bd116f3ba2 0.012s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-cb693733080198d62127 0.012s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-995356ff38ee669e98b9 0.058s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-01f25285d0efa882282a 0.035s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-c098944f002318d1a390 0.027s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-00ab7f59eb1363f74946 0.054s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-81f9a5cf68e5b82794b3 0.033s completed=40
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-0cfe4b9766a2305bb12f 0.021s completed=41
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-e02df60b985734e23070 0.011s completed=42
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-6ba64883c6c5c9f2e153 0.012s completed=43
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-1bff5d6efc0e5073731e 0.012s completed=44
+ok
+test_fresh_pair_materializer_never_creates_test (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_interrupted_run_resumes_and_matches_clean_run (tests.test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
+[stage3] done reactive-bc579b7f80d4f7764ddf 0.005s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.005s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
+[stage3] done reactive-d83b0454d04902e3e883 0.005s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done reactive-8082ac34a5acd424517b 0.005s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.005s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.005s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
+[stage3] done reactive-080c825f9cfd11bb8c64 0.005s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
+[stage3] done reactive-21151477cd2df24f4ffe 0.005s completed=8
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] checkpoint reuse reactive-8082ac34a5acd424517b
+[stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
+[stage3] done reactive-bc579b7f80d4f7764ddf 0.004s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.004s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
+[stage3] done reactive-d83b0454d04902e3e883 0.003s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done reactive-8082ac34a5acd424517b 0.004s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.004s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.004s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
+[stage3] done reactive-080c825f9cfd11bb8c64 0.003s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
+[stage3] done reactive-21151477cd2df24f4ffe 0.003s completed=8
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] checkpoint reuse reactive-8082ac34a5acd424517b
+ok
+test_lru_order_matches_legacy_list_operations (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_manifest_loader_parses_raw_pages_and_fingerprints (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_nearest_rank_is_deterministic (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_real_manifest_stops_at_results_ready_not_verified (tests.test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.013s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.014s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.013s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.013s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.013s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.012s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.013s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.014s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+ok
+test_stage2_must_be_verified (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_stage3_compact_replay_matches_full_replay_exactly (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_synthetic_end_to_end_is_awaiting_real_inputs (tests.test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.014s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.014s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.013s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.013s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.013s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.013s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.013s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.013s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+ok
+test_test_split_and_formal_test_are_rejected (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_watermark_generation_is_traceable_and_strict (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_watermark_tie_prefers_smaller_reserve (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_working_set_uses_train_validation_union (tests.test_capd_proactive_stage3.Stage3Test) ... ok
+test_authority_config_is_valid (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_k_less_than_or_equal_to_bmax_is_rejected (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_selector_cannot_be_enabled (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_stage3_values_cannot_change (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_all_six_weight_formulas_and_relabel (tests.test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_incomplete_and_empty_future_windows_are_explicit (tests.test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_variable_top_b_metrics_ties_and_short_candidates (tests.test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_resolved_sha_and_distinct_content_are_enforced (tests.test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_test_and_overlapping_intervals_are_rejected (tests.test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_test_named_path_is_rejected (tests.test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_selection_is_global_and_deterministic (tests.test_capd_proactive_stage4.ProactiveStage4SelectionTest) ... ok
+test_source_identity_excludes_runtime_output_and_deployment_paths (tests.test_capd_proactive_stage4.ProactiveStage4ServerWorkflowTest) ... ok
+test_validator_does_not_repeat_preflight_after_tests (tests.test_capd_proactive_stage4.ProactiveStage4ServerWorkflowTest) ... ok
+test_multi_round_samples_rebuild_after_state_updates (tests.test_capd_proactive_stage4.ProactiveStage4TrajectoryTest) ... ok
+test_train_resume_identity_and_closed_loop_metric_path (tests.test_capd_proactive_stage4_e2e.ProactiveStage4TrainingE2ETest) ... ok
+test_capd_adapter_has_no_trace_or_future_label_constructor_input (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_every_frozen_single_field_mutation_is_rejected (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_frozen_parameters_and_formal_policy_table (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_path_resolution_rejects_escape_and_old_stage_tree (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_portable_absolute_checkpoint_resolution (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_stage4_verification_chain_reads_all_seed_bindings_without_pth (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_test_and_historical_policy_are_hard_rejected (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_tpp_is_registered_pending_and_never_falls_back (tests.test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_all_runnable_policies_have_valid_frozen_stage0_mappings (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_clock_is_candidate_scoped_clears_bits_and_persists_pointer (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_current_entering_page_is_not_an_initialization_candidate (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_event_accounting_and_frozen_cost_match_manual_recompute (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_fairness_a_and_b_and_single_field_pollution (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_oracle_is_deterministic_candidate_scoped_and_records_tail (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_proactive_lru_triggers_multiple_rounds_and_rebuilds_candidates (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_reactive_lru_has_no_proactive_state_or_event_type (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_rule_policy_replay_is_exactly_deterministic_without_timing (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_test_input_is_hard_rejected (tests.test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_completed_exact_identity_is_reused_without_execution (tests.test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_external_validator_failure_is_atomically_marked (tests.test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_run_identity_covers_capd_runtime_dependencies (tests.test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_running_or_failed_job_is_preserved_and_not_retried (tests.test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_single_identity_change_is_not_reused (tests.test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+
+----------------------------------------------------------------------
+Ran 126 tests in 6.020s
+
+OK
+[OK] resume_fixture__validation__proactive_lru__seed-na
+[resume] exact completed job resume_fixture__validation__proactive_lru__seed-na
+[OK] resume_fixture__validation__proactive_lru__seed-na

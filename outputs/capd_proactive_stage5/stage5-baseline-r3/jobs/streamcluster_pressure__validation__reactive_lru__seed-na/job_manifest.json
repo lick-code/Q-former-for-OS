@@ -1,0 +1,27 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-30T14:02:45Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+  "job_identity": {
+    "accesses": 4096,
+    "checkpoint_sha256": null,
+    "job_name": "streamcluster_pressure__validation__reactive_lru__seed-na",
+    "measure_latency": true,
+    "policy": "reactive_lru",
+    "run_identity_sha256": "ec7cb8305be3e4973ab711bada85b49abbe2893cb01ec54f530e6084a4ee5e1a",
+    "seed": null,
+    "source_interval": {
+      "end": 604096,
+      "start": 600000
+    },
+    "split": "validation",
+    "trace_sha256": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774",
+    "workload": "streamcluster_pressure"
+  },
+  "job_identity_sha256": "ce87f5b7436007b9a807375687e0af20129a5d639d48bdf02cb0265f441f3a22",
+  "result_sha256": "7bc09dad952dc812c8b2b1e666620b04baa3167a00355e8a1c6dfa493b76f9d8",
+  "schema_version": "capd_proactive_stage5_job_v1_0",
+  "semantic_result_sha256": "b60661ad411b2276432d2606e84d9df600827879979fa08dab8f9f10fb3876f2",
+  "started_at": "2026-07-30T14:02:44Z",
+  "status": "completed"
+}

@@ -1,0 +1,27 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-30T14:02:42Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+  "job_identity": {
+    "accesses": 4096,
+    "checkpoint_sha256": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396",
+    "job_name": "dedup_pressure__validation__capd__seed-42",
+    "measure_latency": true,
+    "policy": "capd",
+    "run_identity_sha256": "ec7cb8305be3e4973ab711bada85b49abbe2893cb01ec54f530e6084a4ee5e1a",
+    "seed": 42,
+    "source_interval": {
+      "end": 1004096,
+      "start": 1000000
+    },
+    "split": "validation",
+    "trace_sha256": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8",
+    "workload": "dedup_pressure"
+  },
+  "job_identity_sha256": "67f4fbaebd3031e5bef7eaa72744e5c852bf3c3d40370f1a9778a7a0586dbf14",
+  "result_sha256": "1beae611bb6591abdc29c7304d0a646cfa507e6920208d163def3a32055da5e3",
+  "schema_version": "capd_proactive_stage5_job_v1_0",
+  "semantic_result_sha256": "18ce1d28b6787ee67e852bd0beb7a8d45097c491cfd6280cd0afe5dc7fc09724",
+  "started_at": "2026-07-30T14:02:42Z",
+  "status": "completed"
+}

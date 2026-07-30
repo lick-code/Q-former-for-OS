@@ -1,0 +1,42 @@
+{
+  "completed_at": "2026-07-30T14:02:16Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+  "experiment_A": {
+    "candidate_identity_check": "same_constructor_contract_per_round_snapshot_and_exact_identity_for_every_equal_predecision_state",
+    "capd_seeds": [
+      42,
+      2026,
+      3136859
+    ],
+    "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+    "experiment": "A",
+    "policies": [
+      "capd",
+      "oracle",
+      "proactive_clock",
+      "proactive_lru"
+    ],
+    "schema_version": "capd_proactive_stage5_fairness_v1_0",
+    "status": "passed",
+    "test_used_for_selection": false,
+    "tpp_inspired_status": "pending_stage6"
+  },
+  "experiment_B": {
+    "contract_id": "CAPD-PROACTIVE-STAGE5-1.0",
+    "expected_difference": "reactive_on_demand_vs_low_watermark_proactive_reserve",
+    "experiment": "B",
+    "policies": [
+      "proactive_lru",
+      "reactive_lru"
+    ],
+    "schema_version": "capd_proactive_stage5_fairness_v1_0",
+    "status": "passed",
+    "test_used_for_selection": false
+  },
+  "performance_conclusion": null,
+  "schema_version": "capd_proactive_stage5_synthetic_receipt_v1_0",
+  "status": "passed",
+  "test_trace_opened": false,
+  "tpp_fallback_used": false,
+  "tpp_inspired_status": "pending_stage6"
+}
