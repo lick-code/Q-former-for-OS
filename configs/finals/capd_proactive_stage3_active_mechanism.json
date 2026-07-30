@@ -39,7 +39,7 @@
     ]
   },
   "capacity_rounding_rule": "decimal_ceiling_ratio_times_working_set_minimum_one_no_clamp",
-  "contract_version": "CAPD-PROACTIVE-STAGE3-1.0",
+  "contract_version": "CAPD-PROACTIVE-STAGE3-2.0",
   "cost_profile": {
     "name": "default",
     "status": "stage2_frozen",
@@ -59,13 +59,17 @@
   "output_root": "outputs/capd_proactive_calibration",
   "page_size_bytes": 4096,
   "pressure_distinguishability_rule": {
+    "rule_version": "capacity_rule_v2",
+    "selection_split": "validation",
+    "metric": "reactive_demotions_div_page_enter_dram_count",
     "chronic_exhaustion_rate": 0.1,
     "min_accesses_per_run": 100,
-    "minimum_demotion_rate_range": 0.05,
-    "minimum_nvm_access_rate_range": 0.05,
-    "minimum_ordered_indicators": 3,
-    "monotonic_tolerance": 0.01,
-    "near_no_migration_rate": 0.01
+    "monotonic_tolerance": 0.02,
+    "minimum_middle_replacement_fraction": 0.1,
+    "maximum_middle_replacement_fraction": 0.9,
+    "minimum_low_to_high_relief": 0.2,
+    "minimum_middle_page_enters": 100,
+    "minimum_middle_reactive_demotions": 100
   },
   "provenance": {
     "candidate_filter": "disabled",
@@ -77,7 +81,7 @@
   "random_seed": 2026,
   "ranking_policy": "proactive_lru",
   "schema_name": "capd_proactive_stage3_active_mechanism",
-  "schema_version": "capd_proactive_stage3_v1_0",
+  "schema_version": "capd_proactive_stage3_v2_0",
   "stage3_calibration_candidate_bound": 8,
   "stage3_candidate_bound_status": "non_formal_calibration_proxy",
   "stage_status": "stage3_implemented_awaiting_calibration_inputs",

@@ -45,6 +45,16 @@ class Stage3Test(unittest.TestCase):
         "calibration_kind": kind,
         "path_base": "project_root",
         "test_used_for_parameter_selection": False,
+        "fresh_validation_attestation": {
+            "capacity_rule_version": "capacity_rule_v2",
+            "rule_frozen_before_validation_selection": True,
+            "fresh_validation_required": True,
+            "validation_used_in_rule_design": False,
+            "formal_test_reused": False,
+            "previous_validation_trace_fingerprints": {
+                "synthetic_locality": ["0" * 64],
+            },
+        },
         "entries": [
             {
                 "workload": "synthetic_locality",
@@ -122,6 +132,20 @@ class Stage3Test(unittest.TestCase):
         item["page"] for item in traces["synthetic_locality"]["train"]])
     self.assertEqual(2, len(entries))
     self.assertTrue(all(len(item["trace_fingerprint"]) == 64 for item in entries))
+    reused = self.manifest()
+    reused["path_base"] = "manifest_directory"
+    reused["fresh_validation_attestation"][
+        "previous_validation_trace_fingerprints"]["synthetic_locality"] = [
+            next(
+                item["trace_fingerprint"] for item in entries
+                if item["split"] == "validation")]
+    reused_path = os.path.join(temporary, "reused.json")
+    with open(reused_path, "w", encoding="utf-8") as output_file:
+      json.dump(reused, output_file)
+    with self.assertRaisesRegex(
+        proactive_stage3.Stage3ContractError,
+        "reuses a previous Validation"):
+      proactive_stage3.load_inputs(reused_path, PROJECT_ROOT)
     manifest = self.manifest()
     manifest["entries"][1]["formal_test"] = True
     with self.assertRaises(proactive_stage3.Stage3ContractError):
@@ -136,6 +160,48 @@ class Stage3Test(unittest.TestCase):
     bad["provenance"]["candidate_filter"] = "enabled"
     with self.assertRaises(proactive_stage3.Stage3ContractError):
       proactive_stage3.validate_config(bad)
+
+  def test_capacity_rule_v2_selects_fallback_from_validation_only(self):
+    def rows(profile, ratios, validation_values, train_values):
+      result = []
+      for split, values in (
+          ("train", train_values), ("validation", validation_values)):
+        for ratio, replacement in zip(ratios, values):
+          page_enters = 1000
+          reactive = int(page_enters * replacement)
+          result.append({
+              "workload": "w",
+              "split": split,
+              "capacity_profile": profile,
+              "capacity_ratio": ratio,
+              "total_accesses": 10000,
+              "page_enter_dram_count": page_enters,
+              "nvm_reads": 100,
+              "nvm_writes": 20,
+              "total_demotions": reactive,
+              "reactive_demotions": reactive,
+              "free_frame_exhaustion_count": 0,
+          })
+      return result
+
+    rule = self.config["pressure_distinguishability_rule"]
+    primary = proactive_stage3.audit_pressure(
+        rows(
+            "primary", [0.2, 0.4, 0.6],
+            [0.70, 0.05, 0.0],
+            [0.70, 0.50, 0.20]),
+        rule, "primary")
+    fallback = proactive_stage3.audit_pressure(
+        rows(
+            "fallback", [0.1, 0.2, 0.4],
+            [0.75, 0.45, 0.0],
+            [0.95, 0.95, 0.95]),
+        rule, "fallback")
+    self.assertFalse(primary["all_selection_runs_distinguishable"])
+    self.assertTrue(fallback["all_selection_runs_distinguishable"])
+    decision = proactive_stage3.choose_capacity_profile(primary, fallback)
+    self.assertEqual("fallback", decision["recommended_profile"])
+    self.assertEqual([0.1, 0.2, 0.4], decision["recommended_ratios"])
 
   def test_working_set_uses_train_validation_union(self):
     traces = {
@@ -270,6 +336,11 @@ class Stage3Test(unittest.TestCase):
     self.assertFalse(result["selection_decision"]["capd_used_for_selection"])
     self.assertEqual(
         "pending", result["selection_decision"]["stage4_candidate_status"])
+    self.assertFalse(
+        result["selection_decision"]["proactive_calibration_executed"])
+    self.assertEqual(
+        proactive_stage3.CAPACITY_BLOCKED,
+        result["selection_decision"]["capacity"]["status"])
     run_root = result["output_directory"]
     for name in (
         "resolved_config.json", "provenance.json", "input_manifest.json",
@@ -289,6 +360,35 @@ class Stage3Test(unittest.TestCase):
           self.config, self.stage0, self.stage2, self.manifest(),
           traces, [], "synthetic-smoke", output_root, PROJECT_ROOT)
 
+  def test_fallback_profile_drives_fresh_proactive_matrix(self):
+    traces = {
+        "synthetic_locality": {
+            "train": [
+                {"page": page, "rw": page % 2, "pc": page}
+                for page in range(2400)],
+            "validation": [
+                {"page": page, "rw": page % 2, "pc": page}
+                for page in range(600)],
+        }}
+    output_root = tempfile.mkdtemp(prefix="capd-stage3-fallback-")
+    self.addCleanup(shutil.rmtree, output_root, True)
+    result = proactive_stage3.run_calibration(
+        self.config, self.stage0, self.stage2, self.manifest(),
+        traces, [], "fallback-proactive", output_root, PROJECT_ROOT)
+    decision = result["selection_decision"]
+    self.assertEqual("fallback", decision["capacity"]["recommended_profile"])
+    self.assertEqual(
+        [0.1, 0.2, 0.4], decision["capacity"]["recommended_ratios"])
+    self.assertTrue(decision["proactive_calibration_executed"])
+    self.assertTrue(result["watermark_results"])
+    self.assertTrue(result["bmax_results"])
+    self.assertEqual(
+        {0.1, 0.2, 0.4},
+        {row["capacity_ratio"] for row in result["watermark_results"]})
+    self.assertEqual(
+        {0.1, 0.2, 0.4},
+        {row["capacity_ratio"] for row in result["bmax_results"]})
+
   def test_real_manifest_stops_at_results_ready_not_verified(self):
     traces = {
         "synthetic_locality": {
@@ -299,7 +399,7 @@ class Stage3Test(unittest.TestCase):
     self.addCleanup(shutil.rmtree, output_root, True)
     result = proactive_stage3.run_calibration(
         self.config, self.stage0, self.stage2,
-        self.manifest(kind="real_train_validation"),
+        self.manifest(kind="real_train_fresh_validation_v2"),
         traces, [], "real-gate", output_root, PROJECT_ROOT)
     self.assertEqual(proactive_stage3.RESULTS_READY, result["stage_status"])
     self.assertNotEqual(proactive_stage3.VERIFIED, result["stage_status"])

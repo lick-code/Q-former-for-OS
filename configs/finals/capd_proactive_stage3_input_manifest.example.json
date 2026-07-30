@@ -1,5 +1,5 @@
 {
-  "calibration_kind": "real_train_validation",
+  "calibration_kind": "real_train_fresh_validation_v2",
   "entries": [
     {
       "formal_test": false,
@@ -20,7 +20,19 @@
       "workload": "WORKLOAD_A"
     }
   ],
+  "fresh_validation_attestation": {
+    "capacity_rule_version": "capacity_rule_v2",
+    "formal_test_reused": false,
+    "fresh_validation_required": true,
+    "previous_validation_trace_fingerprints": {
+      "WORKLOAD_A": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ]
+    },
+    "rule_frozen_before_validation_selection": true,
+    "validation_used_in_rule_design": false
+  },
   "path_base": "project_root",
-  "schema_version": "capd_proactive_stage3_input_manifest_v1_0",
+  "schema_version": "capd_proactive_stage3_input_manifest_v2_0",
   "test_used_for_parameter_selection": false
 }

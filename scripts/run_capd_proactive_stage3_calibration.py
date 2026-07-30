@@ -59,8 +59,13 @@ def main(argv=None):
       config, stage0, stage2, manifest, traces, resolved_entries,
       args.run_id, output_root, args.project_root, resume=args.resume)
   print(result["output_directory"])
-  if result["stage_status"] == proactive_stage3.RESULTS_READY:
+  if (
+      result["stage_status"] == proactive_stage3.RESULTS_READY and
+      result["freeze_candidate"]["status"] ==
+      "candidate_ready_for_user_confirmation"):
     print("STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE")
+  elif result["stage_status"] == proactive_stage3.RESULTS_READY:
+    print("STAGE3_CALIBRATION_RESULTS_NOT_FREEZABLE")
   else:
     print("STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS")
   return 0

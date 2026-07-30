@@ -45,6 +45,7 @@ done
 echo "[stage3] compile without writing into the repository"
 "${PYTHON_BIN}" -m py_compile \
   qmap/proactive_stage3.py \
+  scripts/prepare_capd_proactive_stage3_v2_manifest.py \
   scripts/run_capd_proactive_stage3_calibration.py \
   tests/test_capd_proactive_stage3.py
 
@@ -67,10 +68,20 @@ for split, offset in (("train", 0), ("validation", 1000)):
             hex(page), hex((offset + page) << 12), (page + repeat) % 2])
 
 manifest = {
-    "schema_version": "capd_proactive_stage3_input_manifest_v1_0",
+    "schema_version": "capd_proactive_stage3_input_manifest_v2_0",
     "calibration_kind": "synthetic_smoke",
     "path_base": "manifest_directory",
     "test_used_for_parameter_selection": False,
+    "fresh_validation_attestation": {
+        "capacity_rule_version": "capacity_rule_v2",
+        "rule_frozen_before_validation_selection": True,
+        "fresh_validation_required": True,
+        "validation_used_in_rule_design": False,
+        "formal_test_reused": False,
+        "previous_validation_trace_fingerprints": {
+            "synthetic_locality": ["0" * 64],
+        },
+    },
     "entries": [],
 }
 for split, role in (
@@ -203,6 +214,30 @@ if [[ -n "${STAGE3_INPUT_MANIFEST:-}" ]]; then
     --output-root "${real_output_root}" \
     --project-root "${REPO_ROOT}" \
     "${resume_args[@]}"
+  real_run_dir="${real_output_root}/stage3/${real_run_id}"
+  "${PYTHON_BIN}" - "${real_run_dir}" <<'PY'
+import json
+import os
+import sys
+
+run = sys.argv[1]
+with open(os.path.join(run, "selection_decision.json"), encoding="utf-8") as f:
+  decision = json.load(f)
+with open(os.path.join(run, "freeze_candidate.json"), encoding="utf-8") as f:
+  freeze = json.load(f)
+assert decision["capacity_rule_version"] == "capacity_rule_v2"
+assert decision["fresh_validation_attested"] is True
+assert decision["test_used"] is False
+profile = decision["capacity"]["recommended_profile"]
+if profile is None:
+  print("STAGE3_V2_CAPACITY_NOT_FREEZABLE")
+  raise SystemExit(3)
+assert decision["proactive_calibration_executed"] is True
+if freeze["status"] != "candidate_ready_for_user_confirmation":
+  print("STAGE3_V2_PROACTIVE_NOT_FREEZABLE")
+  raise SystemExit(4)
+print("STAGE3_V2_FREEZE_CANDIDATE_READY profile={}".format(profile))
+PY
   echo "STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE"
 else
   echo "STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS"

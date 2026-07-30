@@ -22,7 +22,15 @@
 - `source_kind=raw_access_trace`；
 - `formal_test=false`。
 
-manifest 顶层必须声明 `test_used_for_parameter_selection=false`。任何 `split=test`、`formal_test=true`、缺少正式 role、重复 workload/split 或缺少 Train/Validation 的输入都会在读取 trace 前被拒绝。
+manifest 顶层必须声明 `test_used_for_parameter_selection=false`，并携带 `fresh_validation_attestation`：
+
+- `capacity_rule_version=capacity_rule_v2`；
+- v2 规则在选择新 Validation 前已经冻结；
+- 新 Validation 未参与 v2 规则设计；
+- formal Test 未被重命名或复用；
+- 每个 workload 列出此前 Validation trace 的 SHA-256。
+
+程序会在解析新 Validation 前计算 SHA-256，并与旧 Validation 指纹黑名单比较；任何重复都会硬失败。任何 `split=test`、`formal_test=true`、缺少正式 role、重复 workload/split 或缺少 Train/Validation 的输入也会被拒绝。布尔声明用于记录数据来源责任边界，SHA-256 用于防止旧 Validation 被直接复用；两者都不能把 formal Test 转换为 Validation。
 
 原始 trace 使用仓库现有 `pc,address[,rw]` CSV 解析契约，`page_shift=12` 对应 4 KiB 页。每个输入保存 SHA-256 fingerprint、访问数、RW 来源和解析后的 split 身份。空 trace、负页面 ID 和非法 RW 会失败。Working Set 必须来自原始访问页，不能用历史训练 JSONL 中筛选后的候选集合代替。
 
@@ -63,18 +71,26 @@ D = ceil_decimal(W * ratio)
 
 结果至少为 1 页，且不得超过 Working Set。实现不使用 Python banker rounding，也不做静默 clamp；输出保存比例、十进制原始乘积、整数页数和规则名。
 
-### 4.1 预声明压力判定
+### 4.1 `capacity_rule_v2` 预声明压力判定
 
-配置在查看结果前冻结以下阈值：
+v1 使用“占全部 trace 访问的绝对迁移率跨度”，会受到低 admission base rate 限制。v1 的失败结果保留，不在原结果上改判。v2 改用无量纲替换压力：
 
+```text
+replacement_fraction =
+reactive_demotions / page_enter_dram_count
+```
+
+它表示一次页面进入 DRAM 时需要替换现有页面的概率。配置在新 Validation 选择前冻结以下阈值：
+
+- 容量选择只读取新 `Validation`；Train 结果仅作诊断；
 - 每个 run 至少 100 次访问；
-- 相邻容量的单调容差为 0.01；
-- page-enter、NVM access、demotion、reactive-demotion 四类比率中至少三类随容量降低总体增强；
-- NVM access rate 或 demotion rate 的三档跨度至少 0.05；
-- 所有容量的 demotion rate 都小于 0.01 时判为“几乎无迁移”；
-- 所有容量的 exhaustion rate 都大于 0.1 时判为“长期耗尽”。
+- 三档 `replacement_fraction` 随容量增加单调不升，相邻容差 0.02；
+- 中间容量的 `replacement_fraction` 必须位于 `[0.10, 0.90]`；
+- 低容量到高容量的下降至少为 0.20；
+- 中间容量至少包含 100 次 page-enter 和 100 次 reactive demotion；
+- 三档容量不能全部处于 exhaustion rate 大于 0.1 的长期耗尽状态。
 
-只有长度可靠、至少三类指标满足顺序、至少一个压力跨度达到阈值、且不属于“所有容量几乎无迁移”或“所有容量长期耗尽”时，该 workload/split 的三档压力才可区分。主容量集合对全部代表 workload 的 Train/Validation 均通过时，建议保留 20/40/60；否则检查 10/20/40。无论推荐哪组，真实结果仍需用户确认后才能更新主配置。
+每个代表 workload 的新 Validation 都必须通过。主容量集合全部通过时选择 20/40/60；否则检查 10/20/40。若两组都失败，程序将 `recommended_profile` 保持为 `null`，不再默认回退到 primary，也不会运行水位或 `b_max` 的 Proactive-LRU 校准。只有容量组通过后，后续 burst、水位和批量矩阵才使用该容量组。
 
 ## 5. page_enter_dram 突发统计
 
@@ -159,7 +175,7 @@ Stage 3 大 trace 使用 primitive-array 紧凑输入、O(1) LRU 更新和轻量
 ## 11. 状态转换
 
 - 仅完成代码、配置、合成验证：`stage3_implemented_awaiting_calibration_inputs`；
-- 真实 Train/Validation 运行完成：`stage3_calibration_results_ready_for_freeze`；
+- 真实 Train/新 Validation v2 运行完成：`stage3_calibration_results_ready_for_freeze`；
 - 用户确认唯一冻结候选、阶段 0–2 回归和服务器验证全部成功，并同步更新主配置后，才允许 `stage3_verified`。
 
 当前实现不会自动写 `stage3_verified`，也不会自动修改阶段 0 主配置。真实结果需要人工审阅容量压力表、burst、水位、`b_max` 和 K 代理不变性后再冻结。
@@ -173,12 +189,25 @@ cd ~/Q-former-for-OS
 bash scripts/validate_capd_proactive_stage3_server.sh
 ```
 
-加入真实 Train/Validation 校准：
+新建 v2 manifest。该命令保留旧 run 的 Train 输入、替换全部 Validation，并自动写入旧 Validation SHA-256 黑名单：
 
 ```bash
 cd ~/Q-former-for-OS
-STAGE3_INPUT_MANIFEST=/absolute/path/stage3_manifest.json \
-STAGE3_RUN_ID=stage3-real-001 \
+python3 scripts/prepare_capd_proactive_stage3_v2_manifest.py \
+  --previous-run-directory outputs/capd_proactive_calibration/stage3/stage3-real-001 \
+  --validation canneal=/absolute/path/to/fresh/canneal_validation.csv \
+  --validation streamcluster_pressure=/absolute/path/to/fresh/streamcluster_validation.csv \
+  --validation dedup_pressure=/absolute/path/to/fresh/dedup_validation.csv \
+  --output /absolute/path/stage3_manifest_v2.json \
+  --project-root "$PWD"
+```
+
+加入真实 Train/新 Validation v2 校准：
+
+```bash
+cd ~/Q-former-for-OS
+STAGE3_INPUT_MANIFEST=/absolute/path/stage3_manifest_v2.json \
+STAGE3_RUN_ID=stage3-v2-real-001 \
 bash scripts/validate_capd_proactive_stage3_server.sh
 ```
 
@@ -186,8 +215,8 @@ bash scripts/validate_capd_proactive_stage3_server.sh
 
 ```bash
 cd ~/Q-former-for-OS
-STAGE3_INPUT_MANIFEST=/absolute/path/stage3_manifest.json \
-STAGE3_RUN_ID=stage3-real-001 \
+STAGE3_INPUT_MANIFEST=/absolute/path/stage3_manifest_v2.json \
+STAGE3_RUN_ID=stage3-v2-real-001 \
 STAGE3_RESUME=1 \
 bash scripts/validate_capd_proactive_stage3_server.sh
 ```
@@ -195,7 +224,7 @@ bash scripts/validate_capd_proactive_stage3_server.sh
 恢复前会核对配置、manifest、Stage 0/2 配置和所有 trace fingerprint；任一输入变化都会拒绝复用 checkpoint。运行时终端会逐项打印 `start/done/checkpoint reuse`，状态可查看：
 
 ```bash
-tail -f outputs/capd_proactive_calibration/stage3/stage3-real-001.incomplete/logs/progress.jsonl
+tail -f outputs/capd_proactive_calibration/stage3/stage3-v2-real-001.incomplete/logs/progress.jsonl
 ```
 
-默认日志写入仓库根目录 `stage3_validation.log`。合成验收期望最后输出 `STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS`；真实输入成功运行后输出 `STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE`。脚本不运行 Test、不训练 CAPD、不需要 GPU。
+默认日志写入仓库根目录 `stage3_validation.log`。合成验收期望最后输出 `STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS`。真实输入只有在容量通过、按选中容量组完成水位与 `b_max`、K 代理不变性通过并形成完整冻结候选时，才输出 `STAGE3_V2_FREEZE_CANDIDATE_READY` 和 `STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE`；容量失败时输出 `STAGE3_V2_CAPACITY_NOT_FREEZABLE` 并以非零状态结束，但保留完整 Reactive 审计产物。脚本不运行 Test、不训练 CAPD、不需要 GPU。

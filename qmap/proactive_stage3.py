@@ -31,17 +31,19 @@ from qmap.qmap_generator import is_header_row, parse_header, parse_int, parse_rw
 
 
 SCHEMA_NAME = "capd_proactive_stage3_active_mechanism"
-SCHEMA_VERSION = "capd_proactive_stage3_v1_0"
-CONTRACT_VERSION = "CAPD-PROACTIVE-STAGE3-1.0"
-MANIFEST_SCHEMA = "capd_proactive_stage3_input_manifest_v1_0"
-RESULT_SCHEMA = "capd_proactive_stage3_result_v1_0"
+SCHEMA_VERSION = "capd_proactive_stage3_v2_0"
+CONTRACT_VERSION = "CAPD-PROACTIVE-STAGE3-2.0"
+MANIFEST_SCHEMA = "capd_proactive_stage3_input_manifest_v2_0"
+RESULT_SCHEMA = "capd_proactive_stage3_result_v2_0"
 AWAITING_INPUTS = "stage3_implemented_awaiting_calibration_inputs"
 CAPACITY_READY = "stage3_capacity_results_ready_for_freeze"
+CAPACITY_BLOCKED = "stage3_capacity_not_freezable"
 RESULTS_READY = "stage3_calibration_results_ready_for_freeze"
 VERIFIED = "stage3_verified"
 CALIBRATION_POLICY = "proactive_lru"
 PRE_WATERMARK_POLICY = "reactive_lru"
 WORKING_SET_DEFINITION = "active_unique_pages_from_train_and_validation"
+CAPACITY_RULE_VERSION = "capacity_rule_v2"
 ALLOWED_SPLITS = ("train", "validation")
 FORBIDDEN_SPLITS = ("test",)
 WATERMARK_LABELS = ("small", "medium", "large")
@@ -346,19 +348,19 @@ def validate_config(
       "decimal_ceiling_ratio_times_working_set_minimum_one_no_clamp",
       "Unexpected capacity rounding rule.")
   pressure = value["pressure_distinguishability_rule"]
-  pressure_required = {
-      "min_accesses_per_run", "monotonic_tolerance",
-      "minimum_nvm_access_rate_range", "minimum_demotion_rate_range",
-      "near_no_migration_rate", "chronic_exhaustion_rate",
-      "minimum_ordered_indicators"}
-  _require(
-      isinstance(pressure, Mapping) and
-      not (pressure_required - set(pressure)),
-      "Pressure rule is incomplete.")
-  for key in pressure_required - {"min_accesses_per_run", "minimum_ordered_indicators"}:
-    _finite_number(pressure[key], "pressure.{}".format(key))
-  _positive_integer(pressure["min_accesses_per_run"], "pressure.min_accesses_per_run")
-  _positive_integer(pressure["minimum_ordered_indicators"], "pressure.minimum_ordered_indicators")
+  _require(pressure == {
+      "rule_version": CAPACITY_RULE_VERSION,
+      "selection_split": "validation",
+      "metric": "reactive_demotions_div_page_enter_dram_count",
+      "min_accesses_per_run": 100,
+      "monotonic_tolerance": 0.02,
+      "minimum_middle_replacement_fraction": 0.1,
+      "maximum_middle_replacement_fraction": 0.9,
+      "minimum_low_to_high_relief": 0.2,
+      "minimum_middle_page_enters": 100,
+      "minimum_middle_reactive_demotions": 100,
+      "chronic_exhaustion_rate": 0.1,
+  }, "Unexpected capacity_rule_v2 contract.")
   candidate_rule = value["watermark_candidate_rule"]
   _require(
       candidate_rule == {
@@ -422,11 +424,13 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
   _require(isinstance(value, Mapping), "Input manifest must be an object.")
   required = {
       "schema_version", "calibration_kind", "path_base",
-      "test_used_for_parameter_selection", "entries"}
+      "test_used_for_parameter_selection", "fresh_validation_attestation",
+      "entries"}
   _require(not (required - set(value)), "Input manifest is incomplete.")
   _require(value["schema_version"] == MANIFEST_SCHEMA, "Unexpected manifest schema.")
   _require(
-      value["calibration_kind"] in ("real_train_validation", "synthetic_smoke"),
+      value["calibration_kind"] in (
+          "real_train_fresh_validation_v2", "synthetic_smoke"),
       "Unsupported calibration_kind.")
   _require(
       value["path_base"] in ("manifest_directory", "project_root"),
@@ -434,6 +438,32 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
   _require(
       value["test_used_for_parameter_selection"] is False,
       "Formal Test cannot be used for parameter selection.")
+  attestation = value["fresh_validation_attestation"]
+  attestation_fields = {
+      "capacity_rule_version", "rule_frozen_before_validation_selection",
+      "fresh_validation_required", "validation_used_in_rule_design",
+      "formal_test_reused", "previous_validation_trace_fingerprints"}
+  _require(
+      isinstance(attestation, Mapping) and
+      not (attestation_fields - set(attestation)),
+      "Fresh Validation attestation is incomplete.")
+  _require(
+      attestation["capacity_rule_version"] == CAPACITY_RULE_VERSION,
+      "Manifest must target capacity_rule_v2.")
+  _require(
+      attestation["rule_frozen_before_validation_selection"] is True,
+      "capacity_rule_v2 must be frozen before selecting new Validation.")
+  _require(
+      attestation["fresh_validation_required"] is True and
+      attestation["validation_used_in_rule_design"] is False,
+      "Validation must be fresh and unused in rule design.")
+  _require(
+      attestation["formal_test_reused"] is False,
+      "Formal Test cannot be relabeled as fresh Validation.")
+  previous = attestation["previous_validation_trace_fingerprints"]
+  _require(
+      isinstance(previous, Mapping) and previous,
+      "Previous Validation fingerprints are required.")
   entries = value["entries"]
   _require(isinstance(entries, list) and entries, "Manifest entries cannot be empty.")
   seen = set()
@@ -464,6 +494,18 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
     _require(
         splits == set(ALLOWED_SPLITS),
         "{} must provide both Train and Validation.".format(workload))
+    fingerprints = previous.get(workload)
+    _require(
+        isinstance(fingerprints, list) and fingerprints,
+        "{} lacks previous Validation fingerprints.".format(workload))
+    for fingerprint in fingerprints:
+      _require(
+          isinstance(fingerprint, str) and len(fingerprint) == 64 and
+          all(character in "0123456789abcdef" for character in fingerprint),
+          "{} has an invalid previous Validation SHA-256.".format(workload))
+  _require(
+      set(previous) == set(workloads),
+      "Previous Validation fingerprint workloads must match manifest workloads.")
   return value
 
 
@@ -486,15 +528,32 @@ def load_inputs(
   manifest = validate_manifest(load_json(manifest_path))
   traces: Dict[str, Dict[str, Sequence[Any]]] = collections.defaultdict(dict)
   resolved_entries = []
+  previous_by_workload = manifest["fresh_validation_attestation"][
+      "previous_validation_trace_fingerprints"]
+  all_previous = {
+      fingerprint
+      for fingerprints in previous_by_workload.values()
+      for fingerprint in fingerprints}
+  current_validation_fingerprints = set()
   for entry in manifest["entries"]:
     path = _resolve_trace_path(entry, manifest, manifest_path, project_root)
+    trace_fingerprint = finals_config.fingerprint_file(path)
+    if entry["split"] == "validation":
+      _require(
+          trace_fingerprint not in all_previous,
+          "Fresh Validation rejected: {} reuses a previous Validation trace."
+          .format(entry["workload"]))
+      _require(
+          trace_fingerprint not in current_validation_fingerprints,
+          "Fresh Validation traces must be distinct across workloads.")
+      current_validation_fingerprints.add(trace_fingerprint)
     trace, rw_source = _read_compact_trace(path, entry["page_shift"])
     _require(trace, "Empty trace is forbidden: {}".format(path))
     traces[entry["workload"]][entry["split"]] = trace
     resolved = copy.deepcopy(entry)
     resolved.update({
         "resolved_trace_path": path,
-        "trace_fingerprint": finals_config.fingerprint_file(path),
+        "trace_fingerprint": trace_fingerprint,
         "trace_accesses": len(trace),
         "rw_source": rw_source,
     })
@@ -691,14 +750,18 @@ def _replay_row(
   return row, result
 
 
-def _pressure_rates(row: Mapping[str, Any]) -> Dict[str, float]:
+def _pressure_rates(row: Mapping[str, Any]) -> Dict[str, Optional[float]]:
   accesses = float(row["total_accesses"])
+  page_enters = row["page_enter_dram_count"]
   return {
       "page_enter_dram_rate": row["page_enter_dram_count"] / accesses,
       "nvm_access_rate": (row["nvm_reads"] + row["nvm_writes"]) / accesses,
       "demotion_rate": row["total_demotions"] / accesses,
       "exhaustion_rate": row["free_frame_exhaustion_count"] / accesses,
       "reactive_demotion_rate": row["reactive_demotions"] / accesses,
+      "replacement_fraction": (
+          None if page_enters == 0
+          else row["reactive_demotions"] / float(page_enters)),
   }
 
 
@@ -710,61 +773,85 @@ def audit_pressure(
   for row in rows:
     grouped[(row["workload"], row["split"])].append(row)
   run_audits = []
-  all_distinguishable = True
+  selection_results = []
   all_reliable = True
   for identity in sorted(grouped):
     ordered = sorted(grouped[identity], key=lambda item: item["capacity_ratio"])
+    _require(
+        len(ordered) == 3,
+        "{} {} must have exactly three capacity points.".format(*identity))
     rates = [_pressure_rates(item) for item in ordered]
     reliable = all(
         item["total_accesses"] >= rule["min_accesses_per_run"]
         for item in ordered)
-    indicator_names = (
-        "page_enter_dram_rate", "nvm_access_rate", "demotion_rate",
-        "reactive_demotion_rate")
-    ordered_indicators = 0
-    for name in indicator_names:
-      values = [item[name] for item in rates]
-      if all(
-          values[index] + rule["monotonic_tolerance"] >= values[index + 1]
-          for index in range(len(values) - 1)):
-        ordered_indicators += 1
-    nvm_range = max(item["nvm_access_rate"] for item in rates) - min(
-        item["nvm_access_rate"] for item in rates)
-    demotion_range = max(item["demotion_rate"] for item in rates) - min(
-        item["demotion_rate"] for item in rates)
-    near_no_migration = max(item["demotion_rate"] for item in rates) < (
-        rule["near_no_migration_rate"])
+    replacement = [item["replacement_fraction"] for item in rates]
+    replacement_defined = all(item is not None for item in replacement)
+    monotone_non_increasing = (
+        replacement_defined and
+        all(
+            replacement[index] + rule["monotonic_tolerance"] >=
+            replacement[index + 1]
+            for index in range(len(replacement) - 1)))
+    middle_row = ordered[1]
+    middle_replacement = replacement[1]
+    middle_pressure_ok = (
+        middle_replacement is not None and
+        rule["minimum_middle_replacement_fraction"] <= middle_replacement <=
+        rule["maximum_middle_replacement_fraction"])
+    low_to_high_relief = (
+        None if not replacement_defined
+        else replacement[0] - replacement[2])
+    relief_ok = (
+        low_to_high_relief is not None and
+        low_to_high_relief >= rule["minimum_low_to_high_relief"])
+    middle_sample_stable = (
+        middle_row["page_enter_dram_count"] >=
+        rule["minimum_middle_page_enters"] and
+        middle_row["reactive_demotions"] >=
+        rule["minimum_middle_reactive_demotions"])
     chronic_exhaustion = min(item["exhaustion_rate"] for item in rates) > (
         rule["chronic_exhaustion_rate"])
     distinguishable = (
-        reliable and
-        ordered_indicators >= rule["minimum_ordered_indicators"] and
-        (nvm_range >= rule["minimum_nvm_access_rate_range"] or
-         demotion_range >= rule["minimum_demotion_rate_range"]) and
-        not near_no_migration and not chronic_exhaustion)
-    all_distinguishable = all_distinguishable and distinguishable
+        reliable and replacement_defined and monotone_non_increasing and
+        middle_pressure_ok and relief_ok and middle_sample_stable and
+        not chronic_exhaustion)
+    eligible = identity[1] == rule["selection_split"]
+    if eligible:
+      selection_results.append(distinguishable)
     all_reliable = all_reliable and reliable
     run_audits.append({
         "workload": identity[0],
         "split": identity[1],
         "profile_name": profile_name,
+        "capacity_rule_version": rule["rule_version"],
+        "eligible_for_capacity_selection": eligible,
         "reliable_length": reliable,
-        "ordered_indicators": ordered_indicators,
-        "nvm_access_rate_range": nvm_range,
-        "demotion_rate_range": demotion_range,
-        "all_capacities_near_no_migration": near_no_migration,
+        "replacement_fraction_defined": replacement_defined,
+        "replacement_fraction_monotone_non_increasing":
+            monotone_non_increasing,
+        "middle_replacement_fraction": middle_replacement,
+        "middle_pressure_in_predeclared_range": middle_pressure_ok,
+        "middle_page_enter_dram_count": middle_row["page_enter_dram_count"],
+        "middle_reactive_demotions": middle_row["reactive_demotions"],
+        "middle_sample_stable": middle_sample_stable,
+        "low_to_high_replacement_relief": low_to_high_relief,
+        "minimum_relief_passed": relief_ok,
         "all_capacities_chronically_exhausted": chronic_exhaustion,
         "distinguishable": distinguishable,
         "rates_by_capacity": [
             dict({"capacity_ratio": row["capacity_ratio"]}, **rate)
             for row, rate in zip(ordered, rates)],
     })
+  _require(selection_results, "No Validation capacity runs were audited.")
+  all_selection_distinguishable = all(selection_results)
   return {
       "schema_version": RESULT_SCHEMA,
       "profile_name": profile_name,
       "rule": copy.deepcopy(rule),
       "all_runs_reliable": all_reliable,
-      "all_workload_splits_distinguishable": all_distinguishable,
+      "selection_split": rule["selection_split"],
+      "selection_run_count": len(selection_results),
+      "all_selection_runs_distinguishable": all_selection_distinguishable,
       "run_audits": run_audits,
   }
 
@@ -772,27 +859,27 @@ def audit_pressure(
 def choose_capacity_profile(
     primary_audit: Mapping[str, Any], fallback_audit: Mapping[str, Any]
 ) -> Dict[str, Any]:
-  if primary_audit["all_workload_splits_distinguishable"]:
+  if primary_audit["all_selection_runs_distinguishable"]:
     return {
         "recommended_profile": "primary",
         "recommended_ratios": [0.2, 0.4, 0.6],
         "status": CAPACITY_READY,
-        "reason": "primary_20_40_60_passed_predeclared_pressure_rule",
+        "reason": "primary_20_40_60_passed_predeclared_capacity_rule_v2",
         "requires_user_confirmation": True,
     }
-  if fallback_audit["all_workload_splits_distinguishable"]:
+  if fallback_audit["all_selection_runs_distinguishable"]:
     return {
         "recommended_profile": "fallback",
         "recommended_ratios": [0.1, 0.2, 0.4],
         "status": CAPACITY_READY,
-        "reason": "primary_failed_and_fallback_10_20_40_passed_predeclared_pressure_rule",
+        "reason": "primary_failed_and_fallback_10_20_40_passed_predeclared_capacity_rule_v2",
         "requires_user_confirmation": True,
     }
   return {
       "recommended_profile": None,
       "recommended_ratios": None,
-      "status": CAPACITY_READY,
-      "reason": "neither_capacity_profile_passed_predeclared_pressure_rule",
+      "status": CAPACITY_BLOCKED,
+      "reason": "neither_capacity_profile_passed_predeclared_capacity_rule_v2",
       "requires_user_confirmation": True,
   }
 
@@ -1305,13 +1392,16 @@ def run_calibration(
     capacity_decision = choose_capacity_profile(primary_audit, fallback_audit)
     selected_profile = capacity_decision["recommended_profile"]
     if selected_profile is None:
-      selected_profile = "primary"
-    calibration_capacities = capacity_matrices[selected_profile]
+      calibration_capacities = {workload: [] for workload in traces}
+    else:
+      calibration_capacities = capacity_matrices[selected_profile]
 
     relevant_bursts = [
         item for item in burst_stats_rows
         if item["capacity_profile"] == selected_profile]
-    watermarks = generate_watermark_candidates(relevant_bursts)
+    watermarks = (
+        generate_watermark_candidates(relevant_bursts)
+        if selected_profile is not None else [])
     watermark_rows = []
     proxy_values = config["candidate_bound_invariance_values"]
     for proxy_bound in proxy_values:
@@ -1470,20 +1560,25 @@ def run_calibration(
 
     calibration_kind = manifest["calibration_kind"]
     stage_status = (
-        RESULTS_READY if calibration_kind == "real_train_validation"
+        RESULTS_READY
+        if calibration_kind == "real_train_fresh_validation_v2"
         else AWAITING_INPUTS)
     selection_decision = {
         "schema_version": RESULT_SCHEMA,
+        "capacity_rule_version": CAPACITY_RULE_VERSION,
         "capacity": capacity_decision,
         "watermark": watermark_decision,
         "b_max": bmax_decision,
         "candidate_bound_invariance": invariance,
+        "fresh_validation_attested": True,
+        "proactive_calibration_executed": selected_profile is not None,
         "test_used": False,
         "capd_used_for_selection": False,
         "stage4_candidate_status": "pending",
     }
     freeze_candidate = {
         "schema_version": RESULT_SCHEMA,
+        "capacity_rule_version": CAPACITY_RULE_VERSION,
         "status": (
             "candidate_ready_for_user_confirmation"
             if stage_status == RESULTS_READY and invariance_passed and
@@ -1492,6 +1587,7 @@ def run_calibration(
             bmax_decision["selected_b_max"] is not None
             else "not_freezable"),
         "working_set_definition": WORKING_SET_DEFINITION,
+        "fresh_validation_attested": True,
         "capacity_ratios": capacity_decision["recommended_ratios"],
         "default_capacity_ratio": (
             None if capacity_decision["recommended_ratios"] is None
@@ -1519,6 +1615,9 @@ def run_calibration(
         "test_used": False,
         "capd_used_for_selection": False,
         "candidate_filter": "disabled",
+        "capacity_rule_version": CAPACITY_RULE_VERSION,
+        "fresh_validation_attestation": copy.deepcopy(
+            manifest["fresh_validation_attestation"]),
         "resumed_from_checkpoints": journal.resumed,
         "completed_replay_tasks": journal.state["completed_replay_tasks"],
     }

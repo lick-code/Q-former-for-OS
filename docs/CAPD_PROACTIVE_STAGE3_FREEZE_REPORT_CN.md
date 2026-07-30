@@ -20,6 +20,19 @@
 
 容量比例不能按当前预声明规则冻结。20/40/60 和 10/20/40 都未满足“所有 workload × split 可区分”的绝对压力阈值，因此运行生成的 `freeze_candidate.status` 正确为 `not_freezable`。阶段 0 主配置暂不修改，`freeze_status.stage3_active_mechanism` 继续为 `pending`。
 
+## 2026-07-30 协议修订：`capacity_rule_v2`
+
+上述结论是 v1 历史结果，不删除、不调低原阈值、不在同一 Validation 上改判。现已将后续严格复验协议升级为 `CAPD-PROACTIVE-STAGE3-2.0`：
+
+- 容量指标改为 `reactive_demotions / page_enter_dram_count`；
+- 容量门槛只由规则冻结后、未参与规则设计的新 Validation 决定；
+- manifest 必须列出旧 Validation SHA-256，程序拒绝指纹复用，并继续硬拒绝 Test；
+- primary 失败后才检查 fallback；两者都失败时停止，不再默认使用 primary 运行 Proactive-LRU；
+- 若 fallback 10/20/40 通过，burst、水位候选、完整水位矩阵和 `b_max` 矩阵全部按 10/20/40 重新生成；
+- v1 的 `F_low=2, F_target=4, b_max=4` 不自动继承到 v2。
+
+v2 当前状态为“实现完成，等待新 Validation 服务器运行”。在 v2 产物返回并通过审计前，本报告后文的 v1 水位和批量数字仅是历史候选，不是最终冻结值。
+
 ## 产物完整性
 
 | 检查项 | 结果 |
