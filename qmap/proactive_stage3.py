@@ -441,6 +441,7 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
   attestation = value["fresh_validation_attestation"]
   attestation_fields = {
       "capacity_rule_version", "rule_frozen_before_validation_selection",
+      "fresh_train_required", "train_used_in_rule_design",
       "fresh_validation_required", "validation_used_in_rule_design",
       "formal_test_reused", "previous_stage3_input_trace_fingerprints"}
   _require(
@@ -453,6 +454,10 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
   _require(
       attestation["rule_frozen_before_validation_selection"] is True,
       "capacity_rule_v2 must be frozen before selecting new Validation.")
+  _require(
+      attestation["fresh_train_required"] is True and
+      attestation["train_used_in_rule_design"] is False,
+      "Train must be fresh and unused in rule design.")
   _require(
       attestation["fresh_validation_required"] is True and
       attestation["validation_used_in_rule_design"] is False,
@@ -534,19 +539,18 @@ def load_inputs(
       fingerprint
       for fingerprints in previous_by_workload.values()
       for fingerprint in fingerprints}
-  current_validation_fingerprints = set()
+  current_input_fingerprints = set()
   for entry in manifest["entries"]:
     path = _resolve_trace_path(entry, manifest, manifest_path, project_root)
     trace_fingerprint = finals_config.fingerprint_file(path)
-    if entry["split"] == "validation":
-      _require(
-          trace_fingerprint not in all_previous,
-          "Fresh Validation rejected: {} reuses a previous Stage-3 input trace."
-          .format(entry["workload"]))
-      _require(
-          trace_fingerprint not in current_validation_fingerprints,
-          "Fresh Validation traces must be distinct across workloads.")
-      current_validation_fingerprints.add(trace_fingerprint)
+    _require(
+        trace_fingerprint not in all_previous,
+        "Fresh Stage-3 input rejected: {} {} reuses a previous Stage-3 "
+        "input trace.".format(entry["workload"], entry["split"]))
+    _require(
+        trace_fingerprint not in current_input_fingerprints,
+        "Fresh Stage-3 Train/Validation traces must all be distinct.")
+    current_input_fingerprints.add(trace_fingerprint)
     trace, rw_source = _read_compact_trace(path, entry["page_shift"])
     _require(trace, "Empty trace is forbidden: {}".format(path))
     traces[entry["workload"]][entry["split"]] = trace

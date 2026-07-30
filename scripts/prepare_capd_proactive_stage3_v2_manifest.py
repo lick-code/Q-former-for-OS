@@ -2,9 +2,9 @@
 # coding=utf-8
 """Build a capacity_rule_v2 manifest from a completed v1 Stage-3 run.
 
-The helper preserves the previous Train inputs, replaces every Validation
-input explicitly, and records every previous Stage-3 Train/Validation SHA-256
-as a deny-list.  It never accepts or reads a formal Test manifest.
+The helper replaces every Train and Validation input explicitly and records
+every previous Stage-3 Train/Validation SHA-256 as a deny-list.  It never
+accepts or reads a formal Test manifest.
 """
 
 import argparse
@@ -27,6 +27,10 @@ def parser():
       "--previous-run-directory", required=True,
       help="Completed Stage-3 run containing input_manifest.json")
   value.add_argument(
+      "--train", action="append", required=True,
+      metavar="WORKLOAD=PATH",
+      help="Fresh Train CSV from the same new run as Validation; repeat once per workload")
+  value.add_argument(
       "--validation", action="append", required=True,
       metavar="WORKLOAD=PATH",
       help="Fresh post-rule-freeze Validation CSV; repeat once per workload")
@@ -35,18 +39,18 @@ def parser():
   return value
 
 
-def _validation_map(values):
+def _input_map(values, option):
   result = {}
   for value in values:
     if "=" not in value:
       raise proactive_stage3.Stage3ContractError(
-          "--validation must use WORKLOAD=PATH: {}".format(value))
+          "{} must use WORKLOAD=PATH: {}".format(option, value))
     workload, path = value.split("=", 1)
     workload = workload.strip()
     path = path.strip()
     if not workload or not path or workload in result:
       raise proactive_stage3.Stage3ContractError(
-          "Invalid or duplicate --validation value: {}".format(value))
+          "Invalid or duplicate {} value: {}".format(option, value))
     result[workload] = path
   return result
 
@@ -73,7 +77,8 @@ def main(argv=None):
     raise proactive_stage3.Stage3ContractError(
         "A run that used Test cannot seed a v2 manifest.")
 
-  validation_paths = _validation_map(args.validation)
+  train_paths = _input_map(args.train, "--train")
+  validation_paths = _input_map(args.validation, "--validation")
   entries_by_identity = {}
   previous_stage3_inputs = {}
   workloads = set()
@@ -96,10 +101,41 @@ def main(argv=None):
               workload, split))
     previous_stage3_inputs.setdefault(workload, []).append(fingerprint)
 
-  if set(validation_paths) != workloads:
+  if set(train_paths) != workloads or set(validation_paths) != workloads:
     raise proactive_stage3.Stage3ContractError(
-        "Fresh Validation workloads must exactly match {}.".format(
+        "Fresh Train/Validation workloads must exactly match {}.".format(
             sorted(workloads)))
+
+  previous_fingerprints = {
+      item
+      for values in previous_stage3_inputs.values()
+      for item in values}
+  current_fingerprints = set()
+
+  def fresh_entry(workload, split, template, supplied_path):
+    resolved_path = (
+        supplied_path if os.path.isabs(supplied_path)
+        else os.path.join(project_root, supplied_path))
+    resolved_path = os.path.abspath(resolved_path)
+    if not os.path.isfile(resolved_path):
+      raise proactive_stage3.Stage3ContractError(
+          "Fresh {} trace does not exist: {}".format(split, resolved_path))
+    fingerprint = finals_config.fingerprint_file(resolved_path)
+    if fingerprint in previous_fingerprints:
+      raise proactive_stage3.Stage3ContractError(
+          "{} {} reuses a previous Stage-3 input trace.".format(
+              workload, split))
+    if fingerprint in current_fingerprints:
+      raise proactive_stage3.Stage3ContractError(
+          "Fresh Train/Validation traces must all be distinct.")
+    current_fingerprints.add(fingerprint)
+    result = {
+        key: copy.deepcopy(template[key])
+        for key in (
+            "workload", "split", "role", "page_shift",
+            "source_kind", "formal_test")}
+    result["trace_path"] = supplied_path
+    return result
 
   new_entries = []
   for workload in sorted(workloads):
@@ -108,36 +144,11 @@ def main(argv=None):
     if train is None or old_validation is None:
       raise proactive_stage3.Stage3ContractError(
           "{} lacks previous Train/Validation provenance.".format(workload))
-    train_entry = {
-        key: copy.deepcopy(train[key])
-        for key in (
-            "workload", "split", "role", "trace_path", "page_shift",
-            "source_kind", "formal_test")}
-    new_entries.append(train_entry)
-
-    supplied_path = validation_paths[workload]
-    resolved_path = (
-        supplied_path if os.path.isabs(supplied_path)
-        else os.path.join(project_root, supplied_path))
-    resolved_path = os.path.abspath(resolved_path)
-    if not os.path.isfile(resolved_path):
-      raise proactive_stage3.Stage3ContractError(
-          "Fresh Validation trace does not exist: {}".format(resolved_path))
-    fingerprint = finals_config.fingerprint_file(resolved_path)
-    previous_fingerprints = {
-        item
-        for values in previous_stage3_inputs.values()
-        for item in values}
-    if fingerprint in previous_fingerprints:
-      raise proactive_stage3.Stage3ContractError(
-          "{} reuses a previous Stage-3 input trace.".format(workload))
-    validation_entry = {
-        key: copy.deepcopy(old_validation[key])
-        for key in (
-            "workload", "split", "role", "page_shift",
-            "source_kind", "formal_test")}
-    validation_entry["trace_path"] = supplied_path
-    new_entries.append(validation_entry)
+    new_entries.append(fresh_entry(
+        workload, "train", train, train_paths[workload]))
+    new_entries.append(fresh_entry(
+        workload, "validation", old_validation,
+        validation_paths[workload]))
 
   output_path = os.path.abspath(args.output)
   if os.path.exists(output_path):
@@ -151,6 +162,8 @@ def main(argv=None):
       "fresh_validation_attestation": {
           "capacity_rule_version": proactive_stage3.CAPACITY_RULE_VERSION,
           "rule_frozen_before_validation_selection": True,
+          "fresh_train_required": True,
+          "train_used_in_rule_design": False,
           "fresh_validation_required": True,
           "validation_used_in_rule_design": False,
           "formal_test_reused": False,

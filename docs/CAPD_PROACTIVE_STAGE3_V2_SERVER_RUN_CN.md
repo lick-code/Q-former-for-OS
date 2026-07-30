@@ -1,90 +1,49 @@
 # CAPD 主动降级阶段 3：capacity_rule_v2 服务器运行
 
-## 数据前提
+## 数据选择
 
-下面三个 Validation CSV 必须满足：
+不再调用依赖 `/root/qmap-work` 的重新采集脚本。v2 固定使用仓库中现有但未参与本次 v2 规则设计的 `real_workload_suite/5m` Train/Validation 对：
 
-- 在 `capacity_rule_v2` 冻结后才被选作本轮 Validation；
-- 未参与 v1 结果分析或 v2 阈值设计；
-- 不是 formal Test，也不是从 formal Test 重命名或复制得到；
-- CSV 契约为 `pc,address,rw`，4 KiB 页面使用 `page_shift=12`。
+- `parsec_canneal_train.csv` / `parsec_canneal_valid.csv`；
+- `parsec_streamcluster_train.csv` / `parsec_streamcluster_valid.csv`；
+- `parsec_dedup_train.csv` / `parsec_dedup_valid.csv`。
 
-程序会自动拒绝与 `stage3-real-001` 中任一旧 Train/Validation SHA-256 相同的文件。语义上的数据来源仍需实验负责人确认。
-
-## 重新采集独立 Validation
-
-现有 `dataset/processed/finals_v3_official/*/valid.csv` 已参与 v1，`test.csv` 永远禁止使用。若没有在规则冻结后独立采集的 Validation，先在服务器终端执行：
-
-```bash
-set -euo pipefail
-cd "$HOME/Q-former-for-OS"
-
-PHASE="stage3_v2_fresh_validation_001"
-RUN_ID="stage3-v2-fresh-001"
-
-python3 scripts/collect_finals_v3_recollect.py \
-  --phase "$PHASE" \
-  --run-id "$RUN_ID" \
-  --workloads canneal_native_pilot \
-  --max-records 200000 \
-  --skip-records 600000 \
-  --trace-ref-multiplier 100
-
-python3 scripts/collect_finals_v3_recollect.py \
-  --phase "$PHASE" \
-  --run-id "$RUN_ID" \
-  --workloads streamcluster_native_pilot \
-  --max-records 200000 \
-  --skip-records 600000 \
-  --trace-ref-multiplier 100
-
-python3 scripts/collect_finals_v3_recollect.py \
-  --phase "$PHASE" \
-  --run-id "$RUN_ID" \
-  --workloads dedup_native_pilot \
-  --max-records 1000000 \
-  --skip-records 1100000 \
-  --trace-ref-multiplier 100
-```
-
-这会从三个新的程序执行实例采集与旧 Validation 大小和阶段相匹配的独立片段，不读取旧 Test。
+同一 workload 的 Train/Validation 来自同一套 trace 划分，避免跨运行绝对地址使 Working Set 并集失真。任何 `test.csv` 都不使用。程序还会拒绝把 `stage3-real-001` 的旧 Train/Validation 直接复用到 v2。
 
 ## 一次性运行命令
 
-使用上述采集结果：
+所有命令在服务器终端执行；不要在交互终端设置 `set -e`。
 
 ```bash
-set -euo pipefail
 cd "$HOME/Q-former-for-OS"
 
 PREVIOUS_RUN="$PWD/outputs/capd_proactive_calibration/stage3/stage3-real-001"
-V2_MANIFEST="$PWD/stage3_manifest_v2.json"
-
-PHASE="stage3_v2_fresh_validation_001"
-CANNEAL_V2="$PWD/dataset/raw_traces/finals_v3_recollect/$PHASE/canneal_native_pilot.csv"
-STREAMCLUSTER_V2="$PWD/dataset/raw_traces/finals_v3_recollect/$PHASE/streamcluster_native_pilot.csv"
-DEDUP_V2="$PWD/dataset/raw_traces/finals_v3_recollect/$PHASE/dedup_native_pilot.csv"
-
-test -f "$PREVIOUS_RUN/input_manifest.json"
-test -f "$CANNEAL_V2"
-test -f "$STREAMCLUSTER_V2"
-test -f "$DEDUP_V2"
-test ! -e "$V2_MANIFEST"
+V2_MANIFEST="$PWD/stage3_manifest_v2_003.json"
+SUITE="$PWD/dataset/processed/real_workload_suite/5m"
 
 python3 scripts/prepare_capd_proactive_stage3_v2_manifest.py \
   --previous-run-directory "$PREVIOUS_RUN" \
-  --validation "canneal=$CANNEAL_V2" \
-  --validation "streamcluster_pressure=$STREAMCLUSTER_V2" \
-  --validation "dedup_pressure=$DEDUP_V2" \
+  --train "canneal=$SUITE/parsec_canneal_train.csv" \
+  --validation "canneal=$SUITE/parsec_canneal_valid.csv" \
+  --train "streamcluster_pressure=$SUITE/parsec_streamcluster_train.csv" \
+  --validation "streamcluster_pressure=$SUITE/parsec_streamcluster_valid.csv" \
+  --train "dedup_pressure=$SUITE/parsec_dedup_train.csv" \
+  --validation "dedup_pressure=$SUITE/parsec_dedup_valid.csv" \
   --output "$V2_MANIFEST" \
   --project-root "$PWD"
 
-STAGE3_INPUT_MANIFEST="$V2_MANIFEST" \
-STAGE3_RUN_ID="stage3-v2-real-001" \
-bash scripts/validate_capd_proactive_stage3_server.sh
+if [ $? -eq 0 ] && [ -f "$V2_MANIFEST" ]; then
+  export STAGE3_INPUT_MANIFEST="$V2_MANIFEST"
+  export STAGE3_RUN_ID="stage3-v2-real-003"
+  printf 'manifest=%s\nrun_id=%s\n' \
+    "$STAGE3_INPUT_MANIFEST" "$STAGE3_RUN_ID"
+  bash scripts/validate_capd_proactive_stage3_server.sh
+else
+  echo "V2 manifest 生成失败；当前终端保留，请检查上方第一条错误。"
+fi
 ```
 
-不要把旧 `valid.csv` 或任何 Test 文件填入三个 `*_V2` 变量。manifest 生成器拒绝覆盖已有 `stage3_manifest_v2.json`；需要修正路径时请换一个新 manifest 文件名，以保留失败尝试的 provenance。
+manifest 生成器拒绝覆盖已有文件；若 `stage3_manifest_v2_003.json` 已存在，请把 manifest 文件名和 run id 的 `003` 同时换成新的编号。
 
 ## 运行状态
 

@@ -75,6 +75,8 @@ manifest = {
     "fresh_validation_attestation": {
         "capacity_rule_version": "capacity_rule_v2",
         "rule_frozen_before_validation_selection": True,
+        "fresh_train_required": True,
+        "train_used_in_rule_design": False,
         "fresh_validation_required": True,
         "validation_used_in_rule_design": False,
         "formal_test_reused": False,

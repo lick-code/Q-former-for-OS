@@ -189,14 +189,17 @@ cd ~/Q-former-for-OS
 bash scripts/validate_capd_proactive_stage3_server.sh
 ```
 
-新建 v2 manifest。该命令保留旧 run 的 Train 输入、替换全部 Validation，并自动写入上一轮全部 Train/Validation SHA-256 黑名单：
+新建 v2 manifest。Train 和 Validation 必须成对来自同一套未参与 v2 规则设计的数据；生成器自动写入上一轮全部 Train/Validation SHA-256 黑名单：
 
 ```bash
 cd ~/Q-former-for-OS
 python3 scripts/prepare_capd_proactive_stage3_v2_manifest.py \
   --previous-run-directory outputs/capd_proactive_calibration/stage3/stage3-real-001 \
+  --train canneal=/absolute/path/to/fresh/canneal_train.csv \
   --validation canneal=/absolute/path/to/fresh/canneal_validation.csv \
+  --train streamcluster_pressure=/absolute/path/to/fresh/streamcluster_train.csv \
   --validation streamcluster_pressure=/absolute/path/to/fresh/streamcluster_validation.csv \
+  --train dedup_pressure=/absolute/path/to/fresh/dedup_train.csv \
   --validation dedup_pressure=/absolute/path/to/fresh/dedup_validation.csv \
   --output /absolute/path/stage3_manifest_v2.json \
   --project-root "$PWD"

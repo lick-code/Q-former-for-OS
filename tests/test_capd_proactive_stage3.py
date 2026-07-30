@@ -48,6 +48,8 @@ class Stage3Test(unittest.TestCase):
         "fresh_validation_attestation": {
             "capacity_rule_version": "capacity_rule_v2",
             "rule_frozen_before_validation_selection": True,
+            "fresh_train_required": True,
+            "train_used_in_rule_design": False,
             "fresh_validation_required": True,
             "validation_used_in_rule_design": False,
             "formal_test_reused": False,
@@ -117,11 +119,12 @@ class Stage3Test(unittest.TestCase):
     manifest["path_base"] = "manifest_directory"
     for entry in manifest["entries"]:
       path = os.path.join(temporary, entry["trace_path"])
+      offset = 0 if entry["split"] == "train" else 0x2000
       with open(path, "w", encoding="utf-8", newline="") as output_file:
         writer = csv.writer(output_file)
         writer.writerow(["pc", "address", "rw"])
-        writer.writerow(["0x10", "0x1000", "read"])
-        writer.writerow(["0x20", "0x2000", "write"])
+        writer.writerow(["0x10", hex(0x1000 + offset), "read"])
+        writer.writerow(["0x20", hex(0x2000 + offset), "write"])
     manifest_path = os.path.join(temporary, "manifest.json")
     with open(manifest_path, "w", encoding="utf-8") as output_file:
       json.dump(manifest, output_file)

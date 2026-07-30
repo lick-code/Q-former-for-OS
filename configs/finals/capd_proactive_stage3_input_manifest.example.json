@@ -23,6 +23,7 @@
   "fresh_validation_attestation": {
     "capacity_rule_version": "capacity_rule_v2",
     "formal_test_reused": false,
+    "fresh_train_required": true,
     "fresh_validation_required": true,
     "previous_stage3_input_trace_fingerprints": {
       "WORKLOAD_A": [
@@ -30,6 +31,7 @@
       ]
     },
     "rule_frozen_before_validation_selection": true,
+    "train_used_in_rule_design": false,
     "validation_used_in_rule_design": false
   },
   "path_base": "project_root",
