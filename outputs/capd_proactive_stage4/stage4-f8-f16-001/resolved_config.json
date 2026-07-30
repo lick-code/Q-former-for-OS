@@ -1,0 +1,292 @@
+{
+  "allowed_splits": [
+    "train",
+    "validation"
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+  "cost_profile": {
+    "name": "default",
+    "status": "stage2_frozen",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "dataset": {
+    "early_reuse_window": 64,
+    "incomplete_lookahead": "exclude_from_training_and_report",
+    "page_state_dim": 4
+  },
+  "forbidden_splits": [
+    "test"
+  ],
+  "frozen_stage3": {
+    "F_low": 8,
+    "F_target": 16,
+    "b_max": 4,
+    "candidate_source": "lru_tail",
+    "dram_working_set_ratio": 0.2,
+    "fallback_policy": "lru",
+    "selector": "disabled",
+    "trigger_mode": "low_watermark",
+    "working_set_definition": "active_unique_pages_from_train_and_validation"
+  },
+  "grid": {
+    "candidate_size_K": [
+      8,
+      16
+    ],
+    "history_H": [
+      5,
+      10,
+      20
+    ],
+    "label_weights": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        2
+      ],
+      [
+        1,
+        1,
+        4
+      ],
+      [
+        1,
+        1,
+        8
+      ],
+      [
+        1,
+        2,
+        4
+      ],
+      [
+        2,
+        1,
+        4
+      ]
+    ],
+    "lookahead_L": [
+      256,
+      512,
+      1024
+    ]
+  },
+  "output_root": "outputs/capd_proactive_stage4",
+  "provenance": {
+    "candidate_filter": "disabled",
+    "old_finals_v3_artifacts_allowed": false,
+    "selection_rules_predeclared": true,
+    "test_used": false
+  },
+  "reference": {
+    "candidate_size_K": 8,
+    "history_H": 10,
+    "label_weights": [
+      1,
+      1,
+      4
+    ],
+    "lookahead_L": 256
+  },
+  "resolved_inputs": [
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/canneal/train.csv",
+      "role": "training_and_fit",
+      "rw_source": "real trace RW column",
+      "source_interval": {
+        "end": 600000,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "canneal-20260722T125000",
+      "split": "train",
+      "trace_accesses": 600000,
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/canneal/train.csv",
+      "trace_sha256": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+      "workload": "canneal"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/canneal/valid.csv",
+      "role": "parameter_selection",
+      "rw_source": "real trace RW column",
+      "source_interval": {
+        "end": 800000,
+        "start": 600000
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "canneal-20260722T125000",
+      "split": "validation",
+      "trace_accesses": 200000,
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/canneal/valid.csv",
+      "trace_sha256": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142",
+      "workload": "canneal"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "role": "training_and_fit",
+      "rw_source": "real trace RW column",
+      "source_interval": {
+        "end": 600000,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "streamcluster_pressure-20260722T133000",
+      "split": "train",
+      "trace_accesses": 600000,
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/streamcluster_pressure/train.csv",
+      "trace_sha256": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv",
+      "role": "parameter_selection",
+      "rw_source": "real trace RW column",
+      "source_interval": {
+        "end": 800000,
+        "start": 600000
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "streamcluster_pressure-20260722T133000",
+      "split": "validation",
+      "trace_accesses": 200000,
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/streamcluster_pressure/valid.csv",
+      "trace_sha256": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/dedup_pressure/train.csv",
+      "role": "training_and_fit",
+      "rw_source": "real trace RW column",
+      "source_interval": {
+        "end": 1000000,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "dedup_pressure-20260722T131403",
+      "split": "train",
+      "trace_accesses": 1000000,
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/dedup_pressure/train.csv",
+      "trace_sha256": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+      "workload": "dedup_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/dedup_pressure/valid.csv",
+      "role": "parameter_selection",
+      "rw_source": "real trace RW column",
+      "source_interval": {
+        "end": 2000000,
+        "start": 1000000
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "dedup_pressure-20260722T131403",
+      "split": "validation",
+      "trace_accesses": 1000000,
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/finals_v3_official/dedup_pressure/valid.csv",
+      "trace_sha256": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8",
+      "workload": "dedup_pressure"
+    }
+  ],
+  "run": {
+    "code": {
+      "commit": "7f12282a9132a1dd41a87cb0ffb4c124f7392407",
+      "dirty_diff_sha256": "f7a1f2a85cc4e8dc95e55eada39fd033dfd0ff39fb146a8a2b4190ad8d77b798",
+      "dirty_status_sha256": "614bbfa350379b217d419db2e0796025302bf3f18f5fece46eb128c4523737bf",
+      "dirty_worktree": true
+    },
+    "created_at": "2026-07-30T08:15:50.282277+00:00",
+    "input_manifest": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/manifests/stage4-f8-f16-001.json",
+    "input_manifest_sha256": "d19d070e950d1037ccdcba64037fd521afd05aa5f63765f264bea3c3dd40b3b8",
+    "output_directory": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-001",
+    "project_root": "/home/likc/Q-former-for-OS",
+    "run_id": "stage4-f8-f16-001"
+  },
+  "schema_name": "capd_proactive_stage4",
+  "schema_version": "capd_proactive_stage4_v1_0",
+  "seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "selection_rule": {
+    "global_across_workloads": true,
+    "near_best_relative_tolerance": 0.01,
+    "nvm_write_relative_tolerance": 0.05,
+    "phase_order": [
+      "lookahead_L",
+      "label_weights",
+      "candidate_size_K_and_history_H"
+    ],
+    "primary_metric": "validation_macro_weighted_cost_per_access",
+    "test_used": false,
+    "tie_break_order": [
+      "lower_worst_workload_regression",
+      "lower_nvm_write_regression",
+      "higher_ndcg_at_b_t",
+      "higher_top_b_t_overlap",
+      "lower_top_b_t_regret",
+      "lower_amortized_latency",
+      "lower_complexity",
+      "lower_macro_weighted_cost_within_near_best_band",
+      "lexical_experiment_id"
+    ],
+    "worst_workload_relative_tolerance": 0.05
+  },
+  "stage_status": "stage4_implemented_awaiting_training_inputs",
+  "training": {
+    "approx_ndcg_alpha": 10.0,
+    "batch_size": 32,
+    "checkpoint_rule": "minimum_validation_loss_only",
+    "checkpoint_tie_break": "earliest_epoch",
+    "context_mode": "cross_attention",
+    "dataset_trajectory_policy": "proactive_lru",
+    "deterministic_algorithms": true,
+    "epochs": 10,
+    "global_model_across_workloads": true,
+    "learning_rate": 0.0001,
+    "position_encoding": "none",
+    "shared_page_embedding": false,
+    "use_page_id_embedding": true
+  },
+  "working_set": {
+    "canneal": {
+      "dram_capacity_pages": 512,
+      "train_unique_pages": 2239,
+      "union_working_set_pages": 2560,
+      "validation_unique_pages": 1096
+    },
+    "dedup_pressure": {
+      "dram_capacity_pages": 1389,
+      "train_unique_pages": 4466,
+      "union_working_set_pages": 6945,
+      "validation_unique_pages": 2528
+    },
+    "streamcluster_pressure": {
+      "dram_capacity_pages": 1861,
+      "train_unique_pages": 7316,
+      "union_working_set_pages": 9303,
+      "validation_unique_pages": 2685
+    }
+  }
+}
