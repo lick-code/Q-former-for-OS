@@ -1,0 +1,38 @@
+[
+  {
+    "overlap_pages": 40,
+    "page_size_bytes": 4096,
+    "schema_version": "capd_proactive_stage3_result_v2_0",
+    "trace_accesses_train": 80000,
+    "trace_accesses_validation": 10000,
+    "train_unique_pages": 156,
+    "train_validation_union_pages": 156,
+    "validation_unique_pages": 40,
+    "working_set_definition": "active_unique_pages_from_train_and_validation",
+    "workload": "canneal"
+  },
+  {
+    "overlap_pages": 5,
+    "page_size_bytes": 4096,
+    "schema_version": "capd_proactive_stage3_result_v2_0",
+    "trace_accesses_train": 80000,
+    "trace_accesses_validation": 10000,
+    "train_unique_pages": 111,
+    "train_validation_union_pages": 116,
+    "validation_unique_pages": 10,
+    "working_set_definition": "active_unique_pages_from_train_and_validation",
+    "workload": "dedup_pressure"
+  },
+  {
+    "overlap_pages": 40,
+    "page_size_bytes": 4096,
+    "schema_version": "capd_proactive_stage3_result_v2_0",
+    "trace_accesses_train": 80000,
+    "trace_accesses_validation": 10000,
+    "train_unique_pages": 155,
+    "train_validation_union_pages": 155,
+    "validation_unique_pages": 40,
+    "working_set_definition": "active_unique_pages_from_train_and_validation",
+    "workload": "streamcluster_pressure"
+  }
+]

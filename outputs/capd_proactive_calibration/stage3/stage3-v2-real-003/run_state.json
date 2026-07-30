@@ -1,0 +1,48 @@
+{
+  "completed_replay_tasks": 24,
+  "created_at": "2026-07-30T03:09:13Z",
+  "finished_at": "2026-07-30T03:09:30Z",
+  "identity": {
+    "config_fingerprint": "e537607cb32151df8070b2b888957f5beb23c618d677c36bb89730ccde27762a",
+    "input_fingerprints": [
+      [
+        "canneal",
+        "train",
+        "9040c0b5bcbdc5e857a64c7730514656e8c4d6f20cc13cf1b858be863542b83a"
+      ],
+      [
+        "canneal",
+        "validation",
+        "24e39faa0e6493ced6d8ee68b8e7eb289885b9745bc025eb3fb310cfeab24d63"
+      ],
+      [
+        "dedup_pressure",
+        "train",
+        "1f457a0925495261e9a2729758f0053d74a8ae1c858eb74251a69fb737691cc1"
+      ],
+      [
+        "dedup_pressure",
+        "validation",
+        "3c97a0a1af3901925033180db8e4e5d01b87816d813a76489b1896997dc1691e"
+      ],
+      [
+        "streamcluster_pressure",
+        "train",
+        "4cb30e942931976b261b46d35d3a2b8ad579522301bec3d3e196cdaa97fb48d1"
+      ],
+      [
+        "streamcluster_pressure",
+        "validation",
+        "37522359018f256ed702ef8ba243eb4b59be6fefee70cda3a146b37b62c43f9c"
+      ]
+    ],
+    "manifest_fingerprint": "a198eaaf1d9f74cba919f66b4c0df0589082c0871e05ca013df37467ecec3b42",
+    "run_id": "stage3-v2-real-003",
+    "stage0_config_fingerprint": "8ad983341f2780610350e0b34fa5da47f7d646403caee45cf7408a44ee47abfe",
+    "stage2_config_fingerprint": "9e4aa8840b6907811f7484cc885ac8a4dca42325211adaffe6587615aff39137"
+  },
+  "last_task_id": "reactive-c42c7fe1fe58345373bd",
+  "schema_version": "capd_proactive_stage3_result_v2_0",
+  "status": "completed",
+  "updated_at": "2026-07-30T03:09:30Z"
+}

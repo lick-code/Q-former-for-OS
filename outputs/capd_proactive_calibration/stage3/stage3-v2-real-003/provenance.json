@@ -1,0 +1,199 @@
+{
+  "candidate_filter": "disabled",
+  "capacity_rule_version": "capacity_rule_v2",
+  "capd_used_for_selection": false,
+  "code_commit": "66654dd15b7090669d48628b7fabc4be12948519",
+  "completed_replay_tasks": 24,
+  "config_fingerprint": "e537607cb32151df8070b2b888957f5beb23c618d677c36bb89730ccde27762a",
+  "created_at": "2026-07-30T03:09:30Z",
+  "dirty_diff_fingerprint": "c11aa7e48139cb1cb0002add2fdd05e6dc91f1a70bc903c19adb74960aa794c0",
+  "dirty_worktree": true,
+  "fresh_validation_attestation": {
+    "capacity_rule_version": "capacity_rule_v2",
+    "formal_test_reused": false,
+    "fresh_train_required": true,
+    "fresh_validation_required": true,
+    "previous_stage3_input_trace_fingerprints": {
+      "canneal": [
+        "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+        "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142"
+      ],
+      "dedup_pressure": [
+        "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+        "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8"
+      ],
+      "streamcluster_pressure": [
+        "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+        "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+      ]
+    },
+    "rule_frozen_before_validation_selection": true,
+    "train_used_in_rule_design": false,
+    "validation_used_in_rule_design": false
+  },
+  "input_artifacts": [
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_canneal_train.csv",
+      "role": "training_and_fit",
+      "rw_source": "real trace RW column",
+      "source_kind": "raw_access_trace",
+      "split": "train",
+      "trace_accesses": 80000,
+      "trace_fingerprint": "9040c0b5bcbdc5e857a64c7730514656e8c4d6f20cc13cf1b858be863542b83a",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_canneal_train.csv",
+      "workload": "canneal"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_canneal_valid.csv",
+      "role": "parameter_selection",
+      "rw_source": "real trace RW column",
+      "source_kind": "raw_access_trace",
+      "split": "validation",
+      "trace_accesses": 10000,
+      "trace_fingerprint": "24e39faa0e6493ced6d8ee68b8e7eb289885b9745bc025eb3fb310cfeab24d63",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_canneal_valid.csv",
+      "workload": "canneal"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_dedup_train.csv",
+      "role": "training_and_fit",
+      "rw_source": "real trace RW column",
+      "source_kind": "raw_access_trace",
+      "split": "train",
+      "trace_accesses": 80000,
+      "trace_fingerprint": "1f457a0925495261e9a2729758f0053d74a8ae1c858eb74251a69fb737691cc1",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_dedup_train.csv",
+      "workload": "dedup_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_dedup_valid.csv",
+      "role": "parameter_selection",
+      "rw_source": "real trace RW column",
+      "source_kind": "raw_access_trace",
+      "split": "validation",
+      "trace_accesses": 10000,
+      "trace_fingerprint": "3c97a0a1af3901925033180db8e4e5d01b87816d813a76489b1896997dc1691e",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_dedup_valid.csv",
+      "workload": "dedup_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_streamcluster_train.csv",
+      "role": "training_and_fit",
+      "rw_source": "real trace RW column",
+      "source_kind": "raw_access_trace",
+      "split": "train",
+      "trace_accesses": 80000,
+      "trace_fingerprint": "4cb30e942931976b261b46d35d3a2b8ad579522301bec3d3e196cdaa97fb48d1",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_streamcluster_train.csv",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "resolved_trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_streamcluster_valid.csv",
+      "role": "parameter_selection",
+      "rw_source": "real trace RW column",
+      "source_kind": "raw_access_trace",
+      "split": "validation",
+      "trace_accesses": 10000,
+      "trace_fingerprint": "37522359018f256ed702ef8ba243eb4b59be6fefee70cda3a146b37b62c43f9c",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_streamcluster_valid.csv",
+      "workload": "streamcluster_pressure"
+    }
+  ],
+  "manifest_fingerprint": "a198eaaf1d9f74cba919f66b4c0df0589082c0871e05ca013df37467ecec3b42",
+  "output_artifacts": [
+    {
+      "path": "bmax_results.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "bmax_summary.csv",
+      "sha256": "954300fc8beda3444ab266ee3620a9da1c03106531d21a5939cbc93c84fe4573",
+      "size_bytes": 279
+    },
+    {
+      "path": "burst_statistics.json",
+      "sha256": "dd58820f1a832aaccc5ede1ba05102ebbeba89f0cc1e2ecf95121ad064b3baa0",
+      "size_bytes": 64160
+    },
+    {
+      "path": "burst_windows.jsonl",
+      "sha256": "72ea782864bef1f822f6fc401d2cfab3f659240d875be369d2c9355ed8e6ec20",
+      "size_bytes": 6330862
+    },
+    {
+      "path": "capacity_pressure_audit.json",
+      "sha256": "7b41302319442f860df3dc14b8d1f6b2993164bcfbe45f72e37ca5eed356e08c",
+      "size_bytes": 77883
+    },
+    {
+      "path": "freeze_candidate.json",
+      "sha256": "8b9cefd0f7c2348e57667bdd82cbd2c6bc5660487115e4feceae8ae81fb0cc95",
+      "size_bytes": 470
+    },
+    {
+      "path": "input_manifest.json",
+      "sha256": "d099e84f252ae5a38b9a0854d8c937db71809644054fc0840af85d3014d03b74",
+      "size_bytes": 7002
+    },
+    {
+      "path": "reactive_results.jsonl",
+      "sha256": "c840a33e4ab0171fdab8fe14ae32d43762a526f66c91ecbf2030c60bf67255e2",
+      "size_bytes": 41783
+    },
+    {
+      "path": "report.md",
+      "sha256": "78e548c01793e3234511b23472d7ccffb75071f2578e9c7cfede57ce2c843983",
+      "size_bytes": 1064
+    },
+    {
+      "path": "resolved_config.json",
+      "sha256": "710b987f1d88dde4b81213c0e8e98d9106c8b933c436b34d3b0d60ed0c71dba8",
+      "size_bytes": 6517
+    },
+    {
+      "path": "run_state.json",
+      "sha256": "7c673f451e3ccb9df7eab114a113f6700c9ba58042b03ee6ea8d2e3aa5f24777",
+      "size_bytes": 1598
+    },
+    {
+      "path": "selection_decision.json",
+      "sha256": "2f9e56d13da223ceb4d4f53f8a02addd6a0ebb977618573fed3c64f4a2bf1e6b",
+      "size_bytes": 1270
+    },
+    {
+      "path": "watermark_results.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "watermark_summary.csv",
+      "sha256": "5264be17670d4a8866109819aaa1393314914c07e80d26a0b2230d2699f58530",
+      "size_bytes": 382
+    },
+    {
+      "path": "working_set_summary.json",
+      "sha256": "b5af397b34fc4994821ed3082bc70ae5200d2d8e7ba4343a00e59f5c350c96f1",
+      "size_bytes": 1251
+    }
+  ],
+  "resolved_config_fingerprint": "8ee3674feb03bb179bf7baee09fec28b253443b1e172f04cacb2544ee1bd1342",
+  "resumed_from_checkpoints": false,
+  "run_id": "stage3-v2-real-003",
+  "schema_version": "capd_proactive_stage3_result_v2_0",
+  "stage0_config_fingerprint": "8ad983341f2780610350e0b34fa5da47f7d646403caee45cf7408a44ee47abfe",
+  "stage2_config_fingerprint": "9e4aa8840b6907811f7484cc885ac8a4dca42325211adaffe6587615aff39137",
+  "test_used": false
+}

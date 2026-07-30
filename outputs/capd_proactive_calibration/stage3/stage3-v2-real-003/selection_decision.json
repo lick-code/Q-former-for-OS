@@ -1,0 +1,47 @@
+{
+  "b_max": {
+    "ranking": [],
+    "requires_user_confirmation": true,
+    "selected_b_max": null,
+    "status": "blocked_no_feasible_bmax"
+  },
+  "candidate_bound_invariance": {
+    "decisions": {
+      "16": {
+        "selected_b_max": null,
+        "selected_watermark_label": null
+      },
+      "8": {
+        "selected_b_max": null,
+        "selected_watermark_label": null
+      }
+    },
+    "enters_formal_candidate_size_K": false,
+    "proxy_values": [
+      8,
+      16
+    ],
+    "status": "failed_proxy_K_changes_selection"
+  },
+  "capacity": {
+    "reason": "neither_capacity_profile_passed_predeclared_capacity_rule_v2",
+    "recommended_profile": null,
+    "recommended_ratios": null,
+    "requires_user_confirmation": true,
+    "status": "stage3_capacity_not_freezable"
+  },
+  "capacity_rule_version": "capacity_rule_v2",
+  "capd_used_for_selection": false,
+  "fresh_validation_attested": true,
+  "proactive_calibration_executed": false,
+  "schema_version": "capd_proactive_stage3_result_v2_0",
+  "stage4_candidate_status": "pending",
+  "test_used": false,
+  "watermark": {
+    "ranking": [],
+    "requires_user_confirmation": true,
+    "selected_label": null,
+    "selected_watermark": null,
+    "status": "blocked_no_globally_legal_watermark"
+  }
+}

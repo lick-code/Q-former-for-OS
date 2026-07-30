@@ -11,53 +11,53 @@ test_config_is_predeclared_and_cross_stage_consistent (test_capd_proactive_stage
 test_early_reuse_zero_denominator_is_null (test_capd_proactive_stage3.Stage3Test) ... ok
 test_empty_working_set_fails (test_capd_proactive_stage3.Stage3Test) ... ok
 test_fallback_profile_drives_fresh_proactive_matrix (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=480 ratio=0.2
-[stage3] done reactive-8fe59dd1f67c75f243a1 0.059s completed=1
+[stage3] done reactive-8fe59dd1f67c75f243a1 0.055s completed=1
 [stage3] start reactive workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done reactive-6e82d5538b02334d6635 0.011s completed=2
+[stage3] done reactive-6e82d5538b02334d6635 0.013s completed=2
 [stage3] start reactive workload=synthetic_locality split=train capacity=960 ratio=0.4
-[stage3] done reactive-7dba43c1dba404114390 0.046s completed=3
+[stage3] done reactive-7dba43c1dba404114390 0.053s completed=3
 [stage3] start reactive workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done reactive-0ebd488f9897dc60bb60 0.010s completed=4
+[stage3] done reactive-0ebd488f9897dc60bb60 0.014s completed=4
 [stage3] start reactive workload=synthetic_locality split=train capacity=1440 ratio=0.6
-[stage3] done reactive-7f8ef2156edc8b3f8f6a 0.044s completed=5
+[stage3] done reactive-7f8ef2156edc8b3f8f6a 0.066s completed=5
 [stage3] start reactive workload=synthetic_locality split=validation capacity=1440 ratio=0.6
-[stage3] done reactive-9298da2fca8c60f70ea7 0.010s completed=6
+[stage3] done reactive-9298da2fca8c60f70ea7 0.015s completed=6
 [stage3] start reactive workload=synthetic_locality split=train capacity=240 ratio=0.1
-[stage3] done reactive-20c936de31ca97e32799 0.051s completed=7
+[stage3] done reactive-20c936de31ca97e32799 0.065s completed=7
 [stage3] start reactive workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done reactive-e016917ff96bcb2d6b39 0.012s completed=8
+[stage3] done reactive-e016917ff96bcb2d6b39 0.013s completed=8
 [stage3] checkpoint reuse reactive-8fe59dd1f67c75f243a1
 [stage3] checkpoint reuse reactive-6e82d5538b02334d6635
 [stage3] checkpoint reuse reactive-7dba43c1dba404114390
 [stage3] checkpoint reuse reactive-0ebd488f9897dc60bb60
 [stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done watermark-5dd11486e4e582aef3e8 0.027s completed=9
+[stage3] done watermark-5dd11486e4e582aef3e8 0.029s completed=9
 [stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done watermark-afe6c74241d45cde7538 0.025s completed=10
+[stage3] done watermark-afe6c74241d45cde7538 0.028s completed=10
 [stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done watermark-1f4768e2c193cbb8c991 0.024s completed=11
+[stage3] done watermark-1f4768e2c193cbb8c991 0.026s completed=11
 [stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done watermark-9e27489caee7af96e700 0.018s completed=12
+[stage3] done watermark-9e27489caee7af96e700 0.019s completed=12
 [stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
 [stage3] done watermark-caadde22b818b828f6f7 0.018s completed=13
 [stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done watermark-84c7bbd328d854a04eb9 0.019s completed=14
+[stage3] done watermark-84c7bbd328d854a04eb9 0.018s completed=14
 [stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done watermark-984e181dfd5a6c371699 0.012s completed=15
+[stage3] done watermark-984e181dfd5a6c371699 0.011s completed=15
 [stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
 [stage3] done watermark-31a89d07a8ce26d5689b 0.011s completed=16
 [stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
 [stage3] done watermark-0284dff566fe0bc56bf5 0.011s completed=17
 [stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done watermark-dd75df317c7a9d7d4bd5 0.033s completed=18
+[stage3] done watermark-dd75df317c7a9d7d4bd5 0.034s completed=18
 [stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done watermark-2e7a2adbc8f292df2151 0.036s completed=19
+[stage3] done watermark-2e7a2adbc8f292df2151 0.035s completed=19
 [stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done watermark-beb8d037620fcdec8b49 0.031s completed=20
+[stage3] done watermark-beb8d037620fcdec8b49 0.035s completed=20
 [stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done watermark-9d2a0e4b177db708716d 0.021s completed=21
+[stage3] done watermark-9d2a0e4b177db708716d 0.023s completed=21
 [stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done watermark-193c3b5860ae4b446eb5 0.022s completed=22
+[stage3] done watermark-193c3b5860ae4b446eb5 0.021s completed=22
 [stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
 [stage3] done watermark-3a82fc55a2e4cacea45a 0.022s completed=23
 [stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
@@ -67,82 +67,82 @@ test_fallback_profile_drives_fresh_proactive_matrix (test_capd_proactive_stage3.
 [stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
 [stage3] done watermark-079372a9b17fe5c7d00f 0.011s completed=26
 [stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done bmax-d1a81f2232fd650366db 0.024s completed=27
+[stage3] done bmax-d1a81f2232fd650366db 0.025s completed=27
 [stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
 [stage3] done bmax-d621cdf87271ca9dd49b 0.019s completed=28
 [stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done bmax-08805214cdb6ccda1492 0.015s completed=29
+[stage3] done bmax-08805214cdb6ccda1492 0.020s completed=29
 [stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done bmax-5a308eae757f483b55fa 0.025s completed=30
+[stage3] done bmax-5a308eae757f483b55fa 0.019s completed=30
 [stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done bmax-e79ae795467782d99183 0.020s completed=31
+[stage3] done bmax-e79ae795467782d99183 0.015s completed=31
 [stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done bmax-9f08e61e87c3187599dc 0.018s completed=32
+[stage3] done bmax-9f08e61e87c3187599dc 0.014s completed=32
 [stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done bmax-25f4d46f3eaa16ef9b59 0.013s completed=33
+[stage3] done bmax-25f4d46f3eaa16ef9b59 0.012s completed=33
 [stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done bmax-487001a3d3bd116f3ba2 0.012s completed=34
+[stage3] done bmax-487001a3d3bd116f3ba2 0.011s completed=34
 [stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done bmax-cb693733080198d62127 0.012s completed=35
+[stage3] done bmax-cb693733080198d62127 0.011s completed=35
 [stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
-[stage3] done bmax-995356ff38ee669e98b9 0.032s completed=36
+[stage3] done bmax-995356ff38ee669e98b9 0.031s completed=36
 [stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
 [stage3] done bmax-01f25285d0efa882282a 0.022s completed=37
 [stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
 [stage3] done bmax-c098944f002318d1a390 0.018s completed=38
 [stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
-[stage3] done bmax-00ab7f59eb1363f74946 0.022s completed=39
+[stage3] done bmax-00ab7f59eb1363f74946 0.023s completed=39
 [stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
 [stage3] done bmax-81f9a5cf68e5b82794b3 0.017s completed=40
 [stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
 [stage3] done bmax-0cfe4b9766a2305bb12f 0.014s completed=41
 [stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done bmax-e02df60b985734e23070 0.011s completed=42
+[stage3] done bmax-e02df60b985734e23070 0.012s completed=42
 [stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done bmax-6ba64883c6c5c9f2e153 0.010s completed=43
+[stage3] done bmax-6ba64883c6c5c9f2e153 0.012s completed=43
 [stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
-[stage3] done bmax-1bff5d6efc0e5073731e 0.011s completed=44
+[stage3] done bmax-1bff5d6efc0e5073731e 0.012s completed=44
 ok
 test_interrupted_run_resumes_and_matches_clean_run (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
 [stage3] done reactive-bc579b7f80d4f7764ddf 0.004s completed=1
 [stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
-[stage3] done reactive-04e7bcbe73f110c78eeb 0.003s completed=2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.004s completed=2
 [stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
-[stage3] done reactive-d83b0454d04902e3e883 0.003s completed=3
+[stage3] done reactive-d83b0454d04902e3e883 0.004s completed=3
 [stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
 [stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
 [stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
 [stage3] checkpoint reuse reactive-d83b0454d04902e3e883
 [stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
-[stage3] done reactive-8082ac34a5acd424517b 0.004s completed=4
+[stage3] done reactive-8082ac34a5acd424517b 0.006s completed=4
 [stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
-[stage3] done reactive-f82bcd10ec75854d0ebb 0.003s completed=5
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.006s completed=5
 [stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
-[stage3] done reactive-8bbe8b5557b71b8313cc 0.003s completed=6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.006s completed=6
 [stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
-[stage3] done reactive-080c825f9cfd11bb8c64 0.003s completed=7
+[stage3] done reactive-080c825f9cfd11bb8c64 0.006s completed=7
 [stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
-[stage3] done reactive-21151477cd2df24f4ffe 0.003s completed=8
+[stage3] done reactive-21151477cd2df24f4ffe 0.005s completed=8
 [stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
 [stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
 [stage3] checkpoint reuse reactive-d83b0454d04902e3e883
 [stage3] checkpoint reuse reactive-8082ac34a5acd424517b
 [stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
-[stage3] done reactive-bc579b7f80d4f7764ddf 0.004s completed=1
+[stage3] done reactive-bc579b7f80d4f7764ddf 0.007s completed=1
 [stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
-[stage3] done reactive-04e7bcbe73f110c78eeb 0.003s completed=2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.007s completed=2
 [stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
-[stage3] done reactive-d83b0454d04902e3e883 0.003s completed=3
+[stage3] done reactive-d83b0454d04902e3e883 0.007s completed=3
 [stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
-[stage3] done reactive-8082ac34a5acd424517b 0.004s completed=4
+[stage3] done reactive-8082ac34a5acd424517b 0.006s completed=4
 [stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
-[stage3] done reactive-f82bcd10ec75854d0ebb 0.003s completed=5
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.008s completed=5
 [stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
-[stage3] done reactive-8bbe8b5557b71b8313cc 0.004s completed=6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.010s completed=6
 [stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
-[stage3] done reactive-080c825f9cfd11bb8c64 0.003s completed=7
+[stage3] done reactive-080c825f9cfd11bb8c64 0.005s completed=7
 [stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
-[stage3] done reactive-21151477cd2df24f4ffe 0.003s completed=8
+[stage3] done reactive-21151477cd2df24f4ffe 0.005s completed=8
 [stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
 [stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
 [stage3] checkpoint reuse reactive-d83b0454d04902e3e883
@@ -152,21 +152,21 @@ test_lru_order_matches_legacy_list_operations (test_capd_proactive_stage3.Stage3
 test_manifest_loader_parses_raw_pages_and_fingerprints (test_capd_proactive_stage3.Stage3Test) ... ok
 test_nearest_rank_is_deterministic (test_capd_proactive_stage3.Stage3Test) ... ok
 test_real_manifest_stops_at_results_ready_not_verified (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
-[stage3] done reactive-5a04cce21b77dfcce74c 0.014s completed=1
+[stage3] done reactive-5a04cce21b77dfcce74c 0.022s completed=1
 [stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
-[stage3] done reactive-d081a9c25f7e9cd9e18f 0.013s completed=2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.017s completed=2
 [stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
-[stage3] done reactive-bbe4105eaee398cc9275 0.013s completed=3
+[stage3] done reactive-bbe4105eaee398cc9275 0.017s completed=3
 [stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
-[stage3] done reactive-9f96b7486220d56e5544 0.013s completed=4
+[stage3] done reactive-9f96b7486220d56e5544 0.017s completed=4
 [stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
-[stage3] done reactive-5c2671b8009ed656c078 0.013s completed=5
+[stage3] done reactive-5c2671b8009ed656c078 0.017s completed=5
 [stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
-[stage3] done reactive-bc9ce073ed1d1a67309c 0.013s completed=6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.017s completed=6
 [stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
-[stage3] done reactive-aeb2b194a3458aed5439 0.013s completed=7
+[stage3] done reactive-aeb2b194a3458aed5439 0.017s completed=7
 [stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
-[stage3] done reactive-f5ce201e6c3a58b6f41e 0.013s completed=8
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.017s completed=8
 [stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
 [stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
 [stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
@@ -175,21 +175,21 @@ ok
 test_stage2_must_be_verified (test_capd_proactive_stage3.Stage3Test) ... ok
 test_stage3_compact_replay_matches_full_replay_exactly (test_capd_proactive_stage3.Stage3Test) ... ok
 test_synthetic_end_to_end_is_awaiting_real_inputs (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
-[stage3] done reactive-5a04cce21b77dfcce74c 0.013s completed=1
+[stage3] done reactive-5a04cce21b77dfcce74c 0.018s completed=1
 [stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
-[stage3] done reactive-d081a9c25f7e9cd9e18f 0.014s completed=2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.018s completed=2
 [stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
-[stage3] done reactive-bbe4105eaee398cc9275 0.013s completed=3
+[stage3] done reactive-bbe4105eaee398cc9275 0.017s completed=3
 [stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
-[stage3] done reactive-9f96b7486220d56e5544 0.013s completed=4
+[stage3] done reactive-9f96b7486220d56e5544 0.017s completed=4
 [stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
-[stage3] done reactive-5c2671b8009ed656c078 0.013s completed=5
+[stage3] done reactive-5c2671b8009ed656c078 0.017s completed=5
 [stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
-[stage3] done reactive-bc9ce073ed1d1a67309c 0.013s completed=6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.017s completed=6
 [stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
-[stage3] done reactive-aeb2b194a3458aed5439 0.013s completed=7
+[stage3] done reactive-aeb2b194a3458aed5439 0.018s completed=7
 [stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
-[stage3] done reactive-f5ce201e6c3a58b6f41e 0.013s completed=8
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.017s completed=8
 [stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
 [stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
 [stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
@@ -201,7 +201,7 @@ test_watermark_tie_prefers_smaller_reserve (test_capd_proactive_stage3.Stage3Tes
 test_working_set_uses_train_validation_union (test_capd_proactive_stage3.Stage3Test) ... ok
 
 ----------------------------------------------------------------------
-Ran 22 tests in 1.904s
+Ran 22 tests in 2.076s
 
 OK
 [stage3] run frozen stage-0/1/2 regressions
@@ -222,7 +222,7 @@ test_test_cannot_be_used_for_parameter_selection (test_capd_proactive_config.Pro
 test_unfrozen_formal_test_request_is_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.005s
+Ran 15 tests in 0.007s
 
 OK
 test_F_at_or_above_low_does_not_trigger (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
@@ -246,7 +246,7 @@ test_stage1_does_not_compute_cost_or_require_checkpoint (test_capd_proactive_rep
 test_summary_matches_raw_events (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
 
 ----------------------------------------------------------------------
-Ran 19 tests in 0.041s
+Ran 19 tests in 0.042s
 
 OK
 test_cross_stage_contracts_are_frozen_and_consistent (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
@@ -254,7 +254,7 @@ test_every_stage1_fixture_summary_recomputes_all_profiles (test_capd_stage1_stag
 test_stage1_adapter_rejects_wrong_or_already_costed_summary (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
 
 ----------------------------------------------------------------------
-Ran 3 tests in 0.015s
+Ran 3 tests in 0.019s
 
 OK
 test_all_profiles_reuse_identical_counts (test_capd_proactive_cost.CostArithmeticTest) ... ok
@@ -287,22 +287,22 @@ test_partial_breakdown_never_silently_passes (test_capd_proactive_cost.RawEventC
 test_total_and_complete_breakdown_must_match (test_capd_proactive_cost.RawEventContractTest) ... ok
 
 ----------------------------------------------------------------------
-Ran 28 tests in 0.031s
+Ran 28 tests in 0.030s
 
 OK
 [stage3] compile without writing into the repository
 [stage3] create isolated synthetic Train/Validation traces
 [stage3] run the complete synthetic matrix twice
 [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
-[stage3] done reactive-5a04cce21b77dfcce74c 0.020s completed=1
+[stage3] done reactive-5a04cce21b77dfcce74c 0.017s completed=1
 [stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
-[stage3] done reactive-d081a9c25f7e9cd9e18f 0.015s completed=2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.017s completed=2
 [stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
 [stage3] done reactive-bbe4105eaee398cc9275 0.016s completed=3
 [stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
 [stage3] done reactive-9f96b7486220d56e5544 0.016s completed=4
 [stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
-[stage3] done reactive-5c2671b8009ed656c078 0.015s completed=5
+[stage3] done reactive-5c2671b8009ed656c078 0.016s completed=5
 [stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
 [stage3] done reactive-bc9ce073ed1d1a67309c 0.016s completed=6
 [stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
@@ -313,18 +313,18 @@ OK
 [stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
 [stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
 [stage3] checkpoint reuse reactive-9f96b7486220d56e5544
-/tmp/capd-stage3-Vw0wPr/outputs/stage3/synthetic-a
+/tmp/capd-stage3-SeOcNZ/outputs/stage3/synthetic-a
 STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS
 [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
-[stage3] done reactive-5a04cce21b77dfcce74c 0.021s completed=1
+[stage3] done reactive-5a04cce21b77dfcce74c 0.016s completed=1
 [stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
-[stage3] done reactive-d081a9c25f7e9cd9e18f 0.021s completed=2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.017s completed=2
 [stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
-[stage3] done reactive-bbe4105eaee398cc9275 0.021s completed=3
+[stage3] done reactive-bbe4105eaee398cc9275 0.018s completed=3
 [stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
-[stage3] done reactive-9f96b7486220d56e5544 0.021s completed=4
+[stage3] done reactive-9f96b7486220d56e5544 0.019s completed=4
 [stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
-[stage3] done reactive-5c2671b8009ed656c078 0.018s completed=5
+[stage3] done reactive-5c2671b8009ed656c078 0.017s completed=5
 [stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
 [stage3] done reactive-bc9ce073ed1d1a67309c 0.016s completed=6
 [stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
@@ -335,7 +335,7 @@ STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS
 [stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
 [stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
 [stage3] checkpoint reuse reactive-9f96b7486220d56e5544
-/tmp/capd-stage3-Vw0wPr/outputs/stage3/synthetic-b
+/tmp/capd-stage3-SeOcNZ/outputs/stage3/synthetic-b
 STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS
 [stage3] verify deterministic decisions, complete artifacts, and pending gates
 [stage3] verify formal Test input is rejected
@@ -344,12 +344,75 @@ Traceback (most recent call last):
     raise SystemExit(main())
   File "scripts/run_capd_proactive_stage3_calibration.py", line 55, in main
     args.input_manifest, args.project_root)
-  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 528, in load_inputs
+  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 533, in load_inputs
     manifest = validate_manifest(load_json(manifest_path))
-  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 479, in validate_manifest
+  File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 484, in validate_manifest
     _require(entry["split"] in ALLOWED_SPLITS, "{} split must be Train/Validation.".format(context))
   File "/home/likc/Q-former-for-OS/qmap/proactive_stage3.py", line 219, in _require
     raise Stage3ContractError(message)
 qmap.proactive_stage3.Stage3ContractError: entries[1] split must be Train/Validation.
 [stage3] repository whitespace validation
-STAGE3_IMPLEMENTED_AWAITING_CALIBRATION_INPUTS
+[stage3] run real Train/Validation calibration run_id=stage3-v2-real-003
+[stage3] start reactive workload=canneal split=train capacity=32 ratio=0.2
+[stage3] done reactive-ee8536ea04f17fcdc85f 1.195s completed=1
+[stage3] start reactive workload=canneal split=validation capacity=32 ratio=0.2
+[stage3] done reactive-8c94b82a730d1aee586b 0.166s completed=2
+[stage3] start reactive workload=canneal split=train capacity=63 ratio=0.4
+[stage3] done reactive-6c6b3ee8fc062e1caa36 1.174s completed=3
+[stage3] start reactive workload=canneal split=validation capacity=63 ratio=0.4
+[stage3] done reactive-1bad8f80932d10bc2d82 0.148s completed=4
+[stage3] start reactive workload=canneal split=train capacity=94 ratio=0.6
+[stage3] done reactive-dfc4f84a1fdced7d38a3 1.167s completed=5
+[stage3] start reactive workload=canneal split=validation capacity=94 ratio=0.6
+[stage3] done reactive-75b2f39309f8524663b7 0.149s completed=6
+[stage3] start reactive workload=dedup_pressure split=train capacity=24 ratio=0.2
+[stage3] done reactive-b89fb8faceae6bfaa81b 1.193s completed=7
+[stage3] start reactive workload=dedup_pressure split=validation capacity=24 ratio=0.2
+[stage3] done reactive-615a1d4d9d07997485ab 0.150s completed=8
+[stage3] start reactive workload=dedup_pressure split=train capacity=47 ratio=0.4
+[stage3] done reactive-ecdd6c1cc1abab7954f8 1.210s completed=9
+[stage3] start reactive workload=dedup_pressure split=validation capacity=47 ratio=0.4
+[stage3] done reactive-a1809069e4e9851d422a 0.150s completed=10
+[stage3] start reactive workload=dedup_pressure split=train capacity=70 ratio=0.6
+[stage3] done reactive-20adfe61857c139f5466 1.172s completed=11
+[stage3] start reactive workload=dedup_pressure split=validation capacity=70 ratio=0.6
+[stage3] done reactive-b6fbc8cb7ee6c59816af 0.148s completed=12
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=31 ratio=0.2
+[stage3] done reactive-c0749670cf2717e6b84f 1.179s completed=13
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=31 ratio=0.2
+[stage3] done reactive-b71a7865f9e0f9ee0996 0.149s completed=14
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=62 ratio=0.4
+[stage3] done reactive-064507f55d9cabb11a8f 1.205s completed=15
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=62 ratio=0.4
+[stage3] done reactive-76da35378497b84ac88c 0.150s completed=16
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=93 ratio=0.6
+[stage3] done reactive-1e803b645c3629a670ea 1.170s completed=17
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=93 ratio=0.6
+[stage3] done reactive-8a009e397d8da28aea3d 0.148s completed=18
+[stage3] start reactive workload=canneal split=train capacity=16 ratio=0.1
+[stage3] done reactive-2c5df9f41d693c82e904 1.205s completed=19
+[stage3] start reactive workload=canneal split=validation capacity=16 ratio=0.1
+[stage3] done reactive-16970d5378b38a782d20 0.171s completed=20
+[stage3] checkpoint reuse reactive-ee8536ea04f17fcdc85f
+[stage3] checkpoint reuse reactive-8c94b82a730d1aee586b
+[stage3] checkpoint reuse reactive-6c6b3ee8fc062e1caa36
+[stage3] checkpoint reuse reactive-1bad8f80932d10bc2d82
+[stage3] start reactive workload=dedup_pressure split=train capacity=12 ratio=0.1
+[stage3] done reactive-8be6aca8ac5e73a556ed 1.201s completed=21
+[stage3] start reactive workload=dedup_pressure split=validation capacity=12 ratio=0.1
+[stage3] done reactive-6110196d54c542e923c5 0.190s completed=22
+[stage3] checkpoint reuse reactive-b89fb8faceae6bfaa81b
+[stage3] checkpoint reuse reactive-615a1d4d9d07997485ab
+[stage3] checkpoint reuse reactive-ecdd6c1cc1abab7954f8
+[stage3] checkpoint reuse reactive-a1809069e4e9851d422a
+[stage3] start reactive workload=streamcluster_pressure split=train capacity=16 ratio=0.1
+[stage3] done reactive-7f5aecdc65d368048a5d 1.199s completed=23
+[stage3] start reactive workload=streamcluster_pressure split=validation capacity=16 ratio=0.1
+[stage3] done reactive-c42c7fe1fe58345373bd 0.153s completed=24
+[stage3] checkpoint reuse reactive-c0749670cf2717e6b84f
+[stage3] checkpoint reuse reactive-b71a7865f9e0f9ee0996
+[stage3] checkpoint reuse reactive-064507f55d9cabb11a8f
+[stage3] checkpoint reuse reactive-76da35378497b84ac88c
+/home/likc/Q-former-for-OS/outputs/capd_proactive_calibration/stage3/stage3-v2-real-003
+STAGE3_CALIBRATION_RESULTS_NOT_FREEZABLE
+STAGE3_V2_CAPACITY_NOT_FREEZABLE
