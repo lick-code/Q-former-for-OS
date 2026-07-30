@@ -1,0 +1,99 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+  "entries": [
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "training_and_fit",
+      "source_interval": {
+        "end": 1,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "REPLACE_WITH_AUDITED_CANNEAL_TRAIN_SOURCE",
+      "split": "train",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_canneal_train.csv",
+      "trace_sha256": "REPLACE_WITH_64_LOWERCASE_HEX",
+      "workload": "canneal"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "parameter_selection",
+      "source_interval": {
+        "end": 1,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "REPLACE_WITH_AUDITED_CANNEAL_VALID_SOURCE",
+      "split": "validation",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_canneal_valid.csv",
+      "trace_sha256": "REPLACE_WITH_64_LOWERCASE_HEX",
+      "workload": "canneal"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "training_and_fit",
+      "source_interval": {
+        "end": 1,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "REPLACE_WITH_AUDITED_DEDUP_TRAIN_SOURCE",
+      "split": "train",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_dedup_train.csv",
+      "trace_sha256": "REPLACE_WITH_64_LOWERCASE_HEX",
+      "workload": "dedup_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "parameter_selection",
+      "source_interval": {
+        "end": 1,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "REPLACE_WITH_AUDITED_DEDUP_VALID_SOURCE",
+      "split": "validation",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_dedup_valid.csv",
+      "trace_sha256": "REPLACE_WITH_64_LOWERCASE_HEX",
+      "workload": "dedup_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "training_and_fit",
+      "source_interval": {
+        "end": 1,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "REPLACE_WITH_AUDITED_STREAMCLUSTER_TRAIN_SOURCE",
+      "split": "train",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_streamcluster_train.csv",
+      "trace_sha256": "REPLACE_WITH_64_LOWERCASE_HEX",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "formal_test": false,
+      "page_shift": 12,
+      "role": "parameter_selection",
+      "source_interval": {
+        "end": 1,
+        "start": 0
+      },
+      "source_kind": "raw_access_trace",
+      "source_trace_id": "REPLACE_WITH_AUDITED_STREAMCLUSTER_VALID_SOURCE",
+      "split": "validation",
+      "trace_path": "/home/likc/Q-former-for-OS/dataset/processed/real_workload_suite/5m/parsec_streamcluster_valid.csv",
+      "trace_sha256": "REPLACE_WITH_64_LOWERCASE_HEX",
+      "workload": "streamcluster_pressure"
+    }
+  ],
+  "path_base": "project_root",
+  "schema_version": "capd_proactive_stage4_input_manifest_v1_0",
+  "split_non_overlap_attested": true,
+  "test_used_for_parameter_selection": false
+}

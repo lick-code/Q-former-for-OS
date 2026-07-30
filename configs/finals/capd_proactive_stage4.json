@@ -1,0 +1,148 @@
+{
+  "allowed_splits": [
+    "train",
+    "validation"
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE4-1.0",
+  "cost_profile": {
+    "name": "default",
+    "status": "stage2_frozen",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "dataset": {
+    "early_reuse_window": 64,
+    "incomplete_lookahead": "exclude_from_training_and_report",
+    "page_state_dim": 4
+  },
+  "forbidden_splits": [
+    "test"
+  ],
+  "frozen_stage3": {
+    "F_low": 2,
+    "F_target": 4,
+    "b_max": 4,
+    "candidate_source": "lru_tail",
+    "dram_working_set_ratio": 0.2,
+    "fallback_policy": "lru",
+    "selector": "disabled",
+    "trigger_mode": "low_watermark",
+    "working_set_definition": "active_unique_pages_from_train_and_validation"
+  },
+  "grid": {
+    "candidate_size_K": [
+      8,
+      16
+    ],
+    "history_H": [
+      5,
+      10,
+      20
+    ],
+    "label_weights": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        2
+      ],
+      [
+        1,
+        1,
+        4
+      ],
+      [
+        1,
+        1,
+        8
+      ],
+      [
+        1,
+        2,
+        4
+      ],
+      [
+        2,
+        1,
+        4
+      ]
+    ],
+    "lookahead_L": [
+      256,
+      512,
+      1024
+    ]
+  },
+  "output_root": "outputs/capd_proactive_stage4",
+  "provenance": {
+    "candidate_filter": "disabled",
+    "old_finals_v3_artifacts_allowed": false,
+    "selection_rules_predeclared": true,
+    "test_used": false
+  },
+  "reference": {
+    "candidate_size_K": 8,
+    "history_H": 10,
+    "label_weights": [
+      1,
+      1,
+      4
+    ],
+    "lookahead_L": 256
+  },
+  "schema_name": "capd_proactive_stage4",
+  "schema_version": "capd_proactive_stage4_v1_0",
+  "seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "selection_rule": {
+    "global_across_workloads": true,
+    "near_best_relative_tolerance": 0.01,
+    "nvm_write_relative_tolerance": 0.05,
+    "phase_order": [
+      "lookahead_L",
+      "label_weights",
+      "candidate_size_K_and_history_H"
+    ],
+    "primary_metric": "validation_macro_weighted_cost_per_access",
+    "test_used": false,
+    "tie_break_order": [
+      "lower_worst_workload_regression",
+      "lower_nvm_write_regression",
+      "higher_ndcg_at_b_t",
+      "higher_top_b_t_overlap",
+      "lower_top_b_t_regret",
+      "lower_amortized_latency",
+      "lower_complexity",
+      "lower_macro_weighted_cost_within_near_best_band",
+      "lexical_experiment_id"
+    ],
+    "worst_workload_relative_tolerance": 0.05
+  },
+  "stage_status": "stage4_implemented_awaiting_training_inputs",
+  "training": {
+    "approx_ndcg_alpha": 10.0,
+    "batch_size": 32,
+    "checkpoint_rule": "minimum_validation_loss_only",
+    "checkpoint_tie_break": "earliest_epoch",
+    "context_mode": "cross_attention",
+    "dataset_trajectory_policy": "proactive_lru",
+    "deterministic_algorithms": true,
+    "epochs": 10,
+    "global_model_across_workloads": true,
+    "learning_rate": 0.0001,
+    "position_encoding": "none",
+    "shared_page_embedding": false,
+    "use_page_id_embedding": true
+  }
+}

@@ -919,6 +919,74 @@ class QMAPPolicy(object):
     if self._selector_history is not None:
       self._selector_history.observe(page, rw, access_index)
 
+  def score_explicit_candidates(self, candidates, history, access_index,
+                                dram_insert_time, dirty_pages):
+    """Scores an already constructed LRU-tail set without a B-to-K selector.
+
+    The proactive Stage-4 path owns candidate construction and may request
+    fewer than K valid pages during warmup or a multi-round recovery cycle.
+    Padding is masked and never returned to the caller.
+    """
+    candidates = list(candidates)
+    if not candidates:
+      return []
+    if len(candidates) > self._candidate_count:
+      raise ValueError(
+          "Explicit candidate count exceeds checkpoint K: {} > {}.".format(
+              len(candidates), self._candidate_count))
+    if len(candidates) != len(set(candidates)):
+      raise ValueError("Explicit candidates contain duplicates.")
+    actual_count = len(candidates)
+    padding = self._candidate_count - actual_count
+    padded_candidates = candidates + [0] * padding
+    candidate_mask = [1] * actual_count + [0] * padding
+    recent_history = list(history)[-self._history_length:]
+    candidate_state_features = []
+    for rank, candidate in enumerate(candidates):
+      residency_duration = access_index - dram_insert_time.get(
+          candidate, access_index)
+      candidate_state_features.append(build_candidate_state_features(
+          candidate, recent_history, residency_duration,
+          candidate in dirty_pages, self._lookahead, rank=rank,
+          candidate_count=self._candidate_count))
+    candidate_state_features += [
+        [0.0] * self._page_state_dim for _ in range(padding)]
+    history_page_ids, pc, rw = apply_history_ablation(
+        *padded_history(recent_history, self._history_length),
+        ablation=self._ablation)
+    history_mask = (
+        [0] * (self._history_length - len(recent_history)) +
+        [1] * len(recent_history))
+    torch = self._torch
+    with torch.no_grad():
+      history_page_ids = torch.tensor(
+          [history_page_ids], dtype=torch.long, device=self._device)
+      history_mask_tensor = torch.tensor(
+          [history_mask], dtype=torch.float32, device=self._device)
+      pc = torch.tensor([pc], dtype=torch.long, device=self._device)
+      rw = torch.tensor([rw], dtype=torch.long, device=self._device)
+      candidate_pages = torch.tensor(
+          [padded_candidates], dtype=torch.long, device=self._device)
+      candidate_state_features = torch.tensor(
+          [candidate_state_features], dtype=torch.float32,
+          device=self._device)
+      candidate_mask_tensor = torch.tensor(
+          [candidate_mask], dtype=torch.float32, device=self._device)
+      access_features = self._feature_embedder(history_page_ids, pc, rw)
+      z = self._extractor(
+          access_features, history_mask=history_mask_tensor)
+      candidate_page_embeddings = (
+          self._feature_embedder.embed_pages(candidate_pages)
+          if getattr(self._scorer, "_shared_page_embedding", False) else None)
+      scores = self._scorer(
+          z, candidate_pages, candidate_state_features,
+          candidate_mask_tensor,
+          candidate_page_embeddings=candidate_page_embeddings,
+          history_mask=history_mask_tensor)
+    return [
+        float(value) for value in _flat_sequence(
+            scores[0], "explicit candidate scores")[:actual_count]]
+
   def choose_victim(self, dram_pages, history, max_page, access_index,
                     dram_insert_time, dirty_pages):
     del max_page

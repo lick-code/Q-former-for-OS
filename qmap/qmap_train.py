@@ -30,6 +30,8 @@ from qmap import no_vpn_ablation
 from qmap.qmap_generator import read_trace
 
 
+PROACTIVE_STAGE4_SAMPLE_SCHEMA = "capd_proactive_stage4_sample_v1_0"
+PROACTIVE_STAGE4_CONTRACT_ID = "CAPD-PROACTIVE-STAGE4-1.0"
 ABLATION_CHOICES = (
     "full", "cross_attention", "no_pc", "no_rw", "mean_pool",
     "no_qformer", "no_cost")
@@ -104,30 +106,36 @@ class QMAPAccessSequenceDataset(Dataset):
   def _validate_sample(self, sample, line_number):
     schema = sample.get("schema_version")
     is_v3 = schema == finals_config.SCHEMA_VERSION
-    required = (self.V3_REQUIRED_FIELDS if is_v3 else
+    is_proactive_stage4 = schema == PROACTIVE_STAGE4_SAMPLE_SCHEMA
+    is_structured = is_v3 or is_proactive_stage4
+    required = (self.V3_REQUIRED_FIELDS if is_structured else
                 self.LEGACY_REQUIRED_FIELDS)
     missing = [field for field in required if field not in sample]
     if missing:
       raise ValueError("Line {} missing fields: {}".format(
           line_number, missing))
-    if is_v3 and "physical_address" in sample:
+    if is_structured and "physical_address" in sample:
       raise ValueError(
-          "Line {} v3 rejects legacy field physical_address.".format(
+          "Line {} structured sample rejects legacy field physical_address.".format(
               line_number))
-    history_field = "history_page_ids" if is_v3 else "physical_address"
+    history_field = (
+        "history_page_ids" if is_structured else "physical_address")
     sequence_length = len(sample[history_field])
     if not (len(sample["pc"]) == sequence_length and
             len(sample["rw"]) == sequence_length):
       raise ValueError("Line {} has inconsistent sequence lengths.".format(
           line_number))
-    if is_v3:
+    if is_structured:
       if len(sample["history_mask"]) != sequence_length:
         raise ValueError("Line {} history_mask length mismatch.".format(
             line_number))
       if any(value not in (0, 1) for value in sample["history_mask"]):
         raise ValueError("Line {} history_mask must be binary.".format(
             line_number))
-      if sample["contract_id"] != finals_config.CONTRACT_ID:
+      expected_contract_id = (
+          finals_config.CONTRACT_ID if is_v3
+          else PROACTIVE_STAGE4_CONTRACT_ID)
+      if sample["contract_id"] != expected_contract_id:
         raise ValueError("Line {} contract_id mismatch.".format(line_number))
       if self._expected_identity:
         for key, expected in self._expected_identity.items():
@@ -200,6 +208,11 @@ def build_arg_parser():
   parser.add_argument("--valid_data", default=None)
   parser.add_argument("--config", default=None,
                       help="Resolved, versioned CAPD finals config.")
+  parser.add_argument(
+      "--proactive_stage4_contract", default=None,
+      help=(
+          "Strict capd_proactive_stage4 training identity. Mutually "
+          "exclusive with --config/--selector_params."))
   parser.add_argument("--selector_params", default=None)
   parser.add_argument("--output_dir", default="qmap_checkpoints")
   parser.add_argument("--epochs", type=int, default=10)
@@ -248,6 +261,15 @@ def set_random_seed(seed):
     torch.cuda.manual_seed_all(seed)
 
 
+def enable_strict_determinism():
+  """Enables the reproducibility contract used by proactive Stage 4."""
+  os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+  torch.use_deterministic_algorithms(True)
+  if hasattr(torch.backends, "cudnn"):
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
+
 def move_batch_to_device(batch, device):
   return {key: value.to(device) for key, value in batch.items()}
 
@@ -284,7 +306,9 @@ def _training_code_fingerprint():
       "qmap/finals_generator.py", "policy_learning/cache_model/embed.py",
       "policy_learning/cache_model/model.py",
       "policy_learning/cache_model/qmap_loss.py",
-      "qmap/finals_config.py", "qmap/no_vpn_ablation.py")
+      "qmap/finals_config.py", "qmap/no_vpn_ablation.py",
+      "qmap/proactive_stage4.py", "qmap/proactive_replay.py",
+      "qmap/qmap_eval.py")
   return finals_config.fingerprint_value({
       path: finals_config.fingerprint_file(os.path.join(PROJECT_ROOT, path))
       for path in paths})
@@ -436,6 +460,55 @@ def apply_finals_config(args, explicit_seed=None):
       args.valid_data)
 
 
+def apply_proactive_stage4_contract(args, explicit_seed=None):
+  """Applies the isolated proactive Stage-4 training contract."""
+  if not args.proactive_stage4_contract:
+    return None
+  if args.config or args.selector_params:
+    raise ValueError(
+        "--proactive_stage4_contract is mutually exclusive with "
+        "--config/--selector_params.")
+  if not args.valid_data:
+    raise ValueError(
+        "Proactive Stage-4 training requires --valid_data.")
+  from qmap import proactive_stage4
+  contract_path = os.path.abspath(args.proactive_stage4_contract)
+  value = proactive_stage4.load_json(contract_path)
+  context = proactive_stage4.validate_training_contract(
+      value, args.train_data, args.valid_data,
+      explicit_seed=explicit_seed)
+  training = context["training"]
+  weights = context["weights"]
+  args.seed = context["seed"]
+  args.training_seed_source = (
+      "explicit_cli_and_contract" if explicit_seed is not None
+      else "proactive_stage4_contract")
+  args.epochs = int(training["epochs"])
+  args.batch_size = int(training["batch_size"])
+  args.lr = float(training["learning_rate"])
+  args.inactivity_weight = float(weights[0])
+  args.coldness_weight = float(weights[1])
+  args.write_sensitivity_weight = float(weights[2])
+  args.migration_cost_weight = 0.0
+  args.page_state_dim = int(context["expected_shape"]["page_state_dim"])
+  args.position_encoding = training.get("position_encoding", "none")
+  args.use_page_id_embedding = bool(
+      training.get("use_page_id_embedding", True))
+  args.shared_page_embedding = bool(
+      training.get("shared_page_embedding", False))
+  args.context_mode = training.get("context_mode", "cross_attention")
+  args.stage5_variant_id = None
+  args.approx_ndcg_alpha = float(
+      training.get("approx_ndcg_alpha", 10.0))
+  args.deterministic_algorithms = bool(
+      training.get("deterministic_algorithms", True))
+  if args.ablation != "cross_attention":
+    raise ValueError(
+        "Proactive Stage-4 training requires cross_attention.")
+  context["contract_path"] = contract_path
+  return context
+
+
 def _forward_loss(batch, feature_embedder, extractor, scorer, loss_fn,
                   ablation):
   batch = apply_batch_ablation(batch, ablation)
@@ -481,7 +554,8 @@ def evaluate_loss(dataloader, device, feature_embedder, extractor, scorer,
 def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
                        validation_loss, args, finals_context,
                        best_epoch=None, best_validation_loss=None,
-                       loss_curve=None, training_duration_seconds=0.0):
+                       loss_curve=None, training_duration_seconds=0.0,
+                       proactive_context=None):
   payload = {
       "epoch": epoch,
       "validation_loss": validation_loss,
@@ -548,11 +622,45 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
                   pc_vocab.input_to_index),
           },
       })
+  elif proactive_context:
+    contract = proactive_context["contract"]
+    page_vocab = feature_embedder.page_embedder
+    pc_vocab = feature_embedder.pc_embedder
+    payload.update({
+        "schema_version": contract["schema_version"],
+        "contract_id": contract["contract_id"],
+        "experiment_id": contract["experiment_id"],
+        "seed": args.seed,
+        "training_seed_source": args.training_seed_source,
+        "stage4_training_contract": contract,
+        "stage4_training_contract_fingerprint":
+            proactive_context["contract_fingerprint"],
+        "jsonl_fingerprints": {
+            split: contract["data"][split]["sha256"]
+            for split in ("train", "validation")
+        },
+        "sample_identity": proactive_context["sample_identity"],
+        "git_commit": finals_config.current_git_commit(PROJECT_ROOT),
+        "code_fingerprint": _training_code_fingerprint(),
+        "command": _command_text(),
+        "vocab_contract": {
+            "page_frozen": page_vocab.frozen,
+            "pc_frozen": pc_vocab.frozen,
+            "unk_index": 0,
+            "page_vocab_fingerprint": finals_config.fingerprint_value(
+                page_vocab.input_to_index),
+            "pc_vocab_fingerprint": finals_config.fingerprint_value(
+                pc_vocab.input_to_index),
+        },
+        "test_trace_opened": False,
+        "selector_status": "disabled",
+    })
   return payload
 
 
 def _load_resume_checkpoint(path, device, feature_embedder, extractor, scorer,
-                            optimizer, args, finals_context):
+                            optimizer, args, finals_context,
+                            proactive_context=None):
   checkpoint = torch.load(path, map_location=device)
   if finals_context:
     config = finals_context["config"]
@@ -565,6 +673,17 @@ def _load_resume_checkpoint(path, device, feature_embedder, extractor, scorer,
     if checkpoint.get("selector_fingerprint") != finals_context[
         "selector_fingerprint"]:
       raise ValueError("Resume checkpoint selector mismatch.")
+  elif proactive_context:
+    if checkpoint.get("contract_id") != PROACTIVE_STAGE4_CONTRACT_ID:
+      raise ValueError("Resume checkpoint Stage-4 contract mismatch.")
+    if checkpoint.get("stage4_training_contract_fingerprint") != (
+        proactive_context["contract_fingerprint"]):
+      raise ValueError("Resume checkpoint Stage-4 identity mismatch.")
+    expected_fingerprints = {
+        split: proactive_context["contract"]["data"][split]["sha256"]
+        for split in ("train", "validation")}
+    if checkpoint.get("jsonl_fingerprints") != expected_fingerprints:
+      raise ValueError("Resume checkpoint Stage-4 data mismatch.")
   model_args = checkpoint.get("model_args", {})
   if int(checkpoint.get("seed", args.seed)) != int(args.seed):
     raise ValueError("Resume checkpoint seed mismatch.")
@@ -584,7 +703,7 @@ def _load_resume_checkpoint(path, device, feature_embedder, extractor, scorer,
     torch.cuda.set_rng_state_all(
         [state.cpu() for state in rng_state["cuda"]])
   completed_epoch = int(checkpoint.get("epoch", 0))
-  if completed_epoch >= int(args.epochs):
+  if completed_epoch >= int(args.epochs) and not proactive_context:
     raise ValueError(
         "Resume checkpoint already completed configured epochs.")
   return {
@@ -608,20 +727,30 @@ def main():
   args.training_seed_source = (
       "explicit_cli" if explicit_seed is not None else "parser_default")
   finals_context = apply_finals_config(args, explicit_seed=explicit_seed)
+  proactive_context = apply_proactive_stage4_contract(
+      args, explicit_seed=explicit_seed)
   os.makedirs(args.output_dir, exist_ok=True)
   if finals_context:
     finals_config.write_json(
         os.path.join(args.output_dir, "resolved_config.json"),
         finals_context["config"])
+  elif proactive_context:
+    finals_config.write_json(
+        os.path.join(args.output_dir, "resolved_training_contract.json"),
+        proactive_context["contract"])
   set_random_seed(args.seed)
+  if proactive_context:
+    enable_strict_determinism()
 
   device_name = args.device
   if device_name is None:
     device_name = "cuda" if torch.cuda.is_available() else "cpu"
   device = torch.device(device_name)
-  expected_shape = finals_context["expected_shape"] if finals_context else None
-  sample_identity = (finals_context["sample_identity"]
-                     if finals_context else None)
+  active_context = finals_context or proactive_context
+  expected_shape = (
+      active_context["expected_shape"] if active_context else None)
+  sample_identity = (
+      active_context["sample_identity"] if active_context else None)
   train_dataset = QMAPAccessSequenceDataset(
       args.train_data, expected_shape=expected_shape,
       expected_identity=sample_identity)
@@ -636,6 +765,13 @@ def main():
     if valid_dataset is not None and len(valid_dataset) != int(
         finals_context["metadata"]["valid"]["sample_count"]):
       raise ValueError("Valid JSONL row count/metadata mismatch.")
+  elif proactive_context:
+    if len(train_dataset) != int(
+        proactive_context["data"]["train"]["sample_count"]):
+      raise ValueError("Stage-4 Train JSONL row count/contract mismatch.")
+    if valid_dataset is None or len(valid_dataset) != int(
+        proactive_context["data"]["validation"]["sample_count"]):
+      raise ValueError("Stage-4 Validation JSONL row count/contract mismatch.")
   train_loader = DataLoader(
       train_dataset, batch_size=args.batch_size, shuffle=True,
       num_workers=args.num_workers, drop_last=False)
@@ -673,6 +809,13 @@ def main():
     feature_embedder.pc_embedder.fit(
         (access["pc"] for access in train_trace)).freeze()
     del train_trace
+  elif proactive_context:
+    # Stage-4 vocabularies are fitted on Train samples only and frozen before
+    # the first Validation batch. This prevents validation-vocabulary leakage.
+    feature_embedder.page_embedder.fit(
+        train_dataset.page_vocab_values()).freeze()
+    feature_embedder.pc_embedder.fit(
+        train_dataset.pc_vocab_values()).freeze()
   if feature_embedder.embed_dim != args.hidden_dim:
     raise ValueError("hidden_dim ({}) must equal embedding dimension ({})."
                      .format(args.hidden_dim, feature_embedder.embed_dim))
@@ -717,7 +860,8 @@ def main():
   if args.resume_checkpoint:
     resume_state = _load_resume_checkpoint(
         args.resume_checkpoint, device, feature_embedder, extractor, scorer,
-        optimizer, args, finals_context)
+        optimizer, args, finals_context,
+        proactive_context=proactive_context)
     start_epoch = resume_state["start_epoch"]
     best_loss = resume_state["best_loss"]
     best_epoch = resume_state["best_epoch"]
@@ -774,7 +918,8 @@ def main():
         best_epoch=best_epoch, best_validation_loss=best_loss,
         loss_curve=loss_curve,
         training_duration_seconds=(
-            previous_training_duration + time.time() - training_started))
+            previous_training_duration + time.time() - training_started),
+        proactive_context=proactive_context)
     torch.save(payload, last_path)
     if finals_context is None or args.save_every_epoch:
       # Preserve historical experiment-script checkpoint names outside the
@@ -786,9 +931,37 @@ def main():
     print("epoch={}/{} train_loss={:.6f} valid_loss={:.6f}".format(
         epoch, args.epochs, train_loss, validation_loss), flush=True)
 
+  if not os.path.isfile(best_path):
+    # Covers an interruption after qmap_last.pth was durably written but
+    # before the first/best checkpoint copy and manifest were written.
+    completed = torch.load(last_path, map_location=device)
+    if int(completed.get("best_epoch", -1)) != int(
+        completed.get("epoch", -2)):
+      raise ValueError(
+          "Best checkpoint is missing and cannot be reconstructed from last.")
+    torch.save(completed, best_path)
+  if proactive_context:
+    completed_epoch = len(loss_curve)
+    for epoch in range(1, args.epochs + 1):
+      epoch_path = os.path.join(
+          args.output_dir, "qmap_epoch_{}.pth".format(epoch))
+      if os.path.isfile(epoch_path):
+        continue
+      if epoch != completed_epoch:
+        raise ValueError(
+            "Per-epoch checkpoint is missing and cannot be reconstructed: "
+            "{}.".format(epoch_path))
+      completed = torch.load(last_path, map_location=device)
+      if int(completed.get("epoch", -1)) != epoch:
+        raise ValueError("Last checkpoint epoch mismatch during recovery.")
+      torch.save(completed, epoch_path)
+
   manifest = {
-      "schema_version": (finals_context["config"]["schema_version"]
-                         if finals_context else "legacy_qmap"),
+      "schema_version": (
+          finals_context["config"]["schema_version"]
+          if finals_context else
+          proactive_context["contract"]["schema_version"]
+          if proactive_context else "legacy_qmap"),
       "best_epoch": best_epoch,
       "best_validation_loss": best_loss,
       "final_train_loss": loss_curve[-1]["train_loss"],
@@ -796,12 +969,14 @@ def main():
       "seed": args.seed,
       "variant": (
           no_vpn_ablation.variant_from_config(finals_context["config"])
-          if finals_context else "legacy"),
+          if finals_context else
+          "capd_proactive_stage4" if proactive_context else "legacy"),
       "training_seed_source": args.training_seed_source,
       "selection_criterion": (
           "minimum_valid_loss_only" if valid_loader else
           "minimum_train_loss_no_validation"),
-      "per_epoch_checkpoints_saved": bool(args.save_every_epoch),
+      "per_epoch_checkpoints_saved": bool(
+          args.save_every_epoch or proactive_context),
       "training_duration_seconds": (
           previous_training_duration + time.time() - training_started),
       "nan_or_inf_detected": False,
@@ -873,6 +1048,44 @@ def main():
             args, "use_page_id_embedding", True),
         "write_sensitivity_weight": args.write_sensitivity_weight,
     }
+  elif proactive_context:
+    contract = proactive_context["contract"]
+    manifest.update({
+        "contract_id": contract["contract_id"],
+        "experiment_id": contract["experiment_id"],
+        "stage4_training_contract_fingerprint":
+            proactive_context["contract_fingerprint"],
+        "stage4_training_contract_path":
+            proactive_context["contract_path"],
+        "jsonl_fingerprints": {
+            split: contract["data"][split]["sha256"]
+            for split in ("train", "validation")
+        },
+        "sample_identity": proactive_context["sample_identity"],
+        "audit_input_scope": "train_jsonl_and_validation_jsonl_only",
+        "test_trace_opened": False,
+        "selector_status": "disabled",
+        "checkpoints": dict(manifest["checkpoints"]),
+        "model_contract": {
+            "H": proactive_context["expected_shape"]["H"],
+            "K": proactive_context["expected_shape"]["K"],
+            "page_state_dim":
+                proactive_context["expected_shape"]["page_state_dim"],
+            "use_page_id_embedding": getattr(
+                args, "use_page_id_embedding", True),
+            "position_encoding": getattr(args, "position_encoding", "none"),
+            "context_mode": getattr(
+                args, "context_mode", "cross_attention"),
+            "write_sensitivity_weight": args.write_sensitivity_weight,
+        },
+    })
+    manifest["checkpoints"]["per_epoch"] = [{
+        "epoch": epoch,
+        "path": os.path.abspath(os.path.join(
+            args.output_dir, "qmap_epoch_{}.pth".format(epoch))),
+        "fingerprint": finals_config.fingerprint_file(os.path.join(
+            args.output_dir, "qmap_epoch_{}.pth".format(epoch))),
+    } for epoch in range(1, args.epochs + 1)]
   finals_config.write_json(
       os.path.join(args.output_dir, "checkpoint_manifest.json"), manifest)
   print("Training finished. best={} last={}".format(
