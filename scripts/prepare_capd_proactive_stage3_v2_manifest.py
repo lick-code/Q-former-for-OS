@@ -3,8 +3,8 @@
 """Build a capacity_rule_v2 manifest from a completed v1 Stage-3 run.
 
 The helper preserves the previous Train inputs, replaces every Validation
-input explicitly, and records the previous Validation SHA-256 values as a
-deny-list.  It never accepts or reads a formal Test manifest.
+input explicitly, and records every previous Stage-3 Train/Validation SHA-256
+as a deny-list.  It never accepts or reads a formal Test manifest.
 """
 
 import argparse
@@ -75,7 +75,7 @@ def main(argv=None):
 
   validation_paths = _validation_map(args.validation)
   entries_by_identity = {}
-  previous_validation = {}
+  previous_stage3_inputs = {}
   workloads = set()
   for resolved in previous["resolved_entries"]:
     workload = resolved.get("workload")
@@ -89,13 +89,12 @@ def main(argv=None):
           "Previous run contains duplicate inputs: {}".format(identity))
     entries_by_identity[identity] = resolved
     workloads.add(workload)
-    if split == "validation":
-      fingerprint = resolved.get("trace_fingerprint")
-      if not isinstance(fingerprint, str) or len(fingerprint) != 64:
-        raise proactive_stage3.Stage3ContractError(
-            "Previous Validation fingerprint is missing for {}.".format(
-                workload))
-      previous_validation.setdefault(workload, []).append(fingerprint)
+    fingerprint = resolved.get("trace_fingerprint")
+    if not isinstance(fingerprint, str) or len(fingerprint) != 64:
+      raise proactive_stage3.Stage3ContractError(
+          "Previous Stage-3 input fingerprint is missing for {} {}.".format(
+              workload, split))
+    previous_stage3_inputs.setdefault(workload, []).append(fingerprint)
 
   if set(validation_paths) != workloads:
     raise proactive_stage3.Stage3ContractError(
@@ -127,11 +126,11 @@ def main(argv=None):
     fingerprint = finals_config.fingerprint_file(resolved_path)
     previous_fingerprints = {
         item
-        for values in previous_validation.values()
+        for values in previous_stage3_inputs.values()
         for item in values}
     if fingerprint in previous_fingerprints:
       raise proactive_stage3.Stage3ContractError(
-          "{} reuses a previous Validation trace.".format(workload))
+          "{} reuses a previous Stage-3 input trace.".format(workload))
     validation_entry = {
         key: copy.deepcopy(old_validation[key])
         for key in (
@@ -155,7 +154,8 @@ def main(argv=None):
           "fresh_validation_required": True,
           "validation_used_in_rule_design": False,
           "formal_test_reused": False,
-          "previous_validation_trace_fingerprints": previous_validation,
+          "previous_stage3_input_trace_fingerprints":
+              previous_stage3_inputs,
       },
       "entries": new_entries,
   }

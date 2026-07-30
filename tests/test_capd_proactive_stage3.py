@@ -51,7 +51,7 @@ class Stage3Test(unittest.TestCase):
             "fresh_validation_required": True,
             "validation_used_in_rule_design": False,
             "formal_test_reused": False,
-            "previous_validation_trace_fingerprints": {
+            "previous_stage3_input_trace_fingerprints": {
                 "synthetic_locality": ["0" * 64],
             },
         },
@@ -135,7 +135,7 @@ class Stage3Test(unittest.TestCase):
     reused = self.manifest()
     reused["path_base"] = "manifest_directory"
     reused["fresh_validation_attestation"][
-        "previous_validation_trace_fingerprints"]["synthetic_locality"] = [
+        "previous_stage3_input_trace_fingerprints"]["synthetic_locality"] = [
             next(
                 item["trace_fingerprint"] for item in entries
                 if item["split"] == "validation")]
@@ -144,7 +144,7 @@ class Stage3Test(unittest.TestCase):
       json.dump(reused, output_file)
     with self.assertRaisesRegex(
         proactive_stage3.Stage3ContractError,
-        "reuses a previous Validation"):
+        "reuses a previous Stage-3 input"):
       proactive_stage3.load_inputs(reused_path, PROJECT_ROOT)
     manifest = self.manifest()
     manifest["entries"][1]["formal_test"] = True

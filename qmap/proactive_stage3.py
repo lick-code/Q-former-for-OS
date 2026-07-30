@@ -442,7 +442,7 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
   attestation_fields = {
       "capacity_rule_version", "rule_frozen_before_validation_selection",
       "fresh_validation_required", "validation_used_in_rule_design",
-      "formal_test_reused", "previous_validation_trace_fingerprints"}
+      "formal_test_reused", "previous_stage3_input_trace_fingerprints"}
   _require(
       isinstance(attestation, Mapping) and
       not (attestation_fields - set(attestation)),
@@ -460,10 +460,10 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
   _require(
       attestation["formal_test_reused"] is False,
       "Formal Test cannot be relabeled as fresh Validation.")
-  previous = attestation["previous_validation_trace_fingerprints"]
+  previous = attestation["previous_stage3_input_trace_fingerprints"]
   _require(
       isinstance(previous, Mapping) and previous,
-      "Previous Validation fingerprints are required.")
+      "Previous Stage-3 input fingerprints are required.")
   entries = value["entries"]
   _require(isinstance(entries, list) and entries, "Manifest entries cannot be empty.")
   seen = set()
@@ -497,15 +497,15 @@ def validate_manifest(value: Mapping[str, Any]) -> Mapping[str, Any]:
     fingerprints = previous.get(workload)
     _require(
         isinstance(fingerprints, list) and fingerprints,
-        "{} lacks previous Validation fingerprints.".format(workload))
+        "{} lacks previous Stage-3 input fingerprints.".format(workload))
     for fingerprint in fingerprints:
       _require(
           isinstance(fingerprint, str) and len(fingerprint) == 64 and
           all(character in "0123456789abcdef" for character in fingerprint),
-          "{} has an invalid previous Validation SHA-256.".format(workload))
+          "{} has an invalid previous Stage-3 input SHA-256.".format(workload))
   _require(
       set(previous) == set(workloads),
-      "Previous Validation fingerprint workloads must match manifest workloads.")
+      "Previous Stage-3 fingerprint workloads must match manifest workloads.")
   return value
 
 
@@ -529,7 +529,7 @@ def load_inputs(
   traces: Dict[str, Dict[str, Sequence[Any]]] = collections.defaultdict(dict)
   resolved_entries = []
   previous_by_workload = manifest["fresh_validation_attestation"][
-      "previous_validation_trace_fingerprints"]
+      "previous_stage3_input_trace_fingerprints"]
   all_previous = {
       fingerprint
       for fingerprints in previous_by_workload.values()
@@ -541,7 +541,7 @@ def load_inputs(
     if entry["split"] == "validation":
       _require(
           trace_fingerprint not in all_previous,
-          "Fresh Validation rejected: {} reuses a previous Validation trace."
+          "Fresh Validation rejected: {} reuses a previous Stage-3 input trace."
           .format(entry["workload"]))
       _require(
           trace_fingerprint not in current_validation_fingerprints,

@@ -28,9 +28,9 @@ manifest 顶层必须声明 `test_used_for_parameter_selection=false`，并携�
 - v2 规则在选择新 Validation 前已经冻结；
 - 新 Validation 未参与 v2 规则设计；
 - formal Test 未被重命名或复用；
-- 每个 workload 列出此前 Validation trace 的 SHA-256。
+- 每个 workload 列出此前 Stage 3 Train/Validation trace 的全部 SHA-256。
 
-程序会在解析新 Validation 前计算 SHA-256，并与旧 Validation 指纹黑名单比较；任何重复都会硬失败。任何 `split=test`、`formal_test=true`、缺少正式 role、重复 workload/split 或缺少 Train/Validation 的输入也会被拒绝。布尔声明用于记录数据来源责任边界，SHA-256 用于防止旧 Validation 被直接复用；两者都不能把 formal Test 转换为 Validation。
+程序会在解析新 Validation 前计算 SHA-256，并与上一轮全部 Stage 3 输入指纹黑名单比较；与旧 Train 或旧 Validation 完全相同都会硬失败。任何 `split=test`、`formal_test=true`、缺少正式 role、重复 workload/split 或缺少 Train/Validation 的输入也会被拒绝。布尔声明用于记录数据来源责任边界，SHA-256 用于防止旧输入被直接复用；两者都不能把 formal Test 转换为 Validation。
 
 原始 trace 使用仓库现有 `pc,address[,rw]` CSV 解析契约，`page_shift=12` 对应 4 KiB 页。每个输入保存 SHA-256 fingerprint、访问数、RW 来源和解析后的 split 身份。空 trace、负页面 ID 和非法 RW 会失败。Working Set 必须来自原始访问页，不能用历史训练 JSONL 中筛选后的候选集合代替。
 
@@ -189,7 +189,7 @@ cd ~/Q-former-for-OS
 bash scripts/validate_capd_proactive_stage3_server.sh
 ```
 
-新建 v2 manifest。该命令保留旧 run 的 Train 输入、替换全部 Validation，并自动写入旧 Validation SHA-256 黑名单：
+新建 v2 manifest。该命令保留旧 run 的 Train 输入、替换全部 Validation，并自动写入上一轮全部 Train/Validation SHA-256 黑名单：
 
 ```bash
 cd ~/Q-former-for-OS

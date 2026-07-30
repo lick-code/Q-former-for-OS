@@ -26,7 +26,7 @@
 
 - 容量指标改为 `reactive_demotions / page_enter_dram_count`；
 - 容量门槛只由规则冻结后、未参与规则设计的新 Validation 决定；
-- manifest 必须列出旧 Validation SHA-256，程序拒绝指纹复用，并继续硬拒绝 Test；
+- manifest 必须列出上一轮全部 Stage 3 输入的 SHA-256，程序拒绝把旧 Train 或旧 Validation 复用为新 Validation，并继续硬拒绝 Test；
 - primary 失败后才检查 fallback；两者都失败时停止，不再默认使用 primary 运行 Proactive-LRU；
 - 若 fallback 10/20/40 通过，burst、水位候选、完整水位矩阵和 `b_max` 矩阵全部按 10/20/40 重新生成；
 - v1 的 `F_low=2, F_target=4, b_max=4` 不自动继承到 v2。

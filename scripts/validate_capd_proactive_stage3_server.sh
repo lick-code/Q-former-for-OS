@@ -78,7 +78,7 @@ manifest = {
         "fresh_validation_required": True,
         "validation_used_in_rule_design": False,
         "formal_test_reused": False,
-        "previous_validation_trace_fingerprints": {
+        "previous_stage3_input_trace_fingerprints": {
             "synthetic_locality": ["0" * 64],
         },
     },

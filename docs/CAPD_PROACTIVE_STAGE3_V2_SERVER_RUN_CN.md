@@ -9,11 +9,49 @@
 - 不是 formal Test，也不是从 formal Test 重命名或复制得到；
 - CSV 契约为 `pc,address,rw`，4 KiB 页面使用 `page_shift=12`。
 
-程序会自动拒绝与 `stage3-real-001` 中任一旧 Validation SHA-256 相同的文件。语义上的数据来源仍需实验负责人确认。
+程序会自动拒绝与 `stage3-real-001` 中任一旧 Train/Validation SHA-256 相同的文件。语义上的数据来源仍需实验负责人确认。
+
+## 重新采集独立 Validation
+
+现有 `dataset/processed/finals_v3_official/*/valid.csv` 已参与 v1，`test.csv` 永远禁止使用。若没有在规则冻结后独立采集的 Validation，先在服务器终端执行：
+
+```bash
+set -euo pipefail
+cd "$HOME/Q-former-for-OS"
+
+PHASE="stage3_v2_fresh_validation_001"
+RUN_ID="stage3-v2-fresh-001"
+
+python3 scripts/collect_finals_v3_recollect.py \
+  --phase "$PHASE" \
+  --run-id "$RUN_ID" \
+  --workloads canneal_native_pilot \
+  --max-records 200000 \
+  --skip-records 600000 \
+  --trace-ref-multiplier 100
+
+python3 scripts/collect_finals_v3_recollect.py \
+  --phase "$PHASE" \
+  --run-id "$RUN_ID" \
+  --workloads streamcluster_native_pilot \
+  --max-records 200000 \
+  --skip-records 600000 \
+  --trace-ref-multiplier 100
+
+python3 scripts/collect_finals_v3_recollect.py \
+  --phase "$PHASE" \
+  --run-id "$RUN_ID" \
+  --workloads dedup_native_pilot \
+  --max-records 1000000 \
+  --skip-records 1100000 \
+  --trace-ref-multiplier 100
+```
+
+这会从三个新的程序执行实例采集与旧 Validation 大小和阶段相匹配的独立片段，不读取旧 Test。
 
 ## 一次性运行命令
 
-先把三个新 Validation 路径替换为服务器真实绝对路径：
+使用上述采集结果：
 
 ```bash
 set -euo pipefail
@@ -22,9 +60,10 @@ cd "$HOME/Q-former-for-OS"
 PREVIOUS_RUN="$PWD/outputs/capd_proactive_calibration/stage3/stage3-real-001"
 V2_MANIFEST="$PWD/stage3_manifest_v2.json"
 
-CANNEAL_V2="/absolute/path/to/fresh/canneal_validation.csv"
-STREAMCLUSTER_V2="/absolute/path/to/fresh/streamcluster_pressure_validation.csv"
-DEDUP_V2="/absolute/path/to/fresh/dedup_pressure_validation.csv"
+PHASE="stage3_v2_fresh_validation_001"
+CANNEAL_V2="$PWD/dataset/raw_traces/finals_v3_recollect/$PHASE/canneal_native_pilot.csv"
+STREAMCLUSTER_V2="$PWD/dataset/raw_traces/finals_v3_recollect/$PHASE/streamcluster_native_pilot.csv"
+DEDUP_V2="$PWD/dataset/raw_traces/finals_v3_recollect/$PHASE/dedup_native_pilot.csv"
 
 test -f "$PREVIOUS_RUN/input_manifest.json"
 test -f "$CANNEAL_V2"
