@@ -6,6 +6,7 @@ import csv
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -154,6 +155,44 @@ class Stage3Test(unittest.TestCase):
     with self.assertRaises(proactive_stage3.Stage3ContractError):
       proactive_stage3.validate_manifest(manifest)
 
+  def test_fresh_pair_materializer_never_creates_test(self):
+    temporary = tempfile.mkdtemp(prefix="capd-stage3-pair-")
+    self.addCleanup(shutil.rmtree, temporary, True)
+    source = os.path.join(temporary, "source.csv")
+    with open(source, "w", encoding="utf-8", newline="") as output_file:
+      writer = csv.writer(output_file)
+      writer.writerow(["PC", "Address", "RW"])
+      for index in range(12):
+        writer.writerow([hex(index), hex(index << 12), index % 2])
+    output_directory = os.path.join(temporary, "pair")
+    command = [
+        sys.executable,
+        os.path.join(
+            PROJECT_ROOT, "scripts",
+            "prepare_capd_proactive_stage3_fresh_pair.py"),
+        "--source", "w={}".format(source),
+        "--output-directory", output_directory,
+        "--train-records", "6",
+        "--validation-records", "4",
+        "--project-root", PROJECT_ROOT,
+    ]
+    result = subprocess.run(
+        command, cwd=PROJECT_ROOT, check=False,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    self.assertEqual(0, result.returncode, result.stdout)
+    self.assertTrue(os.path.isfile(
+        os.path.join(output_directory, "w", "train.csv")))
+    self.assertTrue(os.path.isfile(
+        os.path.join(output_directory, "w", "validation.csv")))
+    self.assertFalse(os.path.exists(
+        os.path.join(output_directory, "w", "test.csv")))
+    with open(
+        os.path.join(output_directory, "pair_manifest.json"),
+        encoding="utf-8") as input_file:
+      pair = json.load(input_file)
+    self.assertFalse(pair["formal_test_created"])
+    self.assertFalse(pair["formal_test_used"])
+
   def test_capd_and_candidate_filter_cannot_calibrate(self):
     bad = copy.deepcopy(self.config)
     bad["ranking_policy"] = "capd"
@@ -217,6 +256,45 @@ class Stage3Test(unittest.TestCase):
     self.assertEqual(2, result["validation_unique_pages"])
     self.assertEqual(3, result["train_validation_union_pages"])
     self.assertEqual(1, result["overlap_pages"])
+
+  def test_capacity_preflight_blocks_phase_collapsed_validation(self):
+    traces = {
+        "w": {
+            "train": [
+                {"page": page, "rw": 0, "pc": page}
+                for page in range(100)],
+            "validation": [
+                {"page": page % 10, "rw": 0, "pc": page}
+                for page in range(1000)],
+        }}
+    result = proactive_stage3.capacity_input_preflight(
+        traces, self.config)
+    self.assertFalse(result["any_profile_structurally_capable"])
+    self.assertEqual(
+        "blocked_structurally_unreachable_capacity_gate",
+        result["status"])
+    for profile in result["profiles"].values():
+      item = profile["workloads"][0]
+      self.assertTrue(item["capacity_holds_validation_active_set"])
+      self.assertTrue(item["zero_middle_reactive_demotions_guaranteed"])
+
+  def test_capacity_preflight_allows_pressure_capable_validation(self):
+    traces = {
+        "w": {
+            "train": [
+                {"page": page, "rw": 0, "pc": page}
+                for page in range(100)],
+            "validation": [
+                {"page": page % 100, "rw": 0, "pc": page}
+                for page in range(1000)],
+        }}
+    result = proactive_stage3.capacity_input_preflight(
+        traces, self.config)
+    self.assertTrue(result["any_profile_structurally_capable"])
+    self.assertEqual("ready_for_reactive_capacity_replay", result["status"])
+    self.assertTrue(
+        result["profiles"]["primary"][
+            "all_validation_workloads_structurally_capable"])
 
   def test_empty_working_set_fails(self):
     with self.assertRaises(proactive_stage3.Stage3ContractError):

@@ -1,115 +1,94 @@
 # CAPD 主动降级阶段 3：capacity_rule_v2 服务器运行
 
-## 数据选择
+## 已废止的数据选择
 
-不再调用依赖 `/root/qmap-work` 的重新采集脚本。v2 固定使用仓库中现有但未参与本次 v2 规则设计的 `real_workload_suite/5m` Train/Validation 对：
+不要再用 `dataset/processed/real_workload_suite/5m` 做正式 v2
+Validation。该目录元数据虽然含 `limit=5000000`，实际每个 workload
+只有 100000 条记录，Train/Validation 分别为 80000/10000。正式运行
+`stage3-v2-real-003` 已证明其 Validation 活跃集无法形成预声明容量压力。
 
-- `parsec_canneal_train.csv` / `parsec_canneal_valid.csv`；
-- `parsec_streamcluster_train.csv` / `parsec_streamcluster_valid.csv`；
-- `parsec_dedup_train.csv` / `parsec_dedup_valid.csv`。
+`real_workload_suite/1m` 仍在仓库中，实际为 1000000 条记录，切分为
+800000/100000/100000；它没有丢失。但其连续 Validation 尾段只有
+30/54/10 个活跃页。诊断结果表明它在当前全局 Working Set 容量定义下
+同样无法通过 v2，因此不能仅把路径从 `5m` 换成 `1m` 后重跑。
 
-同一 workload 的 Train/Validation 来自同一套 trace 划分，避免跨运行绝对地址使 Working Set 并集失真。任何 `test.csv` 都不使用。程序还会拒绝把 `stage3-real-001` 的旧 Train/Validation 直接复用到 v2。
+以上两套数据都不得再声称是本轮规则修改后的“全新 Validation”。
+任何 `test.csv` 均不得用于参数选择。
 
-## 一次性运行命令
+## 修复后的防返工机制
 
-所有命令在服务器终端执行；不要在交互终端设置 `set -e`。
+`preflight_capd_proactive_stage3_inputs.py` 会在正式 Reactive-LRU 回放前检查：
 
-```bash
-cd "$HOME/Q-former-for-OS"
+- 只接受 Train/Validation，拒绝 Test；
+- 中档绝对容量是否已经能容纳整个 Validation 活跃页集合；
+- 每个 profile 是否对所有 Validation workload 都具备结构上的可达性。
 
-PREVIOUS_RUN="$PWD/outputs/capd_proactive_calibration/stage3/stage3-real-001"
-V2_MANIFEST="$PWD/stage3_manifest_v2_003.json"
-SUITE="$PWD/dataset/processed/real_workload_suite/5m"
+若两个 profile 都结构不可达，脚本返回 3，写出
+`<run-id>-input-preflight.json`，并跳过耗时回放。
 
-python3 scripts/prepare_capd_proactive_stage3_v2_manifest.py \
-  --previous-run-directory "$PREVIOUS_RUN" \
-  --train "canneal=$SUITE/parsec_canneal_train.csv" \
-  --validation "canneal=$SUITE/parsec_canneal_valid.csv" \
-  --train "streamcluster_pressure=$SUITE/parsec_streamcluster_train.csv" \
-  --validation "streamcluster_pressure=$SUITE/parsec_streamcluster_valid.csv" \
-  --train "dedup_pressure=$SUITE/parsec_dedup_train.csv" \
-  --validation "dedup_pressure=$SUITE/parsec_dedup_valid.csv" \
-  --output "$V2_MANIFEST" \
-  --project-root "$PWD"
+## 唯一正式运行入口
 
-if [ $? -eq 0 ] && [ -f "$V2_MANIFEST" ]; then
-  export STAGE3_INPUT_MANIFEST="$V2_MANIFEST"
-  export STAGE3_RUN_ID="stage3-v2-real-003"
-  printf 'manifest=%s\nrun_id=%s\n' \
-    "$STAGE3_INPUT_MANIFEST" "$STAGE3_RUN_ID"
-  bash scripts/validate_capd_proactive_stage3_server.sh
-else
-  echo "V2 manifest 生成失败；当前终端保留，请检查上方第一条错误。"
-fi
-```
-
-manifest 生成器拒绝覆盖已有文件；若 `stage3_manifest_v2_003.json` 已存在，请把 manifest 文件名和 run id 的 `003` 同时换成新的编号。
-
-## 运行状态
-
-另开终端：
+先同步最新代码，然后在服务器终端执行。不要用 `source` 执行脚本，也不要
+在交互终端设置 `set -e`。
 
 ```bash
 cd "$HOME/Q-former-for-OS"
-tail -f stage3_validation.log
+conda activate capd
+
+bash scripts/run_capd_proactive_stage3_fresh_server.sh \
+  --phase stage3_v2_fresh_001
 ```
 
-查看持久化进度：
+脚本按顺序完成：
+
+1. 自动寻找采集运行时并一次性核对 DynamoRIO、PARSEC 二进制和输入；
+2. 对 canneal、streamcluster、dedup 各重新采集恰好 1M 条真实 RW；
+3. 每个 workload 只切 600k Train 和 400k Validation，不创建 Test；
+4. 生成带旧 Stage-3 输入指纹拒绝列表的 v2 manifest；
+5. 先做容量可达性预检；
+6. 预检通过后才执行 Reactive-LRU、burst、水位与 `b_max`。
+
+若运行时不在自动搜索位置，显式指定一次：
 
 ```bash
-cd "$HOME/Q-former-for-OS"
-tail -f \
-  outputs/capd_proactive_calibration/stage3/stage3-v2-real-001.incomplete/logs/progress.jsonl
+bash scripts/run_capd_proactive_stage3_fresh_server.sh \
+  --phase stage3_v2_fresh_001 \
+  --qmap-root /absolute/path/to/qmap-work
 ```
 
-如果运行中断且 `.incomplete` 存在，输入和代码都没有变化时恢复：
+这里的 `qmap-work` 必须同时包含：
 
-```bash
-cd "$HOME/Q-former-for-OS"
-STAGE3_INPUT_MANIFEST="$PWD/stage3_manifest_v2.json" \
-STAGE3_RUN_ID="stage3-v2-real-001" \
-STAGE3_RESUME=1 \
-bash scripts/validate_capd_proactive_stage3_server.sh
-```
+- `parsec-3.0/`
+- `tools/extern/DynamoRIO-Linux-11.91.20581/`
+- `parsec-inputs/finals_v3_recollect/`
+
+缺失时脚本只打印一条 `FINALS_V3_RECOLLECT_ERROR` 并返回，不会关闭当前终端，
+也不会开始长时间实验。
 
 ## 结束标志
 
-成功形成可审阅冻结候选：
+正式候选形成：
 
 ```text
 STAGE3_V2_FREEZE_CANDIDATE_READY profile=primary
 STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE
+STAGE3_FRESH_SERVER_FINISHED status=0
 ```
 
-或：
+或 fallback：
 
 ```text
 STAGE3_V2_FREEZE_CANDIDATE_READY profile=fallback
 STAGE3_CALIBRATION_RESULTS_READY_FOR_FREEZE
+STAGE3_FRESH_SERVER_FINISHED status=0
 ```
 
-若容量门槛仍未通过：
+新数据在昂贵回放前被拒绝：
 
 ```text
-STAGE3_V2_CAPACITY_NOT_FREEZABLE
+STAGE3_V2_INPUT_PREFLIGHT_BLOCKED
+STAGE3_FRESH_TRACE_REJECTED_BEFORE_EXPENSIVE_REPLAY
 ```
 
-此时脚本以状态码 3 结束，但 Reactive 容量审计目录已经完整落盘，不会运行水位和 `b_max` 的 Proactive-LRU。
-
-若容量通过但水位、`b_max` 或 K 代理不变性未形成完整候选：
-
-```text
-STAGE3_V2_PROACTIVE_NOT_FREEZABLE
-```
-
-此时脚本以状态码 4 结束，保留全部已完成产物。
-
-## 需要同步回本地
-
-```text
-stage3_manifest_v2.json
-stage3_validation.log
-outputs/capd_proactive_calibration/stage3/stage3-v2-real-001/
-```
-
-最终冻结只在本地复核 `capacity_pressure_audit.json`、`selection_decision.json`、`freeze_candidate.json`、水位/批量原始结果和 provenance 后进行。
+此时保留新采集 trace、Train/Validation pair、manifest 和 preflight JSON，
+但不冻结任何容量、水位或 `b_max`。

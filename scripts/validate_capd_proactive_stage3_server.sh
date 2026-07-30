@@ -45,7 +45,10 @@ done
 echo "[stage3] compile without writing into the repository"
 "${PYTHON_BIN}" -m py_compile \
   qmap/proactive_stage3.py \
+  scripts/collect_finals_v3_recollect.py \
+  scripts/preflight_capd_proactive_stage3_inputs.py \
   scripts/prepare_capd_proactive_stage3_v2_manifest.py \
+  scripts/prepare_capd_proactive_stage3_fresh_pair.py \
   scripts/run_capd_proactive_stage3_calibration.py \
   tests/test_capd_proactive_stage3.py
 
@@ -204,6 +207,21 @@ git diff --check
 if [[ -n "${STAGE3_INPUT_MANIFEST:-}" ]]; then
   real_run_id="${STAGE3_RUN_ID:-stage3-$(date -u +%Y%m%dT%H%M%SZ)}"
   real_output_root="${STAGE3_OUTPUT_ROOT:-${REPO_ROOT}/outputs/capd_proactive_calibration}"
+  preflight_artifact="${real_output_root}/stage3/${real_run_id}-input-preflight.json"
+  mkdir -p "$(dirname "${preflight_artifact}")"
+  echo "[stage3] preflight real Validation pressure reachability"
+  set +e
+  "${PYTHON_BIN}" scripts/preflight_capd_proactive_stage3_inputs.py \
+    --config "${CONFIG}" \
+    --input-manifest "${STAGE3_INPUT_MANIFEST}" \
+    --project-root "${REPO_ROOT}" \
+    --output "${preflight_artifact}"
+  preflight_status=$?
+  set -e
+  if [[ "${preflight_status}" -ne 0 ]]; then
+    echo "STAGE3_V2_REAL_REPLAY_SKIPPED_BY_INPUT_PREFLIGHT"
+    exit "${preflight_status}"
+  fi
   echo "[stage3] run real Train/Validation calibration run_id=${real_run_id}"
   resume_args=()
   if [[ "${STAGE3_RESUME:-0}" == "1" ]]; then

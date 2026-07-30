@@ -19,7 +19,8 @@ import time
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-QMAP_ROOT = "/root/qmap-work"
+DEFAULT_QMAP_ROOT = "/root/qmap-work"
+QMAP_ROOT = DEFAULT_QMAP_ROOT
 PARSEC_ROOT = os.path.join(QMAP_ROOT, "parsec-3.0")
 DYNAMORIO = os.path.join(
     QMAP_ROOT,
@@ -175,6 +176,62 @@ WORKLOADS = {
     },
 }
 DEFAULT_WORKLOADS = ("canneal", "streamcluster_pressure", "dedup_pressure")
+
+
+def configure_runtime_root(explicit_root=None):
+  """Rebase collection dependencies instead of assuming /root/qmap-work."""
+  global QMAP_ROOT, PARSEC_ROOT, DYNAMORIO, INPUT_ROOT
+  candidates = []
+  if explicit_root:
+    candidates.append(explicit_root)
+  environment_root = os.environ.get("QMAP_WORK_ROOT")
+  if environment_root:
+    candidates.append(environment_root)
+  candidates.extend([
+      DEFAULT_QMAP_ROOT,
+      os.path.join(os.path.expanduser("~"), "qmap-work"),
+      os.path.join(os.path.dirname(PROJECT_ROOT), "qmap-work"),
+      PROJECT_ROOT,
+  ])
+  unique_candidates = []
+  for candidate in candidates:
+    resolved = os.path.abspath(os.path.expanduser(candidate))
+    if resolved not in unique_candidates:
+      unique_candidates.append(resolved)
+  if explicit_root or environment_root:
+    selected = unique_candidates[0]
+  else:
+    selected = next(
+        (candidate for candidate in unique_candidates
+         if (
+             os.path.isdir(os.path.join(candidate, "parsec-3.0")) and
+             os.path.isfile(os.path.join(
+                 candidate, "tools", "extern",
+                 "DynamoRIO-Linux-11.91.20581", "bin64", "drrun")) and
+             os.path.isdir(os.path.join(
+                 candidate, "parsec-inputs", "finals_v3_recollect")))),
+        None)
+    if selected is None:
+      raise FileNotFoundError(
+          "Cannot locate qmap-work runtime. Searched: {}. "
+          "Pass --qmap-root or set QMAP_WORK_ROOT.".format(
+              unique_candidates))
+
+  previous_root = QMAP_ROOT
+  for spec in WORKLOADS.values():
+    for key in ("binary", "input", "archive", "runconf"):
+      path = spec.get(key)
+      if path:
+        relative = os.path.relpath(path, previous_root)
+        spec[key] = os.path.join(selected, relative)
+  QMAP_ROOT = selected
+  PARSEC_ROOT = os.path.join(QMAP_ROOT, "parsec-3.0")
+  DYNAMORIO = os.path.join(
+      QMAP_ROOT,
+      "tools/extern/DynamoRIO-Linux-11.91.20581/bin64/drrun")
+  INPUT_ROOT = os.path.join(
+      QMAP_ROOT, "parsec-inputs/finals_v3_recollect")
+  return QMAP_ROOT
 
 
 def sha256_file(path):
@@ -378,6 +435,13 @@ def collect_one(args, workload, common):
 
 def build_arg_parser():
   parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument(
+      "--qmap-root", default=None,
+      help="Runtime root containing parsec-3.0, DynamoRIO, and parsec-inputs. "
+           "Defaults to QMAP_WORK_ROOT or a detected qmap-work directory.")
+  parser.add_argument(
+      "--preflight-only", action="store_true",
+      help="Validate every runtime dependency without collecting or writing.")
   parser.add_argument("--phase", default="pilot_1m")
   parser.add_argument("--run-id", default=None)
   parser.add_argument(
@@ -394,32 +458,48 @@ def build_arg_parser():
   return parser
 
 
-def main():
-  args = build_arg_parser().parse_args()
-  if args.max_records <= 0 or args.skip_records < 0:
-    raise ValueError("Invalid record counts.")
-  if args.trace_ref_multiplier <= 0:
-    raise ValueError("--trace-ref-multiplier must be positive.")
-  if args.trace_after_instrs < 0:
-    raise ValueError("--trace-after-instrs must be non-negative.")
-  args.run_id = args.run_id or datetime.datetime.now().strftime(
-      "%Y%m%dT%H%M%S")
-  workloads = [item.strip() for item in args.workloads.split(",")
-               if item.strip()]
-  unknown = sorted(set(workloads) - set(WORKLOADS))
-  if unknown:
-    raise ValueError("Unknown workloads: {}".format(unknown))
+def main(argv=None):
+  args = build_arg_parser().parse_args(argv)
+  try:
+    if args.max_records <= 0 or args.skip_records < 0:
+      raise ValueError("Invalid record counts.")
+    if args.trace_ref_multiplier <= 0:
+      raise ValueError("--trace-ref-multiplier must be positive.")
+    if args.trace_after_instrs < 0:
+      raise ValueError("--trace-after-instrs must be non-negative.")
+    args.run_id = args.run_id or datetime.datetime.now().strftime(
+        "%Y%m%dT%H%M%S")
+    workloads = [item.strip() for item in args.workloads.split(",")
+                 if item.strip()]
+    unknown = sorted(set(workloads) - set(WORKLOADS))
+    if unknown:
+      raise ValueError("Unknown workloads: {}".format(unknown))
 
-  project_git = git_snapshot(PROJECT_ROOT)
-  if args.project_commit:
-    project_git["source_workspace_commit"] = args.project_commit
-  common = {
-      "project_git": project_git,
-      "parsec_git": git_snapshot(PARSEC_ROOT),
-  }
-  for workload in workloads:
-    collect_one(args, workload, common)
+    configure_runtime_root(args.qmap_root)
+    if args.preflight_only:
+      for workload in workloads:
+        validate_source(workload)
+        print("[preflight] {} ready".format(workload))
+      print("QMAP_WORK_ROOT={}".format(QMAP_ROOT))
+      print("FINALS_V3_RECOLLECT_PREFLIGHT_READY")
+      return 0
+
+    project_git = git_snapshot(PROJECT_ROOT)
+    if args.project_commit:
+      project_git["source_workspace_commit"] = args.project_commit
+    common = {
+        "project_git": project_git,
+        "parsec_git": git_snapshot(PARSEC_ROOT),
+    }
+    for workload in workloads:
+      collect_one(args, workload, common)
+    return 0
+  except (
+      FileNotFoundError, ValueError,
+      subprocess.CalledProcessError) as error:
+    print("FINALS_V3_RECOLLECT_ERROR: {}".format(error), file=sys.stderr)
+    return 2
 
 
 if __name__ == "__main__":
-  main()
+  raise SystemExit(main())

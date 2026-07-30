@@ -599,6 +599,99 @@ def working_set_summary(
   return results
 
 
+def capacity_input_preflight(
+    traces: Mapping[str, Mapping[str, Sequence[Any]]],
+    config: Mapping[str, Any]
+) -> Dict[str, Any]:
+  """Rejects inputs whose Validation active set makes v2 impossible.
+
+  Capacity v2 defines absolute capacities from the Train/Validation union but
+  selects a profile on Validation.  If the middle capacity can hold every
+  Validation page, reactive LRU must produce zero replacements at that point,
+  so the predeclared positive middle-pressure and sample-size gates cannot
+  pass.  Detecting that structural impossibility does not inspect Test and
+  avoids an expensive replay that cannot change the decision.
+  """
+  rule = config["pressure_distinguishability_rule"]
+  selection_split = rule["selection_split"]
+  _require(
+      selection_split == "validation",
+      "capacity_input_preflight requires Validation selection.")
+  summaries = working_set_summary(traces, config["page_size_bytes"])
+  by_workload = {item["workload"]: item for item in summaries}
+  profile_results = {}
+  for profile_name in ("primary", "fallback"):
+    ratios = config["capacity_profile_candidates"][profile_name]
+    _require(
+        isinstance(ratios, list) and len(ratios) == 3,
+        "{} capacity profile must contain three ratios.".format(
+            profile_name))
+    middle_ratio = ratios[1]
+    workload_results = []
+    for workload in sorted(traces):
+      summary = by_workload[workload]
+      validation = traces[workload][selection_split]
+      validation_pages = summary["validation_unique_pages"]
+      capacity = capacity_pages(
+          summary["train_validation_union_pages"], middle_ratio)
+      capacity_holds_validation_active_set = (
+          capacity["dram_capacity_pages"] >= validation_pages)
+      reliable_length = (
+          len(validation) >= rule["min_accesses_per_run"])
+      structurally_capable = (
+          reliable_length and
+          not capacity_holds_validation_active_set)
+      workload_results.append({
+          "workload": workload,
+          "selection_split": selection_split,
+          "validation_accesses": len(validation),
+          "validation_unique_pages": validation_pages,
+          "train_validation_union_pages":
+              summary["train_validation_union_pages"],
+          "validation_union_coverage_ratio": (
+              validation_pages /
+              float(summary["train_validation_union_pages"])),
+          "middle_capacity_ratio": middle_ratio,
+          "middle_capacity_pages": capacity["dram_capacity_pages"],
+          "capacity_holds_validation_active_set":
+              capacity_holds_validation_active_set,
+          "zero_middle_reactive_demotions_guaranteed":
+              capacity_holds_validation_active_set,
+          "reliable_length": reliable_length,
+          "structurally_capable_of_passing_v2": structurally_capable,
+      })
+    profile_results[profile_name] = {
+        "profile_name": profile_name,
+        "ratios": list(ratios),
+        "middle_ratio": middle_ratio,
+        "all_validation_workloads_structurally_capable": all(
+            item["structurally_capable_of_passing_v2"]
+            for item in workload_results),
+        "workloads": workload_results,
+    }
+  any_profile_capable = any(
+      item["all_validation_workloads_structurally_capable"]
+      for item in profile_results.values())
+  return {
+      "schema_version": "capd_proactive_stage3_input_preflight_v1",
+      "capacity_rule_version": CAPACITY_RULE_VERSION,
+      "selection_split": selection_split,
+      "test_used": False,
+      "status": (
+          "ready_for_reactive_capacity_replay"
+          if any_profile_capable
+          else "blocked_structurally_unreachable_capacity_gate"),
+      "reason": (
+          "at_least_one_profile_can_reach_all_validation_pressure_gates"
+          if any_profile_capable
+          else
+          "each_profile_has_a_validation_workload_whose_middle_capacity_"
+          "holds_the_entire_active_set"),
+      "any_profile_structurally_capable": any_profile_capable,
+      "profiles": profile_results,
+  }
+
+
 def capacity_pages(working_set_pages: int, ratio: float) -> Dict[str, Any]:
   pages = _positive_integer(working_set_pages, "working_set_pages")
   ratio_value = _finite_number(ratio, "capacity_ratio")
