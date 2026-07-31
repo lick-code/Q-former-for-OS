@@ -56,3 +56,22 @@ run ID 是一次验收现场的唯一目录名。失败会原子写入
 其中关键证据包括 `selection_decision.json`、`final_tpp_config.json`、
 `confirmation_receipt.json`、`fairness_audit.json`、`server_test_receipt.json`、
 `verification.json` 和 `run_state.json`。
+
+## 已完成验收记录
+
+`stage6-tpp-r1` 已在 Linux 服务器完成验收：
+
+- 最终状态：`stage6_tpp_inspired_verified`
+- 最终标记：`[FINAL] STAGE6_TPP_INSPIRED_VERIFIED`
+- 冻结配置：`tpp-e1024-c1-doff`
+- 完整 Validation 网格：36/36 job 完成
+- 选定配置确认：3/3 job 通过
+- 实验 A 公平性：3/3 job 通过
+- 阶段 1～6 回归：146 项通过
+- Test 打开：否
+- 正式性能结论：无
+- 阶段 7 入口门禁：`satisfied`
+
+权威证据目录为 `outputs/capd_proactive_stage6/stage6-tpp-r1/`。该记录只确认阶段 6
+TPP-inspired Baseline 实现、参数冻结和统一框架验收完成，不表示正式 Test 已运行，
+也不表示 CAPD 相对任何方法的性能优劣。
