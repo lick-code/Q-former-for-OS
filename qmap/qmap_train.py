@@ -437,7 +437,14 @@ def apply_finals_config(args, explicit_seed=None):
       "approx_ndcg_alpha", 10.0))
   args.position_encoding = config.get("model", {}).get(
       "position_encoding", "none")
-  args.use_page_id_embedding = finals_config.use_page_id_embedding(config)
+  # load_config(require_resolved=True) above is the single authoritative
+  # schema/data-manifest validation boundary. Do not re-run the whole finals
+  # schema validator merely to read this backward-compatible optional flag:
+  # unit callers may replace the validated loader with a minimal projection,
+  # and a second parse would incorrectly treat that projection as a raw v3
+  # document. The default exactly matches finals_config.use_page_id_embedding.
+  args.use_page_id_embedding = bool(
+      config.get("model", {}).get("use_page_id_embedding", True))
   args.shared_page_embedding = (
       config.get("embedding", {}).get("page", {}).get("shared", False))
   if config["schema_version"] == finals_config.SCHEMA_VERSION:

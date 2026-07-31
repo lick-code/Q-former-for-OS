@@ -57,6 +57,23 @@ class MultiSeedTrainingTest(unittest.TestCase):
     self.assertEqual(42, args.seed)
     self.assertEqual("explicit_cli", args.training_seed_source)
 
+  def test_validated_loader_result_is_not_reparsed_as_raw_v3(self):
+    args = self._args()
+    with mock.patch.object(qmap_train.finals_config, "load_config",
+                           return_value=self._config()) as loader, \
+         mock.patch.object(qmap_train.finals_config,
+                           "use_page_id_embedding",
+                           side_effect=AssertionError(
+                               "validated config was reparsed")), \
+         mock.patch.object(qmap_train, "_validate_finals_artifacts",
+                           return_value={}):
+      qmap_train.apply_finals_config(args, explicit_seed=42)
+    loader.assert_called_once_with(
+        "config.json", require_resolved=True,
+        project_root=qmap_train.PROJECT_ROOT,
+        verify_manifest_files=False)
+    self.assertTrue(args.use_page_id_embedding)
+
   def test_official_seed_set_and_output_directories_are_distinct(self):
     self.assertEqual((3136859, 42, 2026), stage4.stage4_common.SEEDS)
     paths = {"seed_{}".format(seed) for seed in stage4.stage4_common.SEEDS}
