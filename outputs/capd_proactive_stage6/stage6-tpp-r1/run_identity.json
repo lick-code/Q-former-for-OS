@@ -1,0 +1,59 @@
+{
+  "code_artifacts": {
+    "configs/finals/capd_proactive_stage6_tpp.json": "4c38ea0c21bc4d3a8914197a042e9143939b435d3b523ae3fd8e7f0fe07463b0",
+    "configs/finals/capd_proactive_stage6_tpp_result_schema.json": "2a2d2d8beff21fa22cb974f070949abeff8ff48d58f885a5da94440fd3be283c",
+    "docs/CAPD_PROACTIVE_STAGE6_PROTOCOL_CN.md": "a0994447bf33f34d5287ac055abbfe882ad003cfb1313800e4d3ab060a886896",
+    "docs/CAPD_PROACTIVE_STAGE6_SERVER_RUN_CN.md": "eb88c0aafaaabb1757b804e85257d082368675d8a91972fcdc8773c46ce93711",
+    "docs/CAPD_PROACTIVE_STAGE6_STATUS_CN.md": "607b330bcb2ced44c1bbed14755c2abcec6e59960a975a5a4fb64995a0279c89",
+    "qmap/proactive_cost.py": "acedf1d88f49a87d2bb60e61754328c04083443c58b7c95a847e41f58266e4a7",
+    "qmap/proactive_replay.py": "2a5d04ec6cbf7243623cf7e0aec1b457c62eb832cdeeab0235fd4c295cd10be1",
+    "qmap/proactive_stage5_contract.py": "a0b5b9775afb5ebf2be2125d57d415fadaf4bd445fcd165418de3754a5bd38e0",
+    "qmap/proactive_stage5_policies.py": "8a7e9476a57de7c090a026ad301af137df36b1200cbe5462d9164474775d83a5",
+    "qmap/proactive_stage5_replay.py": "d792dbff116b9650a65ed0ae3b73cc2e8c245c0191b2a5d0a698002567d80aec",
+    "qmap/proactive_stage6_contract.py": "d25445d17e4606622a3bc7a0ecedd6a1fa23ae0ce05a461181ddf8f09309e8dd",
+    "qmap/proactive_stage6_replay.py": "2e8d4ee3965ed4d9acc787342878fca778abf3abde600674925f3608302616a4",
+    "qmap/proactive_stage6_tpp.py": "2bd2bf9d5ef59e9c42d45f1db29f4aa5416e8dfb80f34156793ebc0754de21fe",
+    "scripts/run_capd_proactive_stage6.py": "da57309e598e225287d559f0d2b351df7bafa9f4b02960ab6b1d415926a1ab9a",
+    "scripts/validate_capd_proactive_stage6_server.sh": "63a546570d7b21ab26aa33211a526162de6986d7a05e882a79c2112fff2cd81b",
+    "tests/test_capd_proactive_stage6_e2e.py": "8878172c4866c89e696f6385132ca61bbd940c25e6e765d9045d81770c586fbf",
+    "tests/test_capd_proactive_stage6_tpp.py": "63ff9f07830ff2d58f062878e86da98bcd9d539f1abe2195b46cbc44dd6391d6"
+  },
+  "config_sha256": "4c38ea0c21bc4d3a8914197a042e9143939b435d3b523ae3fd8e7f0fe07463b0",
+  "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+  "cost_config_sha256": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0",
+  "git": {
+    "commit": "faffb115d16dc0aca0e929f6a7e2262c1b39ae77",
+    "dirty_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dirty_worktree": true,
+    "status": [
+      "?? stage6-stage6-tpp-r1-console.log"
+    ]
+  },
+  "run_identity_sha256": "3abe29764365dd4bad46c31816d4dd4f1c0e75bb006f4964beedd21aff8ed761",
+  "selection_rule_sha256": "6274caf947f8451b2ee6bd5ca5c1c92be53baa4f4d775281a24ee2adcf603c09",
+  "stage0_sha256": "2226bf05a401f90d093d6fbd5255011cab4af506714b790775908d4a373835c0",
+  "stage4_checkpoint_sha256": {
+    "2026": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b",
+    "3136859": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47",
+    "42": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+  },
+  "stage4_dataset_identity_sha256": "ff2504254cbbe666af51f51301e814b0b803da658c43c3ee6754d23b9b412bcb",
+  "stage4_dataset_manifest_sha256": "8a7629e00ddac74496e7fbe5e617889f6df4408716da432883770b47b6d32c34",
+  "stage4_freeze_candidate_sha256": "480d2d8a577a3b7d17a312f0a786f93e003c65160961cfb1d392a200baef3a93",
+  "stage4_verification_sha256": "5655a300c8ab27a00522067740c58e88e35bb5461dae7d66b617371470802db9",
+  "stage5_entry_sha256": {
+    "fairness_audit": "442dd11860fa49c9e6c467dc87ef133e9e7891a91fd2dadc16387d2e2897300e",
+    "run_state": "508134e8e1792ec404a3f92985d03e307f424fca36256a725b34eac32d7b08f6",
+    "stage5_config": "81bfc754ad194f02a62405f5c716eb8dfc65232da5d39801f667dacac387e609",
+    "verification": "96aed31be275e53cd0930b8cb29b166a54767b2608311cd1825c8d819ea90354"
+  },
+  "trace_sha256": {
+    "canneal:train": "4a98f01a328d2d86b680fde62818163ceb2403392f59676210ea22989c3b773f",
+    "canneal:validation": "2805d4cf2a4d5d2051a0db3baf6ded3abf7d720f82eae3071f0746f4fcaee142",
+    "dedup_pressure:train": "1c505939b9041ae4c0d3a6cb8fed653a45a42aab74a7b74f7d73f3d333b9f716",
+    "dedup_pressure:validation": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8",
+    "streamcluster_pressure:train": "a04bbff36eccb0091d933efd69a390c150114d67bc6644f3dbdf0991897f252d",
+    "streamcluster_pressure:validation": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774"
+  },
+  "validation_grid_sha256": "684d5ac552b62bd14e1152e65027794ceaa393396fea452c285ba7206caaaed4"
+}

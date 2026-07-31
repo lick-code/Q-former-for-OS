@@ -1,0 +1,34 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T03:13:36Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+  "job_identity": {
+    "accesses": 1000000,
+    "invariant_mode": "boundary",
+    "job_name": "grid__dedup_pressure__validation__tpp-e0064-c2-don",
+    "measure_latency": true,
+    "mode": "grid",
+    "parameters": {
+      "cold_threshold": 2,
+      "dirty_tie_break": true,
+      "epoch_length": 64,
+      "experiment_id": "tpp-e0064-c2-don"
+    },
+    "policy": "tpp_inspired",
+    "retain_access_logs": false,
+    "run_identity_sha256": "3abe29764365dd4bad46c31816d4dd4f1c0e75bb006f4964beedd21aff8ed761",
+    "source_interval": {
+      "end": 2000000,
+      "start": 1000000
+    },
+    "split": "validation",
+    "trace_sha256": "19ea50b168cd601e3bb52e24f07102402cc7315b7f30895ff4ee0da1c8a931c8",
+    "workload": "dedup_pressure"
+  },
+  "job_identity_sha256": "500b68224942bfc6e02c039c61486539d4d6f5e581aaf2d7014e04b509ed3311",
+  "result_sha256": "5eb17d676b681a87f284ca63460edd26fd6b1a94232ea44e3bb5905322a3ab7f",
+  "schema_version": "capd_proactive_stage6_job_v1_0",
+  "semantic_result_sha256": "1efe061d88ff85164e7491761bc0ef9c0119ea984973cc565dcd202061818e58",
+  "started_at": "2026-07-31T03:13:12Z",
+  "status": "completed"
+}

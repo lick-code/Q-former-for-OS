@@ -1,0 +1,38 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+  "evidence_sha256": {
+    "confirmation_receipt.json": "3a475db6b020174fbd78e6b5ca6f6aba758a03f0940213eb5ba75d932befe0c6",
+    "fairness_audit.json": "1f658b1ff7f9659a52cd02d0b3cc5f3883f1e6abcd0a487c956a37bc59dcee93",
+    "final_tpp_config.json": "b30af9254f5933eb78dbeb17f87215cfe83012268d040ac483d61dda8e234acd",
+    "selection_decision.json": "ebab14371f7964284eb0dc703fddd7a94817d45b822292dcd6337b69c14d7a60",
+    "server_test_receipt.json": "f3aa70e9b1350e954dcec6c227bfe8368b354f2d2390a7ee6a1dd3b137a062b1",
+    "synthetic_e2e_receipt.json": "7c821c3a6bf4949905bba4ef73342dd78442303eeb000dc597bb738ec14d38bb"
+  },
+  "experiment_A_fairness": "passed",
+  "full_frozen_validation_intervals": true,
+  "interpretation_boundary": "TPP-inspired Replay-compatible adaptation; not Linux TPP and not formal Test performance.",
+  "old_finals_v3_stage_artifacts_used": false,
+  "performance_conclusion": null,
+  "promotion_performed": false,
+  "schema_version": "capd_proactive_stage6_verification_v1_0",
+  "selected_experiment_id": "tpp-e1024-c1-doff",
+  "selected_parameters": {
+    "cold_threshold": 1,
+    "dirty_tie_break": false,
+    "epoch_length": 1024
+  },
+  "stage5_entry_status": "stage5_baseline_framework_verified",
+  "stage5_tpp_status_preserved": "pending_stage6",
+  "stage7_entry_gate": "satisfied",
+  "status": "stage6_tpp_inspired_verified",
+  "test_trace_opened": false,
+  "test_used_for_selection": false,
+  "tpp_fallback_used": false,
+  "validation_configuration_count": 12,
+  "validation_workloads": [
+    "canneal",
+    "dedup_pressure",
+    "streamcluster_pressure"
+  ],
+  "verified_at": "2026-07-31T03:19:45Z"
+}

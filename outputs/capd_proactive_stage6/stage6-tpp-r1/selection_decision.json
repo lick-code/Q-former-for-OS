@@ -1,0 +1,425 @@
+{
+  "aggregates": [
+    {
+      "cold_short_reuse_rate": 0.0,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.015622857142857143,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0064-c1-doff",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.040082333333333,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 1,
+        "dirty_tie_break": false,
+        "epoch_length": 64
+      },
+      "semantic_result_sha256": {
+        "canneal": "4eb9f443c42f39176372150140a4ab76ca15f281a4ed5517b08f8161b389d628",
+        "dedup_pressure": "1a4d2045b5ca04c295d4ac0fc7cd8e6e420d9541095a67b71900425fc0d27d2c",
+        "streamcluster_pressure": "3a712518d2394f605f04039788d04026c92f5d9257c9292dd8c7372991bb0168"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042695,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 0.0
+    },
+    {
+      "cold_short_reuse_rate": 0.0003667033370003667,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0003667033370003667,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.015622857142857143,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0064-c1-don",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.0400889999999998,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 1,
+        "dirty_tie_break": true,
+        "epoch_length": 64
+      },
+      "semantic_result_sha256": {
+        "canneal": "0e847f9932d9e7a0c0ff9622530be57c9489ccf5929b95f79c793ce78979810c",
+        "dedup_pressure": "a3b6b3c468e287887c8a32130cf95d7d8c199866e03f7687335ee7246bdec50f",
+        "streamcluster_pressure": "3500d8516ec4300b0cffcc595412f863674dbf39aa04c759392c660803ad0f28"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042715,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 1.9181064453297488e-05
+    },
+    {
+      "cold_short_reuse_rate": 0.0,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.015622857142857143,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0064-c2-doff",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.040082333333333,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 2,
+        "dirty_tie_break": false,
+        "epoch_length": 64
+      },
+      "semantic_result_sha256": {
+        "canneal": "9c6aff2bab81852450e964e51c3e250a72f35e4d709da75f53414f7668a29bde",
+        "dedup_pressure": "0a257a18789366ed10a1e7f5ac3747dbfaefe500ef7077ca857451b4c4849cbc",
+        "streamcluster_pressure": "02e227f14dc2cc32caafd16856592d8c1deaaa819da2c96bc917c4f2a21a82bf"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042695,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 0.0
+    },
+    {
+      "cold_short_reuse_rate": 0.0003667033370003667,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0003667033370003667,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.015622857142857143,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0064-c2-don",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.0400889999999998,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 2,
+        "dirty_tie_break": true,
+        "epoch_length": 64
+      },
+      "semantic_result_sha256": {
+        "canneal": "d1a2138c5e8b14cf486d16b0d7e78fca5a4bdd00c9d90cdd6f707d7ed3597b9b",
+        "dedup_pressure": "1efe061d88ff85164e7491761bc0ef9c0119ea984973cc565dcd202061818e58",
+        "streamcluster_pressure": "f78dd5ae49986c95512e31911d528963cbda758e55091245969388a0b1409644"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042715,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 1.9181064453297488e-05
+    },
+    {
+      "cold_short_reuse_rate": 0.0,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.003905714285714286,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0256-c1-doff",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.040082333333333,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 1,
+        "dirty_tie_break": false,
+        "epoch_length": 256
+      },
+      "semantic_result_sha256": {
+        "canneal": "396f2c91eb15fd450904eb911a1e201a7d42803330db50a0abf3d53f48157f70",
+        "dedup_pressure": "ddae045f12f3c860e65492d36c201c9eb9614aea6eafd0b7178f93843093bc3d",
+        "streamcluster_pressure": "781d9d244902d263738009fe90777af023dc3cd83f7e8e9c65933b796cccb4d2"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042695,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 0.0
+    },
+    {
+      "cold_short_reuse_rate": 0.0003667033370003667,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0003667033370003667,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.003905714285714286,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0256-c1-don",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.0400889999999998,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 1,
+        "dirty_tie_break": true,
+        "epoch_length": 256
+      },
+      "semantic_result_sha256": {
+        "canneal": "4ec291eab034a565c490a8857e8c35d4a9d24ad117c8b514e5ed63941934add6",
+        "dedup_pressure": "228ff60c81e45dd3ccbebcc693b52c1a936e150d59afec3809bea0307a8bd642",
+        "streamcluster_pressure": "d4d6c125026e9cd2e9ee941abe7395897814bb95d7497938e40fce8d80d3ad69"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042715,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 1.9181064453297488e-05
+    },
+    {
+      "cold_short_reuse_rate": 0.0,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.003905714285714286,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0256-c2-doff",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.040082333333333,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 2,
+        "dirty_tie_break": false,
+        "epoch_length": 256
+      },
+      "semantic_result_sha256": {
+        "canneal": "b61ccff2877fca9360a5dda3df7439037a5e75fdbe979c617501298e09648a60",
+        "dedup_pressure": "276cfede280bf230752151c03a85c83b52e75cd16e9038e13c89ca2bc82bcfe5",
+        "streamcluster_pressure": "3c880198c35038468f126326b89797b7c720f2adb530bcf606afeac436df7704"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042695,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 0.0
+    },
+    {
+      "cold_short_reuse_rate": 0.0003667033370003667,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0003667033370003667,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.003905714285714286,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e0256-c2-don",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.0400889999999998,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 2,
+        "dirty_tie_break": true,
+        "epoch_length": 256
+      },
+      "semantic_result_sha256": {
+        "canneal": "0c319cf34f17990273e91bd85149e62bd40adbe93af79f6b52ed4491fb5a0f3e",
+        "dedup_pressure": "bbd048693a6ff8215f8fc8fb19a2debd9636f746a402c74171524ce0f6e39c8e",
+        "streamcluster_pressure": "5dc3bd78ad8a2f601322ad54bc88747188b54a8dbffd0f7f68614c8d50246925"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042715,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 1.9181064453297488e-05
+    },
+    {
+      "cold_short_reuse_rate": 0.0,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.0009757142857142857,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e1024-c1-doff",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.040082333333333,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 1,
+        "dirty_tie_break": false,
+        "epoch_length": 1024
+      },
+      "semantic_result_sha256": {
+        "canneal": "24c11404d371ebeaf54d4a19f13bf2b73f50f085e287c5e9cd2416f91224959e",
+        "dedup_pressure": "c774f665af9a603ff17f4b3ec4fb3f4044c9bc094d5575a8d5fbbe1491cde72a",
+        "streamcluster_pressure": "4f2d90c85da495304e17a0c3f2e617945ee24e0211654f2bd697d0721ed3c2b2"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042695,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 0.0
+    },
+    {
+      "cold_short_reuse_rate": 0.0003667033370003667,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0003667033370003667,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.0009757142857142857,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e1024-c1-don",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.0400889999999998,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 1,
+        "dirty_tie_break": true,
+        "epoch_length": 1024
+      },
+      "semantic_result_sha256": {
+        "canneal": "a06802adaf4e0c431fc072b8623e542f70b909a36cf68f6be957c904b93bbbbe",
+        "dedup_pressure": "de7451d36a655c3f42d709d6d6cb5e12a9ccea83be9a99529ff683cf41d53a38",
+        "streamcluster_pressure": "291142ed56e255d889d2140128a5ba5a64b58af33bcb87f9ecfb41bb56aad879"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042715,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 1.9181064453297488e-05
+    },
+    {
+      "cold_short_reuse_rate": 0.0,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.0009757142857142857,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e1024-c2-doff",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.040082333333333,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 2,
+        "dirty_tie_break": false,
+        "epoch_length": 1024
+      },
+      "semantic_result_sha256": {
+        "canneal": "e629c27c5782999588e76131a132b4bc71faefff9e5fd3933bc88b053cc60328",
+        "dedup_pressure": "8f66a07a1d809996f825d95718d280b373ba0f1540f65dd7f9a3e681d2dc3383",
+        "streamcluster_pressure": "a5d7f4fbeb02a21a48b35f176e08399cec4cc7c6a7e9377e1aa634ae6d19428c"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042695,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 0.0
+    },
+    {
+      "cold_short_reuse_rate": 0.0003667033370003667,
+      "demotion_rate": 0.0019478571428571429,
+      "early_reuse_rate": 0.0003667033370003667,
+      "eligible": true,
+      "emergency_fallback_count": 0,
+      "epoch_transition_rate": 0.0009757142857142857,
+      "exclusion_reasons": [],
+      "experiment_id": "tpp-e1024-c2-don",
+      "free_frame_exhaustion_count": 0,
+      "macro_weighted_cost_per_access": 1.0400889999999998,
+      "near_best": true,
+      "nvm_write_rate": 0.0008707142857142858,
+      "parameters": {
+        "cold_threshold": 2,
+        "dirty_tie_break": true,
+        "epoch_length": 1024
+      },
+      "semantic_result_sha256": {
+        "canneal": "411b5422c9cd9289a949d58c2c5c4fdea48bc92c9499cf33290a2e9f2b54be2f",
+        "dedup_pressure": "20e2ed79957dd9794c4e10520465ad272a33efaadb1334d37117544c2625cfd9",
+        "streamcluster_pressure": "45394e0e9f370e7b41c161fd59b01c56e3186077db197fa2534dbf409758056a"
+      },
+      "workload_weighted_cost_per_access": {
+        "canneal": 1.042715,
+        "dedup_pressure": 1.021232,
+        "streamcluster_pressure": 1.05632
+      },
+      "worst_workload_relative_gap": 1.9181064453297488e-05
+    }
+  ],
+  "configuration_count": 12,
+  "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+  "full_frozen_validation_intervals": true,
+  "global_configuration_only": true,
+  "performance_conclusion": null,
+  "schema_version": "capd_proactive_stage6_selection_v1_0",
+  "selected_experiment_id": "tpp-e1024-c1-doff",
+  "selected_parameters": {
+    "cold_threshold": 1,
+    "dirty_tie_break": false,
+    "epoch_length": 1024
+  },
+  "selection_inputs_sha256": "9f2db5be17403f3c72630f852c487743b7d0b5cf63a7646004ad72a6fdfda886",
+  "selection_rule": {
+    "aggregation": "unweighted_macro_mean_across_all_validation_workloads",
+    "complexity_preference": {
+      "cold_threshold": [
+        1,
+        2
+      ],
+      "dirty_tie_break": [
+        false,
+        true
+      ],
+      "epoch_length": [
+        1024,
+        256,
+        64
+      ]
+    },
+    "maximum_cold_short_reuse_rate_absolute_gap": 0.05,
+    "maximum_early_reuse_rate_absolute_gap": 0.05,
+    "maximum_nvm_write_rate_relative_to_grid_minimum": 1.1,
+    "maximum_worst_workload_relative_gap": 0.1,
+    "measured_selection_latency_role": "diagnostic_only_not_selection_due_to_cross_machine_nondeterminism",
+    "near_best_relative_tolerance": 0.01,
+    "near_best_tie_break": [
+      "lower_worst_workload_relative_gap",
+      "lower_nvm_write_rate",
+      "lower_early_reuse_rate",
+      "lower_cold_short_reuse_rate",
+      "lower_demotion_rate",
+      "lower_epoch_transition_rate",
+      "lower_predeclared_complexity_rank",
+      "lexicographically_smaller_experiment_id"
+    ],
+    "nvm_write_rate_absolute_slack": 1e-06,
+    "primary_metric": "validation_macro_weighted_cost_per_access",
+    "require_zero_emergency_fallback": true,
+    "require_zero_free_frame_exhaustion": true,
+    "version": "stage6_tpp_global_selection_v1_0"
+  },
+  "split": "validation",
+  "status": "stage6_results_ready_for_freeze",
+  "test_trace_opened": false,
+  "test_used_for_selection": false,
+  "workloads": [
+    "canneal",
+    "dedup_pressure",
+    "streamcluster_pressure"
+  ]
+}

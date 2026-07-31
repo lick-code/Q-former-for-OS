@@ -1,0 +1,1384 @@
+{
+  "B": null,
+  "F_low": 8,
+  "F_target": 16,
+  "access_log_retention": "omitted_full_validation_memory_bound_round_event_logs_retained",
+  "accesses": [],
+  "b_max": 4,
+  "b_t_rule": "min(b_max,F_target-F_t,|C_t|)",
+  "candidate_contract": {
+    "candidate_order": "oldest_to_newest",
+    "candidate_rebuilt_every_round": true,
+    "candidate_size_K": 8,
+    "candidate_source": "current_lru_tail",
+    "current_entering_page_excluded_until_resident": true,
+    "padding": false,
+    "selection_subset_required": true,
+    "sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489"
+  },
+  "candidate_contract_sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489",
+  "candidate_size_K": 8,
+  "candidate_source": "lru_tail",
+  "capacity_claim": "conditional_engineering_default_not_capacity_rule_v2_pass",
+  "checkpoint": null,
+  "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "cycles": [],
+  "dram_capacity_pages": 1861,
+  "dram_working_set_ratio": 0.2,
+  "emergency_fallback_policy": "shared_lru_not_tpp_selection",
+  "events": [],
+  "fallback_policy": "lru",
+  "final_full_invariant_check": true,
+  "final_state": {
+    "F_t": 1786,
+    "access_index": 4095,
+    "active_proactive_cycle": null,
+    "cycle_counter": 0,
+    "decision_counter": 0,
+    "dirty_state": {
+      "31265816576": true,
+      "31265844591": false,
+      "31265844919": false,
+      "31265844998": false,
+      "31265845095": false,
+      "31265846633": false,
+      "31265846981": false,
+      "31265846982": false,
+      "31265847186": false,
+      "31265847187": false,
+      "31265848035": false,
+      "31265848036": false,
+      "31265848520": false,
+      "31265848560": false,
+      "31265848561": false,
+      "31265848916": false,
+      "31265848985": false,
+      "31265849478": false,
+      "31265850586": false,
+      "31265852878": false,
+      "31265853163": false,
+      "31265853391": false,
+      "31265853567": false,
+      "31265853600": false,
+      "31265853918": false,
+      "31265854008": false,
+      "31265855284": false,
+      "31265855312": false,
+      "31265857260": false,
+      "31265857405": false,
+      "31265857443": false,
+      "31265857687": false,
+      "31265858046": false,
+      "31265858118": false,
+      "31265859747": false,
+      "31265860717": false,
+      "31265860797": false,
+      "31265861549": false,
+      "31265861550": false,
+      "31265861637": false,
+      "31265861778": false,
+      "31265862190": false,
+      "31265862345": false,
+      "31265862523": false,
+      "31265862792": false,
+      "31265863319": false,
+      "31265863417": false,
+      "31265863418": false,
+      "31265863578": false,
+      "31265864767": false,
+      "31265865189": false,
+      "31265865510": false,
+      "31265866032": false,
+      "31265866191": false,
+      "31265866905": false,
+      "31265867126": false,
+      "31265867196": false,
+      "31265867460": false,
+      "31265867494": false,
+      "31265867495": false,
+      "31265867729": false,
+      "31268237454": false,
+      "31268237859": false,
+      "31268241724": false,
+      "31268241740": false,
+      "31268241742": false,
+      "31268241753": false,
+      "31268241755": false,
+      "31268241779": false,
+      "31268241788": false,
+      "31268241790": false,
+      "31268241870": false,
+      "31268241904": false,
+      "31268241905": false,
+      "31268242634": true
+    },
+    "dram_capacity_pages": 1861,
+    "dram_lru_mru_to_lru": [
+      31265863578,
+      31268237454,
+      31265845095,
+      31268237859,
+      31265816576,
+      31268241870,
+      31265865189,
+      31268241905,
+      31265849478,
+      31268241904,
+      31265855312,
+      31265858046,
+      31268241753,
+      31265867729,
+      31265853918,
+      31268241779,
+      31265855284,
+      31268241740,
+      31265853163,
+      31265848520,
+      31268241790,
+      31265866191,
+      31265857687,
+      31265850586,
+      31265858118,
+      31268241724,
+      31265848916,
+      31265863418,
+      31265863417,
+      31265859747,
+      31265853600,
+      31265864767,
+      31265862345,
+      31268241755,
+      31265861550,
+      31265861549,
+      31265854008,
+      31268241788,
+      31265861637,
+      31268241742,
+      31265848036,
+      31265848035,
+      31265853567,
+      31265846633,
+      31265867196,
+      31265860797,
+      31265866032,
+      31265853391,
+      31265860717,
+      31265867460,
+      31265863319,
+      31265867495,
+      31265867494,
+      31265862190,
+      31265846982,
+      31265846981,
+      31268242634,
+      31265844998,
+      31265862792,
+      31265862523,
+      31265857260,
+      31265861778,
+      31265844591,
+      31265847187,
+      31265847186,
+      31265865510,
+      31265844919,
+      31265866905,
+      31265857405,
+      31265848561,
+      31265848560,
+      31265848985,
+      31265867126,
+      31265857443,
+      31265852878
+    ],
+    "dram_resident": [
+      31265816576,
+      31265844591,
+      31265844919,
+      31265844998,
+      31265845095,
+      31265846633,
+      31265846981,
+      31265846982,
+      31265847186,
+      31265847187,
+      31265848035,
+      31265848036,
+      31265848520,
+      31265848560,
+      31265848561,
+      31265848916,
+      31265848985,
+      31265849478,
+      31265850586,
+      31265852878,
+      31265853163,
+      31265853391,
+      31265853567,
+      31265853600,
+      31265853918,
+      31265854008,
+      31265855284,
+      31265855312,
+      31265857260,
+      31265857405,
+      31265857443,
+      31265857687,
+      31265858046,
+      31265858118,
+      31265859747,
+      31265860717,
+      31265860797,
+      31265861549,
+      31265861550,
+      31265861637,
+      31265861778,
+      31265862190,
+      31265862345,
+      31265862523,
+      31265862792,
+      31265863319,
+      31265863417,
+      31265863418,
+      31265863578,
+      31265864767,
+      31265865189,
+      31265865510,
+      31265866032,
+      31265866191,
+      31265866905,
+      31265867126,
+      31265867196,
+      31265867460,
+      31265867494,
+      31265867495,
+      31265867729,
+      31268237454,
+      31268237859,
+      31268241724,
+      31268241740,
+      31268241742,
+      31268241753,
+      31268241755,
+      31268241779,
+      31268241788,
+      31268241790,
+      31268241870,
+      31268241904,
+      31268241905,
+      31268242634
+    ],
+    "frequency_state": {
+      "31265816576": 100,
+      "31265844591": 32,
+      "31265844919": 32,
+      "31265844998": 32,
+      "31265845095": 12,
+      "31265846633": 32,
+      "31265846981": 31,
+      "31265846982": 1,
+      "31265847186": 31,
+      "31265847187": 1,
+      "31265848035": 31,
+      "31265848036": 1,
+      "31265848520": 32,
+      "31265848560": 31,
+      "31265848561": 1,
+      "31265848916": 32,
+      "31265848985": 32,
+      "31265849478": 32,
+      "31265850586": 32,
+      "31265852878": 7,
+      "31265853163": 32,
+      "31265853391": 32,
+      "31265853567": 32,
+      "31265853600": 32,
+      "31265853918": 32,
+      "31265854008": 32,
+      "31265855284": 32,
+      "31265855312": 32,
+      "31265857260": 32,
+      "31265857405": 32,
+      "31265857443": 32,
+      "31265857687": 32,
+      "31265858046": 32,
+      "31265858118": 32,
+      "31265859747": 32,
+      "31265860717": 32,
+      "31265860797": 32,
+      "31265861549": 31,
+      "31265861550": 1,
+      "31265861637": 32,
+      "31265861778": 32,
+      "31265862190": 32,
+      "31265862345": 32,
+      "31265862523": 32,
+      "31265862792": 32,
+      "31265863319": 32,
+      "31265863417": 31,
+      "31265863418": 1,
+      "31265863578": 1619,
+      "31265864767": 32,
+      "31265865189": 32,
+      "31265865510": 32,
+      "31265866032": 32,
+      "31265866191": 32,
+      "31265866905": 32,
+      "31265867126": 32,
+      "31265867196": 32,
+      "31265867460": 32,
+      "31265867494": 31,
+      "31265867495": 1,
+      "31265867729": 32,
+      "31268237454": 504,
+      "31268237859": 203,
+      "31268241724": 3,
+      "31268241740": 6,
+      "31268241742": 6,
+      "31268241753": 2,
+      "31268241755": 1,
+      "31268241779": 3,
+      "31268241788": 3,
+      "31268241790": 2,
+      "31268241870": 14,
+      "31268241904": 7,
+      "31268241905": 3,
+      "31268242634": 1
+    },
+    "history_window": [
+      {
+        "page": 31268237454,
+        "pc": 128074662235183,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234931,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662234934,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234947,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662234952,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662234971,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234976,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234988,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662235104,
+        "rw": 0
+      },
+      {
+        "page": 31268237454,
+        "pc": 128074662235183,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234931,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662234934,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234947,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662234952,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662234971,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234976,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234988,
+        "rw": 0
+      },
+      {
+        "page": 31265845095,
+        "pc": 128074662235104,
+        "rw": 0
+      },
+      {
+        "page": 31268237454,
+        "pc": 128074662235183,
+        "rw": 0
+      },
+      {
+        "page": 31265863578,
+        "pc": 128074662234931,
+        "rw": 0
+      }
+    ],
+    "nvm_resident": [],
+    "raw_event_counters": {
+      "accesses_below_F_low": 0,
+      "dirty_demotions": 0,
+      "dram_hits": 4021,
+      "early_reuse_count": 0,
+      "emergency_demotions": 0,
+      "free_frame_exhaustion_count": 0,
+      "nvm_reads": 74,
+      "nvm_writes": 1,
+      "page_enter_dram_count": 75,
+      "proactive_demotions": 0,
+      "reactive_demotions": 0,
+      "total_accesses": 4096,
+      "total_demotions": 0
+    },
+    "residency_state": {
+      "31265816576": "dram",
+      "31265844591": "dram",
+      "31265844919": "dram",
+      "31265844998": "dram",
+      "31265845095": "dram",
+      "31265846633": "dram",
+      "31265846981": "dram",
+      "31265846982": "dram",
+      "31265847186": "dram",
+      "31265847187": "dram",
+      "31265848035": "dram",
+      "31265848036": "dram",
+      "31265848520": "dram",
+      "31265848560": "dram",
+      "31265848561": "dram",
+      "31265848916": "dram",
+      "31265848985": "dram",
+      "31265849478": "dram",
+      "31265850586": "dram",
+      "31265852878": "dram",
+      "31265853163": "dram",
+      "31265853391": "dram",
+      "31265853567": "dram",
+      "31265853600": "dram",
+      "31265853918": "dram",
+      "31265854008": "dram",
+      "31265855284": "dram",
+      "31265855312": "dram",
+      "31265857260": "dram",
+      "31265857405": "dram",
+      "31265857443": "dram",
+      "31265857687": "dram",
+      "31265858046": "dram",
+      "31265858118": "dram",
+      "31265859747": "dram",
+      "31265860717": "dram",
+      "31265860797": "dram",
+      "31265861549": "dram",
+      "31265861550": "dram",
+      "31265861637": "dram",
+      "31265861778": "dram",
+      "31265862190": "dram",
+      "31265862345": "dram",
+      "31265862523": "dram",
+      "31265862792": "dram",
+      "31265863319": "dram",
+      "31265863417": "dram",
+      "31265863418": "dram",
+      "31265863578": "dram",
+      "31265864767": "dram",
+      "31265865189": "dram",
+      "31265865510": "dram",
+      "31265866032": "dram",
+      "31265866191": "dram",
+      "31265866905": "dram",
+      "31265867126": "dram",
+      "31265867196": "dram",
+      "31265867460": "dram",
+      "31265867494": "dram",
+      "31265867495": "dram",
+      "31265867729": "dram",
+      "31268237454": "dram",
+      "31268237859": "dram",
+      "31268241724": "dram",
+      "31268241740": "dram",
+      "31268241742": "dram",
+      "31268241753": "dram",
+      "31268241755": "dram",
+      "31268241779": "dram",
+      "31268241788": "dram",
+      "31268241790": "dram",
+      "31268241870": "dram",
+      "31268241904": "dram",
+      "31268241905": "dram",
+      "31268242634": "dram"
+    },
+    "round_counter": 0
+  },
+  "formal_test": false,
+  "future_information": "not_accessed",
+  "initial_state": {
+    "dirty_pages": [],
+    "dram_resident": [],
+    "free_frames": 1861,
+    "lru_order": [],
+    "nvm_backing_pages": [
+      31265816576,
+      31265844591,
+      31265844919,
+      31265844998,
+      31265845095,
+      31265846633,
+      31265846981,
+      31265846982,
+      31265847186,
+      31265847187,
+      31265848035,
+      31265848036,
+      31265848520,
+      31265848560,
+      31265848561,
+      31265848916,
+      31265848985,
+      31265849478,
+      31265850586,
+      31265852878,
+      31265853163,
+      31265853391,
+      31265853567,
+      31265853600,
+      31265853918,
+      31265854008,
+      31265855284,
+      31265855312,
+      31265857260,
+      31265857405,
+      31265857443,
+      31265857687,
+      31265858046,
+      31265858118,
+      31265859747,
+      31265860717,
+      31265860797,
+      31265861549,
+      31265861550,
+      31265861637,
+      31265861778,
+      31265862190,
+      31265862345,
+      31265862523,
+      31265862792,
+      31265863319,
+      31265863417,
+      31265863418,
+      31265863578,
+      31265864767,
+      31265865189,
+      31265865510,
+      31265866032,
+      31265866191,
+      31265866905,
+      31265867126,
+      31265867196,
+      31265867460,
+      31265867494,
+      31265867495,
+      31265867729,
+      31268237454,
+      31268237859,
+      31268241724,
+      31268241740,
+      31268241742,
+      31268241753,
+      31268241755,
+      31268241779,
+      31268241788,
+      31268241790,
+      31268241870,
+      31268241904,
+      31268241905,
+      31268242634
+    ]
+  },
+  "initial_state_sha256": "871a2a12085a27fb688154aa254b34ad7b998b493c7da79fcd814df47a04b282",
+  "interpretation_boundary": "Replay-compatible synchronous adaptation; measures ranking quality, NVM events, weighted cost, state trajectory, and synchronous selection overhead. It is not Linux TPP, background execution, promotion, or foreground latency.",
+  "invariant_mode": "full",
+  "latency": {
+    "count": 0,
+    "feature_total_seconds": 0.0,
+    "inference_total_seconds": 0.0,
+    "mean_seconds": null,
+    "measurement_scope": "synchronous_replay_decision_overhead",
+    "p50_seconds": null,
+    "p95_seconds": null,
+    "p99_seconds": null,
+    "selection_total_seconds": 0.0,
+    "total_seconds": 0
+  },
+  "lru_contract_sha256": "9f0f65433bac7549e242d575aeea236c8d7d8d4a70c49bbddf8405bf5083f660",
+  "nvm_capacity_model": "unbounded_backing_tier",
+  "old_finals_v3_stage_artifacts_used": false,
+  "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+  "page_size_bytes": 4096,
+  "performance_conclusion": null,
+  "policy": "tpp_inspired",
+  "policy_display_name": "TPP-inspired",
+  "policy_state": {
+    "tpp_inspired": {
+      "cold_threshold": 1,
+      "current_epoch": 3,
+      "dirty_tie_break": false,
+      "epoch_length": 1024,
+      "metrics": {
+        "candidate_temperature_distribution": {
+          "counts": {
+            "Cold": 0,
+            "Hot": 0,
+            "Warm": 0
+          },
+          "ratios": {
+            "Cold": 0.0,
+            "Hot": 0.0,
+            "Warm": 0.0
+          },
+          "total": 0
+        },
+        "cold_selected_count": 0,
+        "cold_short_reuse_count": 0,
+        "cold_short_reuse_rate": 0.0,
+        "cold_short_reuse_window_accesses": 64,
+        "cold_threshold": 1,
+        "current_epoch": 3,
+        "dirty_tie_break": false,
+        "epoch_length": 1024,
+        "epoch_transition_count": 3,
+        "experiment_id": "tpp-e1024-c1-doff",
+        "fallback_to_lru_used": false,
+        "future_information_accessed": false,
+        "missing_state_initializations": 0,
+        "promotion_performed": false,
+        "selected_dirty_distribution": {
+          "counts": {
+            "clean": 0,
+            "dirty": 0
+          },
+          "ratios": {
+            "clean": 0.0,
+            "dirty": 0.0
+          },
+          "total": 0
+        },
+        "selected_temperature_distribution": {
+          "counts": {
+            "Cold": 0,
+            "Hot": 0,
+            "Warm": 0
+          },
+          "ratios": {
+            "Cold": 0.0,
+            "Hot": 0.0,
+            "Warm": 0.0
+          },
+          "total": 0
+        }
+      },
+      "page_states": {
+        "31265816576": {
+          "dirty": true,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 6
+        },
+        "31265844591": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 24
+        },
+        "31265844919": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 19
+        },
+        "31265844998": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 30
+        },
+        "31265845095": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 75
+        },
+        "31265846633": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 45
+        },
+        "31265846981": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 32
+        },
+        "31265846982": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 33
+        },
+        "31265847186": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 22
+        },
+        "31265847187": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 23
+        },
+        "31265848035": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 47
+        },
+        "31265848036": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 48
+        },
+        "31265848520": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 66
+        },
+        "31265848560": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 13
+        },
+        "31265848561": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 14
+        },
+        "31265848916": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 60
+        },
+        "31265848985": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 11
+        },
+        "31265849478": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 73
+        },
+        "31265850586": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 62
+        },
+        "31265852878": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 1
+        },
+        "31265853163": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 67
+        },
+        "31265853391": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 41
+        },
+        "31265853567": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 46
+        },
+        "31265853600": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 56
+        },
+        "31265853918": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 69
+        },
+        "31265854008": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 50
+        },
+        "31265855284": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 68
+        },
+        "31265855312": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 72
+        },
+        "31265857260": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 27
+        },
+        "31265857405": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 16
+        },
+        "31265857443": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 7
+        },
+        "31265857687": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 63
+        },
+        "31265858046": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 71
+        },
+        "31265858118": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 61
+        },
+        "31265859747": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 57
+        },
+        "31265860717": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 40
+        },
+        "31265860797": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 43
+        },
+        "31265861549": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 51
+        },
+        "31265861550": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 52
+        },
+        "31265861637": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 49
+        },
+        "31265861778": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 25
+        },
+        "31265862190": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 34
+        },
+        "31265862345": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 54
+        },
+        "31265862523": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 28
+        },
+        "31265862792": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 29
+        },
+        "31265863319": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 37
+        },
+        "31265863417": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 58
+        },
+        "31265863418": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 59
+        },
+        "31265863578": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 2
+        },
+        "31265864767": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 55
+        },
+        "31265865189": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 74
+        },
+        "31265865510": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 21
+        },
+        "31265866032": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 42
+        },
+        "31265866191": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 65
+        },
+        "31265866905": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 17
+        },
+        "31265867126": {
+          "dirty": false,
+          "last_access_epoch": 0,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 9
+        },
+        "31265867196": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 44
+        },
+        "31265867460": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 39
+        },
+        "31265867494": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 35
+        },
+        "31265867495": {
+          "dirty": false,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 36
+        },
+        "31265867729": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 70
+        },
+        "31268237454": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 3
+        },
+        "31268237859": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 4
+        },
+        "31268241724": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 15
+        },
+        "31268241740": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 5
+        },
+        "31268241742": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 26
+        },
+        "31268241753": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 8
+        },
+        "31268241755": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 53
+        },
+        "31268241779": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 10
+        },
+        "31268241788": {
+          "dirty": false,
+          "last_access_epoch": 2,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 18
+        },
+        "31268241790": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 64
+        },
+        "31268241870": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 12
+        },
+        "31268241904": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 20
+        },
+        "31268241905": {
+          "dirty": false,
+          "last_access_epoch": 3,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 38
+        },
+        "31268242634": {
+          "dirty": true,
+          "last_access_epoch": 1,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 31
+        }
+      },
+      "round_audits": []
+    }
+  },
+  "promotion_performed": false,
+  "raw_access_event_count": 4096,
+  "rounds": [],
+  "schema_version": "capd_proactive_stage6_tpp_result_v1_0",
+  "seed": null,
+  "selector_status": "disabled",
+  "semantic_result_sha256": "80141776e1bafb23d297f289a4ac0ecbb80be2c63a4c7aa9db9170fc0f3bff4b",
+  "split": "validation",
+  "split_role": "parameter_selection",
+  "stage_status": "stage6_implemented_awaiting_validation",
+  "summary": {
+    "accesses_below_F_low": 0,
+    "average_free_frames": 1817.10302734375,
+    "checkpoint_status": "not_required_stage1",
+    "decision_count": 0,
+    "decision_time_status": "measurement_disabled",
+    "dirty_demotions": 0,
+    "dram_hits": 4021,
+    "early_reuse_count": 0,
+    "early_reuse_rate": 0.0,
+    "emergency_demotions": 0,
+    "free_frame_exhaustion_count": 0,
+    "mean_b_t": null,
+    "mean_decision_time": null,
+    "minimum_free_frames": 1786,
+    "number_of_proactive_cycles": 0,
+    "number_of_proactive_rounds": 0,
+    "nvm_reads": 74,
+    "nvm_writes": 1,
+    "p50_decision_time": null,
+    "p95_decision_time": null,
+    "p99_decision_time": null,
+    "page_enter_dram_count": 75,
+    "policy_name": "tpp_inspired",
+    "proactive_demotions": 0,
+    "ranking_policy": "TPP-inspired",
+    "reactive_demotions": 0,
+    "rounds_per_cycle": null,
+    "schema_version": "capd_proactive_stage1_log_v1_0",
+    "selector_status": "disabled",
+    "total_accesses": 4096,
+    "total_decision_time": 0,
+    "total_demotions": 0,
+    "tpp": {
+      "candidate_temperature_distribution": {
+        "counts": {
+          "Cold": 0,
+          "Hot": 0,
+          "Warm": 0
+        },
+        "ratios": {
+          "Cold": 0.0,
+          "Hot": 0.0,
+          "Warm": 0.0
+        },
+        "total": 0
+      },
+      "cold_selected_count": 0,
+      "cold_short_reuse_count": 0,
+      "cold_short_reuse_rate": 0.0,
+      "cold_short_reuse_window_accesses": 64,
+      "cold_threshold": 1,
+      "current_epoch": 3,
+      "dirty_tie_break": false,
+      "epoch_length": 1024,
+      "epoch_transition_count": 3,
+      "experiment_id": "tpp-e1024-c1-doff",
+      "fallback_to_lru_used": false,
+      "future_information_accessed": false,
+      "missing_state_initializations": 0,
+      "promotion_performed": false,
+      "selected_dirty_distribution": {
+        "counts": {
+          "clean": 0,
+          "dirty": 0
+        },
+        "ratios": {
+          "clean": 0.0,
+          "dirty": 0.0
+        },
+        "total": 0
+      },
+      "selected_temperature_distribution": {
+        "counts": {
+          "Cold": 0,
+          "Hot": 0,
+          "Warm": 0
+        },
+        "ratios": {
+          "Cold": 0.0,
+          "Hot": 0.0,
+          "Warm": 0.0
+        },
+        "total": 0
+      },
+      "selection_latency": {
+        "count": 0,
+        "mean_seconds": null,
+        "measurement_scope": "synchronous_tpp_ranking_plus_top_b_selection",
+        "p50_seconds": null,
+        "p95_seconds": null,
+        "p99_seconds": null,
+        "total_seconds": 0
+      }
+    },
+    "weighted_cost": 4177,
+    "weighted_cost_components": {
+      "demotion_cost": 0,
+      "dram_hit_cost": 4021,
+      "nvm_read_cost": 148,
+      "nvm_write_cost": 8
+    },
+    "weighted_cost_status": "stage2_frozen_default_profile"
+  },
+  "test_used_for_selection": false,
+  "tpp_fallback_used": false,
+  "tpp_parameters": {
+    "cold_short_reuse_window_accesses": 64,
+    "cold_threshold": 1,
+    "dirty_tie_break": false,
+    "epoch_interval": "half_open_epoch_id_equals_access_index_div_epoch_length",
+    "epoch_length": 1024,
+    "experiment_id": "tpp-e1024-c1-doff"
+  },
+  "trace_range": {
+    "end": 604096,
+    "interval": "half_open",
+    "start": 600000
+  },
+  "trace_sha256": "e7d875df6e1247bd71320d4b9e1c3e2a3e029a33dce94ad109d8289342951774",
+  "trigger_mode": "low_watermark",
+  "working_set_definition": "active_unique_pages_from_train_and_validation",
+  "working_set_pages": 9303,
+  "workload": "streamcluster_pressure"
+}

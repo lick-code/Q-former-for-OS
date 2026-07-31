@@ -1,0 +1,78 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+  "performance_conclusion": null,
+  "promotion_performed": false,
+  "schema_version": "capd_proactive_stage6_fairness_suite_v1_0",
+  "selected_experiment_id": "tpp-e1024-c1-doff",
+  "status": "passed",
+  "test_trace_opened": false,
+  "tpp_fallback_used": false,
+  "workloads": {
+    "canneal": {
+      "candidate_identity_check": "shared_constructor_immutable_round_snapshot_and_exact_identity_for_equal_predecision_state",
+      "capd_seeds": [
+        42,
+        2026,
+        3136859
+      ],
+      "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+      "experiment": "A",
+      "performance_conclusion": null,
+      "policies": [
+        "capd",
+        "oracle",
+        "proactive_clock",
+        "proactive_lru",
+        "tpp_inspired"
+      ],
+      "schema_version": "capd_proactive_stage6_fairness_v1_0",
+      "status": "passed",
+      "test_used_for_selection": false,
+      "tpp_inspired_status": "implemented_and_selected_in_stage6"
+    },
+    "dedup_pressure": {
+      "candidate_identity_check": "shared_constructor_immutable_round_snapshot_and_exact_identity_for_equal_predecision_state",
+      "capd_seeds": [
+        42,
+        2026,
+        3136859
+      ],
+      "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+      "experiment": "A",
+      "performance_conclusion": null,
+      "policies": [
+        "capd",
+        "oracle",
+        "proactive_clock",
+        "proactive_lru",
+        "tpp_inspired"
+      ],
+      "schema_version": "capd_proactive_stage6_fairness_v1_0",
+      "status": "passed",
+      "test_used_for_selection": false,
+      "tpp_inspired_status": "implemented_and_selected_in_stage6"
+    },
+    "streamcluster_pressure": {
+      "candidate_identity_check": "shared_constructor_immutable_round_snapshot_and_exact_identity_for_equal_predecision_state",
+      "capd_seeds": [
+        42,
+        2026,
+        3136859
+      ],
+      "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+      "experiment": "A",
+      "performance_conclusion": null,
+      "policies": [
+        "capd",
+        "oracle",
+        "proactive_clock",
+        "proactive_lru",
+        "tpp_inspired"
+      ],
+      "schema_version": "capd_proactive_stage6_fairness_v1_0",
+      "status": "passed",
+      "test_used_for_selection": false,
+      "tpp_inspired_status": "implemented_and_selected_in_stage6"
+    }
+  }
+}

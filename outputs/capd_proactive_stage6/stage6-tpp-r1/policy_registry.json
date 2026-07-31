@@ -1,0 +1,19 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE6-TPP-1.0",
+  "experiment_A": [
+    "proactive_lru",
+    "proactive_clock",
+    "tpp_inspired",
+    "capd",
+    "oracle"
+  ],
+  "schema_version": "capd_proactive_stage6_tpp_v1_0",
+  "stage5_tpp_status": "pending_stage6",
+  "stage6_tpp": {
+    "display_name": "TPP-inspired",
+    "fallback_to_lru_allowed": false,
+    "future_information_allowed": false,
+    "promotion_allowed": false,
+    "status": "implemented"
+  }
+}
