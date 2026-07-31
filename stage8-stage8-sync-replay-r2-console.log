@@ -1,0 +1,19 @@
+python=3.7.16 (default, Jan 17 2023, 22:20:44) 
+[GCC 11.2.0]
+CUBLAS_WORKSPACE_CONFIG=:4096:8
+PYTHONHASHSEED=0
+torch=1.13.1+cu117
+cuda_available=True
+cuda_device=NVIDIA GeForce RTX 3060 Ti
+Traceback (most recent call last):
+  File "scripts/run_capd_proactive_stage8.py", line 649, in <module>
+    main()
+  File "scripts/run_capd_proactive_stage8.py", line 645, in main
+    commands[args.command](args)
+  File "scripts/run_capd_proactive_stage8.py", line 140, in preflight
+    _reject_failed_run(run_root)
+  File "scripts/run_capd_proactive_stage8.py", line 133, in _reject_failed_run
+    "Failed Stage-8 evidence is preserved; use a new run ID.")
+qmap.proactive_stage8_contract.Stage8ContractError: Failed Stage-8 evidence is preserved; use a new run ID.
+[NOT VERIFIED] stage8-sync-replay-r2 failed at preflight
+[FAILED] Stage-8 validation stopped at preflight; evidence preserved in /home/likc/Q-former-for-OS/outputs/capd_proactive_stage8/stage8-sync-replay-r2
