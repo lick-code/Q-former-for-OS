@@ -175,8 +175,11 @@ def audit_authority(config: Mapping[str, Any], project_root: str,
   capacity = load_json(paths["capacity_matrix"])
   stage5_verification = load_json(paths["stage5_verification"])
   stage6_verification = load_json(paths["stage6_verification"])
-  proactive_stage5_contract.validate_config(load_json(paths["stage5_config"]))
+  stage5_config = load_json(paths["stage5_config"])
+  proactive_stage5_contract.validate_config(stage5_config)
   proactive_stage6_contract.validate_config(load_json(paths["stage6_config"]))
+  stage4_checkpoint_authority = proactive_stage5_contract.audit_stage4_authority(
+      stage5_config, project_root, require_checkpoints=True)
   stage7_entry = stage7.audit_stage6_entry(
       load_json(paths["stage7_workload_config"]), project_root)
   _require(verification.get("status") == "stage7_workload_suite_verified" and
@@ -270,6 +273,17 @@ def audit_authority(config: Mapping[str, Any], project_root: str,
                "Job experiment A/B membership changed.")
   _require(set(checkpoint_bindings) == set(CAPD_SEEDS),
            "Three CAPD checkpoint bindings are incomplete.")
+  checkpoint_authority = {
+      int(row["seed"]): row
+      for row in stage4_checkpoint_authority["checkpoints"]}
+  _require(set(checkpoint_authority) == set(CAPD_SEEDS),
+           "Stage-4 checkpoint authority is incomplete.")
+  for seed, (resolved, digest) in checkpoint_bindings.items():
+    frozen = checkpoint_authority[seed]
+    _require(frozen["path"] == resolved and frozen["sha256"] == digest and
+             frozen["selection_criterion"] == "minimum_valid_loss_only",
+             "Plan checkpoint differs from Stage-4 authority for seed {}.".format(
+                 seed))
   test_files = {}
   for workload, locked in lock_map.items():
     _require(locked.get("formal_test") is True and
@@ -290,6 +304,7 @@ def audit_authority(config: Mapping[str, Any], project_root: str,
       "capacity": capacity, "paths": paths, "test_files": test_files,
       "result_schema_path": result_schema_path,
       "checkpoint_bindings": checkpoint_bindings,
+      "checkpoint_authority": checkpoint_authority,
       "stage7_entry": stage7_entry,
       "test_payload_operation": "sha256_integrity_only_not_parsed",
       "test_performance_inspected": False}
@@ -421,6 +436,8 @@ def audit_job_result(result: Mapping[str, Any], job: Mapping[str, Any]) -> None:
              isinstance(checkpoint.get("resolved_path"), str) and
              bool(checkpoint.get("resolved_path")) and
              checkpoint.get("sha256") == job.get("checkpoint", {}).get("sha256") and
+             checkpoint.get("selection_criterion") ==
+             "minimum_valid_loss_only" and
              required_oov <= set(generalization) and
              generalization.get("vocabulary_expansion_allowed") is False and
              generalization.get("unk_index") == 0,

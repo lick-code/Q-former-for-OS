@@ -14,7 +14,7 @@ git switch main
 test "$(git branch --show-current)" = "main"
 
 export PYTHON_BIN=python3
-RUN_ID=stage8-sync-replay-r2
+RUN_ID=stage8-sync-replay-r3
 
 set -o pipefail
 bash scripts/validate_capd_proactive_stage8_server.sh \

@@ -159,6 +159,9 @@ def preflight(args) -> str:
       "checkpoint_sha256": {
           str(seed): binding[1]
           for seed, binding in authority["checkpoint_bindings"].items()},
+      "checkpoint_selection_criterion": {
+          str(seed): row["selection_criterion"]
+          for seed, row in authority["checkpoint_authority"].items()},
       "job_count": 144, "code_artifacts": _code_fingerprints(args.project_root),
       "deterministic_runtime_environment": runtime_environment,
       "device": args.device,
@@ -194,6 +197,8 @@ def preflight(args) -> str:
       "test_performance_inspected": False,
       "test_policy_replay_executed": False,
       "checkpoint_sha256": identity["checkpoint_sha256"],
+      "checkpoint_selection_criterion":
+          identity["checkpoint_selection_criterion"],
       "frozen_parameters_changed": False})
   _write_state(run_root, contract.IMPLEMENTED, ["preflight"])
   print("[OK] Stage-8 preflight {} (Test bytes hashed, not parsed)".format(run_root))
@@ -220,6 +225,9 @@ def _loaded_run(args):
           row["workload"]: row["sha256"] for row in authority["lock"]["workloads"]},
       "checkpoint_sha256": {str(seed): value[1]
                             for seed, value in authority["checkpoint_bindings"].items()},
+      "checkpoint_selection_criterion": {
+          str(seed): row["selection_criterion"]
+          for seed, row in authority["checkpoint_authority"].items()},
       "code_artifacts": _code_fingerprints(args.project_root)}
   current["deterministic_runtime_environment"] = runtime_environment
   current["device"] = args.device
@@ -251,10 +259,8 @@ def runtime_smoke(args) -> None:
             "pc": 100 + index % 11} for index in range(128)]
   checkpoint_receipts = {}
   for seed in contract.CAPD_SEEDS:
-    path, digest = authority["checkpoint_bindings"][seed]
-    checkpoint = {
-        "seed": seed, "path": path, "sha256": digest,
-        "selection_criterion": "minimum_validation_loss_only"}
+    checkpoint = _smoke_checkpoint(authority, seed)
+    digest = checkpoint["sha256"]
     result = proactive_stage5_replay.run_replay(
         stage0, stage5_config, cost, trace, "capd",
         workload="stage8_cuda_smoke", split="validation",
@@ -266,6 +272,7 @@ def runtime_smoke(args) -> None:
         measure_latency=False)
     checkpoint_receipts[str(seed)] = {
         "checkpoint_sha256": digest,
+        "selection_criterion": checkpoint["selection_criterion"],
         "semantic_result_sha256": result["semantic_result_sha256"]}
     del result
     torch.cuda.synchronize(device_index)
@@ -290,6 +297,19 @@ def runtime_smoke(args) -> None:
   print("[OK] Stage-8 deterministic CUDA smoke passed for 3/3 CAPD checkpoints")
 
 
+def _smoke_checkpoint(authority, seed):
+  """Returns the exact Stage-4/5 audited checkpoint row; never infers names."""
+  row = authority.get("checkpoint_authority", {}).get(int(seed))
+  if not isinstance(row, Mapping):
+    raise contract.Stage8ContractError(
+        "Missing audited checkpoint authority for seed {}.".format(seed))
+  required = ("seed", "path", "sha256", "selection_criterion")
+  if any(key not in row for key in required):
+    raise contract.Stage8ContractError(
+        "Incomplete audited checkpoint authority for seed {}.".format(seed))
+  return {key: row[key] for key in required}
+
+
 def _trace(path: str):
   return [{"page": row["page"], "rw": 1 if row["rw"] == "W" else 0,
            "pc": row["pc"]} for row in stage7.iter_trace(path, 12)]
@@ -309,11 +329,16 @@ def _run_job(run_root, stage0, cost, authority, run_identity, job,
   checkpoint = None
   if job["policy"] == "capd":
     resolved, digest = authority["checkpoint_bindings"][int(job["seed"])]
-    checkpoint = {"seed": int(job["seed"]), "path": resolved, "sha256": digest}
+    frozen = authority["checkpoint_authority"][int(job["seed"])]
+    checkpoint = {
+        "seed": int(job["seed"]), "path": resolved, "sha256": digest,
+        "selection_criterion": frozen["selection_criterion"]}
   identity = {
       "run_identity_sha256": run_identity["run_identity_sha256"],
       "plan_job": copy.deepcopy(job), "trace_sha256": lock_row["sha256"],
       "checkpoint_sha256": None if checkpoint is None else checkpoint["sha256"],
+      "checkpoint_selection_criterion": (
+          None if checkpoint is None else checkpoint["selection_criterion"]),
       "device": device, "measure_latency": bool(measure_latency),
       "deterministic_runtime_environment": {
           "CUBLAS_WORKSPACE_CONFIG": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
@@ -373,10 +398,15 @@ def _audit_preexecute_evidence(run_root, config, authority):
         "Execute requires CUDA smoke and full regression receipt before Test parse.")
   smoke = contract.load_json(smoke_path)
   receipt = contract.load_json(receipt_path)
-  expected_checkpoints = {str(seed): value[1]
-                          for seed, value in authority["checkpoint_bindings"].items()}
+  expected_checkpoints = {
+      str(seed): {
+          "checkpoint_sha256": row["sha256"],
+          "selection_criterion": row["selection_criterion"]}
+      for seed, row in authority["checkpoint_authority"].items()}
   observed_checkpoints = {
-      seed: row.get("checkpoint_sha256")
+      seed: {
+          "checkpoint_sha256": row.get("checkpoint_sha256"),
+          "selection_criterion": row.get("selection_criterion")}
       for seed, row in smoke.get("checkpoint_receipts", {}).items()}
   minimum = config["acceptance"][
       "minimum_stage1_through_stage8_regression_tests"]

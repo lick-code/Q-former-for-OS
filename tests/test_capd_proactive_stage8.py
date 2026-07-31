@@ -7,10 +7,12 @@ import copy
 import json
 import os
 import tempfile
+import types
 import unittest
 from unittest import mock
 
 from qmap import proactive_stage7_workloads as stage7
+from qmap import proactive_stage5_contract as stage5_contract
 from qmap import finals_config
 from qmap import proactive_cost
 from qmap import proactive_stage8_contract as contract
@@ -169,6 +171,60 @@ class Stage8ContractTest(unittest.TestCase):
       shell = handle.read()
     self.assertLess(shell.index("export CUBLAS_WORKSPACE_CONFIG"),
                     shell.index("import torch"))
+    self.assertLess(shell.index('CURRENT_STEP="cuda_checkpoint_smoke"'),
+                    shell.index('CURRENT_STEP="formal_144_job_execute"'))
+    for command in ("record-tests", "aggregate", "verify"):
+      command_at = shell.index(command)
+      self.assertIn('--device "${DEVICE}"', shell[max(0, command_at - 180):command_at])
+
+  def test_cuda_smoke_inherits_exact_stage4_checkpoint_criterion(self):
+    import importlib.util
+    script = os.path.join(ROOT, "scripts", "run_capd_proactive_stage8.py")
+    spec = importlib.util.spec_from_file_location("stage8_smoke_script", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    stage5_config = stage5_contract.load_config(os.path.join(
+        ROOT, "configs", "finals", "capd_proactive_stage5.json"))
+    frozen = stage5_contract.audit_stage4_authority(
+        stage5_config, ROOT, require_checkpoints=True)
+    authority = {"checkpoint_authority": {
+        int(row["seed"]): row for row in frozen["checkpoints"]}}
+    for seed in contract.CAPD_SEEDS:
+      checkpoint = module._smoke_checkpoint(authority, seed)
+      self.assertEqual("minimum_valid_loss_only",
+                       checkpoint["selection_criterion"])
+      self.assertEqual(seed, checkpoint["seed"])
+      self.assertEqual(64, len(checkpoint["sha256"]))
+    fake_cuda = types.SimpleNamespace(
+        is_available=lambda: True, device_count=lambda: 1,
+        set_device=lambda index: None, synchronize=lambda index=None: None,
+        empty_cache=lambda: None, get_device_name=lambda index: "fixture-gpu")
+    fake_torch = types.SimpleNamespace(cuda=fake_cuda, __version__="fixture")
+    calls = []
+    def fake_replay(*args, **kwargs):
+      checkpoint = kwargs["checkpoint"]
+      self.assertEqual("minimum_valid_loss_only",
+                       checkpoint["selection_criterion"])
+      calls.append(checkpoint["seed"])
+      return {"semantic_result_sha256": str(checkpoint["seed"])}
+    with tempfile.TemporaryDirectory() as directory:
+      contract.write_json_atomic(os.path.join(directory, "run_state.json"), {
+          "status": contract.IMPLEMENTED, "completed": ["preflight"]})
+      loaded = (directory, _config(), {}, None, dict(authority, paths={
+          "stage5_config": os.path.join(
+              ROOT, "configs", "finals", "capd_proactive_stage5.json")}), {})
+      with mock.patch.object(module, "_loaded_run", return_value=loaded), \
+           mock.patch.object(module.proactive_stage5_replay, "run_replay",
+                             side_effect=fake_replay), \
+           mock.patch.dict(os.environ, {
+               "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+               "PYTHONHASHSEED": "0"}, clear=False), \
+           mock.patch.dict("sys.modules", {"torch": fake_torch}):
+        module.runtime_smoke(types.SimpleNamespace(device="cuda:0"))
+      self.assertEqual(list(contract.CAPD_SEEDS), calls)
+      receipt = contract.load_json(os.path.join(directory, "runtime_smoke.json"))
+      self.assertEqual("passed", receipt["status"])
+      self.assertEqual(3, len(receipt["checkpoint_receipts"]))
 
   def test_formal_replay_requires_stage8_locked_authorization(self):
     job = {"policy": "reactive_lru", "formal_test": False, "split": "test",

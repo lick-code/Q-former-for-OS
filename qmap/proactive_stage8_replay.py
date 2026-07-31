@@ -263,7 +263,8 @@ def run_formal_test_replay(
           "seed": int(checkpoint["seed"]),
           "recorded_path": job["checkpoint"]["path"],
           "resolved_path": checkpoint["path"],
-          "sha256": checkpoint["sha256"]}),
+          "sha256": checkpoint["sha256"],
+          "selection_criterion": checkpoint["selection_criterion"]}),
       "capd_generalization": oov,
       "tpp_parameters": ({
           "epoch_length": 1024, "cold_threshold": 1,
