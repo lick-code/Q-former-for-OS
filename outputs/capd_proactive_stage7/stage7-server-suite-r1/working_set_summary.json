@@ -1,0 +1,67 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "definition": "active_unique_pages_from_train_and_validation",
+  "schema_version": "capd_proactive_stage7_working_set_v1_0",
+  "workloads": [
+    {
+      "definition": "active_unique_pages_from_train_and_validation",
+      "test_pages_used": false,
+      "train_unique_pages": 3011,
+      "train_validation_intersection_pages": 2,
+      "train_validation_union_pages": 4443,
+      "validation_unique_pages": 1434,
+      "working_set_pages": 4443,
+      "workload": "canneal"
+    },
+    {
+      "definition": "active_unique_pages_from_train_and_validation",
+      "test_pages_used": false,
+      "train_unique_pages": 1903,
+      "train_validation_intersection_pages": 7,
+      "train_validation_union_pages": 1921,
+      "validation_unique_pages": 25,
+      "working_set_pages": 1921,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "definition": "active_unique_pages_from_train_and_validation",
+      "test_pages_used": false,
+      "train_unique_pages": 716,
+      "train_validation_intersection_pages": 5,
+      "train_validation_union_pages": 982,
+      "validation_unique_pages": 271,
+      "working_set_pages": 982,
+      "workload": "dedup_pressure"
+    },
+    {
+      "definition": "active_unique_pages_from_train_and_validation",
+      "test_pages_used": false,
+      "train_unique_pages": 108,
+      "train_validation_intersection_pages": 21,
+      "train_validation_union_pages": 110,
+      "validation_unique_pages": 23,
+      "working_set_pages": 110,
+      "workload": "blackscholes"
+    },
+    {
+      "definition": "active_unique_pages_from_train_and_validation",
+      "test_pages_used": false,
+      "train_unique_pages": 297,
+      "train_validation_intersection_pages": 25,
+      "train_validation_union_pages": 297,
+      "validation_unique_pages": 25,
+      "working_set_pages": 297,
+      "workload": "swaptions"
+    },
+    {
+      "definition": "active_unique_pages_from_train_and_validation",
+      "test_pages_used": false,
+      "train_unique_pages": 27719,
+      "train_validation_intersection_pages": 3,
+      "train_validation_union_pages": 27720,
+      "validation_unique_pages": 4,
+      "working_set_pages": 27720,
+      "workload": "fluidanimate"
+    }
+  ]
+}

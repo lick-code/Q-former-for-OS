@@ -1,0 +1,50 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "entry_audit": {
+    "authority_sha256": {
+      "stage0_config": "2226bf05a401f90d093d6fbd5255011cab4af506714b790775908d4a373835c0",
+      "stage3_engineering_default": "ef7eebfb201125067787ac99f536aa70fc38e450a038a59ac26ffccb82da0e76",
+      "stage4_final_freeze": "480d2d8a577a3b7d17a312f0a786f93e003c65160961cfb1d392a200baef3a93",
+      "stage4_verification": "5655a300c8ab27a00522067740c58e88e35bb5461dae7d66b617371470802db9",
+      "stage5_config": "81bfc754ad194f02a62405f5c716eb8dfc65232da5d39801f667dacac387e609",
+      "stage5_verification": "96aed31be275e53cd0930b8cb29b166a54767b2608311cd1825c8d819ea90354",
+      "stage6_config": "4c38ea0c21bc4d3a8914197a042e9143939b435d3b523ae3fd8e7f0fe07463b0",
+      "stage6_final_tpp_config": "b30af9254f5933eb78dbeb17f87215cfe83012268d040ac483d61dda8e234acd",
+      "stage6_verification": "84321235521cff69b0a24cb5df53f5c6c9da99029cbd1f0d069e8805644adb6d"
+    },
+    "selected_tpp_parameters": {
+      "cold_threshold": 1,
+      "dirty_tie_break": false,
+      "epoch_length": 1024
+    },
+    "stage6_status": "stage6_tpp_inspired_verified",
+    "stage7_entry_gate": "satisfied",
+    "status": "passed",
+    "test_trace_opened": false
+  },
+  "formal_test_performance_conclusion": null,
+  "input_sha256": {
+    "capacity_config": "0615cdb82e583cfe6c25f4442fd567dfeb179fab1f08ef7aa64caf01f40631b5",
+    "collection_manifest": "a69a565df8f5014d368813e6143cff86cba0a990369aaae86c3bea855adab0a6",
+    "workload_config": "5402e2e4837a64fbada3d7d68a9e77df7e3479697ad4706a2233fd5fa0debf25"
+  },
+  "output_sha256": {
+    "capacity_matrix.json": "bc8e951a8f66ee2d8d049d3052960f718e9acd27819b54438039041e640fedb4",
+    "collection_manifest.json": "bc7ed1ba90dac2ca782348a20c1778c5cc716d124ea6eee7c6f803bf961b988c",
+    "raw_trace_manifest.json": "3eae8c1a9ca7e98fb11612297bbb094f2ab3875f78115f4ec68e63f6c1e99511",
+    "split_manifest.json": "5b4ebd66d8ef737b7d6c696abb67b0501a10eb60dd09ba9b1eb69bf64bad7fff",
+    "stage8_execution_plan.json": "3e1b26ea9ba9e2d37f3f08d6b22694e23520228f5b8591ed26e92e34d76d14d6",
+    "standard_test_lock.json": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb",
+    "working_set_summary.json": "dc09a04d439afda9684e66256daab82cb61e211acc054cc4479447835f38ba3a",
+    "workload_profiles.csv": "29bf82ac3762afd637c72c95e3a74d866c4e55611b8490a23fa852f787ddcd67",
+    "workload_profiles.json": "7ed46fc70c9eca69cc1297260c3ee91608c69f916910f7fa2cacd9fe83795f60",
+    "workload_registry.json": "0e77551257fd393a1ab85e33d5a47853cf0462bcd83eb4350ae9c46fb2691ac4",
+    "workload_table_cn.md": "39a536f4952d9a66545686cf56ceb4a363a1e3cf19b5e79b3b25de183395a9d6"
+  },
+  "schema_version": "capd_proactive_stage7_provenance_v1_0",
+  "status": "stage7_collection_complete_awaiting_freeze",
+  "test_payload_read_for_integrity": true,
+  "test_performance_inspected": false,
+  "test_policy_replay_executed": false,
+  "test_used_for_parameter_selection": false
+}

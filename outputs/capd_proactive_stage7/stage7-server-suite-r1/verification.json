@@ -1,0 +1,47 @@
+{
+  "capacity_ratios": [
+    "0.20",
+    "0.40",
+    "0.60"
+  ],
+  "capd_used_for_workload_selection": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "evidence_sha256": {
+    "capacity_matrix.json": "bc8e951a8f66ee2d8d049d3052960f718e9acd27819b54438039041e640fedb4",
+    "collection_manifest.json": "bc7ed1ba90dac2ca782348a20c1778c5cc716d124ea6eee7c6f803bf961b988c",
+    "provenance.json": "3f853675bd27ef6bb7a2b069f1bc8b4b5f163b000b41b2f4fb77517649ca9e17",
+    "raw_trace_manifest.json": "3eae8c1a9ca7e98fb11612297bbb094f2ab3875f78115f4ec68e63f6c1e99511",
+    "split_manifest.json": "5b4ebd66d8ef737b7d6c696abb67b0501a10eb60dd09ba9b1eb69bf64bad7fff",
+    "stage8_execution_plan.json": "3e1b26ea9ba9e2d37f3f08d6b22694e23520228f5b8591ed26e92e34d76d14d6",
+    "standard_test_lock.json": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb",
+    "working_set_summary.json": "dc09a04d439afda9684e66256daab82cb61e211acc054cc4479447835f38ba3a",
+    "workload_profiles.csv": "29bf82ac3762afd637c72c95e3a74d866c4e55611b8490a23fa852f787ddcd67",
+    "workload_profiles.json": "7ed46fc70c9eca69cc1297260c3ee91608c69f916910f7fa2cacd9fe83795f60",
+    "workload_registry.json": "0e77551257fd393a1ab85e33d5a47853cf0462bcd83eb4350ae9c46fb2691ac4",
+    "workload_table_cn.md": "39a536f4952d9a66545686cf56ceb4a363a1e3cf19b5e79b3b25de183395a9d6"
+  },
+  "formal_test_performance_conclusion": null,
+  "frozen_parameters_changed": false,
+  "pressure_test_enabled": false,
+  "schema_version": "capd_proactive_stage7_verification_v1_0",
+  "seen_workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure"
+  ],
+  "stage8_entry_gate": "satisfied",
+  "stage8_job_count": 144,
+  "standard_test_sealed": true,
+  "status": "stage7_workload_suite_verified",
+  "test_payload_read_for_integrity": true,
+  "test_performance_inspected": false,
+  "test_policy_replay_executed": false,
+  "test_used_for_parameter_selection": false,
+  "unseen_workloads": [
+    "blackscholes",
+    "swaptions",
+    "fluidanimate"
+  ],
+  "verified_at": "2026-07-31T11:34:34.650166Z",
+  "workload_count": 6
+}
