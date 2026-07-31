@@ -1,0 +1,40 @@
+{
+  "automatic_retry": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "error": "Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#cublasApi_reproducibility",
+  "error_type": "RuntimeError",
+  "failed_at": "2026-07-31T12:28:49.199147Z",
+  "job_identity": {
+    "checkpoint_sha256": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47",
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.20",
+      "checkpoint": {
+        "path": "outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_3136859/qmap_best.pth",
+        "sha256": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47"
+      },
+      "deterministic_policy": false,
+      "dram_pages": 889,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "canneal__r020__capd__seed-3136859",
+      "policy": "capd",
+      "seed": 3136859,
+      "split": "test",
+      "test_identity": "f1a346d2b4ac90afc299bec45f2910fe0797c112e3f86818287e753fc437bbfb",
+      "workload": "canneal",
+      "workload_role": "seen_calibration_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "5cedbd3329928c4ac5ed53110713452d4f4f7c70707fb1a38c8a52326343374b",
+    "trace_sha256": "dbf4707925d63710ef36eb37dcc7d10b7aced2ad41890a0de590f863c9ca5d48"
+  },
+  "job_identity_sha256": "e0fc7a79957c65a6a03d9a806f3263b6bda2b34962b756d0a85af1499dee3e52",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "started_at": "2026-07-31T12:28:39.947052Z",
+  "status": "failed"
+}

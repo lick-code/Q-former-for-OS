@@ -1,0 +1,57 @@
+{
+  "checkpoint_sha256": {
+    "2026": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b",
+    "3136859": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47",
+    "42": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+  },
+  "code_artifacts": {
+    "policy_learning/cache_model/embed.py": "0700a90a6ba51958b5682a86fa51ff65cbdd1fb458dcd806e1747e93ce197485",
+    "qmap/finals_config.py": "4b2b39cdce43762b6541215517642d5cec183a3154957a24dceab71a863d8de6",
+    "qmap/proactive_cost.py": "acedf1d88f49a87d2bb60e61754328c04083443c58b7c95a847e41f58266e4a7",
+    "qmap/proactive_replay.py": "dc2870a3d95de6ad532c498ead3c83deff4848401cecff6a0f4f22db370efd1d",
+    "qmap/proactive_stage4.py": "637cd6434f3771897fe8fd6f72e34dc6d753163032302f6a2454f0662a304240",
+    "qmap/proactive_stage5_contract.py": "a0b5b9775afb5ebf2be2125d57d415fadaf4bd445fcd165418de3754a5bd38e0",
+    "qmap/proactive_stage5_policies.py": "8a7e9476a57de7c090a026ad301af137df36b1200cbe5462d9164474775d83a5",
+    "qmap/proactive_stage5_replay.py": "d792dbff116b9650a65ed0ae3b73cc2e8c245c0191b2a5d0a698002567d80aec",
+    "qmap/proactive_stage6_contract.py": "d25445d17e4606622a3bc7a0ecedd6a1fa23ae0ce05a461181ddf8f09309e8dd",
+    "qmap/proactive_stage6_replay.py": "2e8d4ee3965ed4d9acc787342878fca778abf3abde600674925f3608302616a4",
+    "qmap/proactive_stage6_tpp.py": "2bd2bf9d5ef59e9c42d45f1db29f4aa5416e8dfb80f34156793ebc0754de21fe",
+    "qmap/proactive_stage8_contract.py": "205e8e142b6d701769e478baf0d0087a9167cc9dfd738ebfdce95ca459130acf",
+    "qmap/proactive_stage8_replay.py": "202f2d023129cefc8b78aa4fe41ea13a6b1961b8c0a7fc419d540b9dc64a8023",
+    "qmap/proactive_stage8_results.py": "9ef2c62584069350b40feffe62e93cc2f76c325fd5f77c9a201eef2b93a91610",
+    "qmap/qmap_eval.py": "6583d53e63d1043c763539fe4447d8f167c0c0b0d07c44c11e93fe15674df177",
+    "scripts/run_capd_proactive_stage8.py": "7d09d7bdc9a52c089c88c1378ecf44c6bd326c5b7bbf1ab2559ab9c716c12f7a"
+  },
+  "config_sha256": "8a5174ddf4c0b6e261c4ec40d7ab84b3a28de5a5a4eb02d1bf15c27e2ae94078",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "cost_config_sha256": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0",
+  "entry_authority_sha256": {
+    "stage5_config": "81bfc754ad194f02a62405f5c716eb8dfc65232da5d39801f667dacac387e609",
+    "stage5_verification": "96aed31be275e53cd0930b8cb29b166a54767b2608311cd1825c8d819ea90354",
+    "stage6_config": "4c38ea0c21bc4d3a8914197a042e9143939b435d3b523ae3fd8e7f0fe07463b0",
+    "stage6_verification": "84321235521cff69b0a24cb5df53f5c6c9da99029cbd1f0d069e8805644adb6d",
+    "stage7_workload_config": "0fcbf855802a214544b1720fb959217a53d72840d3ee7e96aa567f57caece56b"
+  },
+  "git": {
+    "commit": "c8cb68d18b325bf060c069d6c98d7fe574a36448",
+    "dirty_worktree": true
+  },
+  "job_count": 144,
+  "result_schema_sha256": "33a9a21c0f9ed3209fc4cae04f3b8695b3bbc5ac8475ccb611dc3c91fe78da9a",
+  "run_identity_sha256": "5cedbd3329928c4ac5ed53110713452d4f4f7c70707fb1a38c8a52326343374b",
+  "stage0_sha256": "2226bf05a401f90d093d6fbd5255011cab4af506714b790775908d4a373835c0",
+  "stage7_authority_sha256": {
+    "capacity_matrix": "bc8e951a8f66ee2d8d049d3052960f718e9acd27819b54438039041e640fedb4",
+    "execution_plan": "3e1b26ea9ba9e2d37f3f08d6b22694e23520228f5b8591ed26e92e34d76d14d6",
+    "standard_test_lock": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb",
+    "verification": "29bb6b6c3d131a6535b2c326b9a6b502a894d2b42df4c82cf6cba72732b686b3"
+  },
+  "test_payload_sha256": {
+    "blackscholes": "27f4f7107f15ea52ec2052efdcffab3e2cb6cb605f4ac6cd79c6aa49a23d2a3f",
+    "canneal": "dbf4707925d63710ef36eb37dcc7d10b7aced2ad41890a0de590f863c9ca5d48",
+    "dedup_pressure": "7910bdc116b3ff0414feaca3dfeb553dd84b2ef1955c4d4807f92fc643cb2155",
+    "fluidanimate": "598d8dffb4be589ab8bd035f707141a58894db8347051b9beba9358e046df88d",
+    "streamcluster_pressure": "9433aea84e9cd54146ae5852ca41f02e653ef9f6bb7c66721995fb5687e6e12e",
+    "swaptions": "59afbf2923aea4ac6b1375fb3abc602c192b3e789a829b1a0415f50725ce0ef8"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T12:28:39.936965Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_sha256": null,
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.20",
+      "checkpoint": null,
+      "deterministic_policy": true,
+      "dram_pages": 889,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "canneal__r020__oracle__seed-na",
+      "policy": "oracle",
+      "seed": null,
+      "split": "test",
+      "test_identity": "f1a346d2b4ac90afc299bec45f2910fe0797c112e3f86818287e753fc437bbfb",
+      "workload": "canneal",
+      "workload_role": "seen_calibration_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "5cedbd3329928c4ac5ed53110713452d4f4f7c70707fb1a38c8a52326343374b",
+    "trace_sha256": "dbf4707925d63710ef36eb37dcc7d10b7aced2ad41890a0de590f863c9ca5d48"
+  },
+  "job_identity_sha256": "ccae123e2f928c70908045df7fdc67789fc9665016ab5a1c24e189749e97640e",
+  "result_sha256": "c9695d8b2928ffbb04ac3410f807cddc1eb21ab0cd6685940f3637afeb56dfed",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "419c26723094c7090481faac65170b63bac4c8a992fa32614134a9cf728b9cea",
+  "started_at": "2026-07-31T12:28:30.026327Z",
+  "status": "completed"
+}
