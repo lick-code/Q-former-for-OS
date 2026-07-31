@@ -1,0 +1,42 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T13:18:34.631837Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_selection_criterion": null,
+    "checkpoint_sha256": null,
+    "deterministic_runtime_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.40",
+      "checkpoint": null,
+      "deterministic_policy": true,
+      "dram_pages": 11088,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "fluidanimate__r040__oracle__seed-na",
+      "policy": "oracle",
+      "seed": null,
+      "split": "test",
+      "test_identity": "116b64f4378a6616b921d3aea912b09e9cd1911cd2d8b3a9a0e6bd502a378be9",
+      "workload": "fluidanimate",
+      "workload_role": "held_out_unseen_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "b01a661004d9352d67e4f07b6d9b918182d6677d59d16cadb082fbb9afeca772",
+    "trace_sha256": "598d8dffb4be589ab8bd035f707141a58894db8347051b9beba9358e046df88d"
+  },
+  "job_identity_sha256": "f5c2424c95c6eaeaee81a9d022de62ff563f92b8c23f777aa65fa22be99510e5",
+  "result_sha256": "4ad747b0d2be40aaa7d5af3c68a12f8f23468e76b3b002453aa3949736d8dc8e",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "a1a6256ec5c9a7f8e79de02e58eda719e5f2befe68ab132b6fc56122158b7eeb",
+  "started_at": "2026-07-31T13:18:25.782029Z",
+  "status": "completed"
+}

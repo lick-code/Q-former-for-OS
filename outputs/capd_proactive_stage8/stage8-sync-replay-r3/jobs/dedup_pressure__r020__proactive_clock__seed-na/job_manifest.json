@@ -1,0 +1,42 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T13:04:03.174732Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_selection_criterion": null,
+    "checkpoint_sha256": null,
+    "deterministic_runtime_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.20",
+      "checkpoint": null,
+      "deterministic_policy": true,
+      "dram_pages": 197,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "dedup_pressure__r020__proactive_clock__seed-na",
+      "policy": "proactive_clock",
+      "seed": null,
+      "split": "test",
+      "test_identity": "28772b4982c2d1043d24c6929d371d54e85e84ede5cbc52ed0721b1c4d85e224",
+      "workload": "dedup_pressure",
+      "workload_role": "seen_calibration_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "b01a661004d9352d67e4f07b6d9b918182d6677d59d16cadb082fbb9afeca772",
+    "trace_sha256": "7910bdc116b3ff0414feaca3dfeb553dd84b2ef1955c4d4807f92fc643cb2155"
+  },
+  "job_identity_sha256": "e1225e99d351a0370394a2cf70b6c7748975a46fd2ddd7aea407ca86a76d833a",
+  "result_sha256": "14231aef25f8fc51406ddacae85b8dfe1bf7635233058334fe502730b45905d8",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "0b75eb4a8549d54a5c5a6e78d5e50a69261217cd5ba079757889a176c9d28dde",
+  "started_at": "2026-07-31T13:03:54.163861Z",
+  "status": "completed"
+}

@@ -1,0 +1,334 @@
+{
+  "B": null,
+  "F_low": 8,
+  "F_target": 16,
+  "access_log_retention": "omitted_memory_bound",
+  "accesses": [],
+  "b_max": 4,
+  "b_t_rule": "min(b_max,F_target-F_t,|C_t|)",
+  "candidate_contract": {
+    "candidate_order": "oldest_to_newest",
+    "candidate_rebuilt_every_round": true,
+    "candidate_size_K": 8,
+    "candidate_source": "current_lru_tail",
+    "current_entering_page_excluded_until_resident": true,
+    "padding": false,
+    "selection_subset_required": true,
+    "sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489"
+  },
+  "candidate_contract_sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489",
+  "candidate_size_K": 8,
+  "candidate_source": "lru_tail",
+  "capacity_ratio": "0.20",
+  "capd_generalization": null,
+  "checkpoint": null,
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "cycles": [],
+  "dram_capacity_pages": 5544,
+  "events": [],
+  "fallback_policy": "lru",
+  "final_state": {
+    "F_t": 5541,
+    "access_index": 599999,
+    "active_proactive_cycle": null,
+    "cycle_counter": 0,
+    "decision_counter": 0,
+    "dirty_state": {
+      "34188762083": false,
+      "34188777051": true,
+      "34357590414": true
+    },
+    "dram_capacity_pages": 5544,
+    "dram_lru_mru_to_lru": [
+      34357590414,
+      34188762083,
+      34188777051
+    ],
+    "dram_resident": [
+      34188762083,
+      34188777051,
+      34357590414
+    ],
+    "frequency_state": {
+      "34188762083": 138794,
+      "34188777051": 3014,
+      "34357590414": 458192
+    },
+    "history_window": [
+      {
+        "page": 34357590414,
+        "pc": 140037169372863,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372894,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372648,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372660,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372664,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372667,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372674,
+        "rw": 0
+      },
+      {
+        "page": 34188762083,
+        "pc": 140037169372690,
+        "rw": 0
+      },
+      {
+        "page": 34188762083,
+        "pc": 140037169372703,
+        "rw": 0
+      },
+      {
+        "page": 34188762083,
+        "pc": 140037169372719,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372723,
+        "rw": 1
+      },
+      {
+        "page": 34188762083,
+        "pc": 140037169372735,
+        "rw": 0
+      },
+      {
+        "page": 34188762083,
+        "pc": 140037169372747,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372767,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372804,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372811,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372816,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372821,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372824,
+        "rw": 0
+      },
+      {
+        "page": 34357590414,
+        "pc": 140037169372829,
+        "rw": 0
+      }
+    ],
+    "nvm_resident": [],
+    "raw_event_counters": {
+      "accesses_below_F_low": 0,
+      "dirty_demotions": 0,
+      "dram_hits": 599997,
+      "early_reuse_count": 0,
+      "emergency_demotions": 0,
+      "free_frame_exhaustion_count": 0,
+      "nvm_reads": 1,
+      "nvm_writes": 2,
+      "page_enter_dram_count": 3,
+      "proactive_demotions": 0,
+      "reactive_demotions": 0,
+      "total_accesses": 600000,
+      "total_demotions": 0
+    },
+    "residency_state": {
+      "34188762083": "dram",
+      "34188777051": "dram",
+      "34357590414": "dram"
+    },
+    "round_counter": 0
+  },
+  "formal_test": true,
+  "future_information": "candidate_scoped_oracle_only",
+  "initial_state": {
+    "dirty_pages": [],
+    "dram_resident": [],
+    "free_frames": 5544,
+    "lru_order": [],
+    "nvm_backing_pages": [
+      34188762083,
+      34188777051,
+      34357590414
+    ]
+  },
+  "initial_state_sha256": "b2baaaecaf31105bae8e51a9c52ed91e6c4567c66a2f5151e7c0b08cf4f77563",
+  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency.",
+  "job_id": "fluidanimate__r020__oracle__seed-na",
+  "metrics": {
+    "average_free_frames": 5541.00029,
+    "decision_count": 0,
+    "dram_hits": 599997,
+    "early_reuse": {
+      "denominator_semantics": "proactive_demotion_events_each_selected_page_counts_once",
+      "first_reuse_distance": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "future_access_count": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "no_future_reuse_count": 0,
+      "per_demotion_audit": [],
+      "wasted_demotion_count": 0,
+      "wasted_demotion_rate": 0.0,
+      "windows": {
+        "1024": {
+          "delta_accesses": 1024,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "256": {
+          "delta_accesses": 256,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "64": {
+          "delta_accesses": 64,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        }
+      },
+      "zero_denominator_rate": 0.0
+    },
+    "emergency_demotions": 0,
+    "emergency_fallback_count": 0,
+    "fallback_rate": 0.0,
+    "fallback_rate_denominator": "page_enter_dram_count",
+    "free_frame_exhaustion_count": 0,
+    "mean_b_t": null,
+    "mean_decision_time": null,
+    "minimum_free_frames": 5541,
+    "number_of_proactive_cycles": 0,
+    "number_of_proactive_rounds": 0,
+    "nvm_reads": 1,
+    "nvm_writes": 2,
+    "p50_decision_time": null,
+    "p95_decision_time": null,
+    "p99_decision_time": null,
+    "page_enter_dram_count": 3,
+    "proactive_demotions": 0,
+    "raw_access_count": 600000,
+    "reactive_demotions": 0,
+    "rounds_per_cycle": null,
+    "total_decision_time": 0,
+    "total_demotions": 0,
+    "weighted_cost": 600015,
+    "weighted_cost_components": {
+      "demotion_cost": 0,
+      "dram_hit_cost": 599997,
+      "nvm_read_cost": 2,
+      "nvm_write_cost": 16
+    },
+    "weighted_cost_per_access": 1.000025
+  },
+  "nvm_capacity_model": "unbounded_backing_tier",
+  "old_finals_v3_stage_artifacts_used": false,
+  "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+  "page_size_bytes": 4096,
+  "performance_selection_performed": false,
+  "policy": "oracle",
+  "policy_display_name": "Oracle",
+  "policy_state": null,
+  "rounds": [],
+  "runtime": {
+    "deterministic_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "latency": {
+      "count": 0,
+      "feature_total_seconds": 0.0,
+      "inference_total_seconds": 0.0,
+      "mean_seconds": null,
+      "measurement_scope": "synchronous_replay_decision_overhead",
+      "p50_seconds": null,
+      "p95_seconds": null,
+      "p99_seconds": null,
+      "selection_total_seconds": 0.0,
+      "total_seconds": 0
+    },
+    "measurement_enabled": true
+  },
+  "schema_version": "capd_proactive_stage8_job_result_v1_0",
+  "seed": null,
+  "selector_status": "disabled",
+  "semantic_result_sha256": "eca75c286aad899791aea8e1db3a33805740bcea4a4096c10124bc059846c025",
+  "split": "test",
+  "stage_status": "stage8_implemented_awaiting_formal_replay",
+  "test_identity": "116b64f4378a6616b921d3aea912b09e9cd1911cd2d8b3a9a0e6bd502a378be9",
+  "test_used_for_selection": false,
+  "tpp_parameters": null,
+  "trace_range": {
+    "end_exclusive": 3000000,
+    "start_inclusive": 2400000
+  },
+  "trace_sha256": "598d8dffb4be589ab8bd035f707141a58894db8347051b9beba9358e046df88d",
+  "trigger_mode": "low_watermark",
+  "working_set_pages": 27720,
+  "workload": "fluidanimate",
+  "workload_role": "held_out_unseen_workload"
+}

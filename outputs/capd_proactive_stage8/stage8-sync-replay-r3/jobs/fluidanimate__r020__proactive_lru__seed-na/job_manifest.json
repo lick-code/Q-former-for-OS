@@ -1,0 +1,43 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T13:16:53.626063Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_selection_criterion": null,
+    "checkpoint_sha256": null,
+    "deterministic_runtime_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.20",
+      "checkpoint": null,
+      "deterministic_policy": true,
+      "dram_pages": 5544,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A",
+        "B"
+      ],
+      "formal_test": true,
+      "job_id": "fluidanimate__r020__proactive_lru__seed-na",
+      "policy": "proactive_lru",
+      "seed": null,
+      "split": "test",
+      "test_identity": "116b64f4378a6616b921d3aea912b09e9cd1911cd2d8b3a9a0e6bd502a378be9",
+      "workload": "fluidanimate",
+      "workload_role": "held_out_unseen_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "b01a661004d9352d67e4f07b6d9b918182d6677d59d16cadb082fbb9afeca772",
+    "trace_sha256": "598d8dffb4be589ab8bd035f707141a58894db8347051b9beba9358e046df88d"
+  },
+  "job_identity_sha256": "c3c09a599cd66553810e67c30f4ae5e27f17d712bbc3442e7fbcd8829bfc0c30",
+  "result_sha256": "10787a740e16352f3ff7bc8b191b2cfffc49ffc2186d66325d82811dc5c3ec6c",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "b8bbe800b38d6a840bf991dfbd3de1e59833b072f2bb4f953f11c893113a63bc",
+  "started_at": "2026-07-31T13:16:44.806729Z",
+  "status": "completed"
+}

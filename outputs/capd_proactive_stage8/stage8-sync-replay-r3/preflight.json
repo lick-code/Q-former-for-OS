@@ -1,0 +1,28 @@
+{
+  "checkpoint_selection_criterion": {
+    "2026": "minimum_valid_loss_only",
+    "3136859": "minimum_valid_loss_only",
+    "42": "minimum_valid_loss_only"
+  },
+  "checkpoint_sha256": {
+    "2026": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b",
+    "3136859": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47",
+    "42": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+  },
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "cuda_checkpoint_smoke_required_before_execute": true,
+  "deterministic_runtime_environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "PYTHONHASHSEED": "0"
+  },
+  "execution_plan_sha256": "3e1b26ea9ba9e2d37f3f08d6b22694e23520228f5b8591ed26e92e34d76d14d6",
+  "frozen_parameters_changed": false,
+  "job_count": 144,
+  "schema_version": "capd_proactive_stage8_preflight_v1_0",
+  "stage8_entry_gate": "satisfied",
+  "standard_test_status": "sealed_for_stage8",
+  "status": "passed",
+  "test_payload_operation": "sha256_integrity_only_not_parsed",
+  "test_performance_inspected": false,
+  "test_policy_replay_executed": false
+}

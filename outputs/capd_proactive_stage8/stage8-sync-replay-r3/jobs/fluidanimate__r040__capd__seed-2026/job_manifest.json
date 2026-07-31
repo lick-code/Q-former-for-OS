@@ -1,0 +1,45 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T13:19:02.581766Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_selection_criterion": "minimum_valid_loss_only",
+    "checkpoint_sha256": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b",
+    "deterministic_runtime_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.40",
+      "checkpoint": {
+        "path": "outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_2026/qmap_best.pth",
+        "sha256": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b"
+      },
+      "deterministic_policy": false,
+      "dram_pages": 11088,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "fluidanimate__r040__capd__seed-2026",
+      "policy": "capd",
+      "seed": 2026,
+      "split": "test",
+      "test_identity": "116b64f4378a6616b921d3aea912b09e9cd1911cd2d8b3a9a0e6bd502a378be9",
+      "workload": "fluidanimate",
+      "workload_role": "held_out_unseen_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "b01a661004d9352d67e4f07b6d9b918182d6677d59d16cadb082fbb9afeca772",
+    "trace_sha256": "598d8dffb4be589ab8bd035f707141a58894db8347051b9beba9358e046df88d"
+  },
+  "job_identity_sha256": "6e840f458c10096e790910205b6ebb007de76a7bd5a06a895cfb275e1ea75735",
+  "result_sha256": "2847cb21c88cd47592191202d9ace11c622f86b32e5fd26c5591a91c590770ef",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "fdc9ffafa403ddc3ae3ac0a8ea0267af274aa4a82600089428944f401935bfa1",
+  "started_at": "2026-07-31T13:18:53.251618Z",
+  "status": "completed"
+}

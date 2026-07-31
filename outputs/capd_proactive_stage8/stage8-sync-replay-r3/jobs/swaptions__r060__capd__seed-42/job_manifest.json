@@ -1,0 +1,45 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T13:16:23.720978Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_selection_criterion": "minimum_valid_loss_only",
+    "checkpoint_sha256": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396",
+    "deterministic_runtime_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.60",
+      "checkpoint": {
+        "path": "outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_42/qmap_best.pth",
+        "sha256": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+      },
+      "deterministic_policy": false,
+      "dram_pages": 179,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "swaptions__r060__capd__seed-42",
+      "policy": "capd",
+      "seed": 42,
+      "split": "test",
+      "test_identity": "2de5950143887610bbc14d8b04b62612c754765af2b465af28cd695b06209cce",
+      "workload": "swaptions",
+      "workload_role": "held_out_unseen_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "b01a661004d9352d67e4f07b6d9b918182d6677d59d16cadb082fbb9afeca772",
+    "trace_sha256": "59afbf2923aea4ac6b1375fb3abc602c192b3e789a829b1a0415f50725ce0ef8"
+  },
+  "job_identity_sha256": "d5827a0134f4971fb11e89b1dc29d60e5b0fd25574044a5dea04bc178a3fbdf5",
+  "result_sha256": "7d960522dac542e74b6dffc4c8f852431ae48c2f1ca47238acb1f733cd835322",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "c88c319a552a95d9d79cb2baf560a1a088fa108070275324a2e3aa9680e4204c",
+  "started_at": "2026-07-31T13:16:14.441663Z",
+  "status": "completed"
+}

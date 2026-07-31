@@ -1,0 +1,478 @@
+{
+  "B": null,
+  "F_low": 8,
+  "F_target": 16,
+  "access_log_retention": "omitted_memory_bound",
+  "accesses": [],
+  "b_max": 4,
+  "b_t_rule": "min(b_max,F_target-F_t,|C_t|)",
+  "candidate_contract": {
+    "candidate_order": "oldest_to_newest",
+    "candidate_rebuilt_every_round": true,
+    "candidate_size_K": 8,
+    "candidate_source": "current_lru_tail",
+    "current_entering_page_excluded_until_resident": true,
+    "padding": false,
+    "selection_subset_required": true,
+    "sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489"
+  },
+  "candidate_contract_sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489",
+  "candidate_size_K": 8,
+  "candidate_source": "lru_tail",
+  "capacity_ratio": "0.20",
+  "capd_generalization": {
+    "mapping_behavior": "unseen_frozen_input_maps_to_unk_index_0",
+    "page_access_oov_count": 600000,
+    "page_access_oov_ratio": 1.0,
+    "page_unique_oov_count": 24,
+    "page_unique_oov_ratio": 1.0,
+    "pc_access_oov_count": 600000,
+    "pc_access_oov_ratio": 1.0,
+    "pc_unique_oov_count": 158,
+    "pc_unique_oov_ratio": 1.0,
+    "unk_index": 0,
+    "vocabulary_expansion_allowed": false
+  },
+  "checkpoint": {
+    "recorded_path": "outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_42/qmap_best.pth",
+    "resolved_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_42/qmap_best.pth",
+    "seed": 42,
+    "selection_criterion": "minimum_valid_loss_only",
+    "sha256": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+  },
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "cycles": [],
+  "dram_capacity_pages": 385,
+  "events": [],
+  "fallback_policy": "lru",
+  "final_state": {
+    "F_t": 361,
+    "access_index": 599999,
+    "active_proactive_cycle": null,
+    "cycle_counter": 0,
+    "decision_counter": 0,
+    "dirty_state": {
+      "34151516911": true,
+      "34151516912": true,
+      "34151516913": true,
+      "34151516914": true,
+      "34151516915": true,
+      "34151516916": true,
+      "34151516917": true,
+      "34151516918": true,
+      "34151516919": true,
+      "34151516920": true,
+      "34151516921": true,
+      "34151516922": true,
+      "34151516923": true,
+      "34151516924": true,
+      "34151516925": true,
+      "34151516926": true,
+      "34151516927": true,
+      "34151516928": true,
+      "34153901175": false,
+      "34153901176": false,
+      "34153901197": true,
+      "34153914531": true,
+      "34153916985": false,
+      "34358610044": true
+    },
+    "dram_capacity_pages": 385,
+    "dram_lru_mru_to_lru": [
+      34358610044,
+      34153916985,
+      34153914531,
+      34153901176,
+      34151516928,
+      34153901175,
+      34153901197,
+      34151516927,
+      34151516926,
+      34151516925,
+      34151516924,
+      34151516923,
+      34151516922,
+      34151516921,
+      34151516920,
+      34151516919,
+      34151516918,
+      34151516917,
+      34151516916,
+      34151516915,
+      34151516914,
+      34151516913,
+      34151516912,
+      34151516911
+    ],
+    "dram_resident": [
+      34151516911,
+      34151516912,
+      34151516913,
+      34151516914,
+      34151516915,
+      34151516916,
+      34151516917,
+      34151516918,
+      34151516919,
+      34151516920,
+      34151516921,
+      34151516922,
+      34151516923,
+      34151516924,
+      34151516925,
+      34151516926,
+      34151516927,
+      34151516928,
+      34153901175,
+      34153901176,
+      34153901197,
+      34153914531,
+      34153916985,
+      34358610044
+    ],
+    "frequency_state": {
+      "34151516911": 645,
+      "34151516912": 1024,
+      "34151516913": 1024,
+      "34151516914": 1024,
+      "34151516915": 1024,
+      "34151516916": 1024,
+      "34151516917": 1024,
+      "34151516918": 1024,
+      "34151516919": 1024,
+      "34151516920": 1024,
+      "34151516921": 1024,
+      "34151516922": 1024,
+      "34151516923": 1024,
+      "34151516924": 1024,
+      "34151516925": 1024,
+      "34151516926": 1024,
+      "34151516927": 1024,
+      "34151516928": 889,
+      "34153901175": 15680,
+      "34153901176": 17918,
+      "34153901197": 280,
+      "34153914531": 179190,
+      "34153916985": 35837,
+      "34358610044": 333177
+    },
+    "history_window": [
+      {
+        "page": 34153914531,
+        "pc": 139894432094164,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432094174,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432094178,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432094182,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432094186,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432094196,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432094213,
+        "rw": 1
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432094219,
+        "rw": 1
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432094225,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432100858,
+        "rw": 0
+      },
+      {
+        "page": 34153914531,
+        "pc": 139894432100864,
+        "rw": 0
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432100883,
+        "rw": 1
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432100888,
+        "rw": 0
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432100889,
+        "rw": 0
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432100891,
+        "rw": 0
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432100892,
+        "rw": 0
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432099406,
+        "rw": 0
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432099410,
+        "rw": 0
+      },
+      {
+        "page": 34153916985,
+        "pc": 139894432099414,
+        "rw": 0
+      },
+      {
+        "page": 34358610044,
+        "pc": 139894432099425,
+        "rw": 0
+      }
+    ],
+    "nvm_resident": [],
+    "raw_event_counters": {
+      "accesses_below_F_low": 0,
+      "dirty_demotions": 0,
+      "dram_hits": 599976,
+      "early_reuse_count": 0,
+      "emergency_demotions": 0,
+      "free_frame_exhaustion_count": 0,
+      "nvm_reads": 5,
+      "nvm_writes": 19,
+      "page_enter_dram_count": 24,
+      "proactive_demotions": 0,
+      "reactive_demotions": 0,
+      "total_accesses": 600000,
+      "total_demotions": 0
+    },
+    "residency_state": {
+      "34151516911": "dram",
+      "34151516912": "dram",
+      "34151516913": "dram",
+      "34151516914": "dram",
+      "34151516915": "dram",
+      "34151516916": "dram",
+      "34151516917": "dram",
+      "34151516918": "dram",
+      "34151516919": "dram",
+      "34151516920": "dram",
+      "34151516921": "dram",
+      "34151516922": "dram",
+      "34151516923": "dram",
+      "34151516924": "dram",
+      "34151516925": "dram",
+      "34151516926": "dram",
+      "34151516927": "dram",
+      "34151516928": "dram",
+      "34153901175": "dram",
+      "34153901176": "dram",
+      "34153901197": "dram",
+      "34153914531": "dram",
+      "34153916985": "dram",
+      "34358610044": "dram"
+    },
+    "round_counter": 0
+  },
+  "formal_test": true,
+  "future_information": "not_accessed",
+  "initial_state": {
+    "dirty_pages": [],
+    "dram_resident": [],
+    "free_frames": 385,
+    "lru_order": [],
+    "nvm_backing_pages": [
+      34151516911,
+      34151516912,
+      34151516913,
+      34151516914,
+      34151516915,
+      34151516916,
+      34151516917,
+      34151516918,
+      34151516919,
+      34151516920,
+      34151516921,
+      34151516922,
+      34151516923,
+      34151516924,
+      34151516925,
+      34151516926,
+      34151516927,
+      34151516928,
+      34153901175,
+      34153901176,
+      34153901197,
+      34153914531,
+      34153916985,
+      34358610044
+    ]
+  },
+  "initial_state_sha256": "8d2ad7d176fa4518ee7c4dbd5ec0da3e72f36e4561a4159950fb760338d12894",
+  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency.",
+  "job_id": "streamcluster_pressure__r020__capd__seed-42",
+  "metrics": {
+    "average_free_frames": 369.3860883333333,
+    "decision_count": 0,
+    "dram_hits": 599976,
+    "early_reuse": {
+      "denominator_semantics": "proactive_demotion_events_each_selected_page_counts_once",
+      "first_reuse_distance": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "future_access_count": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "no_future_reuse_count": 0,
+      "per_demotion_audit": [],
+      "wasted_demotion_count": 0,
+      "wasted_demotion_rate": 0.0,
+      "windows": {
+        "1024": {
+          "delta_accesses": 1024,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "256": {
+          "delta_accesses": 256,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "64": {
+          "delta_accesses": 64,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        }
+      },
+      "zero_denominator_rate": 0.0
+    },
+    "emergency_demotions": 0,
+    "emergency_fallback_count": 0,
+    "fallback_rate": 0.0,
+    "fallback_rate_denominator": "page_enter_dram_count",
+    "free_frame_exhaustion_count": 0,
+    "mean_b_t": null,
+    "mean_decision_time": null,
+    "minimum_free_frames": 361,
+    "number_of_proactive_cycles": 0,
+    "number_of_proactive_rounds": 0,
+    "nvm_reads": 5,
+    "nvm_writes": 19,
+    "p50_decision_time": null,
+    "p95_decision_time": null,
+    "p99_decision_time": null,
+    "page_enter_dram_count": 24,
+    "proactive_demotions": 0,
+    "raw_access_count": 600000,
+    "reactive_demotions": 0,
+    "rounds_per_cycle": null,
+    "total_decision_time": 0,
+    "total_demotions": 0,
+    "weighted_cost": 600138,
+    "weighted_cost_components": {
+      "demotion_cost": 0,
+      "dram_hit_cost": 599976,
+      "nvm_read_cost": 10,
+      "nvm_write_cost": 152
+    },
+    "weighted_cost_per_access": 1.00023
+  },
+  "nvm_capacity_model": "unbounded_backing_tier",
+  "old_finals_v3_stage_artifacts_used": false,
+  "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+  "page_size_bytes": 4096,
+  "performance_selection_performed": false,
+  "policy": "capd",
+  "policy_display_name": "CAPD",
+  "policy_state": null,
+  "rounds": [],
+  "runtime": {
+    "deterministic_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "latency": {
+      "count": 0,
+      "feature_total_seconds": 0.0,
+      "inference_total_seconds": 0.0,
+      "mean_seconds": null,
+      "measurement_scope": "synchronous_replay_decision_overhead",
+      "p50_seconds": null,
+      "p95_seconds": null,
+      "p99_seconds": null,
+      "selection_total_seconds": 0.0,
+      "total_seconds": 0
+    },
+    "measurement_enabled": true
+  },
+  "schema_version": "capd_proactive_stage8_job_result_v1_0",
+  "seed": 42,
+  "selector_status": "disabled",
+  "semantic_result_sha256": "b98265630328306d435f7f1ab04b963f67412e44fe58a079462fbbdd12987e39",
+  "split": "test",
+  "stage_status": "stage8_implemented_awaiting_formal_replay",
+  "test_identity": "f71fdcce2db83faa1bfc5769dfdeddf5decfa510abfccb40e7f4d6daed02df3a",
+  "test_used_for_selection": false,
+  "tpp_parameters": null,
+  "trace_range": {
+    "end_exclusive": 3000000,
+    "start_inclusive": 2400000
+  },
+  "trace_sha256": "9433aea84e9cd54146ae5852ca41f02e653ef9f6bb7c66721995fb5687e6e12e",
+  "trigger_mode": "low_watermark",
+  "working_set_pages": 1921,
+  "workload": "streamcluster_pressure",
+  "workload_role": "seen_calibration_workload"
+}

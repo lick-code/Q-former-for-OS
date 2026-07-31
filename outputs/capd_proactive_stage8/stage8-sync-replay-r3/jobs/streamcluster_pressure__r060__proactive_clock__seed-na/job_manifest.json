@@ -1,0 +1,42 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T13:02:46.688281Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_selection_criterion": null,
+    "checkpoint_sha256": null,
+    "deterministic_runtime_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.60",
+      "checkpoint": null,
+      "deterministic_policy": true,
+      "dram_pages": 1153,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "streamcluster_pressure__r060__proactive_clock__seed-na",
+      "policy": "proactive_clock",
+      "seed": null,
+      "split": "test",
+      "test_identity": "f71fdcce2db83faa1bfc5769dfdeddf5decfa510abfccb40e7f4d6daed02df3a",
+      "workload": "streamcluster_pressure",
+      "workload_role": "seen_calibration_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "b01a661004d9352d67e4f07b6d9b918182d6677d59d16cadb082fbb9afeca772",
+    "trace_sha256": "9433aea84e9cd54146ae5852ca41f02e653ef9f6bb7c66721995fb5687e6e12e"
+  },
+  "job_identity_sha256": "ace597822be50fbad49bb6d2af22e74a7f5ef1d7aee497d8963f7858a063fe9c",
+  "result_sha256": "7d0621b7f0b199172ea3299d3eb27790dfb4c71e46b77095fbfc015c8defe64e",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "2354f223dc2d82caf01526f6fc16dd8965591173994cf19a7d33293a95136131",
+  "started_at": "2026-07-31T13:02:37.718025Z",
+  "status": "completed"
+}

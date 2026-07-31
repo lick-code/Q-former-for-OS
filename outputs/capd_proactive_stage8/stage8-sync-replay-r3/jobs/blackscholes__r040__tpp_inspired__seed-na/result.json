@@ -1,0 +1,672 @@
+{
+  "B": null,
+  "F_low": 8,
+  "F_target": 16,
+  "access_log_retention": "omitted_memory_bound",
+  "accesses": [],
+  "b_max": 4,
+  "b_t_rule": "min(b_max,F_target-F_t,|C_t|)",
+  "candidate_contract": {
+    "candidate_order": "oldest_to_newest",
+    "candidate_rebuilt_every_round": true,
+    "candidate_size_K": 8,
+    "candidate_source": "current_lru_tail",
+    "current_entering_page_excluded_until_resident": true,
+    "padding": false,
+    "selection_subset_required": true,
+    "sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489"
+  },
+  "candidate_contract_sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489",
+  "candidate_size_K": 8,
+  "candidate_source": "lru_tail",
+  "capacity_ratio": "0.40",
+  "capd_generalization": null,
+  "checkpoint": null,
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "cycles": [],
+  "dram_capacity_pages": 44,
+  "events": [],
+  "fallback_policy": "lru",
+  "final_state": {
+    "F_t": 22,
+    "access_index": 599999,
+    "active_proactive_cycle": null,
+    "cycle_counter": 0,
+    "decision_counter": 0,
+    "dirty_state": {
+      "34323549289": true,
+      "34323549290": true,
+      "34325996474": false,
+      "34325996475": false,
+      "34325996476": false,
+      "34325996479": true,
+      "34325996480": false,
+      "34326010384": false,
+      "34326010385": false,
+      "34326010399": false,
+      "34326010403": false,
+      "34326010410": false,
+      "34326010411": false,
+      "34326010420": false,
+      "34326010421": false,
+      "34326010463": false,
+      "34326010465": false,
+      "34326010467": false,
+      "34326010474": false,
+      "34326012306": true,
+      "34356578497": true,
+      "34356578498": true
+    },
+    "dram_capacity_pages": 44,
+    "dram_lru_mru_to_lru": [
+      34356578497,
+      34325996480,
+      34325996479,
+      34326010411,
+      34326010384,
+      34326010467,
+      34326010403,
+      34326012306,
+      34326010385,
+      34326010465,
+      34325996474,
+      34323549290,
+      34356578498,
+      34326010420,
+      34326010463,
+      34326010399,
+      34326010421,
+      34326010474,
+      34326010410,
+      34325996475,
+      34325996476,
+      34323549289
+    ],
+    "dram_resident": [
+      34323549289,
+      34323549290,
+      34325996474,
+      34325996475,
+      34325996476,
+      34325996479,
+      34325996480,
+      34326010384,
+      34326010385,
+      34326010399,
+      34326010403,
+      34326010410,
+      34326010411,
+      34326010420,
+      34326010421,
+      34326010463,
+      34326010465,
+      34326010467,
+      34326010474,
+      34326012306,
+      34356578497,
+      34356578498
+    ],
+    "frequency_state": {
+      "34323549289": 740,
+      "34323549290": 899,
+      "34325996474": 4917,
+      "34325996475": 182,
+      "34325996476": 364,
+      "34325996479": 75122,
+      "34325996480": 4306,
+      "34326010384": 8668,
+      "34326010385": 6192,
+      "34326010399": 5090,
+      "34326010403": 3278,
+      "34326010410": 182,
+      "34326010411": 14552,
+      "34326010420": 369,
+      "34326010421": 1208,
+      "34326010463": 1821,
+      "34326010465": 6067,
+      "34326010467": 16244,
+      "34326010474": 366,
+      "34326012306": 14190,
+      "34356578497": 426870,
+      "34356578498": 8373
+    },
+    "history_window": [
+      {
+        "page": 34356578497,
+        "pc": 140599337216439,
+        "rw": 1
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216446,
+        "rw": 1
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216449,
+        "rw": 1
+      },
+      {
+        "page": 34325996479,
+        "pc": 140599337216465,
+        "rw": 0
+      },
+      {
+        "page": 34325996479,
+        "pc": 140599337216469,
+        "rw": 0
+      },
+      {
+        "page": 34325996479,
+        "pc": 140599337216483,
+        "rw": 1
+      },
+      {
+        "page": 34325996480,
+        "pc": 140599337216487,
+        "rw": 0
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216497,
+        "rw": 0
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216422,
+        "rw": 0
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216439,
+        "rw": 1
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216446,
+        "rw": 1
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216449,
+        "rw": 1
+      },
+      {
+        "page": 34325996479,
+        "pc": 140599337216465,
+        "rw": 0
+      },
+      {
+        "page": 34325996479,
+        "pc": 140599337216469,
+        "rw": 0
+      },
+      {
+        "page": 34325996479,
+        "pc": 140599337216483,
+        "rw": 1
+      },
+      {
+        "page": 34325996480,
+        "pc": 140599337216487,
+        "rw": 0
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216497,
+        "rw": 0
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216422,
+        "rw": 0
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216439,
+        "rw": 1
+      },
+      {
+        "page": 34356578497,
+        "pc": 140599337216446,
+        "rw": 1
+      }
+    ],
+    "nvm_resident": [],
+    "raw_event_counters": {
+      "accesses_below_F_low": 0,
+      "dirty_demotions": 0,
+      "dram_hits": 599978,
+      "early_reuse_count": 0,
+      "emergency_demotions": 0,
+      "free_frame_exhaustion_count": 0,
+      "nvm_reads": 19,
+      "nvm_writes": 3,
+      "page_enter_dram_count": 22,
+      "proactive_demotions": 0,
+      "reactive_demotions": 0,
+      "total_accesses": 600000,
+      "total_demotions": 0
+    },
+    "residency_state": {
+      "34323549289": "dram",
+      "34323549290": "dram",
+      "34325996474": "dram",
+      "34325996475": "dram",
+      "34325996476": "dram",
+      "34325996479": "dram",
+      "34325996480": "dram",
+      "34326010384": "dram",
+      "34326010385": "dram",
+      "34326010399": "dram",
+      "34326010403": "dram",
+      "34326010410": "dram",
+      "34326010411": "dram",
+      "34326010420": "dram",
+      "34326010421": "dram",
+      "34326010463": "dram",
+      "34326010465": "dram",
+      "34326010467": "dram",
+      "34326010474": "dram",
+      "34326012306": "dram",
+      "34356578497": "dram",
+      "34356578498": "dram"
+    },
+    "round_counter": 0
+  },
+  "formal_test": true,
+  "future_information": "not_accessed",
+  "initial_state": {
+    "dirty_pages": [],
+    "dram_resident": [],
+    "free_frames": 44,
+    "lru_order": [],
+    "nvm_backing_pages": [
+      34323549289,
+      34323549290,
+      34325996474,
+      34325996475,
+      34325996476,
+      34325996479,
+      34325996480,
+      34326010384,
+      34326010385,
+      34326010399,
+      34326010403,
+      34326010410,
+      34326010411,
+      34326010420,
+      34326010421,
+      34326010463,
+      34326010465,
+      34326010467,
+      34326010474,
+      34326012306,
+      34356578497,
+      34356578498
+    ]
+  },
+  "initial_state_sha256": "aee81bbfdee2e323f2f3e8f7c04b22f227c415d6a07187020a9eef2d713a213d",
+  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency.",
+  "job_id": "blackscholes__r040__tpp_inspired__seed-na",
+  "metrics": {
+    "average_free_frames": 22.718665,
+    "decision_count": 0,
+    "dram_hits": 599978,
+    "early_reuse": {
+      "denominator_semantics": "proactive_demotion_events_each_selected_page_counts_once",
+      "first_reuse_distance": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "future_access_count": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "no_future_reuse_count": 0,
+      "per_demotion_audit": [],
+      "wasted_demotion_count": 0,
+      "wasted_demotion_rate": 0.0,
+      "windows": {
+        "1024": {
+          "delta_accesses": 1024,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "256": {
+          "delta_accesses": 256,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "64": {
+          "delta_accesses": 64,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        }
+      },
+      "zero_denominator_rate": 0.0
+    },
+    "emergency_demotions": 0,
+    "emergency_fallback_count": 0,
+    "fallback_rate": 0.0,
+    "fallback_rate_denominator": "page_enter_dram_count",
+    "free_frame_exhaustion_count": 0,
+    "mean_b_t": null,
+    "mean_decision_time": null,
+    "minimum_free_frames": 22,
+    "number_of_proactive_cycles": 0,
+    "number_of_proactive_rounds": 0,
+    "nvm_reads": 19,
+    "nvm_writes": 3,
+    "p50_decision_time": null,
+    "p95_decision_time": null,
+    "p99_decision_time": null,
+    "page_enter_dram_count": 22,
+    "proactive_demotions": 0,
+    "raw_access_count": 600000,
+    "reactive_demotions": 0,
+    "rounds_per_cycle": null,
+    "total_decision_time": 0,
+    "total_demotions": 0,
+    "weighted_cost": 600040,
+    "weighted_cost_components": {
+      "demotion_cost": 0,
+      "dram_hit_cost": 599978,
+      "nvm_read_cost": 38,
+      "nvm_write_cost": 24
+    },
+    "weighted_cost_per_access": 1.0000666666666667
+  },
+  "nvm_capacity_model": "unbounded_backing_tier",
+  "old_finals_v3_stage_artifacts_used": false,
+  "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+  "page_size_bytes": 4096,
+  "performance_selection_performed": false,
+  "policy": "tpp_inspired",
+  "policy_display_name": "TPP-inspired",
+  "policy_state": {
+    "tpp_inspired": {
+      "cold_threshold": 1,
+      "current_epoch": 585,
+      "dirty_tie_break": false,
+      "epoch_length": 1024,
+      "metrics": {
+        "candidate_temperature_distribution": {
+          "counts": {
+            "Cold": 0,
+            "Hot": 0,
+            "Warm": 0
+          },
+          "ratios": {
+            "Cold": 0.0,
+            "Hot": 0.0,
+            "Warm": 0.0
+          },
+          "total": 0
+        },
+        "cold_selected_count": 0,
+        "cold_short_reuse_count": 0,
+        "cold_short_reuse_rate": 0.0,
+        "cold_short_reuse_window_accesses": 64,
+        "cold_threshold": 1,
+        "current_epoch": 585,
+        "dirty_tie_break": false,
+        "epoch_length": 1024,
+        "epoch_transition_count": 585,
+        "experiment_id": "tpp-e1024-c1-doff",
+        "fallback_to_lru_used": false,
+        "future_information_accessed": false,
+        "missing_state_initializations": 0,
+        "promotion_performed": false,
+        "selected_dirty_distribution": {
+          "counts": {
+            "clean": 0,
+            "dirty": 0
+          },
+          "ratios": {
+            "clean": 0.0,
+            "dirty": 0.0
+          },
+          "total": 0
+        },
+        "selected_temperature_distribution": {
+          "counts": {
+            "Cold": 0,
+            "Hot": 0,
+            "Warm": 0
+          },
+          "ratios": {
+            "Cold": 0.0,
+            "Hot": 0.0,
+            "Warm": 0.0
+          },
+          "total": 0
+        }
+      },
+      "page_states": {
+        "34323549289": {
+          "dirty": true,
+          "last_access_epoch": 265,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 12
+        },
+        "34323549290": {
+          "dirty": true,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 22
+        },
+        "34325996474": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 13
+        },
+        "34325996475": {
+          "dirty": false,
+          "last_access_epoch": 583,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 19
+        },
+        "34325996476": {
+          "dirty": false,
+          "last_access_epoch": 583,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 18
+        },
+        "34325996479": {
+          "dirty": true,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 3
+        },
+        "34325996480": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 21
+        },
+        "34326010384": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 5
+        },
+        "34326010385": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 9
+        },
+        "34326010399": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 15
+        },
+        "34326010403": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 14
+        },
+        "34326010410": {
+          "dirty": false,
+          "last_access_epoch": 583,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 20
+        },
+        "34326010411": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 1
+        },
+        "34326010420": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 10
+        },
+        "34326010421": {
+          "dirty": false,
+          "last_access_epoch": 584,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 16
+        },
+        "34326010463": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 8
+        },
+        "34326010465": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 6
+        },
+        "34326010467": {
+          "dirty": false,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 4
+        },
+        "34326010474": {
+          "dirty": false,
+          "last_access_epoch": 583,
+          "referenced_current_epoch": 0,
+          "referenced_previous_epoch": 0,
+          "residence_lifecycle_id": 17
+        },
+        "34326012306": {
+          "dirty": true,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 7
+        },
+        "34356578497": {
+          "dirty": true,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 2
+        },
+        "34356578498": {
+          "dirty": true,
+          "last_access_epoch": 585,
+          "referenced_current_epoch": 1,
+          "referenced_previous_epoch": 1,
+          "residence_lifecycle_id": 11
+        }
+      },
+      "round_audits": []
+    }
+  },
+  "rounds": [],
+  "runtime": {
+    "deterministic_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "latency": {
+      "count": 0,
+      "feature_total_seconds": 0.0,
+      "inference_total_seconds": 0.0,
+      "mean_seconds": null,
+      "measurement_scope": "synchronous_replay_decision_overhead",
+      "p50_seconds": null,
+      "p95_seconds": null,
+      "p99_seconds": null,
+      "selection_total_seconds": 0.0,
+      "total_seconds": 0
+    },
+    "measurement_enabled": true
+  },
+  "schema_version": "capd_proactive_stage8_job_result_v1_0",
+  "seed": null,
+  "selector_status": "disabled",
+  "semantic_result_sha256": "bb559afb7edd06373225104b683d3ffe49f55dc13124b2567b17a2a064dc50a2",
+  "split": "test",
+  "stage_status": "stage8_implemented_awaiting_formal_replay",
+  "test_identity": "46708bbb55d0ea6fc4e4cf022b5424101a0f4090b8846c13ccc3aa26a9ec9f87",
+  "test_used_for_selection": false,
+  "tpp_parameters": {
+    "cold_threshold": 1,
+    "dirty_tie_break": false,
+    "epoch_length": 1024,
+    "fallback_to_lru_used": false,
+    "future_information_accessed": false,
+    "promotion_performed": false
+  },
+  "trace_range": {
+    "end_exclusive": 3000000,
+    "start_inclusive": 2400000
+  },
+  "trace_sha256": "27f4f7107f15ea52ec2052efdcffab3e2cb6cb605f4ac6cd79c6aa49a23d2a3f",
+  "trigger_mode": "low_watermark",
+  "working_set_pages": 110,
+  "workload": "blackscholes",
+  "workload_role": "held_out_unseen_workload"
+}

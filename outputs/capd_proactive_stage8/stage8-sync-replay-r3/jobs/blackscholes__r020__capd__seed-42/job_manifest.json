@@ -1,0 +1,45 @@
+{
+  "automatic_retry": false,
+  "completed_at": "2026-07-31T13:09:55.446747Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_identity": {
+    "checkpoint_selection_criterion": "minimum_valid_loss_only",
+    "checkpoint_sha256": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396",
+    "deterministic_runtime_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "device": "cuda:0",
+    "measure_latency": true,
+    "plan_job": {
+      "capacity_ratio": "0.20",
+      "checkpoint": {
+        "path": "outputs/capd_proactive_stage4/stage4-f8-f16-r3/final_rebuild/L256_lam1-1-2_K8_H20/checkpoints/seed_42/qmap_best.pth",
+        "sha256": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+      },
+      "deterministic_policy": false,
+      "dram_pages": 22,
+      "execution_status": "planned_not_executed",
+      "experiment_labels": [
+        "A"
+      ],
+      "formal_test": true,
+      "job_id": "blackscholes__r020__capd__seed-42",
+      "policy": "capd",
+      "seed": 42,
+      "split": "test",
+      "test_identity": "46708bbb55d0ea6fc4e4cf022b5424101a0f4090b8846c13ccc3aa26a9ec9f87",
+      "workload": "blackscholes",
+      "workload_role": "held_out_unseen_workload"
+    },
+    "result_schema": "capd_proactive_stage8_job_result_v1_0",
+    "run_identity_sha256": "b01a661004d9352d67e4f07b6d9b918182d6677d59d16cadb082fbb9afeca772",
+    "trace_sha256": "27f4f7107f15ea52ec2052efdcffab3e2cb6cb605f4ac6cd79c6aa49a23d2a3f"
+  },
+  "job_identity_sha256": "e405004cb51e12524008a6d2f0519bff0c1eb3507a25bda892c6fdb825532d02",
+  "result_sha256": "1bfa57e29164089bb8eb9a1ffbfa4b8572b99614174d35a4313637860b44a739",
+  "schema_version": "capd_proactive_stage8_job_manifest_v1_0",
+  "semantic_result_sha256": "2587aad51c02f926f9fc2c3cf881b0822ec7dd9ca464b40429d563b0b115dd38",
+  "started_at": "2026-07-31T13:09:23.433012Z",
+  "status": "completed"
+}

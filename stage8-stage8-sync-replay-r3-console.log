@@ -1,0 +1,796 @@
+python=3.7.16 (default, Jan 17 2023, 22:20:44) 
+[GCC 11.2.0]
+CUBLAS_WORKSPACE_CONFIG=:4096:8
+PYTHONHASHSEED=0
+torch=1.13.1+cu117
+cuda_available=True
+cuda_device=NVIDIA GeForce RTX 3060 Ti
+[OK] Stage-8 preflight /home/likc/Q-former-for-OS/outputs/capd_proactive_stage8/stage8-sync-replay-r3 (Test bytes hashed, not parsed)
+[OK] Stage-8 deterministic CUDA smoke passed for 3/3 CAPD checkpoints
+[OK] Stage-8 synthetic non-Test statistics/Early-Reuse E2E
+test_classical_victim_functions_keep_full_dram_native_logic (test_baseline_golden.BaselineGoldenTest) ... ok
+test_learned_baseline_keeps_native_lru_tail_eight (test_baseline_golden.BaselineGoldenTest) ... ok
+test_patterns_lite_keeps_native_group_scoring (test_baseline_golden.BaselineGoldenTest) ... ok
+test_five_feature_directions (test_candidate_filter.CandidateFilterTest) ... ok
+test_pool_and_retained_size_use_actual_dram_size (test_candidate_filter.CandidateFilterTest) ... ok
+test_selector_score_not_in_state_and_original_rank_survives (test_candidate_filter.CandidateFilterTest) ... ok
+test_tie_break_is_old_rank_then_page_id (test_candidate_filter.CandidateFilterTest) ... ok
+test_build_pilot_command_uses_candidate_specific_paths (test_candidate_sensitivity.CandidateSensitivityTest) ... ok
+test_build_summary_row_uses_best_baseline_at_same_candidate_count (test_candidate_sensitivity.CandidateSensitivityTest) ... ok
+test_rank_score_penalty_is_passed_to_qmap_eval (test_canneal_tuning.CannealTuningTest) ... ok
+test_rank_score_penalty_values_are_normalized_by_rank (test_canneal_tuning.CannealTuningTest) ... ok
+test_select_best_config_uses_validation_cost_with_stable_tiebreaks (test_canneal_tuning.CannealTuningTest) ... ok
+test_stage5_defaults_keep_guard_and_penalty_disabled (test_canneal_tuning.CannealTuningTest) ... ok
+test_build_pilot_command_uses_capacity_specific_paths (test_capacity_sensitivity.CapacitySensitivityTest) ... ok
+test_build_summary_row_uses_best_baseline_at_same_capacity (test_capacity_sensitivity.CapacitySensitivityTest) ... ok
+test_diagnostic_profile_trains_and_emits_decision_evidence (test_capd_bridge_end_to_end.BridgeTorchMiniEndToEndTest) ... skipped 'server-only: set CAPD_BRIDGE_E2E=1'
+test_bridge_config_is_diagnostic_and_independent (test_capd_bridge_plan.BridgePlanTest) ... ok
+test_diagnostic_profile_rejects_official_artifact_label (test_capd_bridge_plan.BridgePlanTest) ... ok
+test_plan_is_the_frozen_33_job_matrix (test_capd_bridge_plan.BridgePlanTest) ... ok
+test_attribution_chain_changes_one_adjacent_anchor (test_capd_bridge_results.BridgeResultTest) ... ok
+test_bounded_next_use_distance_caps_absent_page (test_capd_bridge_results.BridgeResultTest) ... ok
+test_bridge_score_conversion_requires_named_flat_sequence (test_capd_bridge_results.BridgeResultTest) ... ok
+test_case_summary_uses_positive_improvement_for_lower_cost (test_capd_bridge_results.BridgeResultTest) ... ok
+test_replay_stats_records_noninvasive_bridge_diagnostics (test_capd_bridge_results.BridgeResultTest) ... ok
+test_model_declares_context_only_candidate_scorer_mode (test_capd_cross_attention.QMAPCrossAttentionStaticTest) ... ok
+test_model_declares_full_sequence_extractor_mode (test_capd_cross_attention.QMAPCrossAttentionStaticTest) ... ok
+test_candidate_scorer_uses_context_vector_without_concat (test_capd_cross_attention.QMAPCrossAttentionTest) ... ok
+test_extractor_can_return_full_encoded_sequence (test_capd_cross_attention.QMAPCrossAttentionTest) ... ok
+test_per_epoch_checkpoint_replays_valid_without_opening_test (test_capd_optimization_end_to_end.OptimizationTorchMiniEndToEndTest) ... skipped 'server-only: set CAPD_OPTIMIZATION_E2E=1'
+test_candidate_matrix_preserves_method_contract (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_o0_allows_o1_o3_but_blocks_o4_without_touching_upstream (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_o1_plan_is_train_valid_only_and_has_54_jobs (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_o2_plan_applies_o1_gate_per_workload (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_o3_plan_reuses_screening_seed_and_adds_two_seeds (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_optimization_config_accepts_only_preregistered_matrix (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_protocol_declares_ordered_gated_phases (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_valid_replay_mode_and_per_epoch_saving_are_explicit_opt_ins (test_capd_optimization_plan.OptimizationPlanTest) ... ok
+test_active_policy_requires_fields_when_its_gate_is_frozen (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_capd_with_frozen_active_fields_is_accepted (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_illegal_policy_name_is_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_legal_stage0_capd_template_is_accepted (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_missing_required_field_is_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_non_learning_active_policy_requires_only_shared_active_fields (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_official_policy_set_is_frozen (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_overlapping_chronological_splits_are_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_reactive_lru_does_not_require_proactive_fields (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_selector_must_remain_disabled (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_single_process_thread_workload_boundary_is_enforced (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_split_roles_cannot_be_exchanged (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_stage2_default_cost_profile_is_frozen (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_stage3_conditional_engineering_default_is_frozen (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_test_cannot_be_used_for_parameter_selection (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_unfrozen_formal_test_request_is_rejected (test_capd_proactive_config.ProactiveStage0ConfigTest) ... ok
+test_all_profiles_reuse_identical_counts (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_cost_module_has_no_replay_model_or_gpu_import (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_default_hand_calculation_and_components (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_input_mapping_is_not_modified_and_repeated_runs_are_identical (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_only_stage2_namespace_is_added_and_identity_is_unchanged (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_other_profiles_match_hand_calculation (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_reserved_output_namespace_is_never_overwritten (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_switching_profile_changes_only_profile_and_cost_fields (test_capd_proactive_cost.CostArithmeticTest) ... ok
+test_all_four_profiles_are_frozen_exactly (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_default_and_parameterized_provenance_are_frozen (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_default_profile_must_exist_and_equal_default (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_duplicate_json_profile_name_is_rejected_before_validation (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_missing_or_illegal_weight_is_rejected (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_stage1_integration_and_verified_status_are_frozen (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_unsupported_schema_version_is_rejected (test_capd_proactive_cost.CostProfileFreezeTest) ... ok
+test_cli_refuses_input_output_alias (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_cli_writes_json_without_changing_input (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_csv_conversion_is_explicit_and_rejects_noncanonical_counts (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_invalid_cli_input_returns_nonzero_and_diagnostic (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_json_single_default_and_all_profiles (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_jsonl_and_csv_multiple_records_are_supported (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_validate_config_mode_needs_no_input (test_capd_proactive_cost.OfflineCliTest) ... ok
+test_all_zero_counts_are_valid (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_complete_breakdown_alone_derives_total (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_missing_required_base_or_demotion_field_is_rejected (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_negative_float_string_boolean_and_nan_counts_are_rejected (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_partial_breakdown_never_silently_passes (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_total_and_complete_breakdown_must_match (test_capd_proactive_cost.RawEventContractTest) ... ok
+test_F_at_or_above_low_does_not_trigger (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_actual_candidate_count_and_all_b_t_bounds (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_all_declared_fixture_scenarios_run (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_capd_without_checkpoint_is_not_faked_by_lru_ranker (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_early_reuse_is_counted_from_proactive_event (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_empty_candidate_set_terminates_without_loop (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_invalid_ranker_fails_instead_of_silently_repairing (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_low_watermark_starts_cycle_and_reaches_target (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_multi_round_rebuilds_current_candidates (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_no_free_frame_demotes_before_page_enter_and_never_negative (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_proactive_reactive_and_emergency_events_do_not_mix (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_reactive_lru_never_creates_proactive_logs (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_residency_lru_frequency_dirty_and_history_updates (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_round_cycle_and_summary_fields_are_complete (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_same_trace_and_config_are_fully_deterministic (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_single_round_top_b_uses_stub_ranking (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_stage0_contract_and_fixture_remain_separate (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_stage1_does_not_compute_cost_or_require_checkpoint (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_summary_matches_raw_events (test_capd_proactive_replay.ProactiveReplayStage1Test) ... ok
+test_bmax_tie_prefers_smaller_batch (test_capd_proactive_stage3.Stage3Test) ... ok
+test_burst_all_zero_and_all_enter (test_capd_proactive_stage3.Stage3Test) ... ok
+test_burst_windows_exclude_tail_from_quantiles (test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_preflight_allows_pressure_capable_validation (test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_preflight_blocks_phase_collapsed_validation (test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_rounding_is_decimal_ceiling_and_never_zero (test_capd_proactive_stage3.Stage3Test) ... ok
+test_capacity_rule_v2_selects_fallback_from_validation_only (test_capd_proactive_stage3.Stage3Test) ... ok
+test_capd_and_candidate_filter_cannot_calibrate (test_capd_proactive_stage3.Stage3Test) ... ok
+test_config_is_predeclared_and_cross_stage_consistent (test_capd_proactive_stage3.Stage3Test) ... ok
+test_early_reuse_zero_denominator_is_null (test_capd_proactive_stage3.Stage3Test) ... ok
+test_empty_working_set_fails (test_capd_proactive_stage3.Stage3Test) ... ok
+test_fallback_profile_drives_fresh_proactive_matrix (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=480 ratio=0.2
+[stage3] done reactive-8fe59dd1f67c75f243a1 0.054s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done reactive-6e82d5538b02334d6635 0.013s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=960 ratio=0.4
+[stage3] done reactive-7dba43c1dba404114390 0.056s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done reactive-0ebd488f9897dc60bb60 0.014s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=1440 ratio=0.6
+[stage3] done reactive-7f8ef2156edc8b3f8f6a 0.059s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=1440 ratio=0.6
+[stage3] done reactive-9298da2fca8c60f70ea7 0.014s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=240 ratio=0.1
+[stage3] done reactive-20c936de31ca97e32799 0.060s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done reactive-e016917ff96bcb2d6b39 0.014s completed=8
+[stage3] checkpoint reuse reactive-8fe59dd1f67c75f243a1
+[stage3] checkpoint reuse reactive-6e82d5538b02334d6635
+[stage3] checkpoint reuse reactive-7dba43c1dba404114390
+[stage3] checkpoint reuse reactive-0ebd488f9897dc60bb60
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-5dd11486e4e582aef3e8 0.061s completed=9
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-afe6c74241d45cde7538 0.061s completed=10
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-1f4768e2c193cbb8c991 0.055s completed=11
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-9e27489caee7af96e700 0.044s completed=12
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-caadde22b818b828f6f7 0.045s completed=13
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-84c7bbd328d854a04eb9 0.043s completed=14
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-984e181dfd5a6c371699 0.011s completed=15
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-31a89d07a8ce26d5689b 0.012s completed=16
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-0284dff566fe0bc56bf5 0.011s completed=17
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-dd75df317c7a9d7d4bd5 0.067s completed=18
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-2e7a2adbc8f292df2151 0.069s completed=19
+[stage3] start watermark workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done watermark-beb8d037620fcdec8b49 0.068s completed=20
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-9d2a0e4b177db708716d 0.052s completed=21
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-193c3b5860ae4b446eb5 0.053s completed=22
+[stage3] start watermark workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done watermark-3a82fc55a2e4cacea45a 0.054s completed=23
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-c2a89874ee45111ba6cb 0.012s completed=24
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-1202cb52fb6f727eb00e 0.012s completed=25
+[stage3] start watermark workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done watermark-079372a9b17fe5c7d00f 0.011s completed=26
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-d1a81f2232fd650366db 0.065s completed=27
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-d621cdf87271ca9dd49b 0.039s completed=28
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-08805214cdb6ccda1492 0.026s completed=29
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-5a308eae757f483b55fa 0.044s completed=30
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-e79ae795467782d99183 0.028s completed=31
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-9f08e61e87c3187599dc 0.020s completed=32
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-25f4d46f3eaa16ef9b59 0.013s completed=33
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-487001a3d3bd116f3ba2 0.012s completed=34
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-cb693733080198d62127 0.012s completed=35
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-995356ff38ee669e98b9 0.062s completed=36
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-01f25285d0efa882282a 0.037s completed=37
+[stage3] start bmax workload=synthetic_locality split=validation capacity=240 ratio=0.1
+[stage3] done bmax-c098944f002318d1a390 0.026s completed=38
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-00ab7f59eb1363f74946 0.047s completed=39
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-81f9a5cf68e5b82794b3 0.030s completed=40
+[stage3] start bmax workload=synthetic_locality split=validation capacity=480 ratio=0.2
+[stage3] done bmax-0cfe4b9766a2305bb12f 0.022s completed=41
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-e02df60b985734e23070 0.012s completed=42
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-6ba64883c6c5c9f2e153 0.012s completed=43
+[stage3] start bmax workload=synthetic_locality split=validation capacity=960 ratio=0.4
+[stage3] done bmax-1bff5d6efc0e5073731e 0.012s completed=44
+ok
+test_fresh_pair_materializer_never_creates_test (test_capd_proactive_stage3.Stage3Test) ... ok
+test_interrupted_run_resumes_and_matches_clean_run (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
+[stage3] done reactive-bc579b7f80d4f7764ddf 0.004s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.004s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
+[stage3] done reactive-d83b0454d04902e3e883 0.004s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done reactive-8082ac34a5acd424517b 0.004s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.004s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.004s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
+[stage3] done reactive-080c825f9cfd11bb8c64 0.004s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
+[stage3] done reactive-21151477cd2df24f4ffe 0.004s completed=8
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] checkpoint reuse reactive-8082ac34a5acd424517b
+[stage3] start reactive workload=synthetic_locality split=train capacity=4 ratio=0.2
+[stage3] done reactive-bc579b7f80d4f7764ddf 0.004s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=4 ratio=0.2
+[stage3] done reactive-04e7bcbe73f110c78eeb 0.004s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=7 ratio=0.4
+[stage3] done reactive-d83b0454d04902e3e883 0.004s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=7 ratio=0.4
+[stage3] done reactive-8082ac34a5acd424517b 0.004s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=10 ratio=0.6
+[stage3] done reactive-f82bcd10ec75854d0ebb 0.004s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=10 ratio=0.6
+[stage3] done reactive-8bbe8b5557b71b8313cc 0.004s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=2 ratio=0.1
+[stage3] done reactive-080c825f9cfd11bb8c64 0.004s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=2 ratio=0.1
+[stage3] done reactive-21151477cd2df24f4ffe 0.004s completed=8
+[stage3] checkpoint reuse reactive-bc579b7f80d4f7764ddf
+[stage3] checkpoint reuse reactive-04e7bcbe73f110c78eeb
+[stage3] checkpoint reuse reactive-d83b0454d04902e3e883
+[stage3] checkpoint reuse reactive-8082ac34a5acd424517b
+ok
+test_lru_order_matches_legacy_list_operations (test_capd_proactive_stage3.Stage3Test) ... ok
+test_manifest_loader_parses_raw_pages_and_fingerprints (test_capd_proactive_stage3.Stage3Test) ... ok
+test_nearest_rank_is_deterministic (test_capd_proactive_stage3.Stage3Test) ... ok
+test_real_manifest_stops_at_results_ready_not_verified (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.015s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.014s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.014s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.014s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.014s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.014s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.015s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.015s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+ok
+test_stage2_must_be_verified (test_capd_proactive_stage3.Stage3Test) ... ok
+test_stage3_compact_replay_matches_full_replay_exactly (test_capd_proactive_stage3.Stage3Test) ... ok
+test_synthetic_end_to_end_is_awaiting_real_inputs (test_capd_proactive_stage3.Stage3Test) ... [stage3] start reactive workload=synthetic_locality split=train capacity=16 ratio=0.2
+[stage3] done reactive-5a04cce21b77dfcce74c 0.014s completed=1
+[stage3] start reactive workload=synthetic_locality split=validation capacity=16 ratio=0.2
+[stage3] done reactive-d081a9c25f7e9cd9e18f 0.014s completed=2
+[stage3] start reactive workload=synthetic_locality split=train capacity=32 ratio=0.4
+[stage3] done reactive-bbe4105eaee398cc9275 0.014s completed=3
+[stage3] start reactive workload=synthetic_locality split=validation capacity=32 ratio=0.4
+[stage3] done reactive-9f96b7486220d56e5544 0.014s completed=4
+[stage3] start reactive workload=synthetic_locality split=train capacity=48 ratio=0.6
+[stage3] done reactive-5c2671b8009ed656c078 0.014s completed=5
+[stage3] start reactive workload=synthetic_locality split=validation capacity=48 ratio=0.6
+[stage3] done reactive-bc9ce073ed1d1a67309c 0.014s completed=6
+[stage3] start reactive workload=synthetic_locality split=train capacity=8 ratio=0.1
+[stage3] done reactive-aeb2b194a3458aed5439 0.014s completed=7
+[stage3] start reactive workload=synthetic_locality split=validation capacity=8 ratio=0.1
+[stage3] done reactive-f5ce201e6c3a58b6f41e 0.014s completed=8
+[stage3] checkpoint reuse reactive-5a04cce21b77dfcce74c
+[stage3] checkpoint reuse reactive-d081a9c25f7e9cd9e18f
+[stage3] checkpoint reuse reactive-bbe4105eaee398cc9275
+[stage3] checkpoint reuse reactive-9f96b7486220d56e5544
+ok
+test_test_split_and_formal_test_are_rejected (test_capd_proactive_stage3.Stage3Test) ... ok
+test_watermark_generation_is_traceable_and_strict (test_capd_proactive_stage3.Stage3Test) ... ok
+test_watermark_tie_prefers_smaller_reserve (test_capd_proactive_stage3.Stage3Test) ... ok
+test_working_set_uses_train_validation_union (test_capd_proactive_stage3.Stage3Test) ... ok
+test_authority_config_is_valid (test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_k_less_than_or_equal_to_bmax_is_rejected (test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_selector_cannot_be_enabled (test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_stage3_values_cannot_change (test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_all_six_weight_formulas_and_relabel (test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_incomplete_and_empty_future_windows_are_explicit (test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_variable_top_b_metrics_ties_and_short_candidates (test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_resolved_sha_and_distinct_content_are_enforced (test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_test_and_overlapping_intervals_are_rejected (test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_test_named_path_is_rejected (test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_selection_is_global_and_deterministic (test_capd_proactive_stage4.ProactiveStage4SelectionTest) ... ok
+test_source_identity_excludes_runtime_output_and_deployment_paths (test_capd_proactive_stage4.ProactiveStage4ServerWorkflowTest) ... ok
+test_validator_does_not_repeat_preflight_after_tests (test_capd_proactive_stage4.ProactiveStage4ServerWorkflowTest) ... ok
+test_multi_round_samples_rebuild_after_state_updates (test_capd_proactive_stage4.ProactiveStage4TrajectoryTest) ... ok
+test_train_resume_identity_and_closed_loop_metric_path (test_capd_proactive_stage4_e2e.ProactiveStage4TrainingE2ETest) ... ok
+test_capd_adapter_has_no_trace_or_future_label_constructor_input (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_every_frozen_single_field_mutation_is_rejected (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_frozen_parameters_and_formal_policy_table (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_path_resolution_rejects_escape_and_old_stage_tree (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_portable_absolute_checkpoint_resolution (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_stage4_verification_chain_reads_all_seed_bindings_without_pth (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_test_and_historical_policy_are_hard_rejected (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_tpp_is_registered_pending_and_never_falls_back (test_capd_proactive_stage5_contract.ProactiveStage5ContractTest) ... ok
+test_completed_exact_identity_is_reused_without_execution (test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_external_validator_failure_is_atomically_marked (test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_run_identity_covers_capd_runtime_dependencies (test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_running_or_failed_job_is_preserved_and_not_retried (test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_single_identity_change_is_not_reused (test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_unittest_log_parser_accepts_trailing_test_output (test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_unittest_log_parser_rejects_failure_or_missing_summary (test_capd_proactive_stage5_e2e.ProactiveStage5ResumeTest) ... ok
+test_all_runnable_policies_have_valid_frozen_stage0_mappings (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_clock_is_candidate_scoped_clears_bits_and_persists_pointer (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_current_entering_page_is_not_an_initialization_candidate (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_event_accounting_and_frozen_cost_match_manual_recompute (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_fairness_a_and_b_and_single_field_pollution (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_oracle_is_deterministic_candidate_scoped_and_records_tail (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_proactive_lru_triggers_multiple_rounds_and_rebuilds_candidates (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_reactive_lru_has_no_proactive_state_or_event_type (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_rule_policy_replay_is_exactly_deterministic_without_timing (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_test_input_is_hard_rejected (test_capd_proactive_stage5_replay.ProactiveStage5ReplayTest) ... ok
+test_deterministic_semantic_replay_and_stage2_cost (test_capd_proactive_stage6_e2e.ProactiveStage6E2ETest) ... ok
+test_global_selection_is_single_deterministic_and_not_per_workload (test_capd_proactive_stage6_e2e.ProactiveStage6E2ETest) ... ok
+test_runner_receipt_parser_and_exact_completed_job_resume (test_capd_proactive_stage6_e2e.ProactiveStage6E2ETest) ... ok
+test_stage6_experiment_a_includes_tpp_and_detects_pollution (test_capd_proactive_stage6_e2e.ProactiveStage6E2ETest) ... ok
+test_synthetic_e2e_epoch_cold_selection_and_multi_round_cycle (test_capd_proactive_stage6_e2e.ProactiveStage6E2ETest) ... ok
+test_cold_short_reuse_uses_frozen_64_access_window (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_dirty_tie_break_off_ignores_dirty_and_uses_age_lru_page (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_dirty_tie_break_on_uses_six_level_order (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_emergency_demotion_is_not_counted_as_tpp_selection (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_frozen_stage3_stage4_cost_and_selector_fields_cannot_change (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_grid_has_exactly_twelve_unique_predeclared_configs (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_missing_state_is_deterministic_and_candidate_scoped (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_new_page_access_epoch_boundary_and_multi_epoch_jump (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_stage5_entry_chain_and_pending_contract_remain_valid (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_stage6_stage0_mapping_is_tpp_specific_and_checkpoint_free (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_test_input_and_legacy_artifact_are_hard_rejected (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_threshold_one_and_two_classification (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_top_b_is_unique_and_strictly_within_candidate_snapshot (test_capd_proactive_stage6_tpp.ProactiveStage6TPPTest) ... ok
+test_01_stage6_entry_chain_is_valid (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_02_stage6_authority_sha_mutation_is_rejected (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_03_stage6_tpp_parameters_are_frozen (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_04_stage4_capd_parameters_are_frozen (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_05_active_controls_are_frozen (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_06_selector_must_remain_disabled (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_07_seen_workload_set_is_exact (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_08_blackscholes_is_unseen (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_09_exactly_six_workloads_are_required (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_10_duplicate_workload_is_rejected (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_11_required_type_coverage_is_enforced (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_12_unconfirmed_suite_cannot_freeze (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_13_confirmed_suite_passes_confirmation_gate (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_14_heldout_retraining_is_rejected (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_15_cost_profile_is_frozen (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_16_decimal_ceiling_capacity (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_17_capacity_ratios_are_exact (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_18_twenty_percent_default_is_not_reselected (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_19_watermarks_must_not_scale (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_20_nvm_is_unbounded_backing_tier (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_21_d20_hard_gate_is_enforced (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_22_d20_below_100_emits_warning (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_23_pressure_test_is_disabled (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_24_profile_policy_cannot_be_capd (test_capd_proactive_stage7.Stage7ConfigTest) ... ok
+test_25_valid_collection_manifest_passes (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_26_mixed_manifest_pid_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_27_mixed_manifest_tid_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_28_missing_rw_column_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_29_page_shift_other_than_12_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_30_overlapping_split_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_31_split_role_swap_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_32_test_contamination_flag_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_33_loss_or_timeout_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_34_raw_sha_mismatch_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_35_observed_mixed_pid_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_36_working_set_excludes_test_only_pages (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_37_raw_trace_is_not_modified (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_38_profile_is_exactly_deterministic (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_39_full_prepare_freezes_standard_test_and_plan (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_40_stage8_plan_has_three_capd_seeds_and_no_rule_seeds (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_41_drmemtrace_converter_preserves_legacy_schema (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_42_drmemtrace_converter_preserves_pid_tid (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_43_drmemtrace_converter_rejects_missing_identity (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_44_legacy_B64_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_45_stage7_test_policy_replay_is_rejected (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_46_drmemtrace_pid_must_be_explicit (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_47_prepare_uses_confirmed_order_not_manifest_order (test_capd_proactive_stage7.Stage7TraceAndManifestTest) ... ok
+test_aggregation_membership_seed_std_and_groups (test_capd_proactive_stage8.Stage8AggregationTest) ... ok
+test_atomic_write_round_trip (test_capd_proactive_stage8.Stage8AggregationTest) ... ok
+test_bootstrap_is_fixed_seed_reproducible (test_capd_proactive_stage8.Stage8AggregationTest) ... ok
+test_fairness_detects_one_field_pollution (test_capd_proactive_stage8.Stage8AggregationTest) ... ok
+test_authority_sha_tamper_is_rejected (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_cuda_runtime_environment_is_fail_closed_and_exact (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_cuda_smoke_inherits_exact_stage4_checkpoint_criterion (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_each_frozen_family_mutation_is_rejected (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_failed_run_id_is_fail_closed (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_formal_replay_requires_stage8_locked_authorization (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_frozen_config_is_exact (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_legacy_finals_path_is_rejected (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_plan_has_exact_stable_144_cartesian_jobs (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_plan_has_five_deterministic_and_three_capd_jobs_per_cell (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_standard_test_parser_is_only_called_by_execute (test_capd_proactive_stage8.Stage8ContractTest) ... ok
+test_early_reuse_boundaries_64_256_1024 (test_capd_proactive_stage8.Stage8MetricTest) ... ok
+test_early_reuse_zero_denominator_is_predeclared_zero (test_capd_proactive_stage8.Stage8MetricTest) ... ok
+test_five_non_capd_policies_share_replay_and_are_exact (test_capd_proactive_stage8.Stage8MetricTest) ... ok
+test_future_count_and_wasted_demotion (test_capd_proactive_stage8.Stage8MetricTest) ... ok
+test_oov_counts_access_and_unique_without_expansion (test_capd_proactive_stage8.Stage8MetricTest) ... ok
+test_semantic_hash_excludes_latency (test_capd_proactive_stage8.Stage8MetricTest) ... ok
+test_semantic_hash_excludes_resolved_absolute_checkpoint_path (test_capd_proactive_stage8.Stage8MetricTest) ... ok
+test_missing_test_file_is_never_opened (test_capd_r1_end_to_end.R1MiniEndToEndTest) ... skipped 'server-only: set CAPD_R1_E2E=1'
+test_input_audit_keeps_upstream_frozen (test_capd_r1_plan.R1PressurePlanTest) ... ok
+test_plan_is_45_cpu_jobs_without_training_or_test (test_capd_r1_plan.R1PressurePlanTest) ... ok
+test_pressure_configs_are_diagnostic_only_and_contract_preserving (test_capd_r1_plan.R1PressurePlanTest) ... ok
+test_pressure_matrix_is_exactly_d16_d32_d64_with_b_equal_d (test_capd_r1_plan.R1PressurePlanTest) ... ok
+test_headroom_without_strict_preference_is_not_measurable (test_capd_r1_results.R1PressureResultTest) ... ok
+test_positive_headroom_uses_best_classical_cost (test_capd_r1_results.R1PressureResultTest) ... ok
+test_trend_is_descriptive_and_never_selects_a_capacity (test_capd_r1_results.R1PressureResultTest) ... ok
+test_cross_stage_contracts_are_frozen_and_consistent (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
+test_every_stage1_fixture_summary_recomputes_all_profiles (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
+test_stage1_adapter_rejects_wrong_or_already_costed_summary (test_capd_stage1_stage2_integration.Stage1Stage2IntegrationTest) ... ok
+test_mini_pipeline_contract_chain (test_capd_stage1_v3_end_to_end.FinalsV3MiniEndToEndTest) ... skipped 'Set CAPD_RUN_STAGE1_E2E=1 on a torch-enabled validation server.'
+test_two_run_fixed_seed_determinism (test_capd_stage1_v3_end_to_end.FinalsV3MiniEndToEndTest) ... skipped 'Set CAPD_RUN_STAGE1_E2E=1 on a torch-enabled validation server.'
+test_approx_positions_exclude_diagonal_and_padding_exactly (test_capd_stage1_v3_model.PositionAndLossTest) ... ok
+test_fixed_sinusoidal_positions_have_exact_dtype_device_and_values (test_capd_stage1_v3_model.PositionAndLossTest) ... ok
+test_history_padding_cannot_change_valid_transformer_tokens (test_capd_stage1_v3_model.PositionAndLossTest) ... ok
+test_left_padded_causal_history_has_finite_backward_gradients (test_capd_stage1_v3_model.PositionAndLossTest) ... ok
+test_padding_values_do_not_change_approx_ndcg (test_capd_stage1_v3_model.PositionAndLossTest) ... ok
+test_history_and_candidate_paths_share_the_exact_embedding_row (test_capd_stage1_v3_model.SharedVocabAndEmbeddingTest) ... ok
+test_train_fit_freeze_oov_and_valid_forward_do_not_mutate_vocab (test_capd_stage1_v3_model.SharedVocabAndEmbeddingTest) ... ok
+test_v3_accepts_history_page_ids_and_rejects_old_field (test_capd_stage1_v3_model.V3JsonlSchemaTest) ... ok
+test_final_corrected_tensor_score_tie_uses_original_pool_rank (test_capd_stage1_v3_model.V3VictimSelectionTorchTest) ... ok
+test_tensor_nonfinite_valid_scores_hard_fail (test_capd_stage1_v3_model.V3VictimSelectionTorchTest) ... ok
+test_checkpoint_contract_config_workload_selector_mismatches_hard_fail (test_capd_stage1_v3_semantics.ArtifactIdentityTest) ... ok
+test_jsonl_metadata_and_result_mismatches_hard_fail (test_capd_stage1_v3_semantics.ArtifactIdentityTest) ... ok
+test_v2_and_v3_artifacts_are_mutually_incompatible (test_capd_stage1_v3_semantics.ArtifactIdentityTest) ... ok
+test_future_window_boundary_and_exact_label (test_capd_stage1_v3_semantics.FutureSplitAndSnapshotTest) ... ok
+test_official_sources_are_independent_and_holdout_is_smoke_only (test_capd_stage1_v3_semantics.FutureSplitAndSnapshotTest) ... ok
+test_triggering_request_only_enters_reranker_history (test_capd_stage1_v3_semantics.FutureSplitAndSnapshotTest) ... ok
+test_any_hit_and_tie_coverage_are_distinct_numeric_metrics (test_capd_stage1_v3_semantics.LruAndMetricSemanticsTest) ... ok
+test_lru_direction_uses_original_B_t_not_filtered_K_t (test_capd_stage1_v3_semantics.LruAndMetricSemanticsTest) ... ok
+test_pool_selector_end_to_end_and_regret_are_separate (test_capd_stage1_v3_semantics.LruAndMetricSemanticsTest) ... ok
+test_first_read_write_hit_nvm_revisit_and_demotion_costs (test_capd_stage1_v3_semantics.ReplayAccountingTest) ... ok
+test_exact_tie_uses_oldest_original_rank_not_tensor_position (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_invalid_mask_rank_and_shapes_hard_fail (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_padding_with_extreme_placeholder_score_cannot_win (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_selector_score_cannot_break_a_reranker_tie (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_selector_topk_tie_is_rank_ordered_and_page_id_independent (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_unique_highest_score_keeps_the_model_choice (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_valid_nan_and_positive_or_negative_inf_hard_fail (test_capd_stage1_v3_semantics.V3RerankerVictimSelectionTest) ... ok
+test_jsonl_content_fingerprint_mismatch_is_rejected (test_capd_stage2_data.ArtifactBindingTest) ... ok
+test_v2_and_unbound_or_mismatched_v3_artifacts_are_rejected (test_capd_stage2_data.ArtifactBindingTest) ... ok
+test_future_boundary_and_complete_window_count_are_exact (test_capd_stage2_data.AuditMetricsTest) ... ok
+test_report_fields_are_complete_deterministic_and_oov_is_correct (test_capd_stage2_data.AuditMetricsTest) ... ok
+test_short_low_pressure_and_no_decision_are_diagnosed (test_capd_stage2_data.AuditMetricsTest) ... ok
+test_streaming_and_extreme_write_are_diagnosed (test_capd_stage2_data.AuditMetricsTest) ... ok
+test_distinct_collection_ids_may_repeat_values_and_interval_numbers (test_capd_stage2_data.SourceManifestTest) ... ok
+test_manifest_binding_preserves_recorded_crlf_fingerprint (test_capd_stage2_data.SourceManifestTest) ... ok
+test_manifest_or_split_fingerprint_mismatch_hard_fails (test_capd_stage2_data.SourceManifestTest) ... ok
+test_missing_real_rw_fails_for_official_data (test_capd_stage2_data.SourceManifestTest) ... ok
+test_nonoverlap_and_content_chain_are_verified (test_capd_stage2_data.SourceManifestTest) ... ok
+test_passed_report_is_sealed_and_report_tampering_hard_fails (test_capd_stage2_data.SourceManifestTest) ... ok
+test_quality_seal_survives_git_lf_normalization (test_capd_stage2_data.SourceManifestTest) ... ok
+test_source_interval_overlap_fails_even_when_paths_differ (test_capd_stage2_data.SourceManifestTest) ... ok
+test_B8_mechanical_invariants (test_capd_stage3_selector.Stage3AnalysisTest) ... ok
+test_atomic_output_bundle_is_complete_and_refuses_overwrite (test_capd_stage3_selector.Stage3AnalysisTest) ... ok
+test_b_sweep_reports_alignment_monotonicity_and_absolute_gain (test_capd_stage3_selector.Stage3AnalysisTest) ... ok
+test_full_mismatch_hard_fails_before_ablation (test_capd_stage3_selector.Stage3AnalysisTest) ... ok
+test_synthetic_full_single_and_leave_one_out_are_complete (test_capd_stage3_selector.Stage3AnalysisTest) ... ok
+test_every_leave_one_out_grid_has_exactly_286_points (test_capd_stage3_selector.Stage3GridTest) ... ok
+test_five_one_hot_weights_are_exact (test_capd_stage3_selector.Stage3GridTest) ... ok
+test_four_level_choice_order (test_capd_stage3_selector.Stage3GridTest) ... ok
+test_full_grid_has_exactly_1001_points (test_capd_stage3_selector.Stage3GridTest) ... ok
+test_K_not_equal_to_8_hard_fails (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_analysis_audit_has_no_test_or_reranker_read_path (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_audit_only_does_not_write_results (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_contract_schema_profile_workload_and_B_mismatch_hard_fail (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_generator_summary_uses_nested_validation_sample_fingerprints (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_negative_relevance_is_valid_under_frozen_proxy_formula (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_output_inside_stage2_artifacts_is_rejected (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_selector_validation_sample_fingerprint_mismatch_hard_fails (test_capd_stage3_selector.Stage3InputGateTest) ... ok
+test_all_nondiscriminative_full_search_uses_uniform_fallback (test_capd_stage3_selector.Stage3MetricTest) ... ok
+test_any_hit_recall_and_tie_coverage_are_distinct (test_capd_stage3_selector.Stage3MetricTest) ... ok
+test_nondiscriminative_sample_is_excluded_only_from_two_metrics (test_capd_stage3_selector.Stage3MetricTest) ... ok
+test_same_inputs_produce_identical_results (test_capd_stage3_selector.Stage3MetricTest) ... ok
+test_all_nine_label_variants_reuse_the_same_costs (test_capd_stage4_counterfactual.CounterfactualAccountingTest) ... ok
+test_equal_costs_do_not_create_nan_or_zero_division (test_capd_stage4_counterfactual.CounterfactualAccountingTest) ... ok
+test_forced_first_victim_changes_hand_computable_future_cost (test_capd_stage4_counterfactual.CounterfactualAccountingTest) ... ok
+test_later_evictions_are_strict_lru_and_dirty_demotion_has_no_write (test_capd_stage4_counterfactual.CounterfactualAccountingTest) ... ok
+test_spearman_uses_average_tie_ranks_and_undefined_constants (test_capd_stage4_counterfactual.CounterfactualAccountingTest) ... ok
+test_top1_is_set_any_hit_and_ideal_ndcg_is_one (test_capd_stage4_counterfactual.CounterfactualAccountingTest) ... ok
+test_a_b_c_identities_cannot_be_mixed (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_binary_counts_and_ratio_difference (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_changed_numeric_semantics_invalidates_partial (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_distribution_metrics_are_linear_after_sorting (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_distribution_worker_count_is_configurable (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_feature_sampling_contract_is_explicit (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_first_decision_has_no_artificial_zero_interval (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_g11_releases_train_before_loading_valid (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_g11_uses_fresh_spawned_processes_and_resumable_seed_partials (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_ks_identical_is_zero_and_disjoint_is_one (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_ks_matches_simple_empirical_cdf_reference (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_legacy_partial_defaults_to_current_numeric_semantics (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_partial_reuse_rejects_changed_checkpoint_identity (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_quantiles_and_outside_range_ratio (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_resume_identity_ignores_orchestration_provenance (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_wasserstein_matches_reference_quantile_sampling (test_capd_stage4_distribution.DistributionMetricTest) ... ok
+test_mini_pipeline_contract_chain (capd_stage1_e2e_fixture.FinalsV3MiniEndToEndTest) ... skipped 'Set CAPD_RUN_STAGE1_E2E=1 on a torch-enabled validation server.'
+test_two_run_fixed_seed_determinism (capd_stage1_e2e_fixture.FinalsV3MiniEndToEndTest) ... skipped 'Set CAPD_RUN_STAGE1_E2E=1 on a torch-enabled validation server.'
+test_frozen_generate_two_seed_train_g12_g11_chain (test_capd_stage4_end_to_end.Stage4MiniEndToEndTest) ... skipped 'server-only: set CAPD_STAGE4_E2E=1'
+test_default_seed_remains_config_3136859 (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_explicit_seed_is_not_silently_overwritten (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_jsonl_semantic_comparison_rejects_content_change (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_jsonl_semantic_fingerprint_ignores_crlf_and_json_whitespace (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_official_seed_set_and_output_directories_are_distinct (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_stage4_generate_reuses_frozen_selector_without_search (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_stage4_preserves_frozen_manifest_binding_and_records_raw_sha (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_stage4_training_has_no_test_argument_or_path (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_training_source_has_valid_only_selection_and_nonfinite_guard (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_validated_loader_result_is_not_reparsed_as_raw_v3 (test_capd_stage4_training.MultiSeedTrainingTest) ... ok
+test_plan_has_full_required_matrix_without_duplicate_B8 (test_capd_stage5_end_to_end.Stage5PlanEndToEndTest) ... ok
+test_resume_rejects_changed_output_content (test_capd_stage5_end_to_end.Stage5PlanEndToEndTest) ... ok
+test_full_baselines_and_structural_variants_use_only_tmp_path (test_capd_stage5_end_to_end.Stage5TorchMiniEndToEndTest) ... skipped 'server-only: set CAPD_STAGE5_E2E=1'
+test_complete_optional_learned_baseline_enters_main_table (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_improvement_direction_and_negative_regression (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_incomplete_optional_learned_baseline_is_excluded (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_main_summary_keeps_all_seeds_and_selects_lowest_cost_baseline (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_missing_fairness_binding_hard_fails (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_missing_required_seed_hard_fails (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_paired_ablation_uses_matching_seed (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_pilot_and_official_cannot_mix (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_random_seed_cannot_be_overwritten (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_sample_statistics_use_sample_standard_deviation (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_sensitivity_confirmation_flag_is_preserved (test_capd_stage5_results.Stage5ResultTest) ... ok
+test_data_profile_still_rejects_undeclared_method_change (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_every_variant_changes_only_preregistered_parameters (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_full_loader_still_rejects_non_sinusoidal_checkpoint_config (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_history_mean_pool_excludes_padding_and_has_no_attention_module (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_no_candidate_state_keeps_page_embedding_and_four_input_channels (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_no_filter_bypasses_selection_and_preserves_pool_order (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_no_future_write_changes_only_write_risk_term (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_preregistered_matrix_is_complete_and_unique (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_sensitivity_configs_reuse_sealed_full_data_profile (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_stage3_leave_one_out_weights_are_frozen (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_uniform_selector_is_identity_not_independent_evidence (test_capd_stage5_variants.Stage5VariantTest) ... ok
+test_profiled_qmap_chain_uses_only_temporary_paths (test_capd_stage6_end_to_end.Stage6TorchMiniEndToEndTest) ... skipped 'server-only: set CAPD_STAGE6_E2E=1'
+test_capacity_config_changes_only_declared_D (test_capd_stage6_plan.Stage6PlanTest) ... ok
+test_capacity_config_reuses_sealed_full_data_profile (test_capd_stage6_plan.Stage6PlanTest) ... ok
+test_plan_has_profile_and_capacity_matrix (test_capd_stage6_plan.Stage6PlanTest) ... ok
+test_stage5_and_stage6_variant_cannot_mix (test_capd_stage6_plan.Stage6PlanTest) ... ok
+test_capacity_requires_three_qmap_seeds_for_every_point (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_cost_summary_keeps_negative_improvement (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_natural_rw_summary_marks_descriptive_boundary (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_profile_preserves_raw_samples_and_percentiles (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_profile_summarizes_throughput_and_system_effects (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_reweighted_cost_uses_exact_counters (test_capd_stage6_results.Stage6ResultTest) ... ok
+test_decision_holdout_mismatch_is_rejected (test_checkpoint_config_contract.CheckpointConfigContractTest) ... ok
+test_each_frozen_contract_mismatch_is_rejected (test_checkpoint_config_contract.CheckpointConfigContractTest) ... ok
+test_matching_contract_is_accepted (test_checkpoint_config_contract.CheckpointConfigContractTest) ... ok
+test_validation_strategy_mismatch_is_rejected (test_checkpoint_config_contract.CheckpointConfigContractTest) ... ok
+test_build_summary_rows_compares_qmap_to_reweighted_best_baseline (test_cost_weight_robustness.CostWeightSensitivityTest) ... ok
+test_reweight_result_uses_existing_replay_counters (test_cost_weight_robustness.CostWeightSensitivityTest) ... ok
+test_build_summary_rows_compares_qmap_to_reweighted_best_baseline (test_cost_weight_sensitivity.CostWeightSensitivityTest) ... ok
+test_reweight_result_uses_existing_replay_counters (test_cost_weight_sensitivity.CostWeightSensitivityTest) ... ok
+test_chronological_eighty_twenty_split_has_lookahead_guard (test_decision_holdout.DecisionHoldoutTest) ... ok
+test_selector_fit_and_validation_use_only_their_decision_ranges (test_decision_holdout.DecisionHoldoutTest) ... ok
+test_split_is_deterministic_and_independent_of_B (test_decision_holdout.DecisionHoldoutTest) ... ok
+test_too_few_decisions_is_rejected (test_decision_holdout.DecisionHoldoutTest) ... ok
+test_dirty_and_clean_victim_each_migrate_once_without_writeback_count (test_dirty_accounting.DirtyAccountingTest) ... ok
+test_same_state_produces_identical_snapshot (test_generator_replay_feature_equivalence.GeneratorReplayFeatureEquivalenceTest) ... ok
+test_kleio_lite_eviction_uses_lowest_predicted_hotness (test_learned_baselines.LearnedBaselinesTest) ... ok
+test_patterns_lite_uses_page_pattern_group_weights (test_learned_baselines.LearnedBaselinesTest) ... ok
+test_runner_builds_train_and_eval_commands_for_ml_baseline (test_learned_baselines.LearnedBaselinesTest) ... ok
+test_old_config_defaults_to_page_id_enabled (test_no_vpn_ablation.NoVpnConfigContractTest) ... ok
+test_only_allowlisted_fields_differ (test_no_vpn_ablation.NoVpnConfigContractTest) ... ok
+test_cuda_no_vpn_identity_invariance_and_backward (test_no_vpn_ablation.NoVpnModelContractTest) ... ok
+test_default_matches_explicit_true_with_identical_weights (test_no_vpn_ablation.NoVpnModelContractTest) ... /home/likc/.conda/envs/capd/lib/python3.7/site-packages/torch/nn/modules/module.py:1433: UserWarning: Positional args are being deprecated, use kwargs instead. Refer to https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.state_dict for details.
+  "Positional args are being deprecated, use kwargs instead. Refer to "
+ok
+test_full_mode_keeps_page_embedding_path_active (test_no_vpn_ablation.NoVpnModelContractTest) ... ok
+test_no_vpn_is_invariant_to_all_page_ids (test_no_vpn_ablation.NoVpnModelContractTest) ... ok
+test_no_vpn_page_embedding_has_no_loss_gradient (test_no_vpn_ablation.NoVpnModelContractTest) ... ok
+test_resume_restores_model_optimizer_epoch_and_variant (test_no_vpn_ablation.NoVpnResumeAndSummaryTest) ... ok
+test_summary_delta_direction_and_statistics (test_no_vpn_ablation.NoVpnResumeAndSummaryTest) ... ok
+test_full_and_no_vpn_train_save_load_replay (test_no_vpn_ablation.NoVpnTrainReplaySmokeTest) ... ok
+test_model_declares_context_only_candidate_scorer_mode (test_qmap_cross_attention.QMAPCrossAttentionStaticTest) ... ok
+test_model_declares_full_sequence_extractor_mode (test_qmap_cross_attention.QMAPCrossAttentionStaticTest) ... ok
+test_candidate_scorer_uses_context_vector_without_concat (test_qmap_cross_attention.QMAPCrossAttentionTest) ... ok
+test_extractor_can_return_full_encoded_sequence (test_qmap_cross_attention.QMAPCrossAttentionTest) ... ok
+test_collect_seed_row_uses_best_baseline_cost (test_seed_stability.SeedStabilitySummaryTest) ... ok
+test_summarize_rows_reports_population_stability_stats (test_seed_stability.SeedStabilitySummaryTest) ... ok
+test_choice_key_prioritizes_recall_then_regret (test_selector_weight_search.SelectorWeightSearchTest) ... ok
+test_choice_key_uses_uniform_distance_then_lexicographic_order (test_selector_weight_search.SelectorWeightSearchTest) ... ok
+test_empty_effective_validation_set_falls_back_to_uniform (test_selector_weight_search.SelectorWeightSearchTest) ... ok
+test_grid_has_exactly_1001_integer_compositions (test_selector_weight_search.SelectorWeightSearchTest) ... ok
+test_nondiscriminative_sample_is_excluded_from_selector_recall (test_selector_weight_search.SelectorWeightSearchTest) ... ok
+
+----------------------------------------------------------------------
+Ran 436 tests in 36.027s
+
+OK (skipped=10)
+[OK] resume_fixture__validation__proactive_lru__seed-na
+[resume] exact completed job resume_fixture__validation__proactive_lru__seed-na
+[OK] resume_fixture__validation__proactive_lru__seed-na
+[OK] grid__resume_fixture__validation__tpp-e0064-c1-doff
+[resume] exact completed job grid__resume_fixture__validation__tpp-e0064-c1-doff
+[OK] Stage-8 deterministic CUDA smoke passed for 3/3 CAPD checkpoints
+[OK] input_audit canneal B8
+[OK] input_audit canneal B16
+[OK] input_audit canneal B32
+[OK] input_audit canneal B64
+[OK] input_audit streamcluster_pressure B8
+[OK] input_audit streamcluster_pressure B16
+[OK] input_audit streamcluster_pressure B32
+[OK] input_audit streamcluster_pressure B64
+[OK] input_audit dedup_pressure B8
+[OK] input_audit dedup_pressure B16
+[OK] input_audit dedup_pressure B32
+[OK] input_audit dedup_pressure B64
+[FINAL] STAGE3_INPUT_AUDIT_PASSED 12/12
+[OK] Stage1-8 regression receipt recorded (436 tests)
+[OK] canneal__r020__reactive_lru__seed-na
+[OK] canneal__r020__proactive_lru__seed-na
+[OK] canneal__r020__proactive_clock__seed-na
+[OK] canneal__r020__tpp_inspired__seed-na
+[OK] canneal__r020__oracle__seed-na
+[OK] canneal__r020__capd__seed-3136859
+[OK] canneal__r020__capd__seed-42
+[OK] canneal__r020__capd__seed-2026
+[OK] canneal__r040__reactive_lru__seed-na
+[OK] canneal__r040__proactive_lru__seed-na
+[OK] canneal__r040__proactive_clock__seed-na
+[OK] canneal__r040__tpp_inspired__seed-na
+[OK] canneal__r040__oracle__seed-na
+[OK] canneal__r040__capd__seed-3136859
+[OK] canneal__r040__capd__seed-42
+[OK] canneal__r040__capd__seed-2026
+[OK] canneal__r060__reactive_lru__seed-na
+[OK] canneal__r060__proactive_lru__seed-na
+[OK] canneal__r060__proactive_clock__seed-na
+[OK] canneal__r060__tpp_inspired__seed-na
+[OK] canneal__r060__oracle__seed-na
+[OK] canneal__r060__capd__seed-3136859
+[OK] canneal__r060__capd__seed-42
+[OK] canneal__r060__capd__seed-2026
+[OK] streamcluster_pressure__r020__reactive_lru__seed-na
+[OK] streamcluster_pressure__r020__proactive_lru__seed-na
+[OK] streamcluster_pressure__r020__proactive_clock__seed-na
+[OK] streamcluster_pressure__r020__tpp_inspired__seed-na
+[OK] streamcluster_pressure__r020__oracle__seed-na
+[OK] streamcluster_pressure__r020__capd__seed-3136859
+[OK] streamcluster_pressure__r020__capd__seed-42
+[OK] streamcluster_pressure__r020__capd__seed-2026
+[OK] streamcluster_pressure__r040__reactive_lru__seed-na
+[OK] streamcluster_pressure__r040__proactive_lru__seed-na
+[OK] streamcluster_pressure__r040__proactive_clock__seed-na
+[OK] streamcluster_pressure__r040__tpp_inspired__seed-na
+[OK] streamcluster_pressure__r040__oracle__seed-na
+[OK] streamcluster_pressure__r040__capd__seed-3136859
+[OK] streamcluster_pressure__r040__capd__seed-42
+[OK] streamcluster_pressure__r040__capd__seed-2026
+[OK] streamcluster_pressure__r060__reactive_lru__seed-na
+[OK] streamcluster_pressure__r060__proactive_lru__seed-na
+[OK] streamcluster_pressure__r060__proactive_clock__seed-na
+[OK] streamcluster_pressure__r060__tpp_inspired__seed-na
+[OK] streamcluster_pressure__r060__oracle__seed-na
+[OK] streamcluster_pressure__r060__capd__seed-3136859
+[OK] streamcluster_pressure__r060__capd__seed-42
+[OK] streamcluster_pressure__r060__capd__seed-2026
+[OK] dedup_pressure__r020__reactive_lru__seed-na
+[OK] dedup_pressure__r020__proactive_lru__seed-na
+[OK] dedup_pressure__r020__proactive_clock__seed-na
+[OK] dedup_pressure__r020__tpp_inspired__seed-na
+[OK] dedup_pressure__r020__oracle__seed-na
+[OK] dedup_pressure__r020__capd__seed-3136859
+[OK] dedup_pressure__r020__capd__seed-42
+[OK] dedup_pressure__r020__capd__seed-2026
+[OK] dedup_pressure__r040__reactive_lru__seed-na
+[OK] dedup_pressure__r040__proactive_lru__seed-na
+[OK] dedup_pressure__r040__proactive_clock__seed-na
+[OK] dedup_pressure__r040__tpp_inspired__seed-na
+[OK] dedup_pressure__r040__oracle__seed-na
+[OK] dedup_pressure__r040__capd__seed-3136859
+[OK] dedup_pressure__r040__capd__seed-42
+[OK] dedup_pressure__r040__capd__seed-2026
+[OK] dedup_pressure__r060__reactive_lru__seed-na
+[OK] dedup_pressure__r060__proactive_lru__seed-na
+[OK] dedup_pressure__r060__proactive_clock__seed-na
+[OK] dedup_pressure__r060__tpp_inspired__seed-na
+[OK] dedup_pressure__r060__oracle__seed-na
+[OK] dedup_pressure__r060__capd__seed-3136859
+[OK] dedup_pressure__r060__capd__seed-42
+[OK] dedup_pressure__r060__capd__seed-2026
+[OK] blackscholes__r020__reactive_lru__seed-na
+[OK] blackscholes__r020__proactive_lru__seed-na
+[OK] blackscholes__r020__proactive_clock__seed-na
+[OK] blackscholes__r020__tpp_inspired__seed-na
+[OK] blackscholes__r020__oracle__seed-na
+[OK] blackscholes__r020__capd__seed-3136859
+[OK] blackscholes__r020__capd__seed-42
+[OK] blackscholes__r020__capd__seed-2026
+[OK] blackscholes__r040__reactive_lru__seed-na
+[OK] blackscholes__r040__proactive_lru__seed-na
+[OK] blackscholes__r040__proactive_clock__seed-na
+[OK] blackscholes__r040__tpp_inspired__seed-na
+[OK] blackscholes__r040__oracle__seed-na
+[OK] blackscholes__r040__capd__seed-3136859
+[OK] blackscholes__r040__capd__seed-42
+[OK] blackscholes__r040__capd__seed-2026
+[OK] blackscholes__r060__reactive_lru__seed-na
+[OK] blackscholes__r060__proactive_lru__seed-na
+[OK] blackscholes__r060__proactive_clock__seed-na
+[OK] blackscholes__r060__tpp_inspired__seed-na
+[OK] blackscholes__r060__oracle__seed-na
+[OK] blackscholes__r060__capd__seed-3136859
+[OK] blackscholes__r060__capd__seed-42
+[OK] blackscholes__r060__capd__seed-2026
+[OK] swaptions__r020__reactive_lru__seed-na
+[OK] swaptions__r020__proactive_lru__seed-na
+[OK] swaptions__r020__proactive_clock__seed-na
+[OK] swaptions__r020__tpp_inspired__seed-na
+[OK] swaptions__r020__oracle__seed-na
+[OK] swaptions__r020__capd__seed-3136859
+[OK] swaptions__r020__capd__seed-42
+[OK] swaptions__r020__capd__seed-2026
+[OK] swaptions__r040__reactive_lru__seed-na
+[OK] swaptions__r040__proactive_lru__seed-na
+[OK] swaptions__r040__proactive_clock__seed-na
+[OK] swaptions__r040__tpp_inspired__seed-na
+[OK] swaptions__r040__oracle__seed-na
+[OK] swaptions__r040__capd__seed-3136859
+[OK] swaptions__r040__capd__seed-42
+[OK] swaptions__r040__capd__seed-2026
+[OK] swaptions__r060__reactive_lru__seed-na
+[OK] swaptions__r060__proactive_lru__seed-na
+[OK] swaptions__r060__proactive_clock__seed-na
+[OK] swaptions__r060__tpp_inspired__seed-na
+[OK] swaptions__r060__oracle__seed-na
+[OK] swaptions__r060__capd__seed-3136859
+[OK] swaptions__r060__capd__seed-42
+[OK] swaptions__r060__capd__seed-2026
+[OK] fluidanimate__r020__reactive_lru__seed-na
+[OK] fluidanimate__r020__proactive_lru__seed-na
+[OK] fluidanimate__r020__proactive_clock__seed-na
+[OK] fluidanimate__r020__tpp_inspired__seed-na
+[OK] fluidanimate__r020__oracle__seed-na
+[OK] fluidanimate__r020__capd__seed-3136859
+[OK] fluidanimate__r020__capd__seed-42
+[OK] fluidanimate__r020__capd__seed-2026
+[OK] fluidanimate__r040__reactive_lru__seed-na
+[OK] fluidanimate__r040__proactive_lru__seed-na
+[OK] fluidanimate__r040__proactive_clock__seed-na
+[OK] fluidanimate__r040__tpp_inspired__seed-na
+[OK] fluidanimate__r040__oracle__seed-na
+[OK] fluidanimate__r040__capd__seed-3136859
+[OK] fluidanimate__r040__capd__seed-42
+[OK] fluidanimate__r040__capd__seed-2026
+[OK] fluidanimate__r060__reactive_lru__seed-na
+[OK] fluidanimate__r060__proactive_lru__seed-na
+[OK] fluidanimate__r060__proactive_clock__seed-na
+[OK] fluidanimate__r060__tpp_inspired__seed-na
+[OK] fluidanimate__r060__oracle__seed-na
+[OK] fluidanimate__r060__capd__seed-3136859
+[OK] fluidanimate__r060__capd__seed-42
+[OK] fluidanimate__r060__capd__seed-2026
+[OK] Stage-8 formal Test Replay completed 144/144
+[OK] Stage-8 audited aggregation generated
+[FINAL] STAGE8_SYNC_REPLAY_VERIFIED

@@ -1,0 +1,466 @@
+{
+  "B": null,
+  "F_low": null,
+  "F_target": null,
+  "access_log_retention": "omitted_memory_bound",
+  "accesses": [],
+  "b_max": null,
+  "b_t_rule": null,
+  "candidate_contract": {
+    "candidate_order": "oldest_to_newest",
+    "candidate_rebuilt_every_round": true,
+    "candidate_size_K": 8,
+    "candidate_source": "current_lru_tail",
+    "current_entering_page_excluded_until_resident": true,
+    "padding": false,
+    "selection_subset_required": true,
+    "sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489"
+  },
+  "candidate_contract_sha256": "c6fda7650243854881dd4acac1dfa0aed2ebb794a23dcb058d8f734ae2c9b489",
+  "candidate_size_K": null,
+  "candidate_source": null,
+  "capacity_ratio": "0.60",
+  "capd_generalization": null,
+  "checkpoint": null,
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "cycles": [],
+  "dram_capacity_pages": 179,
+  "events": [],
+  "fallback_policy": null,
+  "final_state": {
+    "F_t": 154,
+    "access_index": 599999,
+    "active_proactive_cycle": null,
+    "cycle_counter": 0,
+    "decision_counter": 0,
+    "dirty_state": {
+      "34156297952": false,
+      "34156297953": false,
+      "34156297956": true,
+      "34156297978": false,
+      "34156297991": true,
+      "34156297992": true,
+      "34156297993": true,
+      "34156297994": true,
+      "34156297995": true,
+      "34156297996": true,
+      "34156297997": true,
+      "34156297998": true,
+      "34156311305": false,
+      "34156311306": true,
+      "34156311307": true,
+      "34156311313": false,
+      "34156311314": false,
+      "34156313141": false,
+      "34156313150": false,
+      "34156313151": false,
+      "34156313178": false,
+      "34156313179": false,
+      "34156313229": false,
+      "34156313792": true,
+      "34357579184": true
+    },
+    "dram_capacity_pages": 179,
+    "dram_lru_mru_to_lru": [
+      34156297995,
+      34156297997,
+      34156297996,
+      34156297952,
+      34357579184,
+      34156313150,
+      34156313141,
+      34156313178,
+      34156313179,
+      34156313229,
+      34156297953,
+      34156313792,
+      34156311313,
+      34156311306,
+      34156311307,
+      34156311305,
+      34156311314,
+      34156297994,
+      34156297991,
+      34156297993,
+      34156297992,
+      34156297956,
+      34156297998,
+      34156297978,
+      34156313151
+    ],
+    "dram_resident": [
+      34156297952,
+      34156297953,
+      34156297956,
+      34156297978,
+      34156297991,
+      34156297992,
+      34156297993,
+      34156297994,
+      34156297995,
+      34156297996,
+      34156297997,
+      34156297998,
+      34156311305,
+      34156311306,
+      34156311307,
+      34156311313,
+      34156311314,
+      34156313141,
+      34156313150,
+      34156313151,
+      34156313178,
+      34156313179,
+      34156313229,
+      34156313792,
+      34357579184
+    ],
+    "frequency_state": {
+      "34156297952": 65604,
+      "34156297953": 4867,
+      "34156297956": 168,
+      "34156297978": 58080,
+      "34156297991": 27191,
+      "34156297992": 14478,
+      "34156297993": 10840,
+      "34156297994": 7650,
+      "34156297995": 26523,
+      "34156297996": 65769,
+      "34156297997": 53111,
+      "34156297998": 8531,
+      "34156311305": 294,
+      "34156311306": 883,
+      "34156311307": 376,
+      "34156311313": 271,
+      "34156311314": 83,
+      "34156313141": 3200,
+      "34156313150": 3200,
+      "34156313151": 1542,
+      "34156313178": 25684,
+      "34156313179": 20194,
+      "34156313229": 4742,
+      "34156313792": 524,
+      "34357579184": 196195
+    },
+    "history_window": [
+      {
+        "page": 34156297995,
+        "pc": 139904196400043,
+        "rw": 0
+      },
+      {
+        "page": 34156297996,
+        "pc": 139904196400190,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400201,
+        "rw": 1
+      },
+      {
+        "page": 34156297996,
+        "pc": 139904196400209,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400220,
+        "rw": 1
+      },
+      {
+        "page": 34156297996,
+        "pc": 139904196400224,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400232,
+        "rw": 1
+      },
+      {
+        "page": 34156297996,
+        "pc": 139904196400236,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400244,
+        "rw": 1
+      },
+      {
+        "page": 34156297996,
+        "pc": 139904196400248,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400256,
+        "rw": 1
+      },
+      {
+        "page": 34156297996,
+        "pc": 139904196400260,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400268,
+        "rw": 1
+      },
+      {
+        "page": 34156297996,
+        "pc": 139904196400272,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400280,
+        "rw": 1
+      },
+      {
+        "page": 34156297997,
+        "pc": 139904196400284,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400292,
+        "rw": 1
+      },
+      {
+        "page": 34156297997,
+        "pc": 139904196400296,
+        "rw": 0
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400304,
+        "rw": 1
+      },
+      {
+        "page": 34156297995,
+        "pc": 139904196400043,
+        "rw": 0
+      }
+    ],
+    "nvm_resident": [],
+    "raw_event_counters": {
+      "accesses_below_F_low": 0,
+      "dirty_demotions": 0,
+      "dram_hits": 599975,
+      "early_reuse_count": 0,
+      "emergency_demotions": 0,
+      "free_frame_exhaustion_count": 0,
+      "nvm_reads": 21,
+      "nvm_writes": 4,
+      "page_enter_dram_count": 25,
+      "proactive_demotions": 0,
+      "reactive_demotions": 0,
+      "total_accesses": 600000,
+      "total_demotions": 0
+    },
+    "residency_state": {
+      "34156297952": "dram",
+      "34156297953": "dram",
+      "34156297956": "dram",
+      "34156297978": "dram",
+      "34156297991": "dram",
+      "34156297992": "dram",
+      "34156297993": "dram",
+      "34156297994": "dram",
+      "34156297995": "dram",
+      "34156297996": "dram",
+      "34156297997": "dram",
+      "34156297998": "dram",
+      "34156311305": "dram",
+      "34156311306": "dram",
+      "34156311307": "dram",
+      "34156311313": "dram",
+      "34156311314": "dram",
+      "34156313141": "dram",
+      "34156313150": "dram",
+      "34156313151": "dram",
+      "34156313178": "dram",
+      "34156313179": "dram",
+      "34156313229": "dram",
+      "34156313792": "dram",
+      "34357579184": "dram"
+    },
+    "round_counter": 0
+  },
+  "formal_test": true,
+  "future_information": "not_accessed",
+  "initial_state": {
+    "dirty_pages": [],
+    "dram_resident": [],
+    "free_frames": 179,
+    "lru_order": [],
+    "nvm_backing_pages": [
+      34156297952,
+      34156297953,
+      34156297956,
+      34156297978,
+      34156297991,
+      34156297992,
+      34156297993,
+      34156297994,
+      34156297995,
+      34156297996,
+      34156297997,
+      34156297998,
+      34156311305,
+      34156311306,
+      34156311307,
+      34156311313,
+      34156311314,
+      34156313141,
+      34156313150,
+      34156313151,
+      34156313178,
+      34156313179,
+      34156313229,
+      34156313792,
+      34357579184
+    ]
+  },
+  "initial_state_sha256": "1b26647210ec10e760cc7ad23e0b610a9f47e821de161f5c6838223474f49df1",
+  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency.",
+  "job_id": "swaptions__r060__reactive_lru__seed-na",
+  "metrics": {
+    "average_free_frames": 154.43931166666667,
+    "decision_count": 0,
+    "dram_hits": 599975,
+    "early_reuse": {
+      "denominator_semantics": "proactive_demotion_events_each_selected_page_counts_once",
+      "first_reuse_distance": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "future_access_count": {
+        "count": 0,
+        "maximum": null,
+        "mean": null,
+        "minimum": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "no_future_reuse_count": 0,
+      "per_demotion_audit": [],
+      "wasted_demotion_count": 0,
+      "wasted_demotion_rate": 0.0,
+      "windows": {
+        "1024": {
+          "delta_accesses": 1024,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "256": {
+          "delta_accesses": 256,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        },
+        "64": {
+          "delta_accesses": 64,
+          "denominator_proactive_demotion_pages": 0,
+          "early_reuse_count": 0,
+          "rate": 0.0
+        }
+      },
+      "zero_denominator_rate": 0.0
+    },
+    "emergency_demotions": 0,
+    "emergency_fallback_count": 0,
+    "fallback_rate": 0.0,
+    "fallback_rate_denominator": "page_enter_dram_count",
+    "free_frame_exhaustion_count": 0,
+    "mean_b_t": null,
+    "mean_decision_time": null,
+    "minimum_free_frames": 154,
+    "number_of_proactive_cycles": 0,
+    "number_of_proactive_rounds": 0,
+    "nvm_reads": 21,
+    "nvm_writes": 4,
+    "p50_decision_time": null,
+    "p95_decision_time": null,
+    "p99_decision_time": null,
+    "page_enter_dram_count": 25,
+    "proactive_demotions": 0,
+    "raw_access_count": 600000,
+    "reactive_demotions": 0,
+    "rounds_per_cycle": null,
+    "total_decision_time": 0,
+    "total_demotions": 0,
+    "weighted_cost": 600049,
+    "weighted_cost_components": {
+      "demotion_cost": 0,
+      "dram_hit_cost": 599975,
+      "nvm_read_cost": 42,
+      "nvm_write_cost": 32
+    },
+    "weighted_cost_per_access": 1.0000816666666668
+  },
+  "nvm_capacity_model": "unbounded_backing_tier",
+  "old_finals_v3_stage_artifacts_used": false,
+  "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+  "page_size_bytes": 4096,
+  "performance_selection_performed": false,
+  "policy": "reactive_lru",
+  "policy_display_name": "Reactive-LRU",
+  "policy_state": null,
+  "rounds": [],
+  "runtime": {
+    "deterministic_environment": {
+      "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+      "PYTHONHASHSEED": "0"
+    },
+    "latency": {
+      "count": 0,
+      "feature_total_seconds": 0.0,
+      "inference_total_seconds": 0.0,
+      "mean_seconds": null,
+      "measurement_scope": "synchronous_replay_decision_overhead",
+      "p50_seconds": null,
+      "p95_seconds": null,
+      "p99_seconds": null,
+      "selection_total_seconds": 0.0,
+      "total_seconds": 0
+    },
+    "measurement_enabled": true
+  },
+  "schema_version": "capd_proactive_stage8_job_result_v1_0",
+  "seed": null,
+  "selector_status": "disabled",
+  "semantic_result_sha256": "c461546dea6b74147fe3e8c09cc0e3a463042942fadda9d8308f6d2b34f11919",
+  "split": "test",
+  "stage_status": "stage8_implemented_awaiting_formal_replay",
+  "test_identity": "2de5950143887610bbc14d8b04b62612c754765af2b465af28cd695b06209cce",
+  "test_used_for_selection": false,
+  "tpp_parameters": null,
+  "trace_range": {
+    "end_exclusive": 3000000,
+    "start_inclusive": 2400000
+  },
+  "trace_sha256": "59afbf2923aea4ac6b1375fb3abc602c192b3e789a829b1a0415f50725ce0ef8",
+  "trigger_mode": null,
+  "working_set_pages": 297,
+  "workload": "swaptions",
+  "workload_role": "held_out_unseen_workload"
+}

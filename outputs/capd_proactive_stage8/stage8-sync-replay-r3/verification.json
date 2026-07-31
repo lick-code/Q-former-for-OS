@@ -1,0 +1,33 @@
+{
+  "aggregate_sha256": "677f0ed4f2ca4e86400bffbd1390a211732be4e253b3f61721d78b791459b8fb",
+  "artifact_sha256": {
+    "capd_vs_tpp_paired.csv": "129b242d764b4467c20b01671358a41c37c7478921a5d8c87211e3c82402d455",
+    "fairness_audit.json": "d70f718e2c0ecefa3dbd4df3350c1c8908efdb97426843c6b48a969024933b7a",
+    "per_workload_raw.csv": "1e606711a185e02d6e507f408d4e9082c3b0ba1743439d888549bfc2e8ce364f",
+    "proactive_vs_reactive_paired.csv": "cc6074e2102f53e9f7f9c21ad133cfe4a37d4dfc88bffcfdcacf90fd19470538",
+    "report_cn.md": "b20078275802ef80c568204004878845d559bbf1419eb34c0b78cfb1881b42e2",
+    "table_A.csv": "5f012711edb222f4c0f2c52830811ff349843f432537a53da1c34a4e232443a4",
+    "table_B.csv": "f54846cf6ed453f21be4ae77d684991f889a76503386f1c154a361777309e6a4"
+  },
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "fairness_A": "passed",
+  "fairness_B": "passed",
+  "formal_job_count": 144,
+  "frozen_parameters_changed": false,
+  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency.",
+  "job_results_verified": true,
+  "old_finals_v3_artifacts_used": false,
+  "performance_conclusion": null,
+  "regression_log_sha256": "5f127c3c2c972d280583ec442f7310f0e496c5e204b30375c3c3619ae165d131",
+  "regression_test_count": 436,
+  "runtime_smoke_sha256": "9a60cc56838dc9a940e02015af688c48f084b4a3f0abdc2a29d26198db9f0f41",
+  "schema_version": "capd_proactive_stage8_verification_v1_0",
+  "stage7_entry_gate": "satisfied",
+  "stage9_entry_gate": "satisfied",
+  "standard_test_lock": "sealed_for_stage8",
+  "statistics_verified": true,
+  "status": "stage8_sync_replay_verified",
+  "test_used_for_parameter_selection": false,
+  "verified_at": "2026-07-31T13:21:11.088902Z",
+  "workload_capacity_cell_count": 18
+}
