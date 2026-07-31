@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capd_proactive_stage6_tpp_result_v1_0",
+  "title": "CAPD proactive Stage-6 TPP-inspired Replay result",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "stage_status",
+    "policy",
+    "policy_display_name",
+    "workload",
+    "split",
+    "formal_test",
+    "test_used_for_selection",
+    "trace_sha256",
+    "trace_range",
+    "raw_access_event_count",
+    "dram_capacity_pages",
+    "working_set_pages",
+    "cost_profile",
+    "F_low",
+    "F_target",
+    "candidate_size_K",
+    "b_max",
+    "b_t_rule",
+    "candidate_contract_sha256",
+    "selector_status",
+    "future_information",
+    "promotion_performed",
+    "tpp_fallback_used",
+    "tpp_parameters",
+    "summary",
+    "events",
+    "rounds",
+    "cycles",
+    "final_state",
+    "policy_state",
+    "semantic_result_sha256",
+    "performance_conclusion"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "capd_proactive_stage6_tpp_result_v1_0"
+    },
+    "contract_id": {
+      "const": "CAPD-PROACTIVE-STAGE6-TPP-1.0"
+    },
+    "stage_status": {
+      "const": "stage6_implemented_awaiting_validation"
+    },
+    "policy": {
+      "const": "tpp_inspired"
+    },
+    "policy_display_name": {
+      "const": "TPP-inspired"
+    },
+    "split": {
+      "enum": [
+        "train",
+        "validation"
+      ]
+    },
+    "formal_test": {
+      "const": false
+    },
+    "test_used_for_selection": {
+      "const": false
+    },
+    "selector_status": {
+      "const": "disabled"
+    },
+    "future_information": {
+      "const": "not_accessed"
+    },
+    "promotion_performed": {
+      "const": false
+    },
+    "tpp_fallback_used": {
+      "const": false
+    },
+    "F_low": {
+      "const": 8
+    },
+    "F_target": {
+      "const": 16
+    },
+    "candidate_size_K": {
+      "const": 8
+    },
+    "b_max": {
+      "const": 4
+    },
+    "performance_conclusion": {
+      "type": "null"
+    },
+    "semantic_result_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": true
+}
