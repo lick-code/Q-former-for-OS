@@ -1,0 +1,46 @@
+{
+  "schema_version": "capd_proactive_stage8_result_schema_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "job_result_schema": "capd_proactive_stage8_job_result_v1_0",
+  "required_identity_fields": [
+    "job_id", "workload", "workload_role", "capacity_ratio", "dram_capacity_pages",
+    "policy", "seed", "test_identity", "trace_sha256", "trace_range",
+    "initial_state_sha256", "candidate_contract_sha256", "semantic_result_sha256"
+  ],
+  "required_metric_fields": [
+    "dram_hits", "nvm_reads", "nvm_writes", "total_demotions",
+    "proactive_demotions", "reactive_demotions", "emergency_demotions",
+    "weighted_cost", "raw_access_count", "weighted_cost_per_access",
+    "number_of_proactive_cycles", "number_of_proactive_rounds", "mean_b_t",
+    "rounds_per_cycle", "minimum_free_frames", "average_free_frames",
+    "free_frame_exhaustion_count", "emergency_fallback_count", "fallback_rate",
+    "early_reuse", "decision_count"
+  ],
+  "fallback_rate": {
+    "numerator": "emergency_fallback_count",
+    "denominator": "page_enter_dram_count",
+    "zero_denominator": 0.0
+  },
+  "early_reuse": {
+    "deltas_accesses": [64, 256, 1024],
+    "denominator": "proactive_demotion_events_each_selected_page_counts_once",
+    "zero_denominator": 0.0,
+    "wasted_demotion": "no_future_access_after_proactive_demotion"
+  },
+  "capd_oov_required": [
+    "page_access_oov_count", "page_access_oov_ratio", "page_unique_oov_count",
+    "page_unique_oov_ratio", "pc_access_oov_count", "pc_access_oov_ratio",
+    "pc_unique_oov_count", "pc_unique_oov_ratio",
+    "vocabulary_expansion_allowed", "unk_index"
+  ],
+  "semantic_sha_excludes": [
+    "runtime", "round.feature_latency", "round.inference_latency",
+    "round.selection_latency", "cycle.total_feature_time",
+    "cycle.total_inference_time", "cycle.total_selection_time",
+    "metrics.total_decision_time", "metrics.mean_decision_time",
+    "metrics.p50_decision_time", "metrics.p95_decision_time",
+    "metrics.p99_decision_time"
+  ],
+  "aggregate_schema": "capd_proactive_stage8_aggregate_v1_0",
+  "zero_denominator_policy": "rate_is_exactly_0.0_and_raw_denominator_is_retained"
+}
