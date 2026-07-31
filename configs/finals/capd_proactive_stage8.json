@@ -32,5 +32,6 @@
   "statistics": {"bootstrap_seed": 20260801, "bootstrap_resamples": 10000, "bootstrap_unit": "workload_capacity_cell", "confidence_level": 0.95, "std": "sample_ddof_1", "zero_denominator_rate": 0.0},
   "resume_contract": {"completed_identity_and_schema_and_sha_only": true, "failed_or_running_or_corrupt_requires_new_run_id": true, "automatic_retry": false, "atomic_json_writes": true},
   "acceptance": {"minimum_stage1_through_stage8_regression_tests": 380, "formal_job_count": 144, "verified_status": "stage8_sync_replay_verified", "failure_status": "stage8_not_verified"},
+  "deterministic_runtime": {"cublas_workspace_config": ":4096:8", "pythonhashseed": "0", "torch_deterministic_algorithms": true, "cudnn_benchmark": false, "cudnn_deterministic": true, "cuda_smoke_all_capd_checkpoints_before_test_parse": true},
   "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency."
 }

@@ -6,6 +6,8 @@
 
 Stage8 的冻结配置、入口审计、正式 runner、结果 schema、Early-Reuse/OOV 指标、聚合统计、公平性审计、失败/续跑合同、单元测试和 Linux 验收脚本已经实现。本地尚未真实执行 Stage7 Standard Test 的 144 个正式 job，因此当前不能写 `stage8_sync_replay_verified`，也不能宣称 Stage8 已完成。
 
+服务器首次正式尝试 `stage8-sync-replay-r1` 已保留为失败证据：5 个 canneal/20% 确定性 job 完成，首个 CAPD job 因未在 Python 启动前设置 CUDA cuBLAS 确定性 workspace 而失败。当前实现已将 `CUBLAS_WORKSPACE_CONFIG=:4096:8`、`PYTHONHASHSEED=0` 和三个 checkpoint 的 Test 前 CUDA 推理烟测纳入硬门禁；`r1` 不得复用，修复后须使用新 run ID。
+
 ## 已冻结内容
 
 - 唯一调度源：Stage7 `stage8_execution_plan.json`。
@@ -21,7 +23,7 @@ Stage8 的冻结配置、入口审计、正式 runner、结果 schema、Early-Re
 
 - 新 Stage8 Python 文件静态编译通过。
 - Stage8 非 Test 合成统计/Early-Reuse E2E 通过。
-- `tests.test_capd_proactive_stage8`：19 项通过。
+- `tests.test_capd_proactive_stage8`：21 项通过。
 
 本地 WSL 没有完整正式 Test split/PyTorch-CUDA 执行条件；未伪造 CAPD 推理、Test 结果、聚合报告或 verified 标记。
 

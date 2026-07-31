@@ -9,6 +9,8 @@ fi
 RUN_ID="$1"
 DEVICE="${2:-cuda:0}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+export CUBLAS_WORKSPACE_CONFIG=":4096:8"
+export PYTHONHASHSEED="0"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUN_ROOT="${PROJECT_ROOT}/outputs/capd_proactive_stage8/${RUN_ID}"
 TEST_LOG="${RUN_ROOT}/logs/stage1_stage8_regression.log"
@@ -29,6 +31,8 @@ preserve_failure() {
 trap preserve_failure ERR
 
 echo "python=$(${PYTHON_BIN} -c 'import sys; print(sys.version)')"
+echo "CUBLAS_WORKSPACE_CONFIG=${CUBLAS_WORKSPACE_CONFIG}"
+echo "PYTHONHASHSEED=${PYTHONHASHSEED}"
 "${PYTHON_BIN}" - <<'PY'
 import torch
 print("torch={}".format(torch.__version__))
@@ -48,6 +52,11 @@ CURRENT_STEP="static_compile"
   qmap/proactive_stage8_results.py \
   scripts/run_capd_proactive_stage8.py
 
+CURRENT_STEP="cuda_checkpoint_smoke"
+"${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
+  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" \
+  runtime-smoke
+
 CURRENT_STEP="synthetic_e2e"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
   --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" synthetic
@@ -58,7 +67,7 @@ mkdir -p "$(dirname "${TEST_LOG}")"
 
 CURRENT_STEP="record_regression_receipt"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
-  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" \
+  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" \
   record-tests --test-log "${TEST_LOG}"
 
 CURRENT_STEP="formal_144_job_execute"
@@ -67,10 +76,10 @@ CURRENT_STEP="formal_144_job_execute"
 
 CURRENT_STEP="audited_aggregation"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
-  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" aggregate
+  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" aggregate
 
 CURRENT_STEP="independent_verification"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
-  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" verify
+  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" verify
 
 trap - ERR

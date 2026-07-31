@@ -112,6 +112,12 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
       "formal_job_count": 144,
       "verified_status": VERIFIED, "failure_status": NOT_VERIFIED},
       "Stage-8 acceptance gate changed.")
+  _require(value.get("deterministic_runtime") == {
+      "cublas_workspace_config": ":4096:8", "pythonhashseed": "0",
+      "torch_deterministic_algorithms": True, "cudnn_benchmark": False,
+      "cudnn_deterministic": True,
+      "cuda_smoke_all_capd_checkpoints_before_test_parse": True},
+      "Stage-8 deterministic CUDA runtime contract changed.")
   return value
 
 
@@ -293,6 +299,10 @@ def semantic_payload(result: Mapping[str, Any]) -> Dict[str, Any]:
   value = copy.deepcopy(dict(result))
   value.pop("semantic_result_sha256", None)
   value.pop("runtime", None)
+  if isinstance(value.get("checkpoint"), dict):
+    # Repository resolution is audited separately and is machine-specific;
+    # recorded path + SHA are semantic, resolved absolute path is not.
+    value["checkpoint"].pop("resolved_path", None)
   for row in value.get("rounds", []):
     for key in ("feature_latency", "inference_latency", "selection_latency",
                 "tpp_selection_latency"):

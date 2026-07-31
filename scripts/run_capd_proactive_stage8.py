@@ -23,6 +23,7 @@ if PROJECT_ROOT not in sys.path:
 from qmap import finals_config
 from qmap import proactive_cost
 from qmap import proactive_stage7_workloads as stage7
+from qmap import proactive_stage5_replay
 from qmap import proactive_stage8_contract as contract
 from qmap import proactive_stage8_replay
 from qmap import proactive_stage8_results
@@ -36,8 +37,10 @@ CODE_FILES = (
     "qmap/proactive_stage6_contract.py", "qmap/proactive_stage6_tpp.py",
     "qmap/proactive_stage6_replay.py", "qmap/qmap_eval.py",
     "policy_learning/cache_model/embed.py",
+    "policy_learning/cache_model/model.py",
     "qmap/proactive_stage8_contract.py", "qmap/proactive_stage8_replay.py",
-    "qmap/proactive_stage8_results.py", "scripts/run_capd_proactive_stage8.py")
+    "qmap/proactive_stage8_results.py", "scripts/run_capd_proactive_stage8.py",
+    "scripts/validate_capd_proactive_stage8_server.sh")
 
 
 def _utc_now() -> str:
@@ -61,6 +64,24 @@ def _load(args):
 def _code_fingerprints(project_root: str) -> Dict[str, str]:
   return {path: contract.fingerprint_file(os.path.join(project_root, path))
           for path in CODE_FILES}
+
+
+def _runtime_environment(config: Mapping[str, Any], device: str) -> Dict[str, Any]:
+  expected = config["deterministic_runtime"]
+  actual = {
+      "CUBLAS_WORKSPACE_CONFIG": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+      "PYTHONHASHSEED": os.environ.get("PYTHONHASHSEED")}
+  if actual["PYTHONHASHSEED"] != expected["pythonhashseed"]:
+    raise contract.Stage8ContractError(
+        "PYTHONHASHSEED must be set to {} before Python starts.".format(
+            expected["pythonhashseed"]))
+  if str(device).lower().startswith("cuda") and (
+      actual["CUBLAS_WORKSPACE_CONFIG"] !=
+      expected["cublas_workspace_config"]):
+    raise contract.Stage8ContractError(
+        "CUDA deterministic Replay requires CUBLAS_WORKSPACE_CONFIG={}.".format(
+            expected["cublas_workspace_config"]))
+  return actual
 
 
 def _git_state(project_root: str) -> Dict[str, Any]:
@@ -114,6 +135,7 @@ def _reject_failed_run(run_root: str) -> None:
 
 def preflight(args) -> str:
   config, _, _ = _load(args)
+  runtime_environment = _runtime_environment(config, args.device)
   run_root = _root(args, config)
   _reject_failed_run(run_root)
   os.makedirs(os.path.join(run_root, "jobs"), exist_ok=True)
@@ -138,6 +160,8 @@ def preflight(args) -> str:
           str(seed): binding[1]
           for seed, binding in authority["checkpoint_bindings"].items()},
       "job_count": 144, "code_artifacts": _code_fingerprints(args.project_root),
+      "deterministic_runtime_environment": runtime_environment,
+      "device": args.device,
       "git": _git_state(args.project_root)}
   identity["run_identity_sha256"] = contract.fingerprint_value(identity)
   path = os.path.join(run_root, "run_identity.json")
@@ -165,6 +189,8 @@ def preflight(args) -> str:
       "execution_plan_sha256": config["stage7_authority"]["execution_plan"]["sha256"],
       "job_count": 144, "test_payload_operation":
           "sha256_integrity_only_not_parsed",
+      "deterministic_runtime_environment": runtime_environment,
+      "cuda_checkpoint_smoke_required_before_execute": True,
       "test_performance_inspected": False,
       "test_policy_replay_executed": False,
       "checkpoint_sha256": identity["checkpoint_sha256"],
@@ -182,6 +208,7 @@ def _loaded_run(args):
   if not os.path.isfile(identity_path):
     raise contract.Stage8ContractError("Stage-8 preflight has not passed.")
   expected = contract.load_json(identity_path)
+  runtime_environment = _runtime_environment(config, args.device)
   authority = contract.audit_authority(config, args.project_root, True)
   current = {
       "config_sha256": contract.fingerprint_file(args.config),
@@ -194,11 +221,73 @@ def _loaded_run(args):
       "checkpoint_sha256": {str(seed): value[1]
                             for seed, value in authority["checkpoint_bindings"].items()},
       "code_artifacts": _code_fingerprints(args.project_root)}
+  current["deterministic_runtime_environment"] = runtime_environment
+  current["device"] = args.device
   for key, value in current.items():
     if expected.get(key) != value:
       raise contract.Stage8ContractError(
           "Stage-8 binding changed after preflight: " + key)
   return run_root, config, stage0, cost, authority, expected
+
+
+def runtime_smoke(args) -> None:
+  """Exercises all three frozen CAPD checkpoints before Test CSV parsing."""
+  run_root, config, stage0, cost, authority, _ = _loaded_run(args)
+  if not str(args.device).lower().startswith("cuda"):
+    raise contract.Stage8ContractError(
+        "Formal Stage-8 CAPD runtime smoke requires a CUDA device.")
+  import torch
+  if not torch.cuda.is_available():
+    raise contract.Stage8ContractError("CUDA is unavailable for CAPD smoke.")
+  try:
+    device_index = int(str(args.device).split(":", 1)[1])
+  except (IndexError, ValueError):
+    raise contract.Stage8ContractError("CUDA device must use cuda:N format.")
+  if device_index < 0 or device_index >= torch.cuda.device_count():
+    raise contract.Stage8ContractError("Requested CUDA device does not exist.")
+  torch.cuda.set_device(device_index)
+  stage5_config = contract.load_json(authority["paths"]["stage5_config"])
+  trace = [{"page": index % 37, "rw": int(index % 5 == 0),
+            "pc": 100 + index % 11} for index in range(128)]
+  checkpoint_receipts = {}
+  for seed in contract.CAPD_SEEDS:
+    path, digest = authority["checkpoint_bindings"][seed]
+    checkpoint = {
+        "seed": seed, "path": path, "sha256": digest,
+        "selection_criterion": "minimum_validation_loss_only"}
+    result = proactive_stage5_replay.run_replay(
+        stage0, stage5_config, cost, trace, "capd",
+        workload="stage8_cuda_smoke", split="validation",
+        split_role="parameter_selection",
+        source_interval={"start": 0, "end": len(trace)},
+        trace_sha256=contract.fingerprint_value(trace),
+        dram_capacity_pages=20, working_set_pages=100,
+        checkpoint=checkpoint, device=args.device,
+        measure_latency=False)
+    checkpoint_receipts[str(seed)] = {
+        "checkpoint_sha256": digest,
+        "semantic_result_sha256": result["semantic_result_sha256"]}
+    del result
+    torch.cuda.synchronize(device_index)
+    torch.cuda.empty_cache()
+  receipt = {
+      "schema_version": "capd_proactive_stage8_runtime_smoke_v1_0",
+      "contract_id": contract.CONTRACT_ID, "status": "passed",
+      "device": args.device,
+      "cuda_device_name": torch.cuda.get_device_name(device_index),
+      "torch_version": torch.__version__,
+      "deterministic_runtime_environment":
+          _runtime_environment(config, args.device),
+      "checkpoint_receipts": checkpoint_receipts,
+      "test_trace_opened": False, "test_performance_inspected": False,
+      "completed_at": _utc_now()}
+  contract.write_json_atomic(os.path.join(run_root, "runtime_smoke.json"), receipt)
+  state = contract.load_json(_state_path(run_root))
+  completed = list(state.get("completed", []))
+  if "cuda_checkpoint_smoke" not in completed:
+    completed.append("cuda_checkpoint_smoke")
+  _write_state(run_root, state.get("status", contract.IMPLEMENTED), completed)
+  print("[OK] Stage-8 deterministic CUDA smoke passed for 3/3 CAPD checkpoints")
 
 
 def _trace(path: str):
@@ -226,6 +315,9 @@ def _run_job(run_root, stage0, cost, authority, run_identity, job,
       "plan_job": copy.deepcopy(job), "trace_sha256": lock_row["sha256"],
       "checkpoint_sha256": None if checkpoint is None else checkpoint["sha256"],
       "device": device, "measure_latency": bool(measure_latency),
+      "deterministic_runtime_environment": {
+          "CUBLAS_WORKSPACE_CONFIG": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+          "PYTHONHASHSEED": os.environ.get("PYTHONHASHSEED")},
       "result_schema": contract.RESULT_SCHEMA_VERSION}
   identity_sha = contract.fingerprint_value(identity)
   if os.path.isfile(paths["manifest"]):
@@ -256,6 +348,8 @@ def _run_job(run_root, stage0, cost, authority, run_identity, job,
         checkpoint=checkpoint, device=device,
         measure_latency=measure_latency, retain_access_logs=False,
         invariant_mode="boundary")
+    result["runtime"]["deterministic_environment"] = copy.deepcopy(
+        identity["deterministic_runtime_environment"])
     contract.write_json_atomic(paths["result"], result)
   except Exception as error:
     manifest.update({"status": "failed", "failed_at": _utc_now(),
@@ -271,8 +365,43 @@ def _run_job(run_root, stage0, cost, authority, run_identity, job,
   return result
 
 
+def _audit_preexecute_evidence(run_root, config, authority):
+  smoke_path = os.path.join(run_root, "runtime_smoke.json")
+  receipt_path = os.path.join(run_root, "server_test_receipt.json")
+  if not os.path.isfile(smoke_path) or not os.path.isfile(receipt_path):
+    raise contract.Stage8ContractError(
+        "Execute requires CUDA smoke and full regression receipt before Test parse.")
+  smoke = contract.load_json(smoke_path)
+  receipt = contract.load_json(receipt_path)
+  expected_checkpoints = {str(seed): value[1]
+                          for seed, value in authority["checkpoint_bindings"].items()}
+  observed_checkpoints = {
+      seed: row.get("checkpoint_sha256")
+      for seed, row in smoke.get("checkpoint_receipts", {}).items()}
+  minimum = config["acceptance"][
+      "minimum_stage1_through_stage8_regression_tests"]
+  if (smoke.get("status") != "passed" or
+      smoke.get("test_trace_opened") is not False or
+      smoke.get("test_performance_inspected") is not False or
+      observed_checkpoints != expected_checkpoints or
+      smoke.get("deterministic_runtime_environment") !=
+      _runtime_environment(config, smoke.get("device", ""))):
+    raise contract.Stage8ContractError("CAPD CUDA runtime smoke is invalid.")
+  if (receipt.get("status") != "passed" or
+      int(receipt.get("test_count", 0)) < minimum):
+    raise contract.Stage8ContractError("Stage1-8 regression receipt is invalid.")
+  return receipt, smoke
+
+
 def execute(args) -> None:
   run_root, config, stage0, cost, authority, identity = _loaded_run(args)
+  try:
+    _audit_preexecute_evidence(run_root, config, authority)
+  except Exception:
+    state = contract.load_json(_state_path(run_root))
+    _write_state(run_root, contract.NOT_VERIFIED,
+                 state.get("completed", []), "preexecute_evidence")
+    raise
   lock_map = {row["workload"]: row for row in authority["lock"]["workloads"]}
   capacity_map = {(row["workload"], str(row["ratio"])): row
                   for row in contract._capacity_rows(authority["capacity"])}
@@ -291,6 +420,13 @@ def execute(args) -> None:
         _run_job(run_root, stage0, cost, authority, identity, job, trace,
                  lock_map[workload], int(capacity["working_set_pages"]),
                  args.device, not args.disable_latency)
+        if job["policy"] == "capd" and str(args.device).startswith("cuda"):
+          # Each CAPD job owns an independent predictor/checkpoint lifecycle.
+          # Synchronize before advancing and release allocator cache so 54
+          # sequential jobs cannot accumulate avoidable CUDA cache pressure.
+          import torch
+          torch.cuda.synchronize()
+          torch.cuda.empty_cache()
       del trace
   except Exception:
     state = contract.load_json(_state_path(run_root))
@@ -298,7 +434,8 @@ def execute(args) -> None:
                  "formal_execute")
     raise
   _write_state(run_root, "stage8_formal_replay_complete",
-               ["preflight", "formal_144_jobs"])
+               ["preflight", "cuda_checkpoint_smoke", "server_regressions",
+                "formal_144_jobs"])
   print("[OK] Stage-8 formal Test Replay completed 144/144")
 
 
@@ -344,7 +481,8 @@ def aggregate(args) -> None:
   contract.write_json_atomic(os.path.join(artifacts, "fairness_audit.json"),
                              value["fairness"])
   _write_state(run_root, "stage8_aggregated_awaiting_verification",
-               ["preflight", "formal_144_jobs", "aggregation"])
+               ["preflight", "cuda_checkpoint_smoke", "server_regressions",
+                "formal_144_jobs", "aggregation"])
   print("[OK] Stage-8 audited aggregation generated")
 
 
@@ -427,15 +565,9 @@ def verify(args) -> None:
       expected["fairness"]):
     raise contract.Stage8ContractError(
         "Fairness artifact is not derived from audited aggregate.")
+  receipt, smoke = _audit_preexecute_evidence(run_root, config, authority)
   receipt_path = os.path.join(run_root, "server_test_receipt.json")
-  if not os.path.isfile(receipt_path):
-    raise contract.Stage8ContractError("Stage1-8 regression receipt is missing.")
-  receipt = contract.load_json(receipt_path)
-  minimum = config["acceptance"][
-      "minimum_stage1_through_stage8_regression_tests"]
-  if (receipt.get("status") != "passed" or
-      int(receipt.get("test_count", 0)) < minimum):
-    raise contract.Stage8ContractError("Stage1-8 regression receipt is invalid.")
+  smoke_path = os.path.join(run_root, "runtime_smoke.json")
   verification = {
       "schema_version": "capd_proactive_stage8_verification_v1_0",
       "contract_id": contract.CONTRACT_ID, "status": contract.VERIFIED,
@@ -446,6 +578,7 @@ def verify(args) -> None:
       "fairness_B": "passed", "statistics_verified": True,
       "regression_test_count": receipt["test_count"],
       "regression_log_sha256": receipt["log_sha256"],
+      "runtime_smoke_sha256": contract.fingerprint_file(smoke_path),
       "test_used_for_parameter_selection": False,
       "frozen_parameters_changed": False,
       "old_finals_v3_artifacts_used": False,
@@ -457,7 +590,8 @@ def verify(args) -> None:
       "verified_at": _utc_now()}
   contract.write_json_atomic(os.path.join(run_root, "verification.json"), verification)
   _write_state(run_root, contract.VERIFIED,
-               ["preflight", "formal_144_jobs", "aggregation", "verification"])
+               ["preflight", "cuda_checkpoint_smoke", "server_regressions",
+                "formal_144_jobs", "aggregation", "verification"])
   print("[FINAL] STAGE8_SYNC_REPLAY_VERIFIED")
 
 
@@ -490,7 +624,9 @@ def build_parser():
   parser.add_argument("--device", default="cpu")
   parser.add_argument("--disable-latency", action="store_true")
   sub = parser.add_subparsers(dest="command", required=True)
-  for command in ("preflight", "execute", "aggregate", "verify", "synthetic"):
+  for command in (
+      "preflight", "runtime-smoke", "execute", "aggregate", "verify",
+      "synthetic"):
     sub.add_parser(command)
   tests = sub.add_parser("record-tests")
   tests.add_argument("--test-log", required=True)
@@ -502,6 +638,7 @@ def build_parser():
 def main(argv: Optional[Sequence[str]] = None) -> None:
   args = build_parser().parse_args(argv)
   commands = {"preflight": preflight, "execute": execute,
+              "runtime-smoke": runtime_smoke,
               "aggregate": aggregate, "verify": verify,
               "synthetic": synthetic, "record-tests": record_tests,
               "mark-not-verified": mark_not_verified}

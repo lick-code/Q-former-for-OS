@@ -4,6 +4,8 @@
 
 在仓库 `main` 分支运行。Stage7 的 `stage7-server-suite-r1/splits/*/test.csv`、三个 Stage4 checkpoint 及 Stage4～7 权威证据必须完整存在。脚本不会重新采集 Trace、训练模型或选择参数。
 
+脚本会自行固定 `CUBLAS_WORKSPACE_CONFIG=:4096:8` 和 `PYTHONHASHSEED=0`，并在解析 Standard Test 前执行三个 CAPD checkpoint 的 CUDA 推理烟测。不要删除或覆盖这两个环境设置。
+
 ## 唯一正式命令
 
 ```bash
@@ -12,7 +14,7 @@ git switch main
 test "$(git branch --show-current)" = "main"
 
 export PYTHON_BIN=python3
-RUN_ID=stage8-sync-replay-r1
+RUN_ID=stage8-sync-replay-r2
 
 set -o pipefail
 bash scripts/validate_capd_proactive_stage8_server.sh \
@@ -37,6 +39,7 @@ bash scripts/validate_capd_proactive_stage8_server.sh \
 ## 关键产物
 
 - `run_identity.json`、`preflight.json`、`server_test_receipt.json`
+- `runtime_smoke.json`（三个 CAPD checkpoint 的 Test 前 CUDA 烟测）
 - `jobs/<job_id>/job_manifest.json`、`result.json`
 - `artifacts/aggregate.json`
 - `artifacts/per_workload_raw.csv`

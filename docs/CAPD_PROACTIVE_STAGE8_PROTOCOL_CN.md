@@ -12,6 +12,8 @@ Stage 7 的 `stage8_execution_plan.json` 是唯一 job 调度源。矩阵为 6 w
 
 Standard Test CSV 只能由 `execute` 命令中的受控入口解析。合成测试、单元测试、preflight、聚合和 verification 都不打开 Test 性能。任一身份不一致均 fail closed。
 
+CUDA 正式运行固定 `CUBLAS_WORKSPACE_CONFIG=:4096:8` 与 `PYTHONHASHSEED=0`。验收脚本在打开 Standard Test 前，使用非 Test 合成 Trace 对三个冻结 CAPD checkpoint 分别执行一次真实 CUDA Transformer 推理；该烟测同时验证 CUDA 设备、cuBLAS 确定性环境、checkpoint 加载和模型算子。3/3 checkpoint 未全部通过时不得进入正式 Test。
+
 ## 3. Replay 与策略语义
 
 六种方法复用 `qmap.proactive_replay.ProactiveReplay`，不复制状态机：
@@ -54,4 +56,3 @@ CAPD 相对 TPP-inspired 的主比较先在每个 workload×capacity 单元内�
 ## 7. 解释边界
 
 同步 Replay 只能解释页面排序质量、NVM 事件、weighted cost、状态轨迹和同步决策开销。它不代表真实后台并发或真实前台延迟。fallback 很少或为零只是在该同步功能正确性环境中的结果，不能外推为异步系统必然为零。Stage8 完成也不等于 Stage9 的真实 CPU、内存和推理开销测量完成。
-

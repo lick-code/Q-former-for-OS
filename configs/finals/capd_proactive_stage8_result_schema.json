@@ -34,7 +34,7 @@
     "vocabulary_expansion_allowed", "unk_index"
   ],
   "semantic_sha_excludes": [
-    "runtime", "round.feature_latency", "round.inference_latency",
+    "runtime", "checkpoint.resolved_path", "round.feature_latency", "round.inference_latency",
     "round.selection_latency", "cycle.total_feature_time",
     "cycle.total_inference_time", "cycle.total_selection_time",
     "metrics.total_decision_time", "metrics.mean_decision_time",

@@ -8,6 +8,7 @@ import json
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 from qmap import proactive_stage7_workloads as stage7
 from qmap import finals_config
@@ -88,7 +89,8 @@ class Stage8ContractTest(unittest.TestCase):
         (("cost_profile", "weights", "nvm_write"), 9),
         (("capd", "best_seed_selection_allowed"), True),
         (("tpp_inspired", "epoch_length"), 256),
-        (("statistics", "bootstrap_seed"), 1)):
+        (("statistics", "bootstrap_seed"), 1),
+        (("deterministic_runtime", "cublas_workspace_config"), ":16:8")):
       item = copy.deepcopy(_config())
       target = item
       for key in path[:-1]:
@@ -145,6 +147,29 @@ class Stage8ContractTest(unittest.TestCase):
       with self.assertRaises(contract.Stage8ContractError):
         module._reject_failed_run(directory)
 
+  def test_cuda_runtime_environment_is_fail_closed_and_exact(self):
+    import importlib.util
+    script = os.path.join(ROOT, "scripts", "run_capd_proactive_stage8.py")
+    spec = importlib.util.spec_from_file_location("stage8_runtime_script", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    with mock.patch.dict(os.environ, {
+        "CUBLAS_WORKSPACE_CONFIG": ":16:8", "PYTHONHASHSEED": "0"},
+                         clear=False):
+      with self.assertRaises(contract.Stage8ContractError):
+        module._runtime_environment(_config(), "cuda:0")
+    with mock.patch.dict(os.environ, {
+        "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "PYTHONHASHSEED": "0"},
+                         clear=False):
+      self.assertEqual(":4096:8", module._runtime_environment(
+          _config(), "cuda:0")["CUBLAS_WORKSPACE_CONFIG"])
+    with open(os.path.join(
+        ROOT, "scripts", "validate_capd_proactive_stage8_server.sh"),
+        "r", encoding="utf-8") as handle:
+      shell = handle.read()
+    self.assertLess(shell.index("export CUBLAS_WORKSPACE_CONFIG"),
+                    shell.index("import torch"))
+
   def test_formal_replay_requires_stage8_locked_authorization(self):
     job = {"policy": "reactive_lru", "formal_test": False, "split": "test",
            "test_identity": "x", "dram_pages": 20}
@@ -162,6 +187,8 @@ class Stage8ContractTest(unittest.TestCase):
     execute_body = source.split("def execute(args)", 1)[1].split(
         "def _load_completed_results", 1)[0]
     self.assertIn("trace = _trace(", execute_body)
+    self.assertLess(execute_body.index("_audit_preexecute_evidence("),
+                    execute_body.index("trace = _trace("))
 
 
 class Stage8MetricTest(unittest.TestCase):
@@ -256,6 +283,16 @@ class Stage8MetricTest(unittest.TestCase):
     two["rounds"][0]["feature_latency"] = 99.0
     two["cycles"][0]["total_feature_time"] = 99.0
     two["runtime"]["x"] = 99
+    self.assertEqual(contract.fingerprint_value(contract.semantic_payload(one)),
+                     contract.fingerprint_value(contract.semantic_payload(two)))
+
+  def test_semantic_hash_excludes_resolved_absolute_checkpoint_path(self):
+    one = {"checkpoint": {"recorded_path": "outputs/checkpoint.pth",
+                           "resolved_path": "/server-a/checkpoint.pth",
+                           "sha256": "a" * 64},
+           "metrics": {}, "rounds": [], "cycles": []}
+    two = copy.deepcopy(one)
+    two["checkpoint"]["resolved_path"] = "/server-b/checkpoint.pth"
     self.assertEqual(contract.fingerprint_value(contract.semantic_payload(one)),
                      contract.fingerprint_value(contract.semantic_payload(two)))
 
