@@ -144,3 +144,19 @@ access/unique OOV count 与 ratio；结果必须分别保留 seen、unseen、六
 `[FINAL] STAGE7_WORKLOAD_SUITE_VERIFIED`
 
 该标记只表示数据和阶段 8 配置冻结，不表示正式 Test 已运行或任何性能结论成立。
+
+## 当前正式验收回执（2026-07-31）
+
+服务器 run `stage7-server-suite-r1` 已真实返回：
+
+```text
+Ran 361 tests in 33.312s
+OK (skipped=10)
+[FINAL] STAGE7_WORKLOAD_SUITE_VERIFIED
+validator_exit=0
+```
+
+`run_state.status=stage7_workload_suite_verified`，
+`verification.stage8_entry_gate=satisfied`。六 workload、18 个容量行、Standard Test
+lock 与 144-job 阶段 8 计划均已冻结。Test 参数选择、Test 策略 Replay 和 Test 性能
+查看均为 false；`performance_results` 与正式性能结论仍为空。

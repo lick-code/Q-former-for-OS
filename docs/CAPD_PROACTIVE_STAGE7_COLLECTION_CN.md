@@ -145,3 +145,13 @@ bash scripts/validate_capd_proactive_stage7_server.sh \
 [FINAL] STAGE7_WORKLOAD_SUITE_VERIFIED
 validator_exit=0
 ```
+
+## 已完成验收
+
+正式 collection run 为 `stage7-local-collection-r1`，正式服务器 suite run 为
+`stage7-server-suite-r1`。2026-07-31 服务器实际完成 361 项阶段 1～7 回归并返回 0，
+随后生成 `verification.json`，状态为 `stage7_workload_suite_verified`，
+`stage8_entry_gate=satisfied`。同步回本地后的 12 个证据 SHA-256 全部复算一致。
+
+该完成状态不代表阶段 8 Test 已运行；原始 Trace、split 和采集现场仍需保留，不能因
+阶段 7 完成而删除。
