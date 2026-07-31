@@ -8,6 +8,7 @@ requires no custom DynamoRIO client build.
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -97,6 +98,17 @@ def find_trace_dirs(work_dir):
   return sorted(trace_dirs)
 
 
+TRACE_DIR_PID_RE = re.compile(r"\.(?P<pid>\d+)\.\d+\.dir$")
+
+
+def trace_process_id(trace_dir):
+  match = TRACE_DIR_PID_RE.search(os.path.basename(trace_dir))
+  if match is None:
+    raise ValueError(
+        "Cannot parse PID from drmemtrace directory: {}".format(trace_dir))
+  return int(match.group("pid"))
+
+
 def trace_dir_has_trace_files(trace_dir):
   trace_subdir = os.path.join(trace_dir, "trace")
   if not os.path.isdir(trace_subdir):
@@ -167,8 +179,15 @@ def render_and_convert(args, drrun):
   if not trace_dirs:
     raise FileNotFoundError(
         "No drmemtrace .dir output found under {}.".format(args.work_dir))
+  if len(trace_dirs) > 1 and args.include_process_thread:
+    raise ValueError(
+        "Stage-7 collection observed multiple process trace directories: "
+        "{}".format(trace_dirs))
   if len(trace_dirs) > 1:
     print("[info] found multiple trace dirs; using {}".format(trace_dirs[0]))
+  process_id = (
+      trace_process_id(trace_dirs[0])
+      if args.include_process_thread else None)
   convert_raw_trace(trace_dirs[0], drrun, args.dry_run)
 
   view_command = [
@@ -200,12 +219,13 @@ def render_and_convert(args, drrun):
       if view_log_file is None:
         stats = convert_stream(
             process.stdout, output_file, args.max_records, args.skip_records,
-            args.page_shift, args.keep_raw_address)
+            args.page_shift, args.keep_raw_address,
+            args.include_process_thread, process_id)
       else:
         stats = convert_stream(
             TeeStream(process.stdout, view_log_file), output_file,
             args.max_records, args.skip_records, args.page_shift,
-            args.keep_raw_address)
+            args.keep_raw_address, args.include_process_thread, process_id)
     if stats["written"] >= args.max_records:
       process.terminate()
     return_code = process.wait()
@@ -256,6 +276,9 @@ def build_arg_parser():
   parser.add_argument("--page-shift", type=int, default=12)
   parser.add_argument("--keep-raw-address", action="store_true",
                       help="Do not page-align memory addresses in the CSV.")
+  parser.add_argument(
+      "--include-process-thread", action="store_true",
+      help="Write PID,TID,PC,Address,RW for Stage-7 identity auditing.")
   parser.add_argument("--no-exit-after-tracing",
                       dest="exit_after_tracing",
                       action="store_false",
@@ -295,6 +318,9 @@ def main():
 
   print("Seen data refs: {}".format(stats["seen_data_refs"]))
   print("Wrote records: {}".format(stats["written"]))
+  if args.include_process_thread:
+    print("Process IDs: {}".format(stats["process_ids"]))
+    print("Thread IDs: {}".format(stats["thread_ids"]))
   print("Output: {}".format(args.output))
   if (not args.dry_run and stats["written"] < args.max_records and
       not args.allow_short):

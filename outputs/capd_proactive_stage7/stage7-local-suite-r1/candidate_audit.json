@@ -1,0 +1,216 @@
+{
+  "candidates": [
+    {
+      "capd_results_used": false,
+      "collection_cost_estimate": "medium",
+      "coverage": [
+        "irregular_access",
+        "locality_sensitive"
+      ],
+      "existing_manifest": "dataset/metadata/finals_v3_official/canneal.json",
+      "existing_manifest_sha256": "d823034568a7c9ff5978c50ff92a228a05ee05c3caf9d7b8e5453b5c2a632c73",
+      "formal_suite_frozen": false,
+      "gaps": [
+        "actual_process_ids_not_recorded",
+        "actual_thread_ids_not_recorded",
+        "aslr_state_not_recorded",
+        "lost_event_status_not_recorded",
+        "timeout_status_not_recorded",
+        "truncation_status_not_recorded",
+        "historical_test_was_used_by_old_finals_v3_experiments"
+      ],
+      "qualification_risks": [
+        "verify_actual_single_pid_single_tid"
+      ],
+      "qualification_status": "conditional_reuse_blocked_missing_stage7_identity_evidence",
+      "recommended_action": "fresh_collection_or_independent_supplemental_identity_evidence",
+      "recorded_accesses": 1000000,
+      "recorded_chronological_nonoverlap": true,
+      "recorded_page_shift": 12,
+      "recorded_real_rw": true,
+      "recorded_source_trace_id": "canneal-20260722T125000",
+      "recorded_source_trace_path": "dataset/raw_traces/finals_v3_recollect/candidate_500m_1m/canneal_native_pilot.csv",
+      "recorded_source_trace_sha256": "f8dba14d3ca4271526b124f653917f0e874395b046fb0dc8a19df7da5e513efd",
+      "reusable_now": false,
+      "role": "seen_calibration_workload",
+      "test_payload_read": false,
+      "workload": "canneal"
+    },
+    {
+      "capd_results_used": false,
+      "collection_cost_estimate": "high",
+      "coverage": [
+        "high_capacity_pressure",
+        "bursty_page_entry"
+      ],
+      "existing_manifest": "dataset/metadata/finals_v3_official/streamcluster_pressure.json",
+      "existing_manifest_sha256": "be2f22cda95984d5fb3795b1a796bde6aea7f29f3b63267fbb033aee373a5038",
+      "formal_suite_frozen": false,
+      "gaps": [
+        "actual_process_ids_not_recorded",
+        "actual_thread_ids_not_recorded",
+        "aslr_state_not_recorded",
+        "lost_event_status_not_recorded",
+        "timeout_status_not_recorded",
+        "truncation_status_not_recorded",
+        "historical_test_was_used_by_old_finals_v3_experiments"
+      ],
+      "qualification_risks": [
+        "verify_pthreads_configuration_produces_one_observed_tid",
+        "verify_three_million_contiguous_accesses"
+      ],
+      "qualification_status": "conditional_reuse_blocked_missing_stage7_identity_evidence",
+      "recommended_action": "fresh_collection_or_independent_supplemental_identity_evidence",
+      "recorded_accesses": 1000000,
+      "recorded_chronological_nonoverlap": true,
+      "recorded_page_shift": 12,
+      "recorded_real_rw": true,
+      "recorded_source_trace_id": "streamcluster_pressure-20260722T133000",
+      "recorded_source_trace_path": "dataset/raw_traces/finals_v3_recollect/candidate_5b_1m/streamcluster_native_pilot.csv",
+      "recorded_source_trace_sha256": "ca6ea6cf3da47adfe6d0b3e198619f6bde63f0ffeb17a232acb592dafd75f8d6",
+      "reusable_now": false,
+      "role": "seen_calibration_workload",
+      "test_payload_read": false,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "capd_results_used": false,
+      "collection_cost_estimate": "high",
+      "coverage": [
+        "write_intensive",
+        "high_capacity_pressure"
+      ],
+      "existing_manifest": "dataset/metadata/finals_v3_official/dedup_pressure.json",
+      "existing_manifest_sha256": "8d677878dd5121009581b824172d06a1b7854351afef04c7aeec9186dc63c632",
+      "formal_suite_frozen": false,
+      "gaps": [
+        "actual_process_ids_not_recorded",
+        "actual_thread_ids_not_recorded",
+        "aslr_state_not_recorded",
+        "lost_event_status_not_recorded",
+        "timeout_status_not_recorded",
+        "truncation_status_not_recorded",
+        "historical_test_was_used_by_old_finals_v3_experiments"
+      ],
+      "qualification_risks": [
+        "dedup_pipeline_may_create_multiple_observed_tids",
+        "must_use_a_genuinely_single_thread_execution_or_fail_qualification"
+      ],
+      "qualification_status": "conditional_reuse_blocked_missing_stage7_identity_evidence",
+      "recommended_action": "fresh_collection_or_independent_supplemental_identity_evidence",
+      "recorded_accesses": 3000000,
+      "recorded_chronological_nonoverlap": true,
+      "recorded_page_shift": 12,
+      "recorded_real_rw": true,
+      "recorded_source_trace_id": "dedup_pressure-20260722T131403",
+      "recorded_source_trace_path": "dataset/raw_traces/finals_v3_recollect/candidate_native_100m_3m/dedup_native_pilot.csv",
+      "recorded_source_trace_sha256": "5ab03f12ca848ab5e3621af607229cebf6017ab514f3c38d5854574a7754ff32",
+      "reusable_now": false,
+      "role": "seen_calibration_workload",
+      "test_payload_read": false,
+      "workload": "dedup_pressure"
+    },
+    {
+      "capd_results_used": false,
+      "collection_cost_estimate": "low_to_medium",
+      "coverage": [
+        "stable_locality",
+        "capd_challenge_method_independent"
+      ],
+      "formal_suite_frozen": false,
+      "gaps": [
+        "historical_trace_test_policy_results_exist_recollect_test"
+      ],
+      "qualification_risks": [
+        "historical_test_results_require_fresh_trace_identity"
+      ],
+      "qualification_status": "fresh_collection_required",
+      "recommended_action": "fresh_collection_required",
+      "reusable_now": false,
+      "role": "held_out_unseen_workload",
+      "test_payload_read": false,
+      "workload": "blackscholes"
+    },
+    {
+      "capd_results_used": false,
+      "collection_cost_estimate": "medium",
+      "coverage": [
+        "compute_dominant",
+        "stable_locality"
+      ],
+      "formal_suite_frozen": false,
+      "gaps": [],
+      "qualification_risks": [
+        "verify_nt_1_produces_one_observed_tid"
+      ],
+      "qualification_status": "fresh_collection_required",
+      "recommended_action": "fresh_collection_required",
+      "reusable_now": false,
+      "role": "held_out_unseen_workload",
+      "test_payload_read": false,
+      "workload": "swaptions"
+    },
+    {
+      "capd_results_used": false,
+      "collection_cost_estimate": "medium_to_high",
+      "coverage": [
+        "irregular_access",
+        "bursty_page_entry"
+      ],
+      "formal_suite_frozen": false,
+      "gaps": [],
+      "qualification_risks": [
+        "verify_thread_argument_1_produces_one_observed_tid",
+        "native_input_collection_cost"
+      ],
+      "qualification_status": "fresh_collection_required",
+      "recommended_action": "fresh_collection_required",
+      "reusable_now": false,
+      "role": "held_out_unseen_workload",
+      "test_payload_read": false,
+      "workload": "fluidanimate"
+    }
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "formally_reusable_trace_count": 0,
+  "fresh_or_supplemental_collection_count": 6,
+  "generated_at": "2026-07-31T08:18:09.742721Z",
+  "historical_commit_audit": {
+    "audit_status": "passed",
+    "commit": "b714ad0",
+    "contains_only_stage6_tpp_r1_artifacts_and_console_log": true,
+    "is_current_stage7_evidence": false,
+    "path_count": 101
+  },
+  "metadata_only": true,
+  "schema_version": "capd_proactive_stage7_candidate_audit_v1_0",
+  "stage6_entry": {
+    "authority_sha256": {
+      "stage0_config": "2226bf05a401f90d093d6fbd5255011cab4af506714b790775908d4a373835c0",
+      "stage3_engineering_default": "ef7eebfb201125067787ac99f536aa70fc38e450a038a59ac26ffccb82da0e76",
+      "stage4_final_freeze": "480d2d8a577a3b7d17a312f0a786f93e003c65160961cfb1d392a200baef3a93",
+      "stage4_verification": "5655a300c8ab27a00522067740c58e88e35bb5461dae7d66b617371470802db9",
+      "stage5_config": "81bfc754ad194f02a62405f5c716eb8dfc65232da5d39801f667dacac387e609",
+      "stage5_verification": "96aed31be275e53cd0930b8cb29b166a54767b2608311cd1825c8d819ea90354",
+      "stage6_config": "4c38ea0c21bc4d3a8914197a042e9143939b435d3b523ae3fd8e7f0fe07463b0",
+      "stage6_final_tpp_config": "b30af9254f5933eb78dbeb17f87215cfe83012268d040ac483d61dda8e234acd",
+      "stage6_verification": "84321235521cff69b0a24cb5df53f5c6c9da99029cbd1f0d069e8805644adb6d"
+    },
+    "selected_tpp_parameters": {
+      "cold_threshold": 1,
+      "dirty_tie_break": false,
+      "epoch_length": 1024
+    },
+    "stage6_status": "stage6_tpp_inspired_verified",
+    "stage7_entry_gate": "satisfied",
+    "status": "passed",
+    "test_trace_opened": false
+  },
+  "status": "stage7_implemented_awaiting_collection",
+  "suite_confirmation_required": true,
+  "suite_confirmed": true,
+  "test_payload_read_for_integrity": false,
+  "test_performance_inspected": false,
+  "test_policy_replay_executed": false,
+  "test_used_for_parameter_selection": false
+}

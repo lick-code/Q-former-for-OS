@@ -1,0 +1,90 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "schema_version": "capd_proactive_stage7_raw_trace_manifest_v1_0",
+  "traces": [
+    {
+      "accesses": 3000000,
+      "page_shift": 12,
+      "path": "dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/canneal.csv",
+      "process_ids": [
+        378
+      ],
+      "raw_trace_unchanged": true,
+      "sha256": "dae1921a662cf887b8e0739f202bbff154b006d971e811f86bc951f8cec8b687",
+      "source_trace_id": "canneal-20260731T072730Z",
+      "thread_ids": [
+        378
+      ]
+    },
+    {
+      "accesses": 3000000,
+      "page_shift": 12,
+      "path": "dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/streamcluster_pressure.csv",
+      "process_ids": [
+        982
+      ],
+      "raw_trace_unchanged": true,
+      "sha256": "fca32daf7ce5e32c08dc3fddac9fbab7c877b8f6dde9a5e065f24ac48b040f3f",
+      "source_trace_id": "streamcluster_pressure-20260731T073704Z",
+      "thread_ids": [
+        982
+      ]
+    },
+    {
+      "accesses": 3000000,
+      "page_shift": 12,
+      "path": "dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/dedup_pressure.csv",
+      "process_ids": [
+        457
+      ],
+      "raw_trace_unchanged": true,
+      "sha256": "c9f024d0c3f5254d50b7bb6f4757de296d5121a21b39e0dda21162cdf08c04a6",
+      "source_trace_id": "dedup_pressure-20260731T075134Z",
+      "thread_ids": [
+        457
+      ]
+    },
+    {
+      "accesses": 3000000,
+      "page_shift": 12,
+      "path": "dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/blackscholes.csv",
+      "process_ids": [
+        519
+      ],
+      "raw_trace_unchanged": true,
+      "sha256": "0b24c5597d30f82a793e43a8905de180853913f0c11038ecfd2c4b37291efdea",
+      "source_trace_id": "blackscholes-20260731T075408Z",
+      "thread_ids": [
+        519
+      ]
+    },
+    {
+      "accesses": 3000000,
+      "page_shift": 12,
+      "path": "dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/swaptions.csv",
+      "process_ids": [
+        401
+      ],
+      "raw_trace_unchanged": true,
+      "sha256": "567bca327bafaa672dc60bf5dc362a51f0b7bf0dc142303b7e8f0941a805b6dd",
+      "source_trace_id": "swaptions-20260731T080931Z",
+      "thread_ids": [
+        401
+      ]
+    },
+    {
+      "accesses": 3000000,
+      "page_shift": 12,
+      "path": "dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/fluidanimate.csv",
+      "process_ids": [
+        449
+      ],
+      "raw_trace_unchanged": true,
+      "sha256": "b6c4ce90a042afae8f824e78acef2b0f53d6442e89ac37544f119facaddb43d6",
+      "source_trace_id": "fluidanimate-20260731T081336Z",
+      "thread_ids": [
+        449
+      ]
+    }
+  ]
+}

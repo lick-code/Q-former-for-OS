@@ -1,0 +1,113 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "schema_version": "capd_proactive_stage7_standard_test_lock_v1_0",
+  "status": "sealed_for_stage8",
+  "test_payload_read_for_integrity": true,
+  "test_performance_inspected": false,
+  "test_policy_replay_executed": false,
+  "test_used_for_parameter_selection": false,
+  "workloads": [
+    {
+      "accesses": 600000,
+      "fairness_identity": "f1a346d2b4ac90afc299bec45f2910fe0797c112e3f86818287e753fc437bbfb",
+      "formal_test": true,
+      "interval": {
+        "end_exclusive": 3000000,
+        "start_inclusive": 2400000
+      },
+      "parameter_selection_allowed": false,
+      "path": "outputs/capd_proactive_stage7/stage7-local-suite-r1/splits/canneal/test.csv",
+      "policy_replay_allowed_stage": 8,
+      "role": "seen_calibration_workload",
+      "sha256": "dbf4707925d63710ef36eb37dcc7d10b7aced2ad41890a0de590f863c9ca5d48",
+      "split_role": "test",
+      "test_source_id": "canneal-20260731T072730Z",
+      "workload": "canneal"
+    },
+    {
+      "accesses": 600000,
+      "fairness_identity": "f71fdcce2db83faa1bfc5769dfdeddf5decfa510abfccb40e7f4d6daed02df3a",
+      "formal_test": true,
+      "interval": {
+        "end_exclusive": 3000000,
+        "start_inclusive": 2400000
+      },
+      "parameter_selection_allowed": false,
+      "path": "outputs/capd_proactive_stage7/stage7-local-suite-r1/splits/streamcluster_pressure/test.csv",
+      "policy_replay_allowed_stage": 8,
+      "role": "seen_calibration_workload",
+      "sha256": "9433aea84e9cd54146ae5852ca41f02e653ef9f6bb7c66721995fb5687e6e12e",
+      "split_role": "test",
+      "test_source_id": "streamcluster_pressure-20260731T073704Z",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "accesses": 600000,
+      "fairness_identity": "28772b4982c2d1043d24c6929d371d54e85e84ede5cbc52ed0721b1c4d85e224",
+      "formal_test": true,
+      "interval": {
+        "end_exclusive": 3000000,
+        "start_inclusive": 2400000
+      },
+      "parameter_selection_allowed": false,
+      "path": "outputs/capd_proactive_stage7/stage7-local-suite-r1/splits/dedup_pressure/test.csv",
+      "policy_replay_allowed_stage": 8,
+      "role": "seen_calibration_workload",
+      "sha256": "7910bdc116b3ff0414feaca3dfeb553dd84b2ef1955c4d4807f92fc643cb2155",
+      "split_role": "test",
+      "test_source_id": "dedup_pressure-20260731T075134Z",
+      "workload": "dedup_pressure"
+    },
+    {
+      "accesses": 600000,
+      "fairness_identity": "46708bbb55d0ea6fc4e4cf022b5424101a0f4090b8846c13ccc3aa26a9ec9f87",
+      "formal_test": true,
+      "interval": {
+        "end_exclusive": 3000000,
+        "start_inclusive": 2400000
+      },
+      "parameter_selection_allowed": false,
+      "path": "outputs/capd_proactive_stage7/stage7-local-suite-r1/splits/blackscholes/test.csv",
+      "policy_replay_allowed_stage": 8,
+      "role": "held_out_unseen_workload",
+      "sha256": "27f4f7107f15ea52ec2052efdcffab3e2cb6cb605f4ac6cd79c6aa49a23d2a3f",
+      "split_role": "test",
+      "test_source_id": "blackscholes-20260731T075408Z",
+      "workload": "blackscholes"
+    },
+    {
+      "accesses": 600000,
+      "fairness_identity": "2de5950143887610bbc14d8b04b62612c754765af2b465af28cd695b06209cce",
+      "formal_test": true,
+      "interval": {
+        "end_exclusive": 3000000,
+        "start_inclusive": 2400000
+      },
+      "parameter_selection_allowed": false,
+      "path": "outputs/capd_proactive_stage7/stage7-local-suite-r1/splits/swaptions/test.csv",
+      "policy_replay_allowed_stage": 8,
+      "role": "held_out_unseen_workload",
+      "sha256": "59afbf2923aea4ac6b1375fb3abc602c192b3e789a829b1a0415f50725ce0ef8",
+      "split_role": "test",
+      "test_source_id": "swaptions-20260731T080931Z",
+      "workload": "swaptions"
+    },
+    {
+      "accesses": 600000,
+      "fairness_identity": "116b64f4378a6616b921d3aea912b09e9cd1911cd2d8b3a9a0e6bd502a378be9",
+      "formal_test": true,
+      "interval": {
+        "end_exclusive": 3000000,
+        "start_inclusive": 2400000
+      },
+      "parameter_selection_allowed": false,
+      "path": "outputs/capd_proactive_stage7/stage7-local-suite-r1/splits/fluidanimate/test.csv",
+      "policy_replay_allowed_stage": 8,
+      "role": "held_out_unseen_workload",
+      "sha256": "598d8dffb4be589ab8bd035f707141a58894db8347051b9beba9358e046df88d",
+      "split_role": "test",
+      "test_source_id": "fluidanimate-20260731T081336Z",
+      "workload": "fluidanimate"
+    }
+  ]
+}

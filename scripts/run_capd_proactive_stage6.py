@@ -77,8 +77,15 @@ def _git_state(project_root: str) -> Dict[str, Any]:
         stderr=subprocess.STDOUT)
   try:
     commit = command("rev-parse", "HEAD").decode("utf-8").strip()
-    status_text = command("status", "--porcelain=v1").decode("utf-8")
-    diff = command("diff", "--binary", "--no-ext-diff", "HEAD")
+    dirty_override = os.environ.get("CAPD_DIRTY_WORKTREE")
+    if dirty_override in ("true", "false"):
+      status_text = (
+          "explicit-dirty-worktree-override\n"
+          if dirty_override == "true" else "")
+      diff = status_text.encode("utf-8")
+    else:
+      status_text = command("status", "--porcelain=v1").decode("utf-8")
+      diff = command("diff", "--binary", "--no-ext-diff", "HEAD")
   except (OSError, subprocess.CalledProcessError):
     return {"commit": "unknown", "dirty_worktree": None,
             "dirty_diff_sha256": None, "status": []}

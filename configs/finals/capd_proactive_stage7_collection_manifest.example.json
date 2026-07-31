@@ -1,0 +1,62 @@
+{
+  "schema_version": "capd_proactive_stage7_collection_manifest_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "run_id": "stage7-collection-r1",
+  "suite_confirmed": false,
+  "test_payload_read_for_integrity": false,
+  "test_used_for_parameter_selection": false,
+  "test_policy_replay_executed": false,
+  "test_performance_inspected": false,
+  "collections": [
+    {
+      "workload": "replace_me",
+      "role": "held_out_unseen_workload",
+      "source_trace_id": "replace-me-utc-id",
+      "raw_trace_path": "dataset/raw_traces/capd_proactive_stage7/stage7-collection-r1/replace_me.csv",
+      "raw_trace_sha256": null,
+      "raw_trace_accesses": 3000000,
+      "page_shift": 12,
+      "columns": ["PID", "TID", "PC", "Address", "RW"],
+      "process_ids": [],
+      "thread_ids": [],
+      "benchmark": {
+        "name": "replace_me",
+        "version": "PARSEC 3.0",
+        "binary_path": null,
+        "binary_sha256": null,
+        "input_name": null,
+        "input_path": null,
+        "input_sha256": null,
+        "command": [],
+        "thread_parameter": 1
+      },
+      "collector": {
+        "name": "DynamoRIO drmemtrace",
+        "version": null,
+        "command": [],
+        "started_at": null,
+        "ended_at": null,
+        "exit_code": null,
+        "stdout_log": null,
+        "stderr_log": null,
+        "truncated": false,
+        "timed_out": false,
+        "lost_events": false
+      },
+      "environment": {
+        "machine": null,
+        "cpu": null,
+        "memory": null,
+        "os": null,
+        "git_commit": null,
+        "dirty_worktree": null,
+        "aslr": null
+      },
+      "splits": {
+        "train": [0, 1800000],
+        "validation": [1800000, 2400000],
+        "test": [2400000, 3000000]
+      }
+    }
+  ]
+}

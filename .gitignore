@@ -27,8 +27,21 @@ tools/trace_collectors/**/build/
 dataset/jsonl/
 dataset/raw_traces/finals_v3_official/
 dataset/raw_traces/finals_v3_recollect/
+dataset/raw_traces/capd_proactive_stage7/
 dataset/processed/finals_v3_official/
 outputs/results/finals_v3_recollect/
+
+# Stage-7 local collection evidence
+# Keep collection_manifest.json and the small frozen suite summaries in Git.
+# Raw DynamoRIO blocks, view logs, benchmark outputs, split CSVs, and console
+# logs remain local because they are large and may exceed Windows path limits.
+outputs/capd_proactive_stage7/collections/*/*/
+outputs/capd_proactive_stage7/*/splits/
+outputs/capd_proactive_stage7/*/logs/
+outputs/capd_proactive_stage7/stage7-impl-*/
+outputs/capd_proactive_stage7/stage7-confirmed-*/
+outputs/capd_proactive_stage7/stage7-local-collection-*/
+stage7-*.log
 
 # OS/editor noise
 .DS_Store

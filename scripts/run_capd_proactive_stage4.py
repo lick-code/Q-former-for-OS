@@ -52,11 +52,18 @@ def _git_state(project_root):
   source_scope = (
       ".", ":(exclude)outputs", ":(exclude)tmp",
       ":(exclude)*.patch", ":(exclude)*.tar.gz")
-  status = command(
-      "status", "--porcelain", "--untracked-files=all", "--",
-      *source_scope)
-  diff = command(
-      "diff", "--binary", "--no-ext-diff", "--", *source_scope)
+  dirty_override = os.environ.get("CAPD_DIRTY_WORKTREE")
+  if dirty_override in ("true", "false"):
+    status = (
+        "explicit-dirty-worktree-override"
+        if dirty_override == "true" else "")
+    diff = status
+  else:
+    status = command(
+        "status", "--porcelain", "--untracked-files=all", "--",
+        *source_scope)
+    diff = command(
+        "diff", "--binary", "--no-ext-diff", "--", *source_scope)
   return {
       "commit": commit,
       "dirty_worktree": status not in ("", "unknown"),

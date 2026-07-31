@@ -1,0 +1,37 @@
+{
+  "schema_version": "capd_proactive_stage7_capacity_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE7-1.0",
+  "working_set_definition": "active_unique_pages_from_train_and_validation",
+  "capacity_rounding": "decimal_ceiling_ratio_times_working_set_minimum_one_no_clamp",
+  "ratios": ["0.20", "0.40", "0.60"],
+  "default_ratio": "0.20",
+  "default_ratio_status": "user_accepted_conditional_engineering_default_not_capacity_rule_v2_pass",
+  "page_size_bytes": 4096,
+  "nvm_capacity_model": "unbounded_backing_tier",
+  "fixed_active_controls": {
+    "F_low": 8,
+    "F_target": 16,
+    "b_max": 4,
+    "candidate_size_K": 8,
+    "scale_with_capacity": false
+  },
+  "qualification": {
+    "hard_minimum_D20_exclusive": 16,
+    "warning_below_D20": 100,
+    "preferred_D20_range": "hundreds_to_thousands_of_4KB_pages"
+  },
+  "profile": {
+    "policy": "reactive_lru",
+    "allowed_splits": ["train", "validation"],
+    "forbidden_split": "test",
+    "sequence": "train_then_validation_initial_empty_once",
+    "burst_window_accesses": 100,
+    "burst_quantile_method": "nearest_rank",
+    "early_reuse_window_accesses": 64
+  },
+  "pressure_test": {
+    "enabled": false,
+    "status": "optional_not_enabled",
+    "standard_test_replacement_allowed": false
+  }
+}

@@ -1297,12 +1297,19 @@ def _git_state(project_root):
     commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=project_root,
         stderr=subprocess.STDOUT, universal_newlines=True).strip()
-    status = subprocess.check_output(
-        ["git", "status", "--porcelain=v1"], cwd=project_root,
-        stderr=subprocess.STDOUT, universal_newlines=True)
-    diff = subprocess.check_output(
-        ["git", "diff", "--binary", "--no-ext-diff", "HEAD"],
-        cwd=project_root, stderr=subprocess.STDOUT)
+    dirty_override = os.environ.get("CAPD_DIRTY_WORKTREE")
+    if dirty_override in ("true", "false"):
+      status = (
+          "explicit-dirty-worktree-override\n"
+          if dirty_override == "true" else "")
+      diff = status.encode("utf-8")
+    else:
+      status = subprocess.check_output(
+          ["git", "status", "--porcelain=v1"], cwd=project_root,
+          stderr=subprocess.STDOUT, universal_newlines=True)
+      diff = subprocess.check_output(
+          ["git", "diff", "--binary", "--no-ext-diff", "HEAD"],
+          cwd=project_root, stderr=subprocess.STDOUT)
   except (OSError, subprocess.CalledProcessError):
     return "unknown", None, None
   dirty = bool(status.strip())

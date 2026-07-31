@@ -264,7 +264,13 @@ def _git_state(project_root: str) -> Dict[str, Any]:
       return None
 
   commit = command("git", "rev-parse", "HEAD")
-  status = command("git", "status", "--porcelain")
+  dirty_override = os.environ.get("CAPD_DIRTY_WORKTREE")
+  if dirty_override in ("true", "false"):
+    status = (
+        "explicit-dirty-worktree-override"
+        if dirty_override == "true" else "")
+  else:
+    status = command("git", "status", "--porcelain")
   return {
       "code_commit": commit,
       "dirty_worktree": None if status is None else bool(status),
