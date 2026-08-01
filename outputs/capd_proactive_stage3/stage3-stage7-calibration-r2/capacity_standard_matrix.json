@@ -1,0 +1,150 @@
+{
+  "cells": [
+    {
+      "D_standard": 889,
+      "requested_ratio": 0.2,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 4443,
+      "workload": "canneal"
+    },
+    {
+      "D_standard": 1778,
+      "requested_ratio": 0.4,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 4443,
+      "workload": "canneal"
+    },
+    {
+      "D_standard": 2666,
+      "requested_ratio": 0.6,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 4443,
+      "workload": "canneal"
+    },
+    {
+      "D_standard": 385,
+      "requested_ratio": 0.2,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 1921,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "D_standard": 769,
+      "requested_ratio": 0.4,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 1921,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "D_standard": 1153,
+      "requested_ratio": 0.6,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 1921,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "D_standard": 197,
+      "requested_ratio": 0.2,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 982,
+      "workload": "dedup_pressure"
+    },
+    {
+      "D_standard": 393,
+      "requested_ratio": 0.4,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 982,
+      "workload": "dedup_pressure"
+    },
+    {
+      "D_standard": 590,
+      "requested_ratio": 0.6,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 982,
+      "workload": "dedup_pressure"
+    },
+    {
+      "D_standard": 22,
+      "requested_ratio": 0.2,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 110,
+      "workload": "blackscholes"
+    },
+    {
+      "D_standard": 44,
+      "requested_ratio": 0.4,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 110,
+      "workload": "blackscholes"
+    },
+    {
+      "D_standard": 66,
+      "requested_ratio": 0.6,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 110,
+      "workload": "blackscholes"
+    },
+    {
+      "D_standard": 60,
+      "requested_ratio": 0.2,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 297,
+      "workload": "swaptions"
+    },
+    {
+      "D_standard": 119,
+      "requested_ratio": 0.4,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 297,
+      "workload": "swaptions"
+    },
+    {
+      "D_standard": 179,
+      "requested_ratio": 0.6,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 297,
+      "workload": "swaptions"
+    },
+    {
+      "D_standard": 5544,
+      "requested_ratio": 0.2,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 27720,
+      "workload": "fluidanimate"
+    },
+    {
+      "D_standard": 11088,
+      "requested_ratio": 0.4,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 27720,
+      "workload": "fluidanimate"
+    },
+    {
+      "D_standard": 16632,
+      "requested_ratio": 0.6,
+      "rounding": "ceiling",
+      "working_set_definition": "unique_pages_in_train_validation_union",
+      "working_set_pages": 27720,
+      "workload": "fluidanimate"
+    }
+  ],
+  "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
+  "working_set_definition": "unique_pages_in_train_validation_union"
+}

@@ -1,0 +1,265 @@
+{
+  "contract_version": "CAPD-PROACTIVE-STAGE3-STAGE7-1.0",
+  "controller_search": {
+    "b_max_candidates": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "b_t_rule": "min(b_max,max(0,F_target-free_frames),candidate_count)",
+    "duplicate_demotion_allowed": false
+  },
+  "default_run_id": "stage3-stage7-calibration-r2",
+  "execution": {
+    "profile_checkpoint_granularity": "window",
+    "profile_workers": 3,
+    "search_in_memory_cache": true
+  },
+  "fixed_stage3": {
+    "candidate_size_K": 8,
+    "cost_profile": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    },
+    "early_reuse_window": 64,
+    "history_window_size": 10,
+    "oracle_evaluation": {
+      "label_weights": [
+        1,
+        1,
+        2
+      ],
+      "lookahead_records": 256,
+      "scope": "candidate_scoped_optimization_upper_bound_only",
+      "used_for_pressure_window_selection": false
+    },
+    "stage0_config": "configs/finals/capd_proactive_stage0.json"
+  },
+  "input_contract": {
+    "allowed_split_roles": [
+      "train",
+      "validation"
+    ],
+    "chronological": true,
+    "forbidden_path_tokens": [
+      "standard_test_lock",
+      "pressure_test",
+      "stage8",
+      "capd_test",
+      "oracle_test"
+    ],
+    "formal_test": false,
+    "page_shift": 12,
+    "reject_non_r1_sha": true,
+    "shuffle": false
+  },
+  "output_directory": "outputs/capd_proactive_stage3/stage3-stage7-calibration-r2",
+  "output_root": "outputs/capd_proactive_stage3",
+  "policy_audit": {
+    "all_candidate_window_statistics_saved": true,
+    "oracle_use": "optimization_headroom_only",
+    "oracle_used_for_window_selection": false,
+    "reactive_sentinel_rule": "per_train_block_highest_replacements_then_unique_then_earliest; validation_pressure_and_low_pressure_sentinels",
+    "required_policies": [
+      "reactive_lru",
+      "proactive_lru",
+      "oracle"
+    ],
+    "same_cost_profile": true,
+    "same_dram_capacity": true,
+    "same_initial_state": true,
+    "same_trace_window": true
+  },
+  "pressure_capacity": {
+    "D_guard_min_64_used": false,
+    "minimum_capacity_pages": 8,
+    "minimum_eligible_train_windows_per_block": 1,
+    "ratios": [
+      0.05,
+      0.1,
+      0.15,
+      0.2
+    ],
+    "rounding": "ceiling",
+    "working_set_definition": "W_ref_from_train_chronological_windows"
+  },
+  "pressure_eligibility": {
+    "minimum_reactive_lru_replacement_decisions": 100,
+    "prohibited_selection_features": [
+      "capd",
+      "oracle",
+      "tpp",
+      "weighted_cost",
+      "stage8",
+      "model_accuracy"
+    ],
+    "selection_policy": "fixed_reactive_lru_only",
+    "unique_pages_rule": "strictly_greater_than_D_pressure_plus_F_target"
+  },
+  "provenance": {
+    "capd_or_oracle_used_for_pressure_selection": false,
+    "model_training_allowed": false,
+    "pressure_overhead_claims_allowed": false,
+    "pressure_test_generated": false,
+    "stage4_allowed": false,
+    "stage8_results_used": false,
+    "test_payload_allowed": false,
+    "test_used_for_selection": false
+  },
+  "r1_authority": {
+    "directory": "outputs/capd_proactive_stage7_repair/stage7-repair-r1",
+    "input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+    "raw_identity_audit": "outputs/capd_proactive_stage7_repair/stage7-repair-r1/raw_identity_audit.json",
+    "raw_identity_audit_sha256": "c690b34b9835783d5f33ae6a7461bcb62e994176ecbb194e8c1b48abd1966208",
+    "required_r1_result": "passed",
+    "required_status": "STAGE7_REPAIR_R1_RAW_IDENTITY_VERIFIED",
+    "run_id": "stage7-repair-r1",
+    "verification": "outputs/capd_proactive_stage7_repair/stage7-repair-r1/verification.json",
+    "verification_sha256": "3aaa888f6116b732629c51fc3da514d8fbfde7bd5135f83e1ae1ade7b5f31f76"
+  },
+  "resume": {
+    "failed_directory_must_be_preserved": true,
+    "require_exact_code_sha": true,
+    "require_exact_config_sha": true,
+    "require_exact_input_sha": true
+  },
+  "run_id": "stage3-stage7-calibration-r2",
+  "schema_name": "capd_proactive_stage3_stage7_calibration",
+  "schema_version": "capd_proactive_stage3_stage7_v1_0",
+  "search_space": {
+    "W_ref_quantile": [
+      0.5,
+      0.75,
+      0.9
+    ],
+    "alpha": [
+      0.05,
+      0.1,
+      0.15,
+      0.2
+    ],
+    "b_max": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "beta": [
+      0.4,
+      0.5,
+      0.6
+    ],
+    "r_pressure": [
+      0.05,
+      0.1,
+      0.15,
+      0.2
+    ],
+    "window_records": [
+      100000,
+      300000,
+      500000
+    ]
+  },
+  "selection": {
+    "all_auto_freeze": false,
+    "human_review_required": true,
+    "pareto_objectives": [
+      "minimize_weighted_cost_delta",
+      "maximize_empty_frame_exhaustion_reduction",
+      "maximize_minimum_free_frames",
+      "minimize_early_reuse_ratio",
+      "minimize_proactive_demotion_count",
+      "maximize_oracle_headroom_utilization",
+      "maximize_pressure_coverage"
+    ],
+    "require_any_train_pressure_coverage": true,
+    "require_nonzero_global_oracle_headroom": true,
+    "tie_break": [
+      "validation_safety_passed",
+      "higher_pressure_coverage",
+      "lower_weighted_cost_delta",
+      "higher_empty_frame_exhaustion_reduction",
+      "higher_minimum_free_frames",
+      "lower_early_reuse_ratio",
+      "lower_proactive_demotion_count",
+      "higher_oracle_headroom_utilization",
+      "lexical_candidate_id"
+    ]
+  },
+  "stage_status": "implemented_awaiting_server_calibration",
+  "standard_capacity": {
+    "ratios": [
+      0.2,
+      0.4,
+      0.6
+    ],
+    "rounding": "ceiling",
+    "working_set_definition": "unique_pages_in_train_validation_union"
+  },
+  "validation_safety": {
+    "low_pressure_replacement_decisions_below": 100,
+    "maximum_early_reuse_ratio": 0.25,
+    "maximum_pointless_demotion_count": 1,
+    "maximum_pointless_demotion_fraction_of_page_entries": 0.01,
+    "maximum_weighted_cost_delta": 0,
+    "minimum_dram_hit_delta": 0
+  },
+  "watermark_search": {
+    "F_low_rule": "max(1,round_half_up(beta_times_F_target))",
+    "F_target_rule": "clamp(round_half_up(alpha_times_D),2,16)",
+    "alpha_candidates": [
+      0.05,
+      0.1,
+      0.15,
+      0.2
+    ],
+    "beta_candidates": [
+      0.4,
+      0.5,
+      0.6
+    ],
+    "illegal_rounding_rule": "reject_if_deterministic_decrement_cannot_restore_F_low_lt_F_target",
+    "maximum_reserve_fraction": 0.25
+  },
+  "windowing": {
+    "calibration_window_records": [
+      100000,
+      300000,
+      500000
+    ],
+    "chronological": true,
+    "initial_state": "empty_dram_per_window",
+    "page_entry_burst_records": 1000,
+    "reuse_distance_quantiles": [
+      0.5,
+      0.9,
+      0.99
+    ],
+    "shuffle": false,
+    "train_block_count": 3,
+    "validation_block_count": 1,
+    "window_step": 10000,
+    "working_set_growth_sample_records": 10000
+  },
+  "working_set_reference": {
+    "definition": "train_chronological_window_unique_pages_quantile",
+    "method": "nearest_rank",
+    "quantiles": [
+      0.5,
+      0.75,
+      0.9
+    ]
+  },
+  "workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure",
+    "blackscholes",
+    "swaptions",
+    "fluidanimate"
+  ]
+}

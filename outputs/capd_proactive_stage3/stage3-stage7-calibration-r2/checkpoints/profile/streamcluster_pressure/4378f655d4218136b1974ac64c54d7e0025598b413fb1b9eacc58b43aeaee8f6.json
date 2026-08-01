@@ -1,0 +1,194 @@
+{
+  "elapsed_seconds": 1.4908790730405599,
+  "metadata": {
+    "block_index": 1,
+    "end_record": 920000,
+    "page_entry_burst_records": 1000,
+    "pass": "base_profile",
+    "reference_capacity_pages": 385,
+    "split_role": "train",
+    "start_record": 620000,
+    "window_records": 300000,
+    "working_set_growth_sample_records": 10000,
+    "workload": "streamcluster_pressure"
+  },
+  "payload": {
+    "block_end_record": 1200000,
+    "block_index": 1,
+    "block_start_record": 600000,
+    "chronological": true,
+    "crosses_split_boundary": false,
+    "default_weighted_cost": 324792,
+    "dram_capacity_pages": 385,
+    "dram_hits": 298276,
+    "early_reuse": null,
+    "early_reuse_count": 0,
+    "early_reuse_rate": null,
+    "empty_frame_exhaustion": 1339,
+    "end_record": 920000,
+    "initial_state": "empty_dram_per_window",
+    "lru_misses": 1724,
+    "lru_replacement_decisions": 1339,
+    "mean_free_frames": 31.89114,
+    "minimum_free_frames": 0,
+    "misses": 1724,
+    "nvm_reads": 111,
+    "nvm_writes": 1613,
+    "oracle_headroom": null,
+    "page_entry_burst": {
+      "maximum": 28,
+      "p95": 8,
+      "p99": 11,
+      "records": 1000
+    },
+    "page_entry_count": 1724,
+    "policy": "reactive_lru",
+    "policy_metrics_status": "search_pending",
+    "proactive_demotions": null,
+    "reactive_demotions": 1339,
+    "reuse_distance_summary": {
+      "cold_page_accesses": 1712,
+      "maximum": 210700,
+      "p50": 1,
+      "p90": 2,
+      "p99": 33,
+      "reuse_count": 298288
+    },
+    "shuffle": false,
+    "split_role": "train",
+    "start_record": 620000,
+    "total_accesses": 300000,
+    "unique_pages": 1712,
+    "window_records": 300000,
+    "working_set_growth": {
+      "maximum_new_unique_pages_per_sample": 79,
+      "mean_new_unique_pages_per_sample": 56.206896551724135,
+      "sample_records": 10000,
+      "samples": [
+        {
+          "records": 10000,
+          "unique_pages": 82
+        },
+        {
+          "records": 20000,
+          "unique_pages": 151
+        },
+        {
+          "records": 30000,
+          "unique_pages": 229
+        },
+        {
+          "records": 40000,
+          "unique_pages": 307
+        },
+        {
+          "records": 50000,
+          "unique_pages": 385
+        },
+        {
+          "records": 60000,
+          "unique_pages": 463
+        },
+        {
+          "records": 70000,
+          "unique_pages": 541
+        },
+        {
+          "records": 80000,
+          "unique_pages": 619
+        },
+        {
+          "records": 90000,
+          "unique_pages": 698
+        },
+        {
+          "records": 100000,
+          "unique_pages": 776
+        },
+        {
+          "records": 110000,
+          "unique_pages": 854
+        },
+        {
+          "records": 120000,
+          "unique_pages": 932
+        },
+        {
+          "records": 130000,
+          "unique_pages": 1010
+        },
+        {
+          "records": 140000,
+          "unique_pages": 1088
+        },
+        {
+          "records": 150000,
+          "unique_pages": 1166
+        },
+        {
+          "records": 160000,
+          "unique_pages": 1244
+        },
+        {
+          "records": 170000,
+          "unique_pages": 1323
+        },
+        {
+          "records": 180000,
+          "unique_pages": 1401
+        },
+        {
+          "records": 190000,
+          "unique_pages": 1479
+        },
+        {
+          "records": 200000,
+          "unique_pages": 1557
+        },
+        {
+          "records": 210000,
+          "unique_pages": 1635
+        },
+        {
+          "records": 220000,
+          "unique_pages": 1692
+        },
+        {
+          "records": 230000,
+          "unique_pages": 1710
+        },
+        {
+          "records": 240000,
+          "unique_pages": 1710
+        },
+        {
+          "records": 250000,
+          "unique_pages": 1710
+        },
+        {
+          "records": 260000,
+          "unique_pages": 1711
+        },
+        {
+          "records": 270000,
+          "unique_pages": 1711
+        },
+        {
+          "records": 280000,
+          "unique_pages": 1711
+        },
+        {
+          "records": 290000,
+          "unique_pages": 1711
+        },
+        {
+          "records": 300000,
+          "unique_pages": 1712
+        }
+      ]
+    },
+    "write_ratio": 0.80827
+  },
+  "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
+  "task_id": "4378f655d4218136b1974ac64c54d7e0025598b413fb1b9eacc58b43aeaee8f6"
+}

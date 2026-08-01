@@ -1,0 +1,274 @@
+{
+  "elapsed_seconds": 2.4465633399086073,
+  "metadata": {
+    "block_index": 0,
+    "end_record": 520000,
+    "page_entry_burst_records": 1000,
+    "pass": "base_profile",
+    "reference_capacity_pages": 22,
+    "split_role": "train",
+    "start_record": 20000,
+    "window_records": 500000,
+    "working_set_growth_sample_records": 10000,
+    "workload": "blackscholes"
+  },
+  "payload": {
+    "block_end_record": 600000,
+    "block_index": 0,
+    "block_start_record": 0,
+    "chronological": true,
+    "crosses_split_boundary": false,
+    "default_weighted_cost": 507108,
+    "dram_capacity_pages": 22,
+    "dram_hits": 499348,
+    "early_reuse": null,
+    "early_reuse_count": 0,
+    "early_reuse_rate": null,
+    "empty_frame_exhaustion": 630,
+    "end_record": 520000,
+    "initial_state": "empty_dram_per_window",
+    "lru_misses": 652,
+    "lru_replacement_decisions": 630,
+    "mean_free_frames": 0.005118,
+    "minimum_free_frames": 0,
+    "misses": 652,
+    "nvm_reads": 626,
+    "nvm_writes": 26,
+    "oracle_headroom": null,
+    "page_entry_burst": {
+      "maximum": 61,
+      "p95": 12,
+      "p99": 25,
+      "records": 1000
+    },
+    "page_entry_count": 652,
+    "policy": "reactive_lru",
+    "policy_metrics_status": "search_pending",
+    "proactive_demotions": null,
+    "reactive_demotions": 630,
+    "reuse_distance_summary": {
+      "cold_page_accesses": 97,
+      "maximum": 155048,
+      "p50": 1,
+      "p90": 17,
+      "p99": 381,
+      "reuse_count": 499903
+    },
+    "shuffle": false,
+    "split_role": "train",
+    "start_record": 20000,
+    "total_accesses": 500000,
+    "unique_pages": 97,
+    "window_records": 500000,
+    "working_set_growth": {
+      "maximum_new_unique_pages_per_sample": 29,
+      "mean_new_unique_pages_per_sample": 0.9591836734693877,
+      "sample_records": 10000,
+      "samples": [
+        {
+          "records": 10000,
+          "unique_pages": 50
+        },
+        {
+          "records": 20000,
+          "unique_pages": 52
+        },
+        {
+          "records": 30000,
+          "unique_pages": 67
+        },
+        {
+          "records": 40000,
+          "unique_pages": 96
+        },
+        {
+          "records": 50000,
+          "unique_pages": 96
+        },
+        {
+          "records": 60000,
+          "unique_pages": 96
+        },
+        {
+          "records": 70000,
+          "unique_pages": 96
+        },
+        {
+          "records": 80000,
+          "unique_pages": 96
+        },
+        {
+          "records": 90000,
+          "unique_pages": 96
+        },
+        {
+          "records": 100000,
+          "unique_pages": 96
+        },
+        {
+          "records": 110000,
+          "unique_pages": 96
+        },
+        {
+          "records": 120000,
+          "unique_pages": 96
+        },
+        {
+          "records": 130000,
+          "unique_pages": 96
+        },
+        {
+          "records": 140000,
+          "unique_pages": 96
+        },
+        {
+          "records": 150000,
+          "unique_pages": 96
+        },
+        {
+          "records": 160000,
+          "unique_pages": 96
+        },
+        {
+          "records": 170000,
+          "unique_pages": 96
+        },
+        {
+          "records": 180000,
+          "unique_pages": 96
+        },
+        {
+          "records": 190000,
+          "unique_pages": 96
+        },
+        {
+          "records": 200000,
+          "unique_pages": 96
+        },
+        {
+          "records": 210000,
+          "unique_pages": 96
+        },
+        {
+          "records": 220000,
+          "unique_pages": 96
+        },
+        {
+          "records": 230000,
+          "unique_pages": 96
+        },
+        {
+          "records": 240000,
+          "unique_pages": 96
+        },
+        {
+          "records": 250000,
+          "unique_pages": 96
+        },
+        {
+          "records": 260000,
+          "unique_pages": 96
+        },
+        {
+          "records": 270000,
+          "unique_pages": 96
+        },
+        {
+          "records": 280000,
+          "unique_pages": 96
+        },
+        {
+          "records": 290000,
+          "unique_pages": 96
+        },
+        {
+          "records": 300000,
+          "unique_pages": 96
+        },
+        {
+          "records": 310000,
+          "unique_pages": 96
+        },
+        {
+          "records": 320000,
+          "unique_pages": 96
+        },
+        {
+          "records": 330000,
+          "unique_pages": 96
+        },
+        {
+          "records": 340000,
+          "unique_pages": 96
+        },
+        {
+          "records": 350000,
+          "unique_pages": 96
+        },
+        {
+          "records": 360000,
+          "unique_pages": 96
+        },
+        {
+          "records": 370000,
+          "unique_pages": 96
+        },
+        {
+          "records": 380000,
+          "unique_pages": 96
+        },
+        {
+          "records": 390000,
+          "unique_pages": 96
+        },
+        {
+          "records": 400000,
+          "unique_pages": 96
+        },
+        {
+          "records": 410000,
+          "unique_pages": 97
+        },
+        {
+          "records": 420000,
+          "unique_pages": 97
+        },
+        {
+          "records": 430000,
+          "unique_pages": 97
+        },
+        {
+          "records": 440000,
+          "unique_pages": 97
+        },
+        {
+          "records": 450000,
+          "unique_pages": 97
+        },
+        {
+          "records": 460000,
+          "unique_pages": 97
+        },
+        {
+          "records": 470000,
+          "unique_pages": 97
+        },
+        {
+          "records": 480000,
+          "unique_pages": 97
+        },
+        {
+          "records": 490000,
+          "unique_pages": 97
+        },
+        {
+          "records": 500000,
+          "unique_pages": 97
+        }
+      ]
+    },
+    "write_ratio": 0.342678
+  },
+  "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
+  "task_id": "ebc53116cbccebedf76eb621968b839f6d4c074ee60bbc7037e97d3205109ef3"
+}

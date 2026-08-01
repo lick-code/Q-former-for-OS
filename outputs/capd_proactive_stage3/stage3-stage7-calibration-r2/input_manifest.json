@@ -1,0 +1,208 @@
+{
+  "allowed_split_roles": [
+    "train",
+    "validation"
+  ],
+  "chronological": true,
+  "entries": [
+    {
+      "accesses": 1800000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/canneal/train.csv",
+      "sha256": "03c210451c9ca9d11ef43108807eab1726a6a1ca50dbadc89c192b944242b804",
+      "source_interval": {
+        "end_exclusive": 1800000,
+        "start_inclusive": 0
+      },
+      "source_trace_id": "canneal-20260731T072730Z",
+      "split_role": "train",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/canneal/train.csv",
+      "workload": "canneal"
+    },
+    {
+      "accesses": 600000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/canneal/validation.csv",
+      "sha256": "f8fb2460ea9566c8a4b08288c0c35bedbe377938553fee26b00689f9cd236a0e",
+      "source_interval": {
+        "end_exclusive": 2400000,
+        "start_inclusive": 1800000
+      },
+      "source_trace_id": "canneal-20260731T072730Z",
+      "split_role": "validation",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/canneal/validation.csv",
+      "workload": "canneal"
+    },
+    {
+      "accesses": 1800000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/streamcluster_pressure/train.csv",
+      "sha256": "1363104f6acf018e4246976f160c7b5b43771d62fc1e441e6393c770eebd098f",
+      "source_interval": {
+        "end_exclusive": 1800000,
+        "start_inclusive": 0
+      },
+      "source_trace_id": "streamcluster_pressure-20260731T073704Z",
+      "split_role": "train",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/streamcluster_pressure/train.csv",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "accesses": 600000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/streamcluster_pressure/validation.csv",
+      "sha256": "fb251403ce45e2fe733f6b33b16e79bd0e2f886eaaa69e06bfb1f9ead9b6568b",
+      "source_interval": {
+        "end_exclusive": 2400000,
+        "start_inclusive": 1800000
+      },
+      "source_trace_id": "streamcluster_pressure-20260731T073704Z",
+      "split_role": "validation",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/streamcluster_pressure/validation.csv",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "accesses": 1800000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/dedup_pressure/train.csv",
+      "sha256": "ca6f2c47f5e49821bc58b7603b4841071264c460a3cae17d59f6429497f7fb73",
+      "source_interval": {
+        "end_exclusive": 1800000,
+        "start_inclusive": 0
+      },
+      "source_trace_id": "dedup_pressure-20260731T075134Z",
+      "split_role": "train",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/dedup_pressure/train.csv",
+      "workload": "dedup_pressure"
+    },
+    {
+      "accesses": 600000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/dedup_pressure/validation.csv",
+      "sha256": "5ec6a34e641002708bb8478ec291847ef7c274dcdb3aeac72f4771b7c7993faa",
+      "source_interval": {
+        "end_exclusive": 2400000,
+        "start_inclusive": 1800000
+      },
+      "source_trace_id": "dedup_pressure-20260731T075134Z",
+      "split_role": "validation",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/dedup_pressure/validation.csv",
+      "workload": "dedup_pressure"
+    },
+    {
+      "accesses": 1800000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/blackscholes/train.csv",
+      "sha256": "2b5831321e325a90b6a3ce64692f6177b2629c146545fe44166f2fe9225489d8",
+      "source_interval": {
+        "end_exclusive": 1800000,
+        "start_inclusive": 0
+      },
+      "source_trace_id": "blackscholes-20260731T075408Z",
+      "split_role": "train",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/blackscholes/train.csv",
+      "workload": "blackscholes"
+    },
+    {
+      "accesses": 600000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/blackscholes/validation.csv",
+      "sha256": "bc7f9dabbcdae79f58d08c08ee819977347a628f3f9b8d8d185bf3b8c934f422",
+      "source_interval": {
+        "end_exclusive": 2400000,
+        "start_inclusive": 1800000
+      },
+      "source_trace_id": "blackscholes-20260731T075408Z",
+      "split_role": "validation",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/blackscholes/validation.csv",
+      "workload": "blackscholes"
+    },
+    {
+      "accesses": 1800000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/swaptions/train.csv",
+      "sha256": "82866aa4c135366a54c946526be40a416750f14baf5ba8658016d9c7e6401cc8",
+      "source_interval": {
+        "end_exclusive": 1800000,
+        "start_inclusive": 0
+      },
+      "source_trace_id": "swaptions-20260731T080931Z",
+      "split_role": "train",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/swaptions/train.csv",
+      "workload": "swaptions"
+    },
+    {
+      "accesses": 600000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/swaptions/validation.csv",
+      "sha256": "0b6d761ac18bf9aa4f50b41780cf01c806ef98606e61dee465d5ba31e010742c",
+      "source_interval": {
+        "end_exclusive": 2400000,
+        "start_inclusive": 1800000
+      },
+      "source_trace_id": "swaptions-20260731T080931Z",
+      "split_role": "validation",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/swaptions/validation.csv",
+      "workload": "swaptions"
+    },
+    {
+      "accesses": 1800000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/fluidanimate/train.csv",
+      "sha256": "8bc8c1a40c52f8e946608d024829569d840685fd2a03cb02d7947aebb61d0fc5",
+      "source_interval": {
+        "end_exclusive": 1800000,
+        "start_inclusive": 0
+      },
+      "source_trace_id": "fluidanimate-20260731T081336Z",
+      "split_role": "train",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/fluidanimate/train.csv",
+      "workload": "fluidanimate"
+    },
+    {
+      "accesses": 600000,
+      "formal_test": false,
+      "page_shift": 12,
+      "r1_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+      "resolved_trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/fluidanimate/validation.csv",
+      "sha256": "bf4f3ea22388c4091fb5e96e5c4849dd7f2523e9ab863549d1d6c5d6bec50cb0",
+      "source_interval": {
+        "end_exclusive": 2400000,
+        "start_inclusive": 1800000
+      },
+      "source_trace_id": "fluidanimate-20260731T081336Z",
+      "split_role": "validation",
+      "trace_path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/splits/fluidanimate/validation.csv",
+      "workload": "fluidanimate"
+    }
+  ],
+  "formal_test": false,
+  "run_id": "stage3-stage7-calibration-r2",
+  "schema_version": "capd_proactive_stage3_stage7_input_manifest_v1_0",
+  "shuffle": false,
+  "source_authority_input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+  "source_authority_run_id": "stage7-repair-r1",
+  "test_entries": 0
+}

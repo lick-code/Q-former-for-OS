@@ -1,0 +1,74 @@
+{
+  "elapsed_seconds": 1.1892882180400193,
+  "metadata": {
+    "block_index": 0,
+    "capacities": [
+      8,
+      10,
+      15,
+      20,
+      22,
+      44,
+      66
+    ],
+    "end_record": 230000,
+    "pass": "capacity_metrics",
+    "split_role": "validation",
+    "start_record": 130000,
+    "window_records": 100000,
+    "workload": "blackscholes"
+  },
+  "payload": {
+    "10": {
+      "cold_misses": 21,
+      "dram_capacity_pages": 10,
+      "lru_misses": 3158,
+      "lru_replacement_decisions": 3148,
+      "page_entry_count": 3158
+    },
+    "15": {
+      "cold_misses": 21,
+      "dram_capacity_pages": 15,
+      "lru_misses": 723,
+      "lru_replacement_decisions": 708,
+      "page_entry_count": 723
+    },
+    "20": {
+      "cold_misses": 21,
+      "dram_capacity_pages": 20,
+      "lru_misses": 69,
+      "lru_replacement_decisions": 49,
+      "page_entry_count": 69
+    },
+    "22": {
+      "cold_misses": 21,
+      "dram_capacity_pages": 22,
+      "lru_misses": 21,
+      "lru_replacement_decisions": 0,
+      "page_entry_count": 21
+    },
+    "44": {
+      "cold_misses": 21,
+      "dram_capacity_pages": 44,
+      "lru_misses": 21,
+      "lru_replacement_decisions": 0,
+      "page_entry_count": 21
+    },
+    "66": {
+      "cold_misses": 21,
+      "dram_capacity_pages": 66,
+      "lru_misses": 21,
+      "lru_replacement_decisions": 0,
+      "page_entry_count": 21
+    },
+    "8": {
+      "cold_misses": 21,
+      "dram_capacity_pages": 8,
+      "lru_misses": 4980,
+      "lru_replacement_decisions": 4972,
+      "page_entry_count": 4980
+    }
+  },
+  "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
+  "task_id": "a0e06dd1ea3d10a0c992b9e950cb61ba7a7ca2694f68b1e8b942844f4b33ecf3"
+}

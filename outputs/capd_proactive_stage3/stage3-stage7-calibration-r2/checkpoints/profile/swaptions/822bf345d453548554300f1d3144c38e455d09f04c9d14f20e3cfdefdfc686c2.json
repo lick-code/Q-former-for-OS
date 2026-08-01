@@ -1,0 +1,114 @@
+{
+  "elapsed_seconds": 0.9305075810989365,
+  "metadata": {
+    "block_index": 0,
+    "end_record": 600000,
+    "page_entry_burst_records": 1000,
+    "pass": "base_profile",
+    "reference_capacity_pages": 60,
+    "split_role": "train",
+    "start_record": 500000,
+    "window_records": 100000,
+    "working_set_growth_sample_records": 10000,
+    "workload": "swaptions"
+  },
+  "payload": {
+    "block_end_record": 600000,
+    "block_index": 0,
+    "block_start_record": 0,
+    "chronological": true,
+    "crosses_split_boundary": false,
+    "default_weighted_cost": 105936,
+    "dram_capacity_pages": 60,
+    "dram_hits": 99414,
+    "early_reuse": null,
+    "early_reuse_count": 0,
+    "early_reuse_rate": null,
+    "empty_frame_exhaustion": 526,
+    "end_record": 600000,
+    "initial_state": "empty_dram_per_window",
+    "lru_misses": 586,
+    "lru_replacement_decisions": 526,
+    "mean_free_frames": 1.99871,
+    "minimum_free_frames": 0,
+    "misses": 586,
+    "nvm_reads": 571,
+    "nvm_writes": 15,
+    "oracle_headroom": null,
+    "page_entry_burst": {
+      "maximum": 24,
+      "p95": 15,
+      "p99": 19,
+      "records": 1000
+    },
+    "page_entry_count": 586,
+    "policy": "reactive_lru",
+    "policy_metrics_status": "search_pending",
+    "proactive_demotions": null,
+    "reactive_demotions": 526,
+    "reuse_distance_summary": {
+      "cold_page_accesses": 193,
+      "maximum": 55635,
+      "p50": 1,
+      "p90": 21,
+      "p99": 858,
+      "reuse_count": 99807
+    },
+    "shuffle": false,
+    "split_role": "train",
+    "start_record": 500000,
+    "total_accesses": 100000,
+    "unique_pages": 193,
+    "window_records": 100000,
+    "working_set_growth": {
+      "maximum_new_unique_pages_per_sample": 41,
+      "mean_new_unique_pages_per_sample": 15.11111111111111,
+      "sample_records": 10000,
+      "samples": [
+        {
+          "records": 10000,
+          "unique_pages": 57
+        },
+        {
+          "records": 20000,
+          "unique_pages": 93
+        },
+        {
+          "records": 30000,
+          "unique_pages": 113
+        },
+        {
+          "records": 40000,
+          "unique_pages": 124
+        },
+        {
+          "records": 50000,
+          "unique_pages": 128
+        },
+        {
+          "records": 60000,
+          "unique_pages": 130
+        },
+        {
+          "records": 70000,
+          "unique_pages": 131
+        },
+        {
+          "records": 80000,
+          "unique_pages": 142
+        },
+        {
+          "records": 90000,
+          "unique_pages": 183
+        },
+        {
+          "records": 100000,
+          "unique_pages": 193
+        }
+      ]
+    },
+    "write_ratio": 0.27333
+  },
+  "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
+  "task_id": "822bf345d453548554300f1d3144c38e455d09f04c9d14f20e3cfdefdfc686c2"
+}

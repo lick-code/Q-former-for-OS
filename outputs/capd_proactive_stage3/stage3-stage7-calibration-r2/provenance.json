@@ -1,0 +1,43 @@
+{
+  "code_identity": [
+    {
+      "path": "qmap/proactive_stage3_stage7.py",
+      "sha256": "4625f7304ae241d1cef5cf6a3815e2516833d509e3153d45d417425767be927a"
+    },
+    {
+      "path": "scripts/run_capd_proactive_stage3_stage7.py",
+      "sha256": "a11f29da40fb1fd488ea873060f86171d16e645d1f6a63b20ee6bd7380c186e8"
+    },
+    {
+      "path": "qmap/proactive_replay.py",
+      "sha256": "36bec97e6bf6546384c36583be8b63c4b5a6d95fe1ec29b89a846096b82b71cd"
+    },
+    {
+      "path": "qmap/proactive_stage5_policies.py",
+      "sha256": "8a7e9476a57de7c090a026ad301af137df36b1200cbe5462d9164474775d83a5"
+    }
+  ],
+  "created_at": "2026-08-01T12:05:55Z",
+  "dirty_state_sha256": "283b575452f9808c99edc988262b87da3bce647e778ebc9ec54165f0ff4e8a28",
+  "dirty_worktree": true,
+  "git_commit": "08a50ad71f20683cebba59b4abf72a82153413bb",
+  "input_split_count": 12,
+  "input_split_roles": [
+    "train",
+    "validation"
+  ],
+  "pressure_test_generated": false,
+  "r1_authority": {
+    "R1": "passed",
+    "input_identity_sha256": "94d20f3321cbe7f3dcc6c5c138f452a3dedf80d3f0641a7d6ecd9eadeeb59cb4",
+    "raw_identity_audit_sha256": "c690b34b9835783d5f33ae6a7461bcb62e994176ecbb194e8c1b48abd1966208",
+    "run_id": "stage7-repair-r1",
+    "verification_sha256": "3aaa888f6116b732629c51fc3da514d8fbfde7bd5135f83e1ae1ade7b5f31f76",
+    "verification_status": "STAGE7_REPAIR_R1_RAW_IDENTITY_VERIFIED"
+  },
+  "run_id": "stage3-stage7-calibration-r2",
+  "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
+  "stage8_results_used": false,
+  "test_payload_opened": false,
+  "test_used_for_selection": false
+}
