@@ -21,7 +21,13 @@ bash scripts/validate_capd_proactive_stage8_server.sh \
   "${RUN_ID}" cuda:0 2>&1 | tee "stage8-${RUN_ID}-console.log"
 ```
 
-`RUN_ID` 只是本次验收产物目录名，不需额外配置。成功产物位于 `outputs/capd_proactive_stage8/${RUN_ID}/`。如果失败，原 run ID 会被标记 `stage8_not_verified` 并保留现场；修复代码后必须换一个新 run ID，例如 `stage8-sync-replay-r2`。
+`RUN_ID` 只是本次验收产物目录名，不需额外配置。成功产物位于 `outputs/capd_proactive_stage8/${RUN_ID}/`。如果失败，原 run ID 会被标记 `stage8_not_verified` 并保留现场；修复代码后必须换一个新 run ID。
+
+## 已完成的正式运行
+
+`stage8-sync-replay-r3` 已在 Linux/CUDA 服务器真实完成 144/144 个正式 Test job、聚合和独立 verification，并打印 `[FINAL] STAGE8_SYNC_REPLAY_VERIFIED`。其 `verification.json.status`、`run_state.json.status` 均为 `stage8_sync_replay_verified`，当前不需要再次运行 Stage8。
+
+正式结果说明见 `docs/CAPD_PROACTIVE_STAGE8_RESULTS_CN.md`。`stage8-sync-replay-r1` 与 `stage8-sync-replay-r2` 是早期失败现场，不得替代 r3 权威证据。
 
 ## 成功判断
 

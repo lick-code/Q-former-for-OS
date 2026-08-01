@@ -2,35 +2,51 @@
 
 ## 当前准确状态
 
-`stage8_implemented_awaiting_formal_replay`
+`stage8_sync_replay_verified`
 
-Stage8 的冻结配置、入口审计、正式 runner、结果 schema、Early-Reuse/OOV 指标、聚合统计、公平性审计、失败/续跑合同、单元测试和 Linux 验收脚本已经实现。本地尚未真实执行 Stage7 Standard Test 的 144 个正式 job，因此当前不能写 `stage8_sync_replay_verified`，也不能宣称 Stage8 已完成。
-
-服务器首次正式尝试 `stage8-sync-replay-r1` 已保留为失败证据：5 个 canneal/20% 确定性 job 完成，首个 CAPD job 因未在 Python 启动前设置 CUDA cuBLAS 确定性 workspace 而失败。`stage8-sync-replay-r2` 在 Test 前烟测中因适配层错误地手写 checkpoint selection criterion 而 fail closed，同样未打开 Test。当前实现从 Stage5 已验证的 Stage4 checkpoint authority 逐 seed 继承 `selection_criterion=minimum_valid_loss_only`，不再推断该字段；`r1/r2` 均不得复用，修复后须使用新 run ID。
-
-## 已冻结内容
-
-- 唯一调度源：Stage7 `stage8_execution_plan.json`。
-- 144 个 job，无复制确定性 baseline、无 best-seed 选择。
-- 表 A/表 B 成员资格及公平性合同。
-- CAPD 三 checkpoint SHA、冻结 OOV/UNK=0 行为。
-- TPP Stage6 最终参数。
-- Early-Reuse 64/256/1024、FallbackRate 分母和零分母语义。
-- bootstrap seed=20260801、10000 次、18 个 workload×capacity 单元重采样。
-- 同步 Replay 解释边界。
-
-## 已完成的本地验证
-
-- 新 Stage8 Python 文件静态编译通过。
-- Stage8 非 Test 合成统计/Early-Reuse E2E 通过。
-- `tests.test_capd_proactive_stage8`：22 项通过。
-
-本地 WSL 没有完整正式 Test split/PyTorch-CUDA 执行条件；未伪造 CAPD 推理、Test 结果、聚合报告或 verified 标记。
-
-## 服务器完成门禁
-
-只有 Linux 验收脚本真实完成环境检查、Stage1～8 回归、preflight、144 job、聚合和独立 verification，并打印：
+Stage8 已于 Linux/CUDA 服务器通过正式验收。权威成功运行是
+`outputs/capd_proactive_stage8/stage8-sync-replay-r3/`，最终标记为：
 
 `[FINAL] STAGE8_SYNC_REPLAY_VERIFIED`
 
-之后才能将状态判断为 `stage8_sync_replay_verified`，并进入 Stage9。任何失败状态为 `stage8_not_verified`，失败 run ID 不得自动重试。
+`verification.json` 和 `run_state.json` 均记录
+`stage8_sync_replay_verified`；`stage9_entry_gate=satisfied`。
+
+## 正式完成证据
+
+- Stage7 入口门禁：`satisfied`。
+- Standard Test lock：`sealed_for_stage8`。
+- 正式 job：144/144 completed，144 个 job ID 无重复，144 个 result SHA 均与 manifest 一致。
+- CAPD：三个冻结 checkpoint（seed 3136859、42、2026）均通过 Test 前 CUDA 烟测并独立运行；未选择 best seed。
+- 回归：Stage1～8 共运行 436 项测试，整体结果为 OK，其中 10 项按预声明条件跳过。
+- 聚合：18 个 workload×capacity 单元、表 A、表 B、逐项原始结果及配对统计均已生成。
+- 公平性：实验 A、实验 B 的 18 个单元全部通过；相同决策前状态下候选身份合同通过。
+- 污染审计：冻结参数未改变，未使用旧 `finals_v3`，Test 未用于参数选择。
+- 统计：固定 seed=20260801、10000 次、以 workload×capacity 单元为重采样单位的 95% percentile bootstrap 已通过独立校验。
+- 产物：聚合 JSON/CSV/中文报告 SHA、runtime smoke SHA 和服务器验收收据均已记录。
+
+服务器早期失败运行 `stage8-sync-replay-r1`、`stage8-sync-replay-r2` 仍仅作为失败现场保留，不能作为完成证据，也未被 r3 续跑复用。
+
+## 正式结果摘要
+
+主比较 CAPD 相对 TPP-inspired：
+
+- 18 单元 CAPD−TPP weighted cost 均值：`-310.296296`。
+- 平均相对改善：`0.040231%`。
+- 95% bootstrap CI：`[-930.888889, 0.000000]`。
+- 单元方向：CAPD 较低 1 个、持平 17 个、较高 0 个。
+- 预声明判定：`ci_includes_zero_no_single_direction_claim`，不能据此声称 CAPD 在正式套件上具有确定的全面优势。
+
+唯一出现页面排序差异的单元是 held-out `blackscholes@20%`：CAPD 三 seed weighted cost 为 `765706.666667 ± 7889.360071`，TPP-inspired 为 `771292`，CAPD 平均降低 `5585.333333`（`0.724153%`）；Oracle 为 `757796`。其余 17 个单元 CAPD、TPP-inspired 与最佳非 Oracle 主动 baseline 的 weighted cost 相同。
+
+主动储备机制比较 Proactive-LRU 相对 Reactive-LRU：15 个单元持平，3 个单元成本更高，0 个单元更低。差异分别为 `blackscholes@20% +171252`、`canneal@20% +130`、`dedup_pressure@20% +160`；40%/60% 容量单元均持平。因此，本次同步 Replay 没有给出低水位主动储备降低 weighted cost 的证据。
+
+全部 144 个 job 的 emergency demotion 和 FallbackRate 均为 0。该结果只表示同步功能正确性环境中的轨迹观察，不能外推为异步系统中 fallback 必然为零。
+
+CAPD 的 18 个单元均记录 page/PC access 与 unique OOV ratio 为 100%，并按冻结合同映射到 `UNK index 0`，且 `vocabulary_expansion_allowed=false`。这说明 Stage7 正式 Test 的原始页面和 PC 标识均不在 Stage4 冻结词表中，是解释 CAPD 泛化结果时必须保留的限制；不得在看到 Test 后扩展词表或重训 checkpoint。
+
+完整结果解释见 `docs/CAPD_PROACTIVE_STAGE8_RESULTS_CN.md`；机器可读权威结果为 `artifacts/aggregate.json` 和 `verification.json`。
+
+## 阶段边界与下一步
+
+Stage8 已完成，允许进入 Stage9。Stage8 的同步 Replay 只衡量页面排序质量、NVM 事件、weighted cost、状态轨迹和同步决策开销；它不代表真实后台并发或真实前台延迟。Stage9 的真实 CPU、内存和推理开销测量尚未完成。
