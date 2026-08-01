@@ -42,6 +42,10 @@ class Stage3Stage7ContractTest(unittest.TestCase):
     self.assertNotIn("L", self.config["search_space"])
     self.assertNotIn("H", self.config["search_space"])
     self.assertFalse(self.config["provenance"]["test_used_for_selection"])
+    self.assertEqual(3, self.config["execution"]["profile_workers"])
+    self.assertEqual(
+        "window", self.config["execution"]["profile_checkpoint_granularity"])
+    self.assertTrue(self.config["execution"]["search_in_memory_cache"])
 
   def test_test_split_and_formal_test_are_hard_rejected(self):
     for value in (
@@ -120,6 +124,21 @@ class Stage3Stage7ContractTest(unittest.TestCase):
       self.assertEqual(row["window_records"],
                        row["end_record"] - row["start_record"])
       self.assertFalse(row["crosses_split_boundary"])
+
+  def test_profile_task_plan_is_complete_before_trace_scan(self):
+    manifest = {"entries": []}
+    for workload in stage3.WORKLOADS:
+      manifest["entries"].extend([
+          {"workload": workload, "split_role": "train",
+           "accesses": 1800000},
+          {"workload": workload, "split_role": "validation",
+           "accesses": 600000}])
+    plan = stage3.profile_task_plan(manifest, self.config)
+    self.assertEqual(2232, plan["total_window_count"])
+    self.assertEqual(4464, plan["total_task_count"])
+    self.assertTrue(all(
+        row["window_count"] == 372 and row["total_task_count"] == 744
+        for row in plan["workloads"]))
 
   def test_blocked_calibration_is_chronological_and_not_shuffled(self):
     rows = stage3.build_window_descriptors(
@@ -269,6 +288,95 @@ class Stage3Stage7ContractTest(unittest.TestCase):
                      sorted(row["candidate_id"] for row in first))
     selected = stage3.select_from_frontier(first, self.config["selection"])
     self.assertIn(selected["candidate_id"], ("a", "b"))
+
+  def test_profile_window_checkpoint_is_durable_and_reports_progress(self):
+    with tempfile.TemporaryDirectory() as directory:
+      calls = []
+      metadata = {"workload": "canneal", "start_record": 0,
+                  "end_record": 100000, "pass": "base_profile"}
+      first = stage3._ProfileTaskCache(directory, "canneal")
+      payload = first.run(
+          metadata, lambda: calls.append("called") or {"unique_pages": 7})
+      self.assertEqual({"unique_pages": 7}, payload)
+      second = stage3._ProfileTaskCache(directory, "canneal")
+      resumed = second.run(
+          metadata, lambda: calls.append("called-again") or {"unique_pages": 8})
+      self.assertEqual(payload, resumed)
+      self.assertEqual(["called"], calls)
+      with open(second.log_path, "r", encoding="utf-8") as handle:
+        events = [json.loads(line)["event"] for line in handle if line.strip()]
+      self.assertEqual(
+          ["profile_task_started", "profile_task_completed",
+           "profile_task_resumed"], events)
+
+  def test_base_window_profile_reads_each_trace_record_once(self):
+    class CountingTrace(object):
+
+      def __init__(self, rows):
+        self.rows = rows
+        self.read_count = 0
+
+      def __len__(self):
+        return len(self.rows)
+
+      def __getitem__(self, index):
+        self.read_count += 1
+        return self.rows[index]
+
+    rows = [
+        {"page": 1, "rw": 0, "pc": 10},
+        {"page": 2, "rw": 1, "pc": 11},
+        {"page": 1, "rw": 0, "pc": 12},
+        {"page": 3, "rw": 0, "pc": 13}]
+    trace = CountingTrace(rows)
+    descriptor = {
+        "split_role": "train", "block_index": 0,
+        "block_start_record": 0, "block_end_record": 4,
+        "window_records": 4, "start_record": 0, "end_record": 4,
+        "chronological": True, "shuffle": False,
+        "initial_state": "empty_dram_per_window",
+        "crosses_split_boundary": False}
+    profile = stage3._window_profile(trace, descriptor, 2, self.config)
+    self.assertEqual(4, trace.read_count)
+    self.assertEqual(3, profile["unique_pages"])
+    self.assertEqual(3, profile["lru_misses"])
+    self.assertEqual(1, profile["lru_replacement_decisions"])
+    self.assertEqual(0.25, profile["write_ratio"])
+    reference = stage3._reactive_lru_profile(
+        rows, 2, self.config["windowing"]["page_entry_burst_records"])
+    for field in (
+        "dram_hits", "nvm_reads", "nvm_writes", "misses",
+        "lru_replacement_decisions", "page_entry_count", "page_entry_burst",
+        "minimum_free_frames", "mean_free_frames",
+        "empty_frame_exhaustion", "default_weighted_cost"):
+      self.assertEqual(reference[field], profile[field])
+    pages = [row["page"] for row in rows]
+    self.assertEqual(
+        stage3._reuse_distance_summary(pages),
+        profile["reuse_distance_summary"])
+    self.assertEqual(
+        stage3._growth_summary(
+            pages,
+            self.config["windowing"]["working_set_growth_sample_records"]),
+        profile["working_set_growth"])
+
+  def test_search_task_cache_reuses_memory_before_disk(self):
+    with tempfile.TemporaryDirectory() as directory:
+      calls = []
+      cache = stage3._TaskCache(directory)
+      metadata = {"policy": "reactive_lru", "D": 8,
+                  "start_record": 0, "end_record": 100000}
+      first = cache.run(
+          metadata, lambda: calls.append("called") or {"cost": 10})
+      second = cache.run(
+          metadata, lambda: calls.append("called-again") or {"cost": 11})
+      self.assertEqual(first, second)
+      self.assertEqual(["called"], calls)
+      with open(cache.log_path, "r", encoding="utf-8") as handle:
+        events = [json.loads(line)["event"] for line in handle if line.strip()]
+      self.assertEqual(
+          ["search_task_started", "search_task_completed",
+           "search_task_memory_reused"], events)
 
   def test_resume_identity_changes_when_input_config_or_code_changes(self):
     base = stage3.run_identity_payload("r", "a", "b", ["c"], ["d"])

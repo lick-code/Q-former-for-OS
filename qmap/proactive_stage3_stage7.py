@@ -17,6 +17,7 @@ import decimal
 import hashlib
 import json
 import math
+import multiprocessing
 import os
 import statistics
 import subprocess
@@ -231,6 +232,13 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
   _require(value.get("selection", {}).get("all_auto_freeze") is False and
            value.get("selection", {}).get("human_review_required") is True,
            "all must never auto-freeze.")
+  execution = value.get("execution", {})
+  _require(isinstance(execution.get("profile_workers"), int) and
+           not isinstance(execution.get("profile_workers"), bool) and
+           1 <= execution["profile_workers"] <= len(WORKLOADS) and
+           execution.get("profile_checkpoint_granularity") == "window" and
+           execution.get("search_in_memory_cache") is True,
+           "Bounded profile/checkpoint execution contract changed.")
   return value
 
 
@@ -433,6 +441,42 @@ def build_window_descriptors(
                 block_start <= start < end <= block_end),
         })
   return rows
+
+
+def profile_task_plan(
+    manifest: Mapping[str, Any], config: Mapping[str, Any]
+) -> Dict[str, Any]:
+  """Builds the complete profile task count from manifest metadata only."""
+  entries = {
+      (row["workload"], row["split_role"]): row
+      for row in manifest["entries"]}
+  workloads = []
+  total_windows = 0
+  for workload in WORKLOADS:
+    window_count = 0
+    split_counts = {}
+    for split_role in ALLOWED_SPLITS:
+      entry = entries.get((workload, split_role))
+      _require(entry is not None, "Profile task plan lacks a split entry.")
+      block_count = config["windowing"][
+          "train_block_count" if split_role == "train" else
+          "validation_block_count"]
+      count = len(build_window_descriptors(
+          split_role, int(entry["accesses"]),
+          config["windowing"]["calibration_window_records"],
+          config["windowing"]["window_step"], block_count))
+      split_counts[split_role] = count
+      window_count += count
+    total_windows += window_count
+    workloads.append({
+        "workload": workload, "split_window_counts": split_counts,
+        "window_count": window_count,
+        "base_task_count": window_count,
+        "capacity_task_count": window_count,
+        "total_task_count": 2 * window_count})
+  return {
+      "workloads": workloads, "total_window_count": total_windows,
+      "total_task_count": 2 * total_windows}
 
 
 def nearest_rank(values: Sequence[int], quantile: float) -> Optional[int]:
@@ -916,15 +960,133 @@ def _window_profile(
     reference_capacity: int, config: Mapping[str, Any]
 ) -> Dict[str, Any]:
   view = _TraceView(trace, descriptor["start_record"], descriptor["end_record"])
-  pages = [int(view[index]["page"]) for index in range(len(view))]
-  result = _reactive_lru_profile(
-      view, reference_capacity,
-      config["windowing"]["page_entry_burst_records"])
+  capacity = _positive_integer(reference_capacity, "reference_capacity")
+  burst_size = _positive_integer(
+      config["windowing"]["page_entry_burst_records"],
+      "page_entry_burst_records")
+  growth_step = _positive_integer(
+      config["windowing"]["working_set_growth_sample_records"],
+      "working_set_growth_sample_records")
+  resident = collections.OrderedDict()
+  dirty = {}
+  unique = set()
+  last = {}
+  reuse_distances = []
+  cold = 0
+  misses = 0
+  replacements = 0
+  dram_hits = 0
+  nvm_reads = 0
+  nvm_writes = 0
+  write_count = 0
+  free_sum = 0
+  min_free = capacity
+  exhaustion = 0
+  burst_entries = 0
+  bursts = []
+  growth_samples = []
+  for index in range(len(view)):
+    access = view[index]
+    page = int(access["page"])
+    write = bool(access["rw"])
+    previous = last.get(page)
+    if previous is None:
+      cold += 1
+    else:
+      reuse_distances.append(index - previous)
+    last[page] = index
+    unique.add(page)
+    write_count += int(write)
+    entered = page not in resident
+    if entered:
+      misses += 1
+      burst_entries += 1
+      if write:
+        nvm_writes += 1
+      else:
+        nvm_reads += 1
+      if len(resident) >= capacity:
+        victim, _ = resident.popitem(last=False)
+        dirty.pop(victim, None)
+        replacements += 1
+        exhaustion += 1
+      resident[page] = None
+      dirty[page] = write
+    else:
+      dram_hits += 1
+      resident.move_to_end(page)
+      dirty[page] = dirty.get(page, False) or write
+    free = capacity - len(resident)
+    min_free = min(min_free, free)
+    free_sum += free
+    record_count = index + 1
+    if record_count % burst_size == 0 or record_count == len(view):
+      bursts.append(burst_entries)
+      burst_entries = 0
+    if record_count % growth_step == 0 or record_count == len(view):
+      growth_samples.append({
+          "records": record_count, "unique_pages": len(unique)})
+  growth_increments = [
+      growth_samples[index]["unique_pages"] -
+      growth_samples[index - 1]["unique_pages"]
+      for index in range(1, len(growth_samples))]
+  ordered_reuse = sorted(reuse_distances)
+
+  def reuse_quantile(quantile: float) -> Optional[int]:
+    if not ordered_reuse:
+      return None
+    rank = max(1, int(math.ceil(quantile * len(ordered_reuse))))
+    return ordered_reuse[rank - 1]
+
+  weighted = (
+      dram_hits + 2 * nvm_reads + 8 * nvm_writes + 10 * replacements)
+  result = {
+      "policy": "reactive_lru",
+      "initial_state": "empty_dram_per_window",
+      "dram_capacity_pages": capacity,
+      "unique_pages": len(unique),
+      "total_accesses": len(view),
+      "dram_hits": dram_hits,
+      "nvm_reads": nvm_reads,
+      "nvm_writes": nvm_writes,
+      "misses": misses,
+      "lru_misses": misses,
+      "lru_replacement_decisions": replacements,
+      "reactive_demotions": replacements,
+      "page_entry_count": misses,
+      "page_entry_burst": {
+          "records": burst_size,
+          "p95": nearest_rank(bursts, 0.95),
+          "p99": nearest_rank(bursts, 0.99),
+          "maximum": max(bursts or [0])},
+      "write_ratio": write_count / float(len(view)),
+      "minimum_free_frames": min_free,
+      "mean_free_frames": free_sum / float(len(view)),
+      "empty_frame_exhaustion": exhaustion,
+      "proactive_demotions": 0,
+      "early_reuse_count": 0,
+      "early_reuse_rate": None,
+      "default_weighted_cost": weighted,
+  }
   result.update(copy.deepcopy(descriptor))
   result.update({
-      "reuse_distance_summary": _reuse_distance_summary(pages),
-      "working_set_growth": _growth_summary(
-          pages, config["windowing"]["working_set_growth_sample_records"]),
+      "reuse_distance_summary": {
+          "cold_page_accesses": cold,
+          "reuse_count": len(reuse_distances),
+          "p50": reuse_quantile(0.50),
+          "p90": reuse_quantile(0.90),
+          "p99": reuse_quantile(0.99),
+          "maximum": ordered_reuse[-1] if ordered_reuse else None,
+      },
+      "working_set_growth": {
+          "sample_records": growth_step,
+          "samples": growth_samples,
+          "mean_new_unique_pages_per_sample": (
+              statistics.mean(growth_increments)
+              if growth_increments else 0.0),
+          "maximum_new_unique_pages_per_sample": max(
+              growth_increments or [0]),
+      },
       "proactive_demotions": None,
       "early_reuse": None,
       "oracle_headroom": None,
@@ -1128,6 +1290,58 @@ class _TaskCache(object):
   def __init__(self, run_directory: str):
     self.directory = os.path.join(run_directory, "checkpoints", "search")
     self.log_path = os.path.join(run_directory, "logs", "progress.jsonl")
+    self.memory = {}
+    self.memory_reuse_count = 0
+    os.makedirs(self.directory, exist_ok=True)
+
+  def run(self, metadata: Mapping[str, Any], callback) -> Mapping[str, Any]:
+    task_id = fingerprint_value(metadata)
+    if task_id in self.memory:
+      self.memory_reuse_count += 1
+      if self.memory_reuse_count == 1 or self.memory_reuse_count % 1000 == 0:
+        _append_jsonl(self.log_path, {
+            "timestamp": _utc_now(), "event": "search_task_memory_reused",
+            "task_id": task_id,
+            "memory_reuse_count": self.memory_reuse_count})
+      return self.memory[task_id]
+    path = os.path.join(self.directory, task_id + ".json")
+    if os.path.isfile(path):
+      value = load_json(path)
+      _require(value.get("metadata") == metadata,
+               "Search checkpoint metadata mismatch.")
+      self.memory[task_id] = value["payload"]
+      _append_jsonl(self.log_path, {
+          "timestamp": _utc_now(), "event": "search_task_resumed",
+          "task_id": task_id})
+      return value["payload"]
+    _append_jsonl(self.log_path, {
+        "timestamp": _utc_now(), "event": "search_task_started",
+        "task_id": task_id, "metadata": metadata})
+    started = time.monotonic()
+    payload = callback()
+    elapsed_seconds = time.monotonic() - started
+    _write_json_atomic(path, {
+        "schema_version": RESULT_SCHEMA, "task_id": task_id,
+        "metadata": copy.deepcopy(metadata),
+        "elapsed_seconds": elapsed_seconds,
+        "payload": payload})
+    self.memory[task_id] = payload
+    _append_jsonl(self.log_path, {
+        "timestamp": _utc_now(), "event": "search_task_completed",
+        "task_id": task_id, "metadata": metadata,
+        "elapsed_seconds": elapsed_seconds})
+    return payload
+
+
+class _ProfileTaskCache(object):
+  """Durable per-window cache and progress stream for one workload."""
+
+  def __init__(self, run_directory: str, workload: str):
+    _require(workload in WORKLOADS, "Unknown profile workload.")
+    self.directory = os.path.join(
+        run_directory, "checkpoints", "profile", workload)
+    self.log_path = os.path.join(
+        run_directory, "logs", "profile", workload + ".jsonl")
     os.makedirs(self.directory, exist_ok=True)
 
   def run(self, metadata: Mapping[str, Any], callback) -> Mapping[str, Any]:
@@ -1136,21 +1350,26 @@ class _TaskCache(object):
     if os.path.isfile(path):
       value = load_json(path)
       _require(value.get("metadata") == metadata,
-               "Search checkpoint metadata mismatch.")
+               "Profile checkpoint metadata mismatch.")
       _append_jsonl(self.log_path, {
-          "timestamp": _utc_now(), "event": "search_task_resumed",
+          "timestamp": _utc_now(), "event": "profile_task_resumed",
           "task_id": task_id})
       return value["payload"]
+    _append_jsonl(self.log_path, {
+        "timestamp": _utc_now(), "event": "profile_task_started",
+        "task_id": task_id, "metadata": metadata})
     started = time.monotonic()
     payload = callback()
+    elapsed_seconds = time.monotonic() - started
     _write_json_atomic(path, {
         "schema_version": RESULT_SCHEMA, "task_id": task_id,
         "metadata": copy.deepcopy(metadata),
-        "elapsed_seconds": time.monotonic() - started,
+        "elapsed_seconds": elapsed_seconds,
         "payload": payload})
     _append_jsonl(self.log_path, {
-        "timestamp": _utc_now(), "event": "search_task_completed",
-        "task_id": task_id, "metadata": metadata})
+        "timestamp": _utc_now(), "event": "profile_task_completed",
+        "task_id": task_id, "metadata": metadata,
+        "elapsed_seconds": elapsed_seconds})
     return payload
 
 
@@ -1383,6 +1602,126 @@ def _profile_csv_row(row: Mapping[str, Any]) -> Dict[str, Any]:
   return fields
 
 
+def _profile_workload_task(arguments: Tuple[Any, ...]) -> Dict[str, Any]:
+  """Profiles one workload in an isolated process with window checkpoints."""
+  config, manifest, workload, project_root, directory = arguments
+  traces = _load_workload_traces(project_root, manifest, workload)
+  train_pages = set(traces["train"].pages)
+  validation_pages = set(traces["validation"].pages)
+  union_pages = len(train_pages | validation_pages)
+  standard_rows = standard_capacity_rows(
+      workload, union_pages, config["standard_capacity"]["ratios"])
+  descriptors = []
+  block_rows = []
+  for split_role in ALLOWED_SPLITS:
+    block_count = config["windowing"][
+        "train_block_count" if split_role == "train" else
+        "validation_block_count"]
+    split_descriptors = build_window_descriptors(
+        split_role, len(traces[split_role]),
+        config["windowing"]["calibration_window_records"],
+        config["windowing"]["window_step"], block_count)
+    descriptors.extend(split_descriptors)
+    for block_index in sorted({row["block_index"]
+                               for row in split_descriptors}):
+      block_rows.append({
+          "workload": workload, "split_role": split_role,
+          "block_index": block_index,
+          "window_count": sum(
+              row["block_index"] == block_index
+              for row in split_descriptors),
+          "chronological": True, "shuffle": False,
+          "cross_block_windows": 0})
+
+  cache = _ProfileTaskCache(directory, workload)
+  _append_jsonl(cache.log_path, {
+      "timestamp": _utc_now(), "event": "profile_workload_started",
+      "workload": workload, "base_task_count": len(descriptors),
+      "capacity_task_count": len(descriptors),
+      "total_task_count": 2 * len(descriptors)})
+  reference_capacity = standard_rows[0]["D_standard"]
+  preliminary = []
+  for descriptor in descriptors:
+    metadata = {
+        "pass": "base_profile", "workload": workload,
+        "split_role": descriptor["split_role"],
+        "block_index": descriptor["block_index"],
+        "window_records": descriptor["window_records"],
+        "start_record": descriptor["start_record"],
+        "end_record": descriptor["end_record"],
+        "reference_capacity_pages": reference_capacity,
+        "page_entry_burst_records":
+            config["windowing"]["page_entry_burst_records"],
+        "working_set_growth_sample_records":
+            config["windowing"]["working_set_growth_sample_records"],
+    }
+
+    def base_task(split=descriptor["split_role"], row=descriptor):
+      return _window_profile(traces[split], row, reference_capacity, config)
+
+    profile = copy.deepcopy(cache.run(metadata, base_task))
+    profile.update({"workload": workload,
+                    "reference_capacity_pages": reference_capacity})
+    preliminary.append(profile)
+
+  wref_rows = []
+  pressure_rows = []
+  for records in config["windowing"]["calibration_window_records"]:
+    train_values = [
+        row["unique_pages"] for row in preliminary
+        if row["split_role"] == "train" and
+        row["window_records"] == records]
+    validation_count = sum(
+        row["split_role"] == "validation" and
+        row["window_records"] == records for row in preliminary)
+    for quantile in config["working_set_reference"]["quantiles"]:
+      W_ref = nearest_rank(train_values, quantile)
+      wref_rows.append({
+          "workload": workload, "window_records": records,
+          "W_ref_quantile": quantile, "W_ref": W_ref,
+          "train_window_count": len(train_values),
+          "validation_window_count": validation_count})
+      for ratio in config["pressure_capacity"]["ratios"]:
+        pressure_rows.append(pressure_capacity_row(
+            workload, W_ref, quantile, ratio, records))
+
+  capacities = [row["D_standard"] for row in standard_rows]
+  capacities.extend(row["D_pressure"] for row in pressure_rows)
+  capacities = sorted(set(capacities))
+  profiles = []
+  for profile in preliminary:
+    metadata = {
+        "pass": "capacity_metrics", "workload": workload,
+        "split_role": profile["split_role"],
+        "block_index": profile["block_index"],
+        "window_records": profile["window_records"],
+        "start_record": profile["start_record"],
+        "end_record": profile["end_record"],
+        "capacities": capacities,
+    }
+
+    def capacity_task(row=profile):
+      trace = traces[row["split_role"]]
+      pages = trace.pages[row["start_record"]:row["end_record"]]
+      return _lru_metrics_for_capacities(pages, capacities)
+
+    profile["lru_capacity_metrics"] = copy.deepcopy(
+        cache.run(metadata, capacity_task))
+    reference = profile["lru_capacity_metrics"][str(reference_capacity)]
+    profile["lru_misses"] = reference["lru_misses"]
+    profile["lru_replacement_decisions"] = reference[
+        "lru_replacement_decisions"]
+    profiles.append(profile)
+  _append_jsonl(cache.log_path, {
+      "timestamp": _utc_now(), "event": "profile_workload_completed",
+      "workload": workload, "window_count": len(profiles),
+      "total_task_count": 2 * len(descriptors)})
+  return {
+      "workload": workload, "profiles": profiles,
+      "wref_rows": wref_rows, "standard_rows": standard_rows,
+      "pressure_rows": pressure_rows, "block_rows": block_rows}
+
+
 def run_profile(
     config_path: str, run_id: str, project_root: str,
     output_root: Optional[str] = None, resume: bool = False
@@ -1397,75 +1736,41 @@ def run_profile(
     standard_rows = []
     pressure_rows = []
     block_rows = []
-    for workload in WORKLOADS:
-      traces = _load_workload_traces(project_root, manifest, workload)
-      train_pages = set(traces["train"].pages)
-      validation_pages = set(traces["validation"].pages)
-      union_pages = len(train_pages | validation_pages)
-      standard = standard_capacity_rows(
-          workload, union_pages, config["standard_capacity"]["ratios"])
-      standard_rows.extend(standard)
-      descriptors = []
-      for split_role in ALLOWED_SPLITS:
-        block_count = config["windowing"][
-            "train_block_count" if split_role == "train" else
-            "validation_block_count"]
-        split_descriptors = build_window_descriptors(
-            split_role, len(traces[split_role]),
-            config["windowing"]["calibration_window_records"],
-            config["windowing"]["window_step"], block_count)
-        descriptors.extend(split_descriptors)
-        for block_index in sorted({row["block_index"]
-                                   for row in split_descriptors}):
-          block_rows.append({
-              "workload": workload, "split_role": split_role,
-              "block_index": block_index,
-              "window_count": sum(
-                  row["block_index"] == block_index
-                  for row in split_descriptors),
-              "chronological": True, "shuffle": False,
-              "cross_block_windows": 0})
-      preliminary = []
-      reference_capacity = standard[0]["D_standard"]
-      for descriptor in descriptors:
-        profile = _window_profile(
-            traces[descriptor["split_role"]], descriptor,
-            reference_capacity, config)
-        profile.update({"workload": workload,
-                        "reference_capacity_pages": reference_capacity})
-        preliminary.append(profile)
-      for records in config["windowing"]["calibration_window_records"]:
-        train_values = [
-            row["unique_pages"] for row in preliminary
-            if row["split_role"] == "train" and
-            row["window_records"] == records]
-        validation_count = sum(
-            row["split_role"] == "validation" and
-            row["window_records"] == records for row in preliminary)
-        for quantile in config["working_set_reference"]["quantiles"]:
-          W_ref = nearest_rank(train_values, quantile)
-          wref_rows.append({
-              "workload": workload, "window_records": records,
-              "W_ref_quantile": quantile, "W_ref": W_ref,
-              "train_window_count": len(train_values),
-              "validation_window_count": validation_count})
-          for ratio in config["pressure_capacity"]["ratios"]:
-            pressure_rows.append(pressure_capacity_row(
-                workload, W_ref, quantile, ratio, records))
-      workload_pressure = [row for row in pressure_rows
-                           if row["workload"] == workload]
-      capacities = [row["D_standard"] for row in standard]
-      capacities.extend(row["D_pressure"] for row in workload_pressure)
-      for profile in preliminary:
-        trace = traces[profile["split_role"]]
-        pages = trace.pages[profile["start_record"]:profile["end_record"]]
-        profile["lru_capacity_metrics"] = _lru_metrics_for_capacities(
-            pages, capacities)
-        reference = profile["lru_capacity_metrics"][str(reference_capacity)]
-        profile["lru_misses"] = reference["lru_misses"]
-        profile["lru_replacement_decisions"] = reference[
-            "lru_replacement_decisions"]
-        all_profiles.append(profile)
+    task_plan = profile_task_plan(manifest, config)
+    _append_jsonl(os.path.join(directory, "logs", "progress.jsonl"), {
+        "timestamp": _utc_now(), "event": "profile_plan_created",
+        "profile_workers": config["execution"]["profile_workers"],
+        "total_window_count": task_plan["total_window_count"],
+        "total_task_count": task_plan["total_task_count"],
+        "workloads": task_plan["workloads"]})
+    arguments = [
+        (config, manifest, workload, project_root, directory)
+        for workload in WORKLOADS]
+    worker_count = min(
+        config["execution"]["profile_workers"], len(arguments))
+    if worker_count == 1:
+      workload_results = [_profile_workload_task(value) for value in arguments]
+    else:
+      pool = multiprocessing.Pool(processes=worker_count)
+      try:
+        workload_results = pool.map(_profile_workload_task, arguments)
+      except BaseException:
+        pool.terminate()
+        pool.join()
+        raise
+      else:
+        pool.close()
+        pool.join()
+    for result in workload_results:
+      all_profiles.extend(result["profiles"])
+      wref_rows.extend(result["wref_rows"])
+      standard_rows.extend(result["standard_rows"])
+      pressure_rows.extend(result["pressure_rows"])
+      block_rows.extend(result["block_rows"])
+      _append_jsonl(os.path.join(directory, "logs", "progress.jsonl"), {
+          "timestamp": _utc_now(), "event": "profile_workload_completed",
+          "workload": result["workload"],
+          "window_count": len(result["profiles"])})
     wref_index = collections.defaultdict(list)
     for row in wref_rows:
       wref_index[(row["workload"], row["window_records"],

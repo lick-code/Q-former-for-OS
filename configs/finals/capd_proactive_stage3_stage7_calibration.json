@@ -3,8 +3,13 @@
   "schema_version": "capd_proactive_stage3_stage7_v1_0",
   "contract_version": "CAPD-PROACTIVE-STAGE3-STAGE7-1.0",
   "stage_status": "implemented_awaiting_server_calibration",
-  "default_run_id": "stage3-stage7-calibration-r1",
+  "default_run_id": "stage3-stage7-calibration-r2",
   "output_root": "outputs/capd_proactive_stage3",
+  "execution": {
+    "profile_workers": 3,
+    "profile_checkpoint_granularity": "window",
+    "search_in_memory_cache": true
+  },
   "workloads": [
     "canneal",
     "streamcluster_pressure",

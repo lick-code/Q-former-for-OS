@@ -19,7 +19,7 @@ from qmap import proactive_stage3_stage7
 DEFAULT_CONFIG = os.path.join(
     PROJECT_ROOT, "configs", "finals",
     "capd_proactive_stage3_stage7_calibration.json")
-DEFAULT_RUN_ID = "stage3-stage7-calibration-r1"
+DEFAULT_RUN_ID = "stage3-stage7-calibration-r2"
 
 
 def _common(value: argparse.ArgumentParser) -> None:

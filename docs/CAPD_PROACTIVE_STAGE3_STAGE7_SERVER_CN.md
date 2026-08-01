@@ -4,16 +4,20 @@
 Stage 8 结果或旧 CAPD/Oracle Test 指标传给本 runner。本文不执行 Stage 4，
 不训练模型，也不生成 Pressure CSV 或 Pressure Test lock。
 
+2026-08-01 的 `stage3-stage7-calibration-r1` 应在旧实现的 `profile` 阶段人工中止。
+中止后必须保留其失败目录用于审计，不能用修改后的代码 resume。优化后的代码使用新的
+run ID，输入和实验选择规则均未改变。
+
 固定 run ID：
 
 ```text
-stage3-stage7-calibration-r1
+stage3-stage7-calibration-r2
 ```
 
 固定输出目录：
 
 ```text
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/
 ```
 
 以下命令逐段复制执行。不要在交互终端前置 `set -e`；这样某条命令失败时
@@ -82,7 +86,7 @@ python3 -m unittest \
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py preflight \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD"
 ```
 
@@ -95,7 +99,7 @@ python3 scripts/run_capd_proactive_stage3_stage7.py preflight \
 
 ```bash
 python3 -m json.tool \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/input_manifest.json
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/input_manifest.json
 ```
 
 确认 `input_entry_count` 的实际含义为 12 项，且只出现 `train`、
@@ -106,28 +110,52 @@ python3 -m json.tool \
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py profile \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD"
 ```
 
 该阶段保存所有 100k/300k/500k 连续窗口。Train 被划分为三个连续 block；
 Validation 保持独立，不跨 split 或 block。每个窗口以空 DRAM 开始，不
 shuffle。窗口 LRU stack-distance 只计算一次，并同时解析所有候选容量，避免
-对每个容量重复扫描整个窗口。
+对每个容量重复扫描整个窗口。三个 workload worker 并行执行；每个窗口的 base
+profile 和容量指标分别原子写入 checkpoint，中断后可在代码、配置和输入 SHA
+不变时恢复。
+
+另开一个终端查看 profile 进度：
+
+```bash
+tail -f outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/logs/profile/*.jsonl
+```
+
+每个 workload 的首条 `profile_workload_started` 会给出 `total_task_count`；
+`profile_task_completed` 给出单任务实际秒数，不再靠无输出等待猜测进度。
+主日志中的 `profile_plan_created` 会在读取 trace 前给出全部 workload 的
+`total_window_count` 和 `total_task_count`。
+
+统计已完成的 profile 子任务：
+
+```bash
+find outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/checkpoints/profile \
+  -name '*.json' -type f | wc -l
+```
+
+默认 R1 manifest 下预计为 2232 个窗口、4464 个 profile 子任务；checkpoint
+计数除以 4464 即为完成比例。该数字是 manifest 计划，不是删减窗口后的近似值。
 
 ## 9. 执行 search
 
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py search \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD"
 ```
 
-search 可能是本轮耗时最长的阶段。进度和逐任务 checkpoint 位于：
+search 可能是本轮耗时最长的阶段。相同 Replay 身份先使用进程内缓存，跨进程
+重启时再读取磁盘 checkpoint，不改变任何策略结果。进度和逐任务 checkpoint 位于：
 
 ```bash
-tail -f outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/logs/progress.jsonl
+tail -f outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/logs/progress.jsonl
 ```
 
 另开一个终端执行 `tail -f`；原执行终端保持不动。窗口哨兵只按
@@ -139,7 +167,7 @@ weighted cost 和任何模型结果不参与选窗。
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py select \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD"
 ```
 
@@ -151,7 +179,7 @@ python3 scripts/run_capd_proactive_stage3_stage7.py select \
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py verify \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD"
 ```
 
@@ -167,7 +195,7 @@ STAGE3_STAGE7_FREEZE_CANDIDATE_VERIFIED
 ## 12. 查看 Pressure coverage
 
 ```bash
-python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_coverage.json"; d=json.load(open(p)); print("rows",len(d["rows"])); [(print(r["coverage_id"],r["workload"],r["train_pressure_window_count"],r["train_pressure_coverage"],r["validation_pressure_window_count"],r["validation_pressure_coverage"])) for r in d["rows"][:30]]'
+python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_coverage.json"; d=json.load(open(p)); print("rows",len(d["rows"])); [(print(r["coverage_id"],r["workload"],r["train_pressure_window_count"],r["train_pressure_coverage"],r["validation_pressure_window_count"],r["validation_pressure_coverage"])) for r in d["rows"][:30]]'
 ```
 
 完整数据保留在 JSON 中，以上只打印前 30 行用于快速检查。
@@ -175,7 +203,7 @@ python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibrat
 ## 13. 查看 Oracle headroom
 
 ```bash
-python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/oracle_headroom.json"; d=json.load(open(p)); print(json.dumps(d["gate"],indent=2)); print("rows",len(d["rows"]))'
+python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/oracle_headroom.json"; d=json.load(open(p)); print(json.dumps(d["gate"],indent=2)); print("rows",len(d["rows"]))'
 ```
 
 若所有合格窗口 headroom 都为 0，Stage 3 必须阻止进入 Stage 4。
@@ -183,7 +211,7 @@ python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibrat
 ## 14. 查看 Validation safety
 
 ```bash
-python3 -c 'import json,collections; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/validation_safety.json"; d=json.load(open(p)); c=collections.Counter(reason for row in d["rows"] if not row["passed"] for reason in row["reasons"]); print("rows",len(d["rows"])); print(c)'
+python3 -c 'import json,collections; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/validation_safety.json"; d=json.load(open(p)); c=collections.Counter(reason for row in d["rows"] if not row["passed"] for reason in row["reasons"]); print("rows",len(d["rows"])); print(c)'
 ```
 
 重点检查 `meaningless_proactive_demotions`、`weighted_cost_regression`、
@@ -192,25 +220,25 @@ python3 -c 'import json,collections; p="outputs/capd_proactive_stage3/stage3-sta
 ## 15. 查看 Pareto frontier
 
 ```bash
-python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pareto_frontier.json"; d=json.load(open(p)); print("frontier",len(d["frontier"])); [print(r) for r in d["frontier"]]'
+python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pareto_frontier.json"; d=json.load(open(p)); print("frontier",len(d["frontier"])); [print(r) for r in d["frontier"]]'
 ```
 
 ## 16. 查看 final freeze candidate
 
 ```bash
 python3 -m json.tool \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze_candidate.json
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze_candidate.json
 
 python3 -m json.tool \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract_candidate.json
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_contract_candidate.json
 ```
 
 检查实际逐 workload `D_pressure/F_low/F_target`、窗口长度、W_ref 分位数、
 `b_max`、所有门禁和选择理由。此时以下文件必须仍不存在：
 
 ```bash
-test ! -e outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json
-test ! -e outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+test ! -e outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze.json
+test ! -e outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_contract.json
 ```
 
 ## 17. 人工确认后显式 freeze
@@ -220,9 +248,9 @@ test ! -e outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_ge
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py freeze \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD" \
-  --candidate outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze_candidate.json \
+  --candidate outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze_candidate.json \
   --confirm-stage3-stage7-freeze
 ```
 
@@ -232,14 +260,14 @@ python3 scripts/run_capd_proactive_stage3_stage7.py freeze \
 
 ```bash
 python3 -m json.tool \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze.json
 
 python3 -m json.tool \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_contract.json
 
 sha256sum \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze.json \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_contract.json
 ```
 
 正式合同仍只描述以后如何生成 Pressure；本 runner 不生成 Pressure CSV 或
@@ -252,7 +280,7 @@ Pressure Test lock。
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py search \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD" \
   --resume
 ```
@@ -262,7 +290,7 @@ python3 scripts/run_capd_proactive_stage3_stage7.py search \
 ```bash
 python3 scripts/run_capd_proactive_stage3_stage7.py all \
   --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
-  --run-id stage3-stage7-calibration-r1 \
+  --run-id stage3-stage7-calibration-r2 \
   --project-root "$PWD" \
   --resume
 ```
@@ -278,8 +306,8 @@ STAGE3_STAGE7_ALL_COMPLETE_FREEZE_NOT_EXECUTED
 
 - 不删除失败目录，不用删除后重跑伪装首次成功。
 - 输入 SHA、配置 SHA 和代码 SHA 完全一致：使用 `--resume`。
-- 任一 SHA 或代码身份改变：保留 r1 目录，改用新的 run ID，例如
-  `stage3-stage7-calibration-r2`。
+- 本次旧代码身份的 r1 必须保留；修改后的实现必须使用 r2，禁止跨代码身份 resume。
+- 后续任一 SHA 或代码身份再次改变：保留原目录并递增 run ID。
 - R1 SHA/状态失败：立即停止，不绕过、不重跑 R1。
 - Oracle 全零 headroom：保留失败门禁，不进入 Stage 4。
 - Validation safety 失败：保留逐候选原因，不查看 Test 后调参。
@@ -289,10 +317,10 @@ STAGE3_STAGE7_ALL_COMPLETE_FREEZE_NOT_EXECUTED
 
 ```bash
 python3 -m json.tool \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/run_state.json
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/run_state.json
 
 tail -n 100 \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/logs/progress.jsonl
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/logs/progress.jsonl
 ```
 
 ## 21. 打包结果并计算 SHA256
@@ -300,13 +328,13 @@ tail -n 100 \
 在 freeze 前返回候选也可以；若已正式 freeze，则两个正式文件会一并打包。
 
 ```bash
-tar -czf capd-stage3-stage7-calibration-r1-results.tar.gz \
-  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1
+tar -czf capd-stage3-stage7-calibration-r2-results.tar.gz \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r2
 
-sha256sum capd-stage3-stage7-calibration-r1-results.tar.gz \
-  > capd-stage3-stage7-calibration-r1-results.tar.gz.sha256
+sha256sum capd-stage3-stage7-calibration-r2-results.tar.gz \
+  > capd-stage3-stage7-calibration-r2-results.tar.gz.sha256
 
-cat capd-stage3-stage7-calibration-r1-results.tar.gz.sha256
+cat capd-stage3-stage7-calibration-r2-results.tar.gz.sha256
 ```
 
 ## 22. 带回本地的产物
@@ -314,22 +342,22 @@ cat capd-stage3-stage7-calibration-r1-results.tar.gz.sha256
 需要带回：
 
 ```text
-capd-stage3-stage7-calibration-r1-results.tar.gz
-capd-stage3-stage7-calibration-r1-results.tar.gz.sha256
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/run_state.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/verification.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_coverage.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/oracle_headroom.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/validation_safety.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pareto_frontier.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/selection_rationale.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze_candidate.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract_candidate.json
+capd-stage3-stage7-calibration-r2-results.tar.gz
+capd-stage3-stage7-calibration-r2-results.tar.gz.sha256
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/run_state.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/verification.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_coverage.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/oracle_headroom.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/validation_safety.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pareto_frontier.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/selection_rationale.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze_candidate.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_contract_candidate.json
 ```
 
 若已人工 freeze，再额外带回：
 
 ```text
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json
-outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_contract.json
 ```
