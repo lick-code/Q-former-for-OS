@@ -1,0 +1,72 @@
+{
+  "checkpoint_selection_criterion": {
+    "2026": "minimum_valid_loss_only",
+    "3136859": "minimum_valid_loss_only",
+    "42": "minimum_valid_loss_only"
+  },
+  "checkpoint_sha256": {
+    "2026": "cb6f1543177bf9c968abd40a322177b21d4cc1a26818146b10f3ae4d4a12f52b",
+    "3136859": "cb17fcd9e0458f484d385abea0b7ced5047824d087619489b8e189af2239ee47",
+    "42": "8d306c6372abcf888bc6af2ff04637370949ca64e28277803ab32f1dcf7d7396"
+  },
+  "code_artifacts": {
+    "policy_learning/cache_model/embed.py": "0700a90a6ba51958b5682a86fa51ff65cbdd1fb458dcd806e1747e93ce197485",
+    "policy_learning/cache_model/model.py": "597ef45be66affbcc6081fc60c4ef6b1b317a6cfd81118678cfed71066b8f854",
+    "qmap/finals_config.py": "4b2b39cdce43762b6541215517642d5cec183a3154957a24dceab71a863d8de6",
+    "qmap/proactive_replay.py": "dc2870a3d95de6ad532c498ead3c83deff4848401cecff6a0f4f22db370efd1d",
+    "qmap/proactive_stage4.py": "637cd6434f3771897fe8fd6f72e34dc6d753163032302f6a2454f0662a304240",
+    "qmap/proactive_stage5_contract.py": "a0b5b9775afb5ebf2be2125d57d415fadaf4bd445fcd165418de3754a5bd38e0",
+    "qmap/proactive_stage5_policies.py": "8a7e9476a57de7c090a026ad301af137df36b1200cbe5462d9164474775d83a5",
+    "qmap/proactive_stage5_replay.py": "d792dbff116b9650a65ed0ae3b73cc2e8c245c0191b2a5d0a698002567d80aec",
+    "qmap/proactive_stage7_workloads.py": "f99185d0c67af3cba2919d1b5559491608e66b6dc1fccc8359cb765ffaa6b41b",
+    "qmap/proactive_stage8_contract.py": "8b56e7bd7eae2d176e3da9009236318eeb73bba5ea7371b1eac4e4a93fb5b20a",
+    "qmap/proactive_stage8_replay.py": "7153c7a4b774b2e772d8d2d078b6c335b8932b2707789b36413d27ea1adf1314",
+    "qmap/proactive_stage9.py": "02427d2b3ebf2390fb8fb24ec1c49a3cf1a7cf470713ff56f16a0e89750124fe",
+    "qmap/qmap_eval.py": "6583d53e63d1043c763539fe4447d8f167c0c0b0d07c44c11e93fe15674df177",
+    "scripts/run_capd_proactive_stage9.py": "aa273407ce400874671d39e14f643239d1b59e5d1f3a77fee70cde801ee175a9",
+    "scripts/validate_capd_proactive_stage9_server.sh": "94000b5c039fbb8bafaa68203c48743aa1b77662dda109035196993b13c99018",
+    "tests/test_capd_proactive_stage9.py": "026f6f33d18cbb175ed48d28a5ce686734f8b5b747d045714cce03192bf871e4"
+  },
+  "config_sha256": "61cb4c00569797f057f988620a43e66fb88e23ebda91a514031ee10c6d796cdb",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-1.0",
+  "cost_config_sha256": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0",
+  "device": "cpu",
+  "formal_b_max": 4,
+  "git": {
+    "commit": "b37bd4d51a3673683217127695242ac098796bd7",
+    "dirty_worktree": true
+  },
+  "result_schema_sha256": "b68c5aa8d561d0913957cd3697f3b317297cc8a468371134554f759744e87fcc",
+  "run_id": "stage9-overhead-r1",
+  "run_identity_sha256": "759f5635aeb4423ee4d4ba0766d8abc83b99f73a28a22dac6628482e62eb5381",
+  "runtime_binding": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "actual_affinity": [
+      0
+    ],
+    "cpu_threads": 1,
+    "formal_repetitions": 3,
+    "requested_affinity": [
+      0
+    ],
+    "torch_inter_op_threads": 1,
+    "torch_intra_op_threads": 1,
+    "warmup_rounds": 20
+  },
+  "schema_version": "capd_proactive_stage9_run_identity_v1_0",
+  "sensitivity_b_max": [
+    1,
+    2,
+    4
+  ],
+  "stage0_sha256": "2226bf05a401f90d093d6fbd5255011cab4af506714b790775908d4a373835c0",
+  "stage8_authority_sha256": {
+    "config": "f8047c7ba712b30f4a7252ce89221388ec46860a9001ba08ee561410307e74d8",
+    "resolved_config": "9e5ee218cb110fcbcb67b2d8aed0303ba3bb386e66b66668cb91bbed0b03c314",
+    "result_schema": "ff4f81029fc4d6dc475c47de494fb0a2cba076db9f86ef121bd8f5a35fb502d6",
+    "run_identity": "791862c357089eae5cec6d1811f88b83509f56a9f9e259c7868d5236b86523fb",
+    "verification": "74b01a13359d10019a11cc9bb1f5b0fd89b880b8aecf2a43ebbefc4d1e93b76e"
+  },
+  "test_used_for_parameter_selection": false
+}

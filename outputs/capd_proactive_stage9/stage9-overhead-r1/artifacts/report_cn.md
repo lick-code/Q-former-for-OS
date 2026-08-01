@@ -1,0 +1,37 @@
+# CAPD Stage9 CPU 推理与内存开销报告
+
+> 状态：服务器测量已生成，只有 verification.json 通过后才是 Stage9 完成。
+
+计时使用 `time.perf_counter_ns()`。六个子阶段均为 exclusive；总延迟从水位检查开始，到 Top-b 结果产生结束，不含迁移、Replay 状态更新、质量统计和文件写入。总延迟与子项之差保存为未归属框架开销。
+
+## 延迟与吞吐
+
+| b_max | Mean round (ns) | P50 | P95 | P99 | Mean amortized (ns/page) | rounds/s | pages/s |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | None | None | None | None | None | None | None |
+| 2 | None | None | None | None | None | None | None |
+| 4 | None | None | None | None | None | None | None |
+
+b_t=0 单独计数并从单页摊销除法中排除。b_max=1/2/4 仅为预声明分析项；正式配置始终为 4。
+
+## 质量护栏
+
+| b_max | cells | Mean weighted cost | Early-Reuse@64 | Early-Reuse@256 | Early-Reuse@1024 |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 18 | 602024.5 | 0.0 | 0.0 | 0.0 |
+| 2 | 18 | 602024.5 | 0.0 | 0.0 | 0.0 |
+| 4 | 18 | 602024.5 | 0.0 | 0.0 | 0.0 |
+
+## 内存口径
+
+模型参数和输入张量按 numel×element_size 精确计算；Transformer activation 是已物化输出张量下界。Python 容器采用递归 sys.getsizeof 估算，不能解释为完整 native 内存；PyTorch native allocator 由 OS RSS peak 覆盖，未使用 tracemalloc 冒充完整值。
+
+- 固定管理内存：8030596 bytes (7.658573 MiB)
+- 每页 metadata：64 bytes/page
+- 进程 baseline RSS：254103552 bytes
+- 总 peak RSS：537440256 bytes
+- Stage9 增量 peak RSS：283336704 bytes
+
+## 边界
+
+capacity_overhead.csv 已按 ceil(management_memory_bytes/4096) 给出所有 workload/容量的有效 DRAM 页数。代表 workload 的公平容量 Replay 复算本阶段标记为 deferred，且不会覆盖 Stage8 正式结果。perf cycles 见 perf/perf_parsed.json；本报告不声称内核集成、真实迁移耗时、前台端到端延迟或异步结果。

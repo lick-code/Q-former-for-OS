@@ -1,0 +1,274 @@
+{
+  "by_b_max": {
+    "1": {
+      "clock": "time.perf_counter_ns",
+      "excluded_from_total": [
+        "page_migration",
+        "replay_state_update",
+        "invariant_checks",
+        "quality_metrics",
+        "artifact_serialization"
+      ],
+      "measured_sample_count": 0,
+      "schema_version": "capd_proactive_stage9_latency_summary_v1_0",
+      "stage_timings": "exclusive",
+      "stages": {
+        "candidate_construction_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "candidate_scoring_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "feature_construction_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "top_b_selection_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "total_round_latency_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "transformer_encoding_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "unattributed_framework_overhead_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "watermark_check_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        }
+      },
+      "total_boundary": "watermark_check_start_through_top_b_result",
+      "warmup_sample_count": 0
+    },
+    "2": {
+      "clock": "time.perf_counter_ns",
+      "excluded_from_total": [
+        "page_migration",
+        "replay_state_update",
+        "invariant_checks",
+        "quality_metrics",
+        "artifact_serialization"
+      ],
+      "measured_sample_count": 0,
+      "schema_version": "capd_proactive_stage9_latency_summary_v1_0",
+      "stage_timings": "exclusive",
+      "stages": {
+        "candidate_construction_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "candidate_scoring_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "feature_construction_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "top_b_selection_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "total_round_latency_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "transformer_encoding_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "unattributed_framework_overhead_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "watermark_check_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        }
+      },
+      "total_boundary": "watermark_check_start_through_top_b_result",
+      "warmup_sample_count": 0
+    },
+    "4": {
+      "clock": "time.perf_counter_ns",
+      "excluded_from_total": [
+        "page_migration",
+        "replay_state_update",
+        "invariant_checks",
+        "quality_metrics",
+        "artifact_serialization"
+      ],
+      "measured_sample_count": 0,
+      "schema_version": "capd_proactive_stage9_latency_summary_v1_0",
+      "stage_timings": "exclusive",
+      "stages": {
+        "candidate_construction_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "candidate_scoring_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "feature_construction_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "top_b_selection_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "total_round_latency_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "transformer_encoding_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "unattributed_framework_overhead_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "watermark_check_ns": {
+          "count": 0,
+          "maximum": null,
+          "mean": null,
+          "minimum": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        }
+      },
+      "total_boundary": "watermark_check_start_through_top_b_result",
+      "warmup_sample_count": 0
+    }
+  },
+  "formal_b_max": 4,
+  "schema_version": "capd_proactive_stage9_latency_suite_v1_0",
+  "sensitivity_purpose": "analysis_only_not_selection"
+}

@@ -1,0 +1,27 @@
+{
+  "completed_at": "2026-08-01T07:12:11.362913Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-1.0",
+  "device": "cpu",
+  "runtime_binding": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "actual_affinity": [
+      0
+    ],
+    "cpu_threads": 1,
+    "formal_repetitions": 3,
+    "requested_affinity": [
+      0
+    ],
+    "torch_inter_op_threads": 1,
+    "torch_intra_op_threads": 1,
+    "warmup_rounds": 20
+  },
+  "schema_version": "capd_proactive_stage9_preflight_v1_0",
+  "stage8_artifacts_read_only": true,
+  "stage8_formal_job_count": 144,
+  "stage8_stage9_entry_gate": "satisfied",
+  "stage8_status": "stage8_sync_replay_verified",
+  "status": "passed",
+  "test_used_for_parameter_selection": false
+}

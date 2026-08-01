@@ -1,0 +1,112 @@
+{
+  "candidate_tensor": {
+    "bytes": 0,
+    "method": "exact_materialized_tensor_bytes",
+    "python_candidate_state_estimate_bytes": 72
+  },
+  "history_buffer": {
+    "logical_packed_bytes": 480,
+    "python_estimate_limit": "sys.getsizeof recursion is not native RSS",
+    "python_recursive_estimate_bytes": 6743
+  },
+  "management_fixed_bytes": 8030596,
+  "management_fixed_mib": 7.658573150634766,
+  "metadata_bytes_per_page": 64,
+  "metadata_method": "analytical_packed_target_layout_not_python_dict_size",
+  "model_buffers": {
+    "bytes": 0,
+    "measurement_method": "exact_tensor_numel_times_element_size",
+    "mib": 0.0
+  },
+  "model_by_seed": {
+    "2026": {
+      "model_buffers": {
+        "bytes": 0,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "mib": 0.0
+      },
+      "model_parameters": {
+        "all_model_parameters_bytes": 8030116,
+        "all_model_parameters_mib": 7.658115386962891,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "other_parameter_bytes": 13628,
+        "page_embedding_parameter_bytes": 6400000,
+        "pc_embedding_parameter_bytes": 1600000,
+        "transformer_parameter_bytes": 16488
+      },
+      "runtime_tensors": {}
+    },
+    "3136859": {
+      "model_buffers": {
+        "bytes": 0,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "mib": 0.0
+      },
+      "model_parameters": {
+        "all_model_parameters_bytes": 8030116,
+        "all_model_parameters_mib": 7.658115386962891,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "other_parameter_bytes": 13628,
+        "page_embedding_parameter_bytes": 6400000,
+        "pc_embedding_parameter_bytes": 1600000,
+        "transformer_parameter_bytes": 16488
+      },
+      "runtime_tensors": {}
+    },
+    "42": {
+      "model_buffers": {
+        "bytes": 0,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "mib": 0.0
+      },
+      "model_parameters": {
+        "all_model_parameters_bytes": 8030116,
+        "all_model_parameters_mib": 7.658115386962891,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "other_parameter_bytes": 13628,
+        "page_embedding_parameter_bytes": 6400000,
+        "pc_embedding_parameter_bytes": 1600000,
+        "transformer_parameter_bytes": 16488
+      },
+      "runtime_tensors": {}
+    }
+  },
+  "model_parameters": {
+    "all_model_parameters_bytes": 8030116,
+    "all_model_parameters_mib": 7.658115386962891,
+    "measurement_method": "exact_tensor_numel_times_element_size",
+    "other_parameter_bytes": 13628,
+    "page_embedding_parameter_bytes": 6400000,
+    "pc_embedding_parameter_bytes": 1600000,
+    "transformer_parameter_bytes": 16488
+  },
+  "page_embedding": {
+    "bytes": 6400000,
+    "method": "exact_tensor_numel_times_element_size"
+  },
+  "pc_embedding": {
+    "bytes": 1600000,
+    "method": "exact_tensor_numel_times_element_size"
+  },
+  "rss": {
+    "measurement_method": "os_observed_rss",
+    "process_baseline_rss_bytes": 254103552,
+    "process_baseline_rss_mib": 242.33203125,
+    "stage9_incremental_peak_rss_bytes": 283336704,
+    "stage9_incremental_peak_rss_mib": 270.2109375,
+    "total_peak_rss_bytes": 537440256,
+    "total_peak_rss_mib": 512.54296875
+  },
+  "runtime_tensor_maxima": {},
+  "schema_version": "capd_proactive_stage9_memory_v1_0",
+  "tracemalloc_complete_for_torch_native": false,
+  "transformer_activation": {
+    "bytes": 0,
+    "limitation": "Internal ATen workspaces are covered only by RSS peak.",
+    "method": "materialized_output_tensor_lower_bound"
+  },
+  "transformer_parameters": {
+    "bytes": 16488,
+    "method": "exact_tensor_numel_times_element_size"
+  }
+}

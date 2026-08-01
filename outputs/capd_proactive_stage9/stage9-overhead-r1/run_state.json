@@ -1,0 +1,26 @@
+{
+  "completed": [
+    "preflight",
+    "server_regressions",
+    "latency",
+    "quality",
+    "memory",
+    "capacity_accounting",
+    "instrumentation_audit"
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE9-1.0",
+  "failure": {
+    "failed_at": "2026-08-01T07:22:45.228196Z",
+    "perf_failure_evidence": {
+      "perf-stat.raw": "# started on Sat Aug  1 15:22:45 2026\n\n",
+      "perf-stderr.log": "Error:\nNo supported events found.\nAccess to performance monitoring and observability operations is limited.\nConsider adjusting /proc/sys/kernel/perf_event_paranoid setting to open\naccess to performance monitoring and observability operations for processes\nwithout CAP_PERFMON, CAP_SYS_PTRACE or CAP_SYS_ADMIN Linux capability.\nMore information can be found at 'Perf events and tool security' document:\nhttps://www.kernel.org/doc/html/latest/admin-guide/perf-security.html\nperf_event_paranoid setting is 4:\n  -1: Allow use of (almost) all events by all users\n      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK\n>= 0: Disallow raw and ftrace function tracepoint access\n>= 1: Disallow CPU event access\n>= 2: Disallow kernel profiling\nTo make the adjusted perf_event_paranoid setting permanent preserve it\nin /etc/sysctl.conf (e.g. kernel.perf_event_paranoid = <setting>)\n"
+    },
+    "permission_guidance": "Check /proc/sys/kernel/perf_event_paranoid and hardware-counter availability; obtain authorized access and rerun with a NEW run ID. Do not estimate cycles from wall time and CPU frequency.",
+    "reason": "server_validation_exit_1",
+    "requires_new_run_id": true,
+    "step": "perf_hardware_counters"
+  },
+  "schema_version": "capd_proactive_stage9_run_state_v1_0",
+  "stage10_entry_gate": "not_satisfied",
+  "status": "stage9_not_verified"
+}

@@ -1,0 +1,184 @@
+{
+  "acceptance": {
+    "failure_status": "stage9_not_verified",
+    "minimum_stage1_through_stage9_regression_tests": 450,
+    "required_status": "stage9_overhead_verified",
+    "stage10_entry_gate": "satisfied",
+    "success_marker": "[FINAL] STAGE9_OVERHEAD_VERIFIED"
+  },
+  "capd": {
+    "best_seed_selection_allowed": false,
+    "history_H": 20,
+    "label_weights": [
+      1,
+      1,
+      2
+    ],
+    "lookahead_L": 256,
+    "unk_index": 0,
+    "vocabulary_expansion_allowed": false
+  },
+  "capd_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "config_sha256": "61cb4c00569797f057f988620a43e66fb88e23ebda91a514031ee10c6d796cdb",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-1.0",
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "fair_capacity": {
+    "formal_replay": "deferred",
+    "formula": "baseline_dram_pages-ceil(capd_management_memory_bytes/4096)",
+    "overwrite_stage8_allowed": false
+  },
+  "frozen_controls": {
+    "F_low": 8,
+    "F_target": 16,
+    "b_max": 4,
+    "candidate_size_K": 8,
+    "candidate_source": "lru_tail",
+    "fallback_policy": "lru",
+    "selector": "disabled",
+    "trigger_mode": "low_watermark"
+  },
+  "interpretation_boundary": "Stage9 measures user-space Linux CPU synchronous CAPD decision-round overhead. It is not kernel integration, page-migration latency, foreground end-to-end latency, promotion, or Stage10 asynchronous replay.",
+  "measurement": {
+    "batch_size_rounds": 1,
+    "clock": "time.perf_counter_ns",
+    "cpu_affinity": [
+      0
+    ],
+    "cpu_threads": 1,
+    "device": "cpu",
+    "excluded_from_total": [
+      "page_migration",
+      "replay_state_update",
+      "invariant_checks",
+      "quality_metrics",
+      "artifact_serialization"
+    ],
+    "formal_repetitions": 3,
+    "mkl_num_threads": 1,
+    "model_eval": true,
+    "omp_num_threads": 1,
+    "stage_timings": "exclusive",
+    "torch_inter_op_threads": 1,
+    "torch_intra_op_threads": 1,
+    "torch_no_grad": true,
+    "total_boundary": "watermark_check_start_through_top_b_result",
+    "warmup_rounds": 20
+  },
+  "measurement_matrix": {
+    "capacity_ratios": [
+      "0.40"
+    ],
+    "job_count": 54,
+    "seeds": [
+      3136859,
+      42,
+      2026
+    ],
+    "selection_basis": "predeclared_full_locked_workload_suite_middle_capacity_all_frozen_seeds",
+    "workloads": "all_stage8_locked_workloads"
+  },
+  "memory": {
+    "metadata_bytes_per_page": 64,
+    "metadata_layout": {
+      "allocator_alignment_reserve_bytes": 16,
+      "dram_entry_index_bytes": 8,
+      "frequency_counter_bytes": 8,
+      "last_access_index_bytes": 8,
+      "lru_links_bytes": 16,
+      "residency_and_dirty_flags_bytes": 8
+    },
+    "native_process_measurement": "proc_status_and_getrusage_peak_rss",
+    "python_object_measurement": "recursive_sys_getsizeof_estimate_only",
+    "tracemalloc_complete_for_torch_native": false
+  },
+  "output_root": "outputs/capd_proactive_stage9",
+  "perf": {
+    "control": "perf_stat_fifo_enable_disable",
+    "counter_source": "linux_perf_hardware",
+    "events": [
+      "cycles",
+      "instructions",
+      "task-clock",
+      "context-switches",
+      "cpu-migrations",
+      "page-faults"
+    ],
+    "repetitions_per_snapshot": 200,
+    "required": true,
+    "scope": "formal_b_max_4_all_locked_workloads_middle_capacity_all_seeds_measured_region_only",
+    "snapshot_rule": "first_decision_after_20_warmup_rounds_per_workload_seed",
+    "wall_time_frequency_estimate_allowed": false
+  },
+  "result_schema": "configs/finals/capd_proactive_stage9_result_schema.json",
+  "resume_contract": {
+    "atomic_writes": true,
+    "automatic_retry": false,
+    "completed_identity_schema_sha_only": true,
+    "failed_running_or_corrupt_requires_new_run_id": true
+  },
+  "run_id": "stage9-overhead-r1",
+  "run_identity_sha256": "759f5635aeb4423ee4d4ba0766d8abc83b99f73a28a22dac6628482e62eb5381",
+  "schema_version": "capd_proactive_stage9_v1_0",
+  "sensitivity": {
+    "b_max_values": [
+      1,
+      2,
+      4
+    ],
+    "formal_b_max": 4,
+    "purpose": "analysis_only_not_selection",
+    "quality_metrics": [
+      "weighted_cost",
+      "early_reuse"
+    ]
+  },
+  "stage8_authority": {
+    "config": {
+      "path": "configs/finals/capd_proactive_stage8.json",
+      "sha256": "f8047c7ba712b30f4a7252ce89221388ec46860a9001ba08ee561410307e74d8"
+    },
+    "resolved_config": {
+      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/resolved_config.json",
+      "sha256": "9e5ee218cb110fcbcb67b2d8aed0303ba3bb386e66b66668cb91bbed0b03c314"
+    },
+    "result_schema": {
+      "path": "configs/finals/capd_proactive_stage8_result_schema.json",
+      "sha256": "ff4f81029fc4d6dc475c47de494fb0a2cba076db9f86ef121bd8f5a35fb502d6"
+    },
+    "run_identity": {
+      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/run_identity.json",
+      "sha256": "791862c357089eae5cec6d1811f88b83509f56a9f9e259c7868d5236b86523fb"
+    },
+    "verification": {
+      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/verification.json",
+      "sha256": "74b01a13359d10019a11cc9bb1f5b0fd89b880b8aecf2a43ebbefc4d1e93b76e"
+    }
+  },
+  "stage_status": "stage9_implemented_awaiting_server_measurement",
+  "storage": {
+    "nvm_capacity_model": "unbounded_backing_tier",
+    "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+    "page_size_bytes": 4096,
+    "promotion_allowed": false
+  },
+  "test_policy": {
+    "checkpoint_selection_allowed": false,
+    "formal_b_max_selection_allowed": false,
+    "oov_fix_allowed": false,
+    "retraining_allowed": false,
+    "used_for_parameter_selection": false,
+    "vocabulary_expansion_allowed": false
+  }
+}
