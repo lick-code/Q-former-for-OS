@@ -1,0 +1,158 @@
+{
+  "schema_version": "capd_proactive_stage9_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-1.0",
+  "stage_status": "stage9_implemented_awaiting_server_measurement",
+  "output_root": "outputs/capd_proactive_stage9",
+  "result_schema": "configs/finals/capd_proactive_stage9_result_schema.json",
+  "stage8_authority": {
+    "verification": {
+      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/verification.json",
+      "sha256": "74b01a13359d10019a11cc9bb1f5b0fd89b880b8aecf2a43ebbefc4d1e93b76e"
+    },
+    "run_identity": {
+      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/run_identity.json",
+      "sha256": "791862c357089eae5cec6d1811f88b83509f56a9f9e259c7868d5236b86523fb"
+    },
+    "resolved_config": {
+      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/resolved_config.json",
+      "sha256": "9e5ee218cb110fcbcb67b2d8aed0303ba3bb386e66b66668cb91bbed0b03c314"
+    },
+    "config": {
+      "path": "configs/finals/capd_proactive_stage8.json",
+      "sha256": "f8047c7ba712b30f4a7252ce89221388ec46860a9001ba08ee561410307e74d8"
+    },
+    "result_schema": {
+      "path": "configs/finals/capd_proactive_stage8_result_schema.json",
+      "sha256": "ff4f81029fc4d6dc475c47de494fb0a2cba076db9f86ef121bd8f5a35fb502d6"
+    }
+  },
+  "frozen_controls": {
+    "F_low": 8,
+    "F_target": 16,
+    "b_max": 4,
+    "candidate_size_K": 8,
+    "candidate_source": "lru_tail",
+    "selector": "disabled",
+    "fallback_policy": "lru",
+    "trigger_mode": "low_watermark"
+  },
+  "capd": {
+    "lookahead_L": 256,
+    "label_weights": [1, 1, 2],
+    "history_H": 20,
+    "vocabulary_expansion_allowed": false,
+    "unk_index": 0,
+    "best_seed_selection_allowed": false
+  },
+  "capd_seeds": [3136859, 42, 2026],
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8,
+      "demotion": 10
+    }
+  },
+  "storage": {
+    "page_size_bytes": 4096,
+    "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+    "nvm_capacity_model": "unbounded_backing_tier",
+    "promotion_allowed": false
+  },
+  "measurement": {
+    "device": "cpu",
+    "batch_size_rounds": 1,
+    "clock": "time.perf_counter_ns",
+    "stage_timings": "exclusive",
+    "cpu_threads": 1,
+    "cpu_affinity": [0],
+    "torch_intra_op_threads": 1,
+    "torch_inter_op_threads": 1,
+    "omp_num_threads": 1,
+    "mkl_num_threads": 1,
+    "warmup_rounds": 20,
+    "formal_repetitions": 3,
+    "model_eval": true,
+    "torch_no_grad": true,
+    "total_boundary": "watermark_check_start_through_top_b_result",
+    "excluded_from_total": [
+      "page_migration",
+      "replay_state_update",
+      "invariant_checks",
+      "quality_metrics",
+      "artifact_serialization"
+    ]
+  },
+  "measurement_matrix": {
+    "workloads": "all_stage8_locked_workloads",
+    "capacity_ratios": ["0.40"],
+    "seeds": [3136859, 42, 2026],
+    "job_count": 54,
+    "selection_basis": "predeclared_full_locked_workload_suite_middle_capacity_all_frozen_seeds"
+  },
+  "sensitivity": {
+    "b_max_values": [1, 2, 4],
+    "formal_b_max": 4,
+    "purpose": "analysis_only_not_selection",
+    "quality_metrics": ["weighted_cost", "early_reuse"]
+  },
+  "perf": {
+    "required": true,
+    "counter_source": "linux_perf_hardware",
+    "events": [
+      "cycles",
+      "instructions",
+      "task-clock",
+      "context-switches",
+      "cpu-migrations",
+      "page-faults"
+    ],
+    "scope": "formal_b_max_4_all_locked_workloads_middle_capacity_all_seeds_measured_region_only",
+    "control": "perf_stat_fifo_enable_disable",
+    "repetitions_per_snapshot": 200,
+    "snapshot_rule": "first_decision_after_20_warmup_rounds_per_workload_seed",
+    "wall_time_frequency_estimate_allowed": false
+  },
+  "memory": {
+    "metadata_bytes_per_page": 64,
+    "metadata_layout": {
+      "residency_and_dirty_flags_bytes": 8,
+      "frequency_counter_bytes": 8,
+      "last_access_index_bytes": 8,
+      "dram_entry_index_bytes": 8,
+      "lru_links_bytes": 16,
+      "allocator_alignment_reserve_bytes": 16
+    },
+    "python_object_measurement": "recursive_sys_getsizeof_estimate_only",
+    "native_process_measurement": "proc_status_and_getrusage_peak_rss",
+    "tracemalloc_complete_for_torch_native": false
+  },
+  "fair_capacity": {
+    "formula": "baseline_dram_pages-ceil(capd_management_memory_bytes/4096)",
+    "formal_replay": "deferred",
+    "overwrite_stage8_allowed": false
+  },
+  "test_policy": {
+    "used_for_parameter_selection": false,
+    "checkpoint_selection_allowed": false,
+    "formal_b_max_selection_allowed": false,
+    "retraining_allowed": false,
+    "vocabulary_expansion_allowed": false,
+    "oov_fix_allowed": false
+  },
+  "resume_contract": {
+    "atomic_writes": true,
+    "completed_identity_schema_sha_only": true,
+    "failed_running_or_corrupt_requires_new_run_id": true,
+    "automatic_retry": false
+  },
+  "acceptance": {
+    "minimum_stage1_through_stage9_regression_tests": 450,
+    "required_status": "stage9_overhead_verified",
+    "failure_status": "stage9_not_verified",
+    "success_marker": "[FINAL] STAGE9_OVERHEAD_VERIFIED",
+    "stage10_entry_gate": "satisfied"
+  },
+  "interpretation_boundary": "Stage9 measures user-space Linux CPU synchronous CAPD decision-round overhead. It is not kernel integration, page-migration latency, foreground end-to-end latency, promotion, or Stage10 asynchronous replay."
+}
