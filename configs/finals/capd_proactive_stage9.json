@@ -86,10 +86,23 @@
   },
   "measurement_matrix": {
     "workloads": "all_stage8_locked_workloads",
-    "capacity_ratios": ["0.40"],
+    "capacity_ratios": ["0.20"],
     "seeds": [3136859, 42, 2026],
     "job_count": 54,
-    "selection_basis": "predeclared_full_locked_workload_suite_middle_capacity_all_frozen_seeds"
+    "selection_basis": "stage7_prefrozen_main_default_capacity_not_stage8_test_selection",
+    "latency_applicability": "active_proactive_round_cells_only_zero_round_cells_retained_in_quality",
+    "expected_active_round_jobs_per_b_max": 9,
+    "expected_zero_round_jobs_per_b_max": 9,
+    "expected_active_round_workloads": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes"
+    ],
+    "expected_zero_round_workloads": [
+      "streamcluster_pressure",
+      "swaptions",
+      "fluidanimate"
+    ]
   },
   "sensitivity": {
     "b_max_values": [1, 2, 4],
@@ -108,9 +121,10 @@
       "cpu-migrations",
       "page-faults"
     ],
-    "scope": "formal_b_max_4_all_locked_workloads_middle_capacity_all_seeds_measured_region_only",
+    "scope": "formal_b_max_4_stage7_main_default_active_round_cells_all_seeds_measured_region_only",
     "control": "perf_stat_fifo_enable_disable",
     "repetitions_per_snapshot": 200,
+    "expected_snapshot_count": 9,
     "snapshot_rule": "first_decision_after_20_warmup_rounds_per_workload_seed",
     "wall_time_frequency_estimate_allowed": false
   },

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import importlib.util
 import os
 import tempfile
 import unittest
@@ -55,7 +56,10 @@ class Stage9ContractTest(unittest.TestCase):
         (("measurement", "batch_size_rounds"), 2),
         (("measurement", "warmup_rounds"), 0),
         (("measurement", "formal_repetitions"), 0),
+        (("measurement_matrix", "capacity_ratios"), ["0.40"]),
+        (("measurement_matrix", "expected_active_round_workloads"), []),
         (("sensitivity", "b_max_values"), [1, 4]),
+        (("perf", "expected_snapshot_count"), 18),
         (("test_policy", "used_for_parameter_selection"), True),
     ):
       item = copy.deepcopy(_config())
@@ -67,6 +71,34 @@ class Stage9ContractTest(unittest.TestCase):
     for item in mutations:
       with self.assertRaises(stage9.Stage9ContractError):
         stage9.validate_config(item)
+
+  def test_measurement_uses_stage7_prefrozen_main_default_capacity(self):
+    matrix = _config()["measurement_matrix"]
+    self.assertEqual(["0.20"], matrix["capacity_ratios"])
+    self.assertEqual(
+        "stage7_prefrozen_main_default_capacity_not_stage8_test_selection",
+        matrix["selection_basis"])
+    self.assertEqual(9, matrix["expected_active_round_jobs_per_b_max"])
+    self.assertEqual(9, matrix["expected_zero_round_jobs_per_b_max"])
+    self.assertEqual(
+        ["canneal", "dedup_pressure", "blackscholes"],
+        matrix["expected_active_round_workloads"])
+
+  def test_stage7_main_default_capacity_authority_is_verified(self):
+    runner = Stage9LatencyAndCycleTest._runner_module()
+    capacity = stage9.load_json(os.path.join(
+        ROOT, "outputs", "capd_proactive_stage7", "stage7-server-suite-r1",
+        "capacity_matrix.json"))
+    authority = {
+        "capacity": capacity,
+        "lock": {"workloads": [
+            {"workload": workload} for workload in (
+                "canneal", "streamcluster_pressure", "dedup_pressure",
+                "blackscholes", "swaptions", "fluidanimate")]}}
+    runner._audit_main_default_capacity(_config(), authority)
+    capacity["default_ratio"] = "0.40"
+    with self.assertRaises(stage9.Stage9ContractError):
+      runner._audit_main_default_capacity(_config(), authority)
 
   def test_stage8_entry_gate_rejects_every_invalid_authority_field(self):
     valid = {
@@ -138,8 +170,29 @@ class Stage9ContractTest(unittest.TestCase):
       second = stage9.prepare_new_run(directory, "run-b")
       self.assertNotEqual(first, second)
 
+  def test_server_checks_perf_permission_before_starting_expensive_run(self):
+    path = os.path.join(
+        ROOT, "scripts", "validate_capd_proactive_stage9_server.sh")
+    with open(path, "r", encoding="utf-8") as handle:
+      shell = handle.read()
+    probe = shell.index("pre-run perf hardware counter")
+    preflight = shell.index('CURRENT_STEP="preflight"')
+    measure = shell.index('CURRENT_STEP="latency_quality_memory"')
+    self.assertLess(probe, preflight)
+    self.assertLess(probe, measure)
+    self.assertIn("kernel.perf_event_paranoid=0", shell)
+    self.assertIn("<not supported>|<not counted>", shell)
+
 
 class Stage9LatencyAndCycleTest(unittest.TestCase):
+
+  @staticmethod
+  def _runner_module():
+    path = os.path.join(ROOT, "scripts", "run_capd_proactive_stage9.py")
+    spec = importlib.util.spec_from_file_location("stage9_runner_test", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
   def test_empty_and_single_sample_statistics(self):
     self.assertEqual(
@@ -203,6 +256,84 @@ class Stage9LatencyAndCycleTest(unittest.TestCase):
     self.assertEqual(2000, value["events"]["instructions"]["value"])
     self.assertEqual("not_supported",
                      value["events"]["task-clock"]["status"])
+    self.assertFalse(value["required_events_verified"])
+
+  def test_measurement_completeness_rejects_zero_latency_suite(self):
+    runner = self._runner_module()
+    quality = []
+    accumulators = {}
+    for b_max in (1, 2, 4):
+      quality.extend([
+          {"b_max": b_max, "workload": workload, "seed": seed,
+           "number_of_proactive_rounds": 30}
+          for workload in ("canneal", "dedup_pressure", "blackscholes")
+          for seed in (3136859, 42, 2026)])
+      quality.extend([
+          {"b_max": b_max, "workload": workload, "seed": seed,
+           "number_of_proactive_rounds": 0}
+          for workload in ("streamcluster_pressure", "swaptions",
+                           "fluidanimate")
+          for seed in (3136859, 42, 2026)])
+      value = runner._LatencyAccumulator()
+      value.warmup = 9 * 20
+      value.measured = 9 * (30 - 20) * 3
+      value.pages = value.measured
+      for workload in ("canneal", "dedup_pressure", "blackscholes"):
+        for seed in (3136859, 42, 2026):
+          value.sample_counts_by_cell[(
+              workload, "0.20", seed, "warmup")] = 20
+          value.sample_counts_by_cell[(
+              workload, "0.20", seed, "measured")] = 30
+      accumulators[str(b_max)] = value
+    runner._audit_measurement_completeness(
+        accumulators, quality, _config())
+    accumulators["4"].measured = 0
+    with self.assertRaises(stage9.Stage9ContractError):
+      runner._audit_measurement_completeness(
+          accumulators, quality, _config())
+
+  def test_perf_scope_requires_exact_active_and_zero_cells(self):
+    runner = self._runner_module()
+    config = _config()
+    active = [
+        {"workload": workload, "capacity_ratio": "0.20", "seed": seed}
+        for workload in ("canneal", "dedup_pressure", "blackscholes")
+        for seed in (3136859, 42, 2026)]
+    zero = [
+        {"workload": workload, "capacity_ratio": "0.20", "seed": seed}
+        for workload in ("streamcluster_pressure", "swaptions",
+                         "fluidanimate")
+        for seed in (3136859, 42, 2026)]
+    scope = {
+        "snapshot_count": 9,
+        "measured_job_ids": ["active-{}".format(i) for i in range(9)],
+        "measured_cells": active,
+        "zero_round_job_count": 9,
+        "zero_round_job_ids": ["zero-{}".format(i) for i in range(9)],
+        "zero_round_cells": zero,
+        "measured_rounds": 1800,
+        "measured_demoted_pages": 7200}
+    runner._audit_perf_scope_counts(scope, config)
+    scope["measured_cells"] = active[:-1]
+    with self.assertRaises(stage9.Stage9ContractError):
+      runner._audit_perf_scope_counts(scope, config)
+
+  def test_model_memory_keeps_max_runtime_instead_of_last_zero_cell(self):
+    runner = self._runner_module()
+    target = {}
+    first = {
+        "model_parameters": {"all_model_parameters_bytes": 100},
+        "model_buffers": {"bytes": 10},
+        "runtime_tensors": {"candidate_tensor_bytes": 64,
+                            "measurement_method": "exact"}}
+    last_zero = {
+        "model_parameters": {"all_model_parameters_bytes": 100},
+        "model_buffers": {"bytes": 10},
+        "runtime_tensors": {}}
+    runner._merge_model_memory_observation(target, 42, first)
+    runner._merge_model_memory_observation(target, 42, last_zero)
+    self.assertEqual(64, target["42"]["runtime_tensors"][
+        "candidate_tensor_bytes"])
 
 
 class Stage9MemoryAndSemanticsTest(unittest.TestCase):

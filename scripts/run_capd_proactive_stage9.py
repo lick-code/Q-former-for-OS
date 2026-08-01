@@ -113,9 +113,11 @@ def _git_state(project_root):
 def _read_text(path):
   try:
     with open(path, "r", encoding="utf-8") as handle:
-      return {"status": "read", "value": handle.read().strip()}
+      return {"status": "read", "path": path,
+              "value": handle.read().strip()}
   except (OSError, UnicodeError) as error:
     return {"status": "unavailable", "value": None,
+            "path": path,
             "reason": "{}: {}".format(type(error).__name__, error)}
 
 
@@ -142,13 +144,21 @@ def _cpu_information(affinity):
           current_core = value
   except OSError:
     pass
+  if current_physical is not None and current_core is not None:
+    physical.add((current_physical, current_core))
   governors = {}
   for cpu in affinity:
     governors[str(cpu)] = _read_text(
         "/sys/devices/system/cpu/cpu{}/cpufreq/scaling_governor".format(cpu))
   turbo = _read_text("/sys/devices/system/cpu/intel_pstate/no_turbo")
-  if turbo["status"] != "read":
+  if turbo["status"] == "read":
+    turbo["semantic"] = "one_means_disabled_zero_means_enabled"
+    turbo["enabled"] = (turbo["value"] == "0")
+  else:
     turbo = _read_text("/sys/devices/system/cpu/cpufreq/boost")
+    if turbo["status"] == "read":
+      turbo["semantic"] = "one_means_enabled_zero_means_disabled"
+      turbo["enabled"] = (turbo["value"] == "1")
   return {
       "model": model, "logical_cpu_count": os.cpu_count(),
       "physical_core_count": len(physical) if physical else None,
@@ -302,7 +312,23 @@ def _trace(path):
            "pc": row["pc"]} for row in stage7.iter_trace(path, 12)]
 
 
+def _audit_main_default_capacity(config, authority):
+  expected_ratio = config["measurement_matrix"]["capacity_ratios"][0]
+  capacity = authority["capacity"]
+  rows = stage8_contract._capacity_rows(capacity)
+  locked_workloads = {row["workload"]
+                      for row in authority["lock"]["workloads"]}
+  main_rows = [row for row in rows if row.get("is_main_default") is True]
+  if (str(capacity.get("default_ratio")) != expected_ratio or
+      len(main_rows) != len(locked_workloads) or
+      {row["workload"] for row in main_rows} != locked_workloads or
+      any(str(row["ratio"]) != expected_ratio for row in main_rows)):
+    raise stage9.Stage9ContractError(
+        "Stage-7 pre-frozen main-default capacity binding changed.")
+
+
 def _measurement_jobs(config, authority):
+  _audit_main_default_capacity(config, authority)
   ratios = set(config["measurement_matrix"]["capacity_ratios"])
   jobs = [job for job in authority["plan"]["jobs"]
           if job["policy"] == "capd" and
@@ -358,8 +384,13 @@ class _LatencyAccumulator(object):
     self.pages = 0
     self.b_t = {}
     self.amortized = array.array("d")
+    self.sample_counts_by_cell = {}
 
   def add(self, sample):
+    cell = (sample["workload"], str(sample["capacity_ratio"]),
+            int(sample["seed"]), sample["sample_kind"])
+    self.sample_counts_by_cell[cell] = (
+        self.sample_counts_by_cell.get(cell, 0) + 1)
     if sample["sample_kind"] == "warmup":
       self.warmup += 1
       return
@@ -425,8 +456,12 @@ def _aggregate_quality(rows):
   groups = {}
   for b_max in stage9.SENSITIVITY_BMAX:
     selected = [row for row in rows if row["b_max"] == b_max]
+    active = [row for row in selected
+              if row["number_of_proactive_rounds"] > 0]
     groups[str(b_max)] = {
         "cell_count": len(selected),
+        "active_round_cell_count": len(active),
+        "zero_round_cell_count": len(selected) - len(active),
         "weighted_cost_mean": statistics_mean(
             row["weighted_cost"] for row in selected),
         "early_reuse_rate_64_mean": statistics_mean(
@@ -446,6 +481,110 @@ def statistics_mean(values):
   return sum(values) / float(len(values)) if values else None
 
 
+def _audit_measurement_completeness(accumulators, quality_rows, config):
+  matrix = config["measurement_matrix"]
+  warmup_rounds = config["measurement"]["warmup_rounds"]
+  repetitions = config["measurement"]["formal_repetitions"]
+  expected_active = matrix["expected_active_round_jobs_per_b_max"]
+  expected_zero = matrix["expected_zero_round_jobs_per_b_max"]
+  expected_active_cells = {
+      (workload, seed)
+      for workload in matrix["expected_active_round_workloads"]
+      for seed in matrix["seeds"]}
+  expected_zero_cells = {
+      (workload, seed)
+      for workload in matrix["expected_zero_round_workloads"]
+      for seed in matrix["seeds"]}
+  for b_max in stage9.SENSITIVITY_BMAX:
+    rows = [row for row in quality_rows if row["b_max"] == b_max]
+    active = [row for row in rows
+              if row["number_of_proactive_rounds"] > 0]
+    zero = [row for row in rows
+            if row["number_of_proactive_rounds"] == 0]
+    if (len(rows) != expected_active + expected_zero or
+        len(active) != expected_active or len(zero) != expected_zero):
+      raise stage9.Stage9ContractError(
+          "b_max={} active/zero-round applicability changed: {}/{}.".format(
+              b_max, len(active), len(zero)))
+    active_cells = {(row["workload"], row["seed"]) for row in active}
+    zero_cells = {(row["workload"], row["seed"]) for row in zero}
+    if (active_cells != expected_active_cells or
+        zero_cells != expected_zero_cells):
+      raise stage9.Stage9ContractError(
+          "b_max={} active/zero workload identities changed.".format(b_max))
+    insufficient = [row for row in active
+                    if row["number_of_proactive_rounds"] <= warmup_rounds]
+    if insufficient:
+      raise stage9.Stage9ContractError(
+          "Active cells do not exceed frozen warmup rounds: {}".format(
+              [row["workload"] for row in insufficient]))
+    expected_warmup = len(active) * warmup_rounds
+    expected_measured = sum(
+        (row["number_of_proactive_rounds"] - warmup_rounds) * repetitions
+        for row in active)
+    observed = accumulators[str(b_max)]
+    for row in active:
+      cell = (row["workload"], str(matrix["capacity_ratios"][0]),
+              int(row["seed"]))
+      if (observed.sample_counts_by_cell.get(cell + ("warmup",), 0) !=
+          warmup_rounds or
+          observed.sample_counts_by_cell.get(cell + ("measured",), 0) !=
+          (row["number_of_proactive_rounds"] - warmup_rounds) * repetitions):
+        raise stage9.Stage9ContractError(
+            "b_max={} raw sample count changed for workload/seed {}.".format(
+                b_max, cell))
+    unexpected_cells = {
+        cell[:3] for cell in observed.sample_counts_by_cell
+        if cell[:3] not in {
+            (row["workload"], str(matrix["capacity_ratios"][0]),
+             int(row["seed"])) for row in active}}
+    if unexpected_cells:
+      raise stage9.Stage9ContractError(
+          "b_max={} raw samples include inapplicable cells: {}.".format(
+              b_max, sorted(unexpected_cells)))
+    if (observed.warmup != expected_warmup or
+        observed.measured != expected_measured or
+        observed.measured <= 0 or observed.pages <= 0):
+      raise stage9.Stage9ContractError(
+          "b_max={} latency sample completeness failed: warmup {}/{}, "
+          "measured {}/{}, pages {}.".format(
+              b_max, observed.warmup, expected_warmup,
+              observed.measured, expected_measured, observed.pages))
+
+
+def _audit_perf_scope_counts(scope, config):
+  matrix = config["measurement_matrix"]
+  expected_active_cells = {
+      (workload, str(config["measurement_matrix"]["capacity_ratios"][0]), seed)
+      for workload in matrix["expected_active_round_workloads"]
+      for seed in matrix["seeds"]}
+  expected_zero_cells = {
+      (workload, str(config["measurement_matrix"]["capacity_ratios"][0]), seed)
+      for workload in matrix["expected_zero_round_workloads"]
+      for seed in matrix["seeds"]}
+  measured_cells = {
+      (row.get("workload"), str(row.get("capacity_ratio")), row.get("seed"))
+      for row in scope.get("measured_cells", [])}
+  zero_cells = {
+      (row.get("workload"), str(row.get("capacity_ratio")), row.get("seed"))
+      for row in scope.get("zero_round_cells", [])}
+  expected_snapshots = config["perf"]["expected_snapshot_count"]
+  repetitions = config["perf"]["repetitions_per_snapshot"]
+  if (scope.get("snapshot_count") != expected_snapshots or
+      scope.get("zero_round_job_count") !=
+      matrix["expected_zero_round_jobs_per_b_max"] or
+      len(scope.get("measured_job_ids", [])) != expected_snapshots or
+      len(set(scope.get("measured_job_ids", []))) != expected_snapshots or
+      len(scope.get("zero_round_job_ids", [])) != len(expected_zero_cells) or
+      len(set(scope.get("zero_round_job_ids", []))) != len(expected_zero_cells) or
+      measured_cells != expected_active_cells or
+      zero_cells != expected_zero_cells or
+      scope.get("measured_rounds") != expected_snapshots * repetitions or
+      scope.get("measured_demoted_pages", 0) <= 0):
+    raise stage9.Stage9ContractError(
+        "Perf snapshot/job/cell scope completeness failed.")
+
+
 def _audit_instrumentation(raw, cpu_reference):
   observed_rounds = [row["selected_pages"] for row in raw["rounds"]]
   expected_rounds = [row["selected_pages"]
@@ -462,6 +601,24 @@ def _audit_instrumentation(raw, cpu_reference):
           "top_b_sha256": stage9.fingerprint_value(observed_rounds),
           "final_state_sha256": stage9.fingerprint_value(raw["state"]),
           "status": "identical"}
+
+
+def _merge_model_memory_observation(model_memory_by_seed, seed, observation):
+  key = str(seed)
+  existing = model_memory_by_seed.get(key)
+  if existing is None:
+    model_memory_by_seed[key] = copy.deepcopy(observation)
+    return
+  if (existing["model_parameters"] != observation["model_parameters"] or
+      existing["model_buffers"] != observation["model_buffers"]):
+    raise stage9.Stage9ContractError(
+        "Model parameter/buffer memory changed within a frozen seed.")
+  runtime = existing.setdefault("runtime_tensors", {})
+  for name, value in observation.get("runtime_tensors", {}).items():
+    if name.endswith("_bytes"):
+      runtime[name] = max(int(runtime.get(name, 0)), int(value))
+    else:
+      runtime.setdefault(name, value)
 
 
 def measure(args):
@@ -532,7 +689,8 @@ def measure(args):
                   _audit_instrumentation(raw, cpu_reference))
               del cpu_reference
             memory = stage9.model_memory_from_ranker(ranker)
-            model_memory_by_seed[str(job["seed"])] = memory
+            _merge_model_memory_observation(
+                model_memory_by_seed, job["seed"], memory)
             for key, value in memory["runtime_tensors"].items():
               if key.endswith("_bytes"):
                 max_runtime[key] = max(max_runtime.get(key, 0), int(value))
@@ -550,6 +708,7 @@ def measure(args):
         gc.collect()
       handle.flush()
       os.fsync(handle.fileno())
+    _audit_measurement_completeness(accumulators, quality_rows, config)
     os.replace(temporary, raw_path)
   except Exception:
     try:
@@ -561,11 +720,13 @@ def measure(args):
   latency_summary = {
       "schema_version": "capd_proactive_stage9_latency_suite_v1_0",
       "formal_b_max": 4, "sensitivity_purpose": "analysis_only_not_selection",
+      "applicability": config["measurement_matrix"]["latency_applicability"],
       "by_b_max": {key: value.latency()
                    for key, value in accumulators.items()}}
   throughput_summary = {
       "schema_version": "capd_proactive_stage9_throughput_suite_v1_0",
       "formal_b_max": 4, "sensitivity_purpose": "analysis_only_not_selection",
+      "applicability": config["measurement_matrix"]["latency_applicability"],
       "by_b_max": {key: value.throughput()
                    for key, value in accumulators.items()}}
   stage9.write_json_atomic(
@@ -675,11 +836,11 @@ def _write_report(run_root, latency, throughput, quality, memory):
   lines.extend([
       "", "b_t=0 单独计数并从单页摊销除法中排除。b_max=1/2/4 仅为预声明分析项；正式配置始终为 4。",
       "", "## 质量护栏", "",
-      "| b_max | cells | Mean weighted cost | Early-Reuse@64 | Early-Reuse@256 | Early-Reuse@1024 |",
-      "|---:|---:|---:|---:|---:|---:|"])
+      "| b_max | cells | active | zero-round | Mean weighted cost | Early-Reuse@64 | Early-Reuse@256 | Early-Reuse@1024 |",
+      "|---:|---:|---:|---:|---:|---:|---:|---:|"])
   for b_max in (1, 2, 4):
     row = quality["by_b_max"][str(b_max)]
-    lines.append("| {b} | {cell_count} | {weighted_cost_mean} | {early_reuse_rate_64_mean} | {early_reuse_rate_256_mean} | {early_reuse_rate_1024_mean} |".format(
+    lines.append("| {b} | {cell_count} | {active_round_cell_count} | {zero_round_cell_count} | {weighted_cost_mean} | {early_reuse_rate_64_mean} | {early_reuse_rate_256_mean} | {early_reuse_rate_1024_mean} |".format(
         b=b_max, **row))
   lines.extend([
       "", "## 内存口径", "",
@@ -745,6 +906,10 @@ def perf_workload(args):
   control = _PerfControl(args.perf_control_fifo, args.perf_ack_fifo)
   repetitions = int(config["perf"]["repetitions_per_snapshot"])
   measured_rounds = measured_pages = snapshot_count = 0
+  zero_round_jobs = []
+  measured_job_ids = []
+  zero_round_cells = []
+  measured_cells = []
   jobs = _measurement_jobs(config, authority)
   jobs_by_workload = {}
   for job in jobs:
@@ -766,8 +931,20 @@ def perf_workload(args):
         except _SnapshotReady as ready:
           snapshot = ready
         if snapshot is None:
+          logical_rounds = replay._stage9_logical_rounds
+          if logical_rounds == 0:
+            zero_round_jobs.append(job["job_id"])
+            zero_round_cells.append({
+                "workload": job["workload"],
+                "capacity_ratio": str(job["capacity_ratio"]),
+                "seed": int(job["seed"])})
+            del replay, ranker
+            gc.collect()
+            continue
           raise stage9.Stage9ContractError(
-              "Could not capture post-warmup perf round: " + workload)
+              "Perf cell has {} rounds, insufficient for {} warmup rounds: {}".format(
+                  logical_rounds, config["measurement"]["warmup_rounds"],
+                  job["job_id"]))
         expected = snapshot.decision[:4]
         control.command("enable")
         try:
@@ -783,24 +960,36 @@ def perf_workload(args):
         finally:
           control.command("disable")
         snapshot_count += 1
+        measured_job_ids.append(job["job_id"])
+        measured_cells.append({
+            "workload": job["workload"],
+            "capacity_ratio": str(job["capacity_ratio"]),
+            "seed": int(job["seed"])})
         del replay, ranker
         gc.collect()
       del trace
   finally:
     control.close()
-  stage9.write_json_atomic(
-      os.path.join(run_root, "perf", "perf_scope_counts.json"), {
+  scope = {
           "schema_version": "capd_proactive_stage9_perf_scope_v1_0",
           "counter_scope": config["perf"]["scope"],
           "control": config["perf"]["control"],
           "snapshot_rule": config["perf"]["snapshot_rule"],
           "snapshot_count": snapshot_count,
+          "measured_job_ids": measured_job_ids,
+          "measured_cells": measured_cells,
+          "zero_round_job_count": len(zero_round_jobs),
+          "zero_round_job_ids": zero_round_jobs,
+          "zero_round_cells": zero_round_cells,
           "repetitions_per_snapshot": repetitions,
           "measured_rounds": measured_rounds,
           "measured_demoted_pages": measured_pages,
           "formal_b_max": 4, "device": "cpu",
           "model_load_and_warmup_excluded": True,
-          "test_used_for_parameter_selection": False})
+          "test_used_for_parameter_selection": False}
+  _audit_perf_scope_counts(scope, config)
+  stage9.write_json_atomic(
+      os.path.join(run_root, "perf", "perf_scope_counts.json"), scope)
   print("[OK] perf controlled region completed: {} rounds, {} pages".format(
       measured_rounds, measured_pages))
 
@@ -831,9 +1020,10 @@ def parse_perf(args):
         "rerun with a NEW run ID. Never substitute wall time times frequency.")
   stage9.write_json_atomic(
       os.path.join(run_root, "perf", "perf_parsed.json"), parsed)
-  if not parsed["cycles_verified"]:
+  if not parsed["required_events_verified"]:
     raise stage9.Stage9ContractError(
-        "perf cycles unavailable: " + str(parsed["failure_reason"]))
+        "required perf counters unavailable: " +
+        str(parsed["failure_reason"]))
   report_path = os.path.join(run_root, "artifacts", "report_cn.md")
   with open(report_path, "r", encoding="utf-8") as handle:
     report = handle.read().rstrip()
@@ -935,21 +1125,32 @@ def verify(args):
     raise stage9.Stage9ContractError("Server regression receipt is not passing.")
   perf = stage9.load_json(os.path.join(run_root, "perf", "perf_parsed.json"))
   if (perf.get("cycles_verified") is not True or
+      perf.get("required_events_verified") is not True or
       perf.get("counter_source") != "linux_perf_hardware" or
       not isinstance(perf.get("derived"), Mapping)):
     raise stage9.Stage9ContractError("Hardware cycles were not verified.")
   perf_scope = perf.get("scope_counts", {})
-  expected_snapshots = len(entry["authority"]["lock"]["workloads"]) * 3
-  if (perf_scope.get("snapshot_count") != expected_snapshots or
-      perf_scope.get("measured_rounds") != expected_snapshots *
-      config["perf"]["repetitions_per_snapshot"] or
-      perf_scope.get("measured_demoted_pages", 0) <= 0):
-    raise stage9.Stage9ContractError("perf controlled scope count is incomplete.")
+  _audit_perf_scope_counts(perf_scope, config)
+  expected_derived = stage9.cycles_per_unit(
+      int(perf["events"]["cycles"]["value"]),
+      int(perf_scope["measured_rounds"]),
+      int(perf_scope["measured_demoted_pages"]),
+      "linux_perf_hardware")
+  if perf.get("derived") != expected_derived:
+    raise stage9.Stage9ContractError(
+        "Perf cycles/round or cycles/page derivation changed.")
   memory = stage9.load_json(os.path.join(run_root, "memory_breakdown.json"))
+  rss = memory.get("rss", {})
   if (memory.get("management_fixed_bytes", 0) <= 0 or
       memory.get("metadata_bytes_per_page") != 64 or
-      memory.get("rss", {}).get("process_baseline_rss_bytes", 0) <= 0 or
-      memory.get("rss", {}).get("total_peak_rss_bytes", 0) <= 0 or
+      rss.get("process_baseline_rss_bytes", 0) <= 0 or
+      rss.get("total_peak_rss_bytes", 0) <= 0 or
+      rss.get("stage9_incremental_peak_rss_bytes", -1) < 0 or
+      rss.get("total_peak_rss_bytes", 0) <
+      rss.get("process_baseline_rss_bytes", 0) or
+      rss.get("stage9_incremental_peak_rss_bytes") !=
+      rss.get("total_peak_rss_bytes") -
+      rss.get("process_baseline_rss_bytes") or
       set(memory.get("model_by_seed", {})) != {"3136859", "42", "2026"}):
     raise stage9.Stage9ContractError("Memory breakdown is incomplete.")
   import csv
@@ -964,15 +1165,14 @@ def verify(args):
     if (int(row["management_pages"]) != expected_pages or
         int(row["capd_effective_dram_pages"]) !=
         int(row["baseline_dram_pages"]) - expected_pages or
+        abs(float(row["capacity_overhead_percent"]) -
+            expected_pages * 100.0 / int(row["baseline_dram_pages"])) > 1e-12 or
         row["fair_capacity_replay_status"] != "deferred"):
       raise stage9.Stage9ContractError("Capacity deduction arithmetic changed.")
   accumulators = _read_raw_accumulators(
       os.path.join(run_root, "raw_latency_samples.csv"))
-  if any(value.measured <= 0 or value.warmup != 18 *
-         config["measurement"]["warmup_rounds"]
-         for value in accumulators.values()):
-    raise stage9.Stage9ContractError(
-        "A b_max group lacks formal samples or its warmup count changed.")
+  quality = stage9.load_json(os.path.join(run_root, "quality_summary.json"))
+  _audit_measurement_completeness(accumulators, quality.get("rows", []), config)
   expected_latency = {key: value.latency()
                       for key, value in accumulators.items()}
   expected_throughput = {key: value.throughput()
@@ -981,21 +1181,36 @@ def verify(args):
   throughput = stage9.load_json(os.path.join(
       run_root, "throughput_summary.json"))
   if (latency.get("by_b_max") != expected_latency or
-      throughput.get("by_b_max") != expected_throughput):
+      throughput.get("by_b_max") != expected_throughput or
+      latency.get("applicability") !=
+      config["measurement_matrix"]["latency_applicability"] or
+      throughput.get("applicability") !=
+      config["measurement_matrix"]["latency_applicability"]):
     raise stage9.Stage9ContractError(
         "Raw samples do not reproduce latency/throughput summaries.")
-  quality = stage9.load_json(os.path.join(run_root, "quality_summary.json"))
   if (set(quality.get("by_b_max", {})) != {"1", "2", "4"} or
       quality.get("purpose") != "analysis_only_not_selection" or
       quality.get("test_used_for_parameter_selection") is not False or
       len(quality.get("rows", ())) != 54 or
-      any(quality["by_b_max"][key].get("cell_count") != 18
+      any(quality["by_b_max"][key].get("cell_count") != 18 or
+          quality["by_b_max"][key].get("active_round_cell_count") != 9 or
+          quality["by_b_max"][key].get("zero_round_cell_count") != 9
           for key in ("1", "2", "4"))):
     raise stage9.Stage9ContractError("Sensitivity quality guard is incomplete.")
+  if quality.get("by_b_max") != _aggregate_quality(
+      quality.get("rows", []))["by_b_max"]:
+    raise stage9.Stage9ContractError(
+        "Sensitivity quality rows do not reproduce aggregate metrics.")
   instrumentation = stage9.load_json(os.path.join(
       run_root, "instrumentation_audit.json"))
+  instrumentation_jobs = instrumentation.get("jobs", [])
   if (instrumentation.get("status") != "identical" or
-      instrumentation.get("job_count") != 18):
+      instrumentation.get("job_count") != 18 or
+      len(instrumentation_jobs) != 18 or
+      len({row.get("job_id") for row in instrumentation_jobs}) != 18 or
+      any(row.get("status") != "identical" or
+          row.get("reference_device") != "cpu"
+          for row in instrumentation_jobs)):
     raise stage9.Stage9ContractError("Instrumentation semantics did not pass.")
   verification = {
       "schema_version": "capd_proactive_stage9_verification_v1_0",

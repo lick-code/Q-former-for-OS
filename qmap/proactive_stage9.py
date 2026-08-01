@@ -196,14 +196,32 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
       "oov_fix_allowed": False},
       "Stage-9 Test/freeze stop-loss policy changed.")
   matrix = value.get("measurement_matrix", {})
-  _require(matrix.get("capacity_ratios") == ["0.40"] and
+  _require(matrix.get("capacity_ratios") == ["0.20"] and
            matrix.get("workloads") == "all_stage8_locked_workloads" and
            matrix.get("seeds") == list(CAPD_SEEDS) and
-           matrix.get("job_count") == 54,
+           matrix.get("job_count") == 54 and
+           matrix.get("selection_basis") ==
+           "stage7_prefrozen_main_default_capacity_not_stage8_test_selection" and
+           matrix.get("latency_applicability") ==
+           "active_proactive_round_cells_only_zero_round_cells_retained_in_quality" and
+           matrix.get("expected_active_round_jobs_per_b_max") == 9 and
+           matrix.get("expected_zero_round_jobs_per_b_max") == 9 and
+           matrix.get("expected_active_round_workloads") ==
+           ["canneal", "dedup_pressure", "blackscholes"] and
+           matrix.get("expected_zero_round_workloads") ==
+           ["streamcluster_pressure", "swaptions", "fluidanimate"],
            "Stage-9 predeclared measurement matrix changed.")
   _require(value.get("fair_capacity", {}).get("formal_replay") == "deferred" and
            value.get("fair_capacity", {}).get("overwrite_stage8_allowed") is False,
            "Stage-9 fair-capacity boundary changed.")
+  perf = value.get("perf", {})
+  _require(perf.get("required") is True and
+           perf.get("counter_source") == "linux_perf_hardware" and
+           perf.get("control") == "perf_stat_fifo_enable_disable" and
+           perf.get("repetitions_per_snapshot") == 200 and
+           perf.get("expected_snapshot_count") == 9 and
+           perf.get("wall_time_frequency_estimate_allowed") is False,
+           "Stage-9 perf hardware-counter contract changed.")
   return value
 
 
@@ -417,6 +435,7 @@ def cycles_per_unit(cycles: int, measured_rounds: int, measured_pages: int,
 def parse_perf_stat(raw: str, delimiter: str = ";") -> Dict[str, Any]:
   known = ("cycles", "instructions", "task-clock", "context-switches",
            "cpu-migrations", "page-faults")
+  required = ("cycles", "instructions", "task-clock")
   events = {}
   for line in raw.splitlines():
     stripped = line.strip()
@@ -447,13 +466,18 @@ def parse_perf_stat(raw: str, delimiter: str = ";") -> Dict[str, Any]:
   for event in known:
     events.setdefault(event, {"status": "missing", "value": None,
                               "raw_value": None})
+  unavailable = [event for event in required
+                 if events[event]["status"] != "ok"]
   return {
       "schema_version": "capd_proactive_stage9_perf_v1_0",
       "delimiter": delimiter, "events": events,
       "cycles_verified": events["cycles"]["status"] == "ok",
-      "failure_reason": (None if events["cycles"]["status"] == "ok" else
-                         "cycles counter status: " +
-                         events["cycles"]["status"]),
+      "required_events_verified": not unavailable,
+      "required_events": list(required),
+      "failure_reason": (None if not unavailable else
+                         "required perf event status: " + ", ".join(
+                             "{}={}".format(event, events[event]["status"])
+                             for event in unavailable)),
   }
 
 

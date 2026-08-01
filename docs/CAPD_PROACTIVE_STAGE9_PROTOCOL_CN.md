@@ -22,7 +22,9 @@ Stage8 r3 目录全程只读。Stage9 只写 `outputs/capd_proactive_stage9/<run
 
 如果服务器 cpuset 不允许 CPU 0，只能在任何正式 run 开始前修改 Stage9 配置中的 affinity，并使用新 run ID 运行 preflight；preflight 记录修改后的配置 SHA。不得在观察测量结果后更换 affinity、线程、20 个预热 round 或 3 次正式重复。
 
-测量矩阵预声明为 6 个 Stage8 锁定 workload、0.40 容量、3 个冻结 seed、`b_max=1/2/4`，共 54 个质量/延迟单元。1/2/4 是摊销敏感性，不是重新选择正式 `b_max`；正式值始终为 4。Test 只用于预声明 Replay 分析，不能用于参数、checkpoint 或正式 `b_max` 选择。
+测量矩阵预声明为 6 个 Stage8 锁定 workload、Stage7 在查看 Test 前冻结的主默认容量 0.20、3 个冻结 seed、`b_max=1/2/4`，共 54 个质量单元。选择 0.20 的依据是 Stage7 `capacity_matrix.json` 中 `default_ratio=0.20` 且对应行 `is_main_default=true`，不是查看 Stage8 Test 后选择更容易触发 round 的容量点。1/2/4 是摊销敏感性，不是重新选择正式 `b_max`；正式值始终为 4。Test 不能用于参数、checkpoint、容量或正式 `b_max` 选择。
+
+Stage8 冻结轨迹表明，在 0.20 容量下，每个 b_max 的 18 个质量单元中，canneal、dedup_pressure、blackscholes 的 3 seed 共 9 个单元存在主动降级 round，streamcluster_pressure、swaptions、fluidanimate 的 3 seed 共 9 个单元为零 round。所有 18 个单元都保留 weighted cost 和 Early-Reuse 质量结果；延迟、摊销和吞吐只对 9 个有效 round 单元统计。零 round 单元不伪造延迟样本。有效/零 round 的数量和 workload 身份都是 fail-closed 契约，发生变化即停止。
 
 ## 3. 延迟边界
 
@@ -56,11 +58,11 @@ Stage8 r3 目录全程只读。Stage9 只写 `outputs/capd_proactive_stage9/<run
 
 ## 5. CPU cycles
 
-cycles 只能来自 Linux `perf stat` 的硬件计数器。验证脚本使用 perf FIFO control：模型加载、Trace 定位和 20-round 预热时计数器关闭；每个 workload/seed 捕获首个预热后 full-shape 决策状态，只在 200 次无状态改变的正式 `b_max=4` round 重复区间启用计数器。18 个 snapshot 的启用区间累加，scope 数量写入 `perf_scope_counts.json`。
+cycles 只能来自 Linux `perf stat` 的硬件计数器。验证脚本使用 perf FIFO control：模型加载、Trace 定位和 20-round 预热时计数器关闭；对 9 个有效 workload/seed 捕获首个预热后 full-shape 决策状态，只在 200 次无状态改变的正式 `b_max=4` round 重复区间启用计数器。9 个 snapshot 的启用区间累加；另外 9 个零 round 单元的 job ID 单独记录，scope 数量写入 `perf_scope_counts.json`。
 
 perf 受控区间执行同一 stateless round，但移除 `perf_counter_ns` 调用和样本字典构造，避免把延迟插桩本身计入 cycles；候选构造、feature、模型推理、确定性排序、ranking 验证和 Top-b 均保留。原始 `perf -x ';'` 输出原样保存为 `perf/perf-stat.raw`，解析 `cycles`、`instructions`、`task-clock`、context switches、CPU migrations 和 page faults。cycles/round、cycles/page 只除以受控区间的实际 round/page 数。
 
-若 `perf_event_paranoid`、虚拟机或硬件限制导致 `<not supported>`、`<not counted>` 或权限错误，run 必须变为 `stage9_not_verified`。禁止使用墙钟乘 CPU 频率估算 cycles。
+服务器一键脚本会在创建 run 目录和执行昂贵 Replay 之前，实际运行一次 cycles、instructions、task-clock 硬件计数探针，并检查该 perf 版本支持 FIFO control。若 `perf_event_paranoid`、虚拟机或硬件限制导致 `<not supported>`、`<not counted>` 或权限错误，不消耗 run ID，直接要求管理员授权。正式计数若仍失败，run 必须变为 `stage9_not_verified`。cycles、instructions、task-clock 三项都必须可解析；禁止使用墙钟乘 CPU 频率估算 cycles。
 
 ## 6. 内存口径
 

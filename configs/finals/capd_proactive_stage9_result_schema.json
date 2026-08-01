@@ -62,6 +62,16 @@
   ],
   "perf_required_events": ["cycles", "instructions", "task-clock"],
   "perf_counter_source": "linux_perf_hardware",
+  "perf_scope_required_fields": [
+    "snapshot_count",
+    "measured_job_ids",
+    "measured_cells",
+    "zero_round_job_count",
+    "zero_round_job_ids",
+    "zero_round_cells",
+    "measured_rounds",
+    "measured_demoted_pages"
+  ],
   "perf_derived_fields": [
     "cpu_cycles_per_round",
     "cpu_cycles_per_demoted_page"
@@ -76,10 +86,25 @@
     "history_buffer",
     "candidate_tensor",
     "metadata_bytes_per_page",
-    "process_baseline_rss",
-    "total_peak_rss",
-    "stage9_incremental_peak_rss",
+    "rss",
     "management_fixed_bytes"
+  ],
+  "memory_rss_required_fields": [
+    "process_baseline_rss_bytes",
+    "process_baseline_rss_mib",
+    "total_peak_rss_bytes",
+    "total_peak_rss_mib",
+    "stage9_incremental_peak_rss_bytes",
+    "stage9_incremental_peak_rss_mib"
+  ],
+  "quality_group_required_fields": [
+    "cell_count",
+    "active_round_cell_count",
+    "zero_round_cell_count",
+    "weighted_cost_mean",
+    "early_reuse_rate_64_mean",
+    "early_reuse_rate_256_mean",
+    "early_reuse_rate_1024_mean"
   ],
   "capacity_required_fields": [
     "workload",
