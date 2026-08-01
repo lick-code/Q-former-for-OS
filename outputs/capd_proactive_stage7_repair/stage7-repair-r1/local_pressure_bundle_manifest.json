@@ -1,0 +1,83 @@
+{
+  "bundle_root": ".",
+  "candidate_statistics": "pressure_candidates.csv",
+  "capacity_matrices": {
+    "guarded": "capacity_matrix_guarded.json",
+    "standard": "capacity_matrix_standard.json"
+  },
+  "configuration": {
+    "frozen_parameters_path": "frozen_parameters.json",
+    "frozen_parameters_sha256": "baed989f75e2d4523394d35765df8476fd7143eb31c6713a7276bae460a7f950",
+    "source_path": "configs/finals/capd_proactive_stage7_repair.json",
+    "source_sha256": "bc763721a3af35548195c30c2700ae0a09b2b85a7092d4999d74b2336d56e410"
+  },
+  "contract_id": "CAPD-PROACTIVE-STAGE7-REPAIR-R1-R4-1.0",
+  "derived_pressure": [],
+  "excluded_stages": [
+    "R5",
+    "R6",
+    "R7",
+    "R8",
+    "R9",
+    "R10",
+    "R11"
+  ],
+  "files": [
+    {
+      "bytes": 6634,
+      "path": "capacity_matrix_guarded.json",
+      "sha256": "cf1b3053ff583912f8e67ea5b4f3495871fcb0d2846a5736d2aa69257ef248c1"
+    },
+    {
+      "bytes": 6588,
+      "path": "capacity_matrix_standard.json",
+      "sha256": "54ca4d7f9425bda495f6a77d3c5f9f9d53431053b275954908a3f6422881c344"
+    },
+    {
+      "bytes": 2365,
+      "path": "frozen_parameters.json",
+      "sha256": "baed989f75e2d4523394d35765df8476fd7143eb31c6713a7276bae460a7f950"
+    },
+    {
+      "bytes": 307005,
+      "path": "pressure_candidates.csv",
+      "sha256": "d21f8d5e9469bbe98dbc409ca730e517d2f9b556145041626bc51f2b7a650ce1"
+    },
+    {
+      "bytes": 14047,
+      "path": "pressure_test_lock.json",
+      "sha256": "fefb80e5ba7bb6ae43890ba8d9afac0986f7314f65f1ae5c5326eb72b5585d65"
+    },
+    {
+      "bytes": 11890,
+      "path": "pressure_window_manifest.json",
+      "sha256": "d2411ae63883c2f37d3058facb002e1d925731ba9d152ecd76ac726528317a67"
+    },
+    {
+      "bytes": 16304,
+      "path": "raw_identity_audit.json",
+      "sha256": "aadbc2963aea02e60ec170d31e94f06cd0e0c9aabe28a3a61e593490ff9f992a"
+    },
+    {
+      "bytes": 31832,
+      "path": "stage3_pressure_audit.json",
+      "sha256": "09e49a01e1861b19e300355a4e8d59cf68cdf329a6a6451509712dc11e4e751e"
+    }
+  ],
+  "formal_pressure_bundle": false,
+  "included_stages": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "input_identity_sha256": "ae25d91dda836716ed3c7cea7749e4e845302923cd88bdda07ad308e77241cc5",
+  "pressure_overhead_claims_allowed": false,
+  "revocation_reason": "R2-R4_not_formally_frozen",
+  "run_id": "stage7-repair-r1",
+  "schema_version": "capd_stage7_repair_local_pressure_bundle_v1_0",
+  "server_consumption_rule": "forbidden",
+  "server_may_rescan_or_rederive": false,
+  "status": "revoked_pending_parameter_reselection",
+  "window_lock": "pressure_test_lock.json"
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": "capd_proactive_stage7_repair_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE7-REPAIR-R1-R4-1.0",
+  "execution_scope": "local_r1_r4_only",
+  "source_stage7_run_id": "stage7-server-suite-r1",
+  "parameter_status": "pending_stage3_stage4_parameter_reselection",
+  "formal_freeze_allowed": false,
+  "workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure",
+    "blackscholes",
+    "swaptions",
+    "fluidanimate"
+  ],
+  "candidate_parameters_snapshot": {
+    "F_low": 8,
+    "F_target": 16,
+    "b_max": 4,
+    "K": 8,
+    "H": 20,
+    "L": 256,
+    "lambda": [1, 1, 2],
+    "seeds": [3136859, 42, 2026],
+    "tpp_inspired": {
+      "epoch_length": 1024,
+      "cold_threshold": 1,
+      "dirty_tie_break": false
+    },
+    "cost_profile": {
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8,
+      "demotion": 10
+    }
+  },
+  "capacity": {
+    "working_set_definition": "unique_pages_in_train_validation_union",
+    "requested_ratios": ["0.20", "0.40", "0.60"],
+    "rounding": "decimal_ceiling",
+    "reserve_fraction_cap": 0.25,
+    "D_guard_min": 64
+  },
+  "split_contract": {
+    "total_accesses": 3000000,
+    "train": [0, 1800000],
+    "validation": [1800000, 2400000],
+    "test": [2400000, 3000000],
+    "interval": "half_open",
+    "chronological": true,
+    "shuffle": false
+  },
+  "pressure_scan": {
+    "policy": "reactive_lru",
+    "initial_state": "empty_dram_per_candidate",
+    "test_interval": [2400000, 3000000],
+    "window_records": 100000,
+    "scan_step": 10000,
+    "minimum_lru_replacement_decisions": 100,
+    "unique_pages_rule": "strictly_greater_than_D_guarded_plus_F_target",
+    "selection_features": [
+      "reactive_lru_decisions",
+      "unique_pages",
+      "earliest_start"
+    ],
+    "prohibited_selection_features": [
+      "capd",
+      "oracle",
+      "tpp",
+      "weighted_cost",
+      "stage8",
+      "policy_result"
+    ]
+  },
+  "source_authority": {
+    "stage4_verification": "outputs/capd_proactive_stage4/stage4-f8-f16-r3/verification.json",
+    "stage6_verification": "outputs/capd_proactive_stage6/stage6-tpp-r1/verification.json"
+  },
+  "pressure_overhead_claims_allowed": false,
+  "test_access_policy": {
+    "r1_r3_test_payload_allowed": false,
+    "r4_reader": "fixed_reactive_lru_only",
+    "capd_or_oracle_selection_allowed": false
+  },
+  "prohibited_local_stages": ["R5", "R6", "R7", "R8", "R9", "R10", "R11"]
+}

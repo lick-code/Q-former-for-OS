@@ -1,0 +1,104 @@
+{
+  "authority": {
+    "stage4_verification": {
+      "path": "outputs/capd_proactive_stage4/stage4-f8-f16-r3/verification.json",
+      "sha256": "5655a300c8ab27a00522067740c58e88e35bb5461dae7d66b617371470802db9"
+    },
+    "stage6_verification": {
+      "path": "outputs/capd_proactive_stage6/stage6-tpp-r1/verification.json",
+      "sha256": "84321235521cff69b0a24cb5df53f5c6c9da99029cbd1f0d069e8805644adb6d"
+    }
+  },
+  "candidate_parameters_snapshot": {
+    "F_low": 8,
+    "F_target": 16,
+    "H": 20,
+    "K": 8,
+    "L": 256,
+    "b_max": 4,
+    "cost_profile": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    },
+    "lambda": [
+      1,
+      1,
+      2
+    ],
+    "seeds": [
+      3136859,
+      42,
+      2026
+    ],
+    "tpp_inspired": {
+      "cold_threshold": 1,
+      "dirty_tie_break": false,
+      "epoch_length": 1024
+    }
+  },
+  "capacity": {
+    "D_guard_min": 64,
+    "requested_ratios": [
+      "0.20",
+      "0.40",
+      "0.60"
+    ],
+    "reserve_fraction_cap": 0.25,
+    "rounding": "decimal_ceiling",
+    "working_set_definition": "unique_pages_in_train_validation_union"
+  },
+  "config_path": "configs/finals/capd_proactive_stage7_repair.json",
+  "config_sha256": "bc763721a3af35548195c30c2700ae0a09b2b85a7092d4999d74b2336d56e410",
+  "contract_id": "CAPD-PROACTIVE-STAGE7-REPAIR-R1-R4-1.0",
+  "formal_freeze": false,
+  "hyperparameters_reselected": false,
+  "local_execution_scope": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "pressure_overhead_claims_allowed": false,
+  "pressure_scan": {
+    "initial_state": "empty_dram_per_candidate",
+    "minimum_lru_replacement_decisions": 100,
+    "policy": "reactive_lru",
+    "prohibited_selection_features": [
+      "capd",
+      "oracle",
+      "tpp",
+      "weighted_cost",
+      "stage8",
+      "policy_result"
+    ],
+    "scan_step": 10000,
+    "selection_features": [
+      "reactive_lru_decisions",
+      "unique_pages",
+      "earliest_start"
+    ],
+    "test_interval": [
+      2400000,
+      3000000
+    ],
+    "unique_pages_rule": "strictly_greater_than_D_guarded_plus_F_target",
+    "window_records": 100000
+  },
+  "prohibited_local_stages": [
+    "R5",
+    "R6",
+    "R7",
+    "R8",
+    "R9",
+    "R10",
+    "R11"
+  ],
+  "run_id": "stage7-repair-r1",
+  "schema_version": "capd_stage7_repair_frozen_parameters_v1_0",
+  "selection_source": "stage4-f8-f16-r3_calibration",
+  "server_consumption_allowed": false,
+  "status": "exploratory_old_parameter_artifact_not_frozen",
+  "supersession_reason": "pending_stage3_stage4_parameter_reselection"
+}

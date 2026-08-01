@@ -1,0 +1,25 @@
+{
+  "R1": "verified_and_retained",
+  "R2": "paused_not_formally_frozen",
+  "R3": "paused_not_formally_frozen",
+  "R4": "paused_not_formally_frozen",
+  "R5_R11_allowed": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE7-REPAIR-R1-R4-1.0",
+  "formal_pressure_bundle_export_allowed": false,
+  "non_authoritative_old_parameter_artifacts": [
+    "frozen_parameters.json",
+    "capacity_matrix_standard.json",
+    "capacity_matrix_guarded.json",
+    "stage3_pressure_audit.json",
+    "pressure_candidates.csv",
+    "pressure_window_manifest.json",
+    "pressure_test_lock.json",
+    "local_pressure_bundle_manifest.json"
+  ],
+  "parameter_status": "pending_stage3_stage4_parameter_reselection",
+  "resume_requirement": "freeze_new_stage3_stage4_parameters_and_use_a_new_run_id",
+  "run_id": "stage7-repair-r1",
+  "schema_version": "capd_stage7_repair_pause_v1_0",
+  "server_consumption_allowed": false,
+  "status": "R1_verified_R2_R4_paused"
+}
