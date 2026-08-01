@@ -229,7 +229,8 @@ class ReplayParameters(object):
   def __init__(
       self, policy_name, dram_capacity_pages, F_low=None, F_target=None,
       b_max=None, candidate_size_K=None, history_window_size=10,
-      early_reuse_window=64, non_demotable_pages=None):
+      early_reuse_window=64, non_demotable_pages=None,
+      allow_b_max_equal_candidate_size=False):
     self.policy_name = str(policy_name)
     self.dram_capacity_pages = _positive_integer(
         dram_capacity_pages, "dram_capacity_pages")
@@ -264,8 +265,16 @@ class ReplayParameters(object):
     if self.F_target > self.dram_capacity_pages:
       raise ReplayConfigurationError(
           "F_target cannot exceed dram_capacity_pages.")
-    if not (1 <= self.b_max < self.candidate_size_K):
-      raise ReplayConfigurationError("Fixture requires 1 <= b_max < K.")
+    batch_bound_valid = (
+        1 <= self.b_max <= self.candidate_size_K
+        if allow_b_max_equal_candidate_size else
+        1 <= self.b_max < self.candidate_size_K)
+    if not batch_bound_valid:
+      raise ReplayConfigurationError(
+          "Fixture requires 1 <= b_max {} K.".format(
+              "<=" if allow_b_max_equal_candidate_size else "<"))
+    self.allow_b_max_equal_candidate_size = bool(
+        allow_b_max_equal_candidate_size)
 
   @classmethod
   def from_fixture(cls, policy_name, value):
@@ -288,7 +297,7 @@ class ReplayParameters(object):
     )
 
   def to_dict(self):
-    return {
+    value = {
         "policy_name": self.policy_name,
         "dram_capacity_pages": self.dram_capacity_pages,
         "F_low": self.F_low,
@@ -300,6 +309,9 @@ class ReplayParameters(object):
         "non_demotable_pages": sorted(self.non_demotable_pages),
         "parameter_status": "non_formal_fixture",
     }
+    if getattr(self, "allow_b_max_equal_candidate_size", False):
+      value["allow_b_max_equal_candidate_size"] = True
+    return value
 
 
 class CandidateRankingPolicy(object):

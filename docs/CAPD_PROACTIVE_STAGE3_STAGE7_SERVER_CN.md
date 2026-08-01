@@ -1,0 +1,335 @@
+# CAPD Stage 3 适配 Stage 7 六 Workload 服务器执行指南
+
+本文只执行 Stage 3 Train/Validation 校准。禁止把任何 Test、Pressure Test、
+Stage 8 结果或旧 CAPD/Oracle Test 指标传给本 runner。本文不执行 Stage 4，
+不训练模型，也不生成 Pressure CSV 或 Pressure Test lock。
+
+固定 run ID：
+
+```text
+stage3-stage7-calibration-r1
+```
+
+固定输出目录：
+
+```text
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/
+```
+
+以下命令逐段复制执行。不要在交互终端前置 `set -e`；这样某条命令失败时
+终端仍保留，便于查看错误和继续排查。
+
+## 1. 进入仓库并激活环境
+
+```bash
+cd "$HOME/Q-former-for-OS"
+conda activate capd
+pwd
+```
+
+## 2. 检查 Git 状态
+
+```bash
+git status --short
+git rev-parse HEAD
+```
+
+工作区可以包含本轮 Stage 3 未提交文件，但不得覆盖旧 Stage 3、R1 或其他
+已验证输出。
+
+## 3. 检查 Python、PyTorch 和 CUDA
+
+```bash
+python3 -c 'import sys; print(sys.version)'
+python3 -c 'import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.device_count())'
+```
+
+Stage 3 Replay 本身使用 CPU；这里检查 CUDA 只是确认服务器环境完整，不会
+启动 Stage 4 训练。
+
+## 4. 编译本轮新增和修改的 Python
+
+```bash
+python3 -m py_compile \
+  qmap/proactive_stage3_stage7.py \
+  qmap/proactive_replay.py \
+  scripts/run_capd_proactive_stage3_stage7.py \
+  tests/test_capd_proactive_stage3_stage7.py
+```
+
+任何编译错误都先停止，不要创建或删除实验目录来绕过。
+
+## 5. 运行新 Stage 3 测试
+
+```bash
+python3 -m unittest tests.test_capd_proactive_stage3_stage7 -v
+```
+
+## 6. 运行旧 Stage 3 和共享 Replay 回归测试
+
+```bash
+python3 -m unittest \
+  tests.test_capd_proactive_stage3 \
+  tests.test_capd_proactive_replay \
+  tests.test_capd_proactive_stage4 -v
+```
+
+必须同时验证旧 Stage 3 接口。`proactive_replay` 的新开关只允许新 Stage 3
+显式测试 `b_max=K=8`；旧调用仍执行原来的 `b_max < K` 合同。
+
+## 7. 执行 preflight
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py preflight \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD"
+```
+
+该阶段只接受 R1 权威链中的 6 Train + 6 Validation。它会校验 R1
+`raw_identity_audit.json`、`verification.json`、12 个 split SHA、配置 SHA 和
+代码 SHA。任何 Test role、`formal_test=true`、`standard_test_lock`、
+`pressure_test` 或 `stage8` 路径都会立即失败。
+
+查看输入合同：
+
+```bash
+python3 -m json.tool \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/input_manifest.json
+```
+
+确认 `input_entry_count` 的实际含义为 12 项，且只出现 `train`、
+`validation`。
+
+## 8. 执行 profile
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py profile \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD"
+```
+
+该阶段保存所有 100k/300k/500k 连续窗口。Train 被划分为三个连续 block；
+Validation 保持独立，不跨 split 或 block。每个窗口以空 DRAM 开始，不
+shuffle。窗口 LRU stack-distance 只计算一次，并同时解析所有候选容量，避免
+对每个容量重复扫描整个窗口。
+
+## 9. 执行 search
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py search \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD"
+```
+
+search 可能是本轮耗时最长的阶段。进度和逐任务 checkpoint 位于：
+
+```bash
+tail -f outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/logs/progress.jsonl
+```
+
+另开一个终端执行 `tail -f`；原执行终端保持不动。窗口哨兵只按
+Reactive-LRU replacement decisions、unique pages、起点顺序选择。Oracle、
+weighted cost 和任何模型结果不参与选窗。
+
+## 10. 执行 select
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py select \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD"
+```
+
+该阶段依次应用压力覆盖、Oracle 非零 headroom、主动机制效果、Validation
+安全门禁和 Pareto frontier。它只生成候选，不正式 freeze。
+
+## 11. 执行 verify
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py verify \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD"
+```
+
+成功候选的状态应为：
+
+```text
+STAGE3_STAGE7_FREEZE_CANDIDATE_VERIFIED
+```
+
+如果输出 `STAGE3_STAGE7_GATES_BLOCKED`，说明代码和产物验证完成，但数据没有
+通过进入 Stage 4 的机制门禁；此时禁止 freeze，也禁止通过查看 Test 调参。
+
+## 12. 查看 Pressure coverage
+
+```bash
+python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_coverage.json"; d=json.load(open(p)); print("rows",len(d["rows"])); [(print(r["coverage_id"],r["workload"],r["train_pressure_window_count"],r["train_pressure_coverage"],r["validation_pressure_window_count"],r["validation_pressure_coverage"])) for r in d["rows"][:30]]'
+```
+
+完整数据保留在 JSON 中，以上只打印前 30 行用于快速检查。
+
+## 13. 查看 Oracle headroom
+
+```bash
+python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/oracle_headroom.json"; d=json.load(open(p)); print(json.dumps(d["gate"],indent=2)); print("rows",len(d["rows"]))'
+```
+
+若所有合格窗口 headroom 都为 0，Stage 3 必须阻止进入 Stage 4。
+
+## 14. 查看 Validation safety
+
+```bash
+python3 -c 'import json,collections; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/validation_safety.json"; d=json.load(open(p)); c=collections.Counter(reason for row in d["rows"] if not row["passed"] for reason in row["reasons"]); print("rows",len(d["rows"])); print(c)'
+```
+
+重点检查 `meaningless_proactive_demotions`、`weighted_cost_regression`、
+`high_early_reuse` 和 `normal_dram_residency_degraded`。
+
+## 15. 查看 Pareto frontier
+
+```bash
+python3 -c 'import json; p="outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pareto_frontier.json"; d=json.load(open(p)); print("frontier",len(d["frontier"])); [print(r) for r in d["frontier"]]'
+```
+
+## 16. 查看 final freeze candidate
+
+```bash
+python3 -m json.tool \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze_candidate.json
+
+python3 -m json.tool \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract_candidate.json
+```
+
+检查实际逐 workload `D_pressure/F_low/F_target`、窗口长度、W_ref 分位数、
+`b_max`、所有门禁和选择理由。此时以下文件必须仍不存在：
+
+```bash
+test ! -e outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json
+test ! -e outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+```
+
+## 17. 人工确认后显式 freeze
+
+只有人工复核候选并同意后，才执行：
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py freeze \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD" \
+  --candidate outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze_candidate.json \
+  --confirm-stage3-stage7-freeze
+```
+
+缺少候选路径或确认参数时必须失败。`all` 命令永远不会代替这一步。
+
+## 18. freeze 后验证
+
+```bash
+python3 -m json.tool \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json
+
+python3 -m json.tool \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+
+sha256sum \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+```
+
+正式合同仍只描述以后如何生成 Pressure；本 runner 不生成 Pressure CSV 或
+Pressure Test lock。
+
+## 19. 断点续跑
+
+某阶段中断后，保留原目录，使用同一命令加 `--resume`。例如：
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py search \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD" \
+  --resume
+```
+
+也可以从头按阶段自动跳过已完成项：
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py all \
+  --config configs/finals/capd_proactive_stage3_stage7_calibration.json \
+  --run-id stage3-stage7-calibration-r1 \
+  --project-root "$PWD" \
+  --resume
+```
+
+`all` 的顺序固定为 `preflight -> profile -> search -> select -> verify`，结束
+标记为：
+
+```text
+STAGE3_STAGE7_ALL_COMPLETE_FREEZE_NOT_EXECUTED
+```
+
+## 20. 失败处理
+
+- 不删除失败目录，不用删除后重跑伪装首次成功。
+- 输入 SHA、配置 SHA 和代码 SHA 完全一致：使用 `--resume`。
+- 任一 SHA 或代码身份改变：保留 r1 目录，改用新的 run ID，例如
+  `stage3-stage7-calibration-r2`。
+- R1 SHA/状态失败：立即停止，不绕过、不重跑 R1。
+- Oracle 全零 headroom：保留失败门禁，不进入 Stage 4。
+- Validation safety 失败：保留逐候选原因，不查看 Test 后调参。
+- 不执行 Stage 4、Stage 8、模型训练或 Pressure Test 生成来“补救”Stage 3。
+
+查看失败状态：
+
+```bash
+python3 -m json.tool \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/run_state.json
+
+tail -n 100 \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/logs/progress.jsonl
+```
+
+## 21. 打包结果并计算 SHA256
+
+在 freeze 前返回候选也可以；若已正式 freeze，则两个正式文件会一并打包。
+
+```bash
+tar -czf capd-stage3-stage7-calibration-r1-results.tar.gz \
+  outputs/capd_proactive_stage3/stage3-stage7-calibration-r1
+
+sha256sum capd-stage3-stage7-calibration-r1-results.tar.gz \
+  > capd-stage3-stage7-calibration-r1-results.tar.gz.sha256
+
+cat capd-stage3-stage7-calibration-r1-results.tar.gz.sha256
+```
+
+## 22. 带回本地的产物
+
+需要带回：
+
+```text
+capd-stage3-stage7-calibration-r1-results.tar.gz
+capd-stage3-stage7-calibration-r1-results.tar.gz.sha256
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/run_state.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/verification.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_coverage.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/oracle_headroom.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/validation_safety.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pareto_frontier.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/selection_rationale.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze_candidate.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract_candidate.json
+```
+
+若已人工 freeze，再额外带回：
+
+```text
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/final_freeze.json
+outputs/capd_proactive_stage3/stage3-stage7-calibration-r1/pressure_generation_contract.json
+```

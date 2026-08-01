@@ -1,0 +1,316 @@
+# coding=utf-8
+"""Contract tests for six-workload Stage-7 Stage-3 calibration.
+
+These tests are intentionally executable without opening any real trace.  The
+Linux server suite supplies the integration coverage for CSV loading/replay.
+"""
+
+from __future__ import annotations
+
+import copy
+import json
+import os
+import tempfile
+import unittest
+
+from qmap import proactive_stage3_stage7 as stage3
+from qmap import proactive_replay
+
+
+PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+CONFIG_PATH = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_stage3_stage7_calibration.json")
+
+
+class Stage3Stage7ContractTest(unittest.TestCase):
+
+  def setUp(self):
+    with open(CONFIG_PATH, "r", encoding="utf-8") as handle:
+      self.config = json.load(handle)
+
+  def test_config_freezes_six_workloads_and_stage3_only_search_space(self):
+    stage3.validate_config(self.config)
+    self.assertEqual(stage3.WORKLOADS, tuple(self.config["workloads"]))
+    self.assertEqual([100000, 300000, 500000],
+                     self.config["windowing"]["calibration_window_records"])
+    self.assertEqual([0.05, 0.10, 0.15, 0.20],
+                     self.config["pressure_capacity"]["ratios"])
+    self.assertEqual([1, 2, 4, 8],
+                     self.config["controller_search"]["b_max_candidates"])
+    self.assertEqual(8, self.config["fixed_stage3"]["candidate_size_K"])
+    self.assertNotIn("L", self.config["search_space"])
+    self.assertNotIn("H", self.config["search_space"])
+    self.assertFalse(self.config["provenance"]["test_used_for_selection"])
+
+  def test_test_split_and_formal_test_are_hard_rejected(self):
+    for value in (
+        {"split_role": "test", "formal_test": False, "trace_path": "x.csv"},
+        {"split": "test", "formal_test": False, "trace_path": "x.csv"},
+        {"split_role": "validation", "formal_test": True,
+         "trace_path": "x.csv"}):
+      with self.assertRaises(stage3.Stage3Stage7Error):
+        stage3.reject_forbidden_input(value)
+
+  def test_forbidden_path_names_are_hard_rejected(self):
+    for token in ("standard_test_lock", "pressure_test", "stage8"):
+      with self.assertRaises(stage3.Stage3Stage7Error):
+        stage3.reject_forbidden_input({
+            "split_role": "validation", "formal_test": False,
+            "trace_path": "/tmp/{}/input.csv".format(token)})
+
+  def test_old_capd_and_oracle_test_metrics_are_hard_rejected(self):
+    for source in ("old_capd_test_results.json", "oracle_test_metrics.json"):
+      with self.assertRaises(stage3.Stage3Stage7Error):
+        stage3.reject_forbidden_input({
+            "split_role": "validation", "formal_test": False,
+            "metrics_source": source})
+
+  def test_authoritative_sha_chain_accepts_only_train_validation(self):
+    authority = {
+        "run_id": "stage7-repair-r1",
+        "status": "STAGE7_REPAIR_RAW_IDENTITY_VERIFIED",
+        "input_identity_sha256": self.config["r1_authority"][
+            "input_identity_sha256"],
+        "identity_access_only": True,
+        "policy_metrics_read": False,
+        "workloads": []}
+    for workload in stage3.WORKLOADS:
+      authority["workloads"].append({
+          "workload": workload, "page_shift": 12,
+          "source_trace_id": workload + "-trace",
+          "splits": {
+              "train": {
+                  "recorded_path": "splits/{}/train.csv".format(workload),
+                  "sha256_declared": "a" * 64,
+                  "sha256_actual": "a" * 64,
+                  "accesses": 1800000,
+                  "interval": {"start_inclusive": 0,
+                               "end_exclusive": 1800000}},
+              "validation": {
+                  "recorded_path": "splits/{}/validation.csv".format(workload),
+                  "sha256_declared": "b" * 64,
+                  "sha256_actual": "b" * 64,
+                  "accesses": 600000,
+                  "interval": {"start_inclusive": 1800000,
+                               "end_exclusive": 2400000}},
+              "test": {"recorded_path": "must-not-be-copied/test.csv"}}})
+    manifest = stage3.manifest_from_r1_authority(
+        authority, self.config, verify_files=False)
+    self.assertEqual(12, len(manifest["entries"]))
+    self.assertEqual({"train", "validation"},
+                     {row["split_role"] for row in manifest["entries"]})
+    self.assertFalse(any("test" in row["trace_path"].lower()
+                         for row in manifest["entries"]))
+    changed = copy.deepcopy(manifest)
+    changed["entries"][0]["sha256"] = "c" * 64
+    with self.assertRaises(stage3.Stage3Stage7Error):
+      stage3.validate_input_manifest(changed, authority)
+
+  def test_multiscale_windows_are_deterministic_and_never_cross_blocks(self):
+    first = stage3.build_window_descriptors(
+        "train", 1800000, [100000, 300000, 500000], 10000, 3)
+    second = stage3.build_window_descriptors(
+        "train", 1800000, [100000, 300000, 500000], 10000, 3)
+    self.assertEqual(first, second)
+    self.assertTrue(first)
+    for row in first:
+      self.assertGreaterEqual(row["start_record"], row["block_start_record"])
+      self.assertLessEqual(row["end_record"], row["block_end_record"])
+      self.assertEqual(row["window_records"],
+                       row["end_record"] - row["start_record"])
+      self.assertFalse(row["crosses_split_boundary"])
+
+  def test_blocked_calibration_is_chronological_and_not_shuffled(self):
+    rows = stage3.build_window_descriptors(
+        "train", 1800000, [100000], 10000, 3)
+    self.assertEqual([0, 1, 2], sorted({row["block_index"] for row in rows}))
+    for block in (0, 1, 2):
+      starts = [row["start_record"] for row in rows
+                if row["block_index"] == block]
+      self.assertEqual(starts, sorted(starts))
+    self.assertTrue(all(row["chronological"] for row in rows))
+    self.assertTrue(all(not row["shuffle"] for row in rows))
+
+  def test_nearest_rank_wref_quantiles(self):
+    values = [1, 2, 3, 4]
+    self.assertEqual(2, stage3.nearest_rank(values, 0.50))
+    self.assertEqual(3, stage3.nearest_rank(values, 0.75))
+    self.assertEqual(4, stage3.nearest_rank(values, 0.90))
+
+  def test_standard_capacity_preserves_union_definition(self):
+    rows = stage3.standard_capacity_rows("w", 101, [0.20, 0.40, 0.60])
+    self.assertEqual([21, 41, 61], [row["D_standard"] for row in rows])
+    self.assertTrue(all(
+        row["working_set_definition"] ==
+        "unique_pages_in_train_validation_union" for row in rows))
+
+  def test_pressure_capacity_uses_new_ratios_without_64_page_guard(self):
+    rows = [stage3.pressure_capacity_row("w", 100, 0.5, ratio)
+            for ratio in (0.05, 0.10, 0.15, 0.20)]
+    self.assertEqual([8, 10, 15, 20],
+                     [row["D_pressure"] for row in rows])
+    self.assertEqual([5, 10, 15, 20],
+                     [row["D_pressure_raw"] for row in rows])
+    self.assertTrue(rows[0]["minimum_capacity_applied"])
+    self.assertFalse(any(row["D_pressure"] == 64 for row in rows))
+
+  def test_dynamic_watermark_rounding_clamp_and_legality(self):
+    value = stage3.dynamic_watermark(40, 0.10, 0.5)
+    self.assertEqual((2, 4), (value["F_low"], value["F_target"]))
+    clamped = stage3.dynamic_watermark(1000, 0.20, 0.6)
+    self.assertEqual(16, clamped["F_target"])
+    self.assertLess(clamped["F_low"], clamped["F_target"])
+    self.assertLess(clamped["F_target"], clamped["D"])
+    self.assertLessEqual(clamped["reserve_fraction"], 0.25)
+    minimum = stage3.dynamic_watermark(8, 0.20, 0.6)
+    self.assertEqual((1, 2), (minimum["F_low"], minimum["F_target"]))
+    self.assertEqual(0.25, minimum["F_target_over_D"])
+
+  def test_b_t_obeys_batch_gap_and_candidate_bounds(self):
+    self.assertEqual(0, stage3.compute_b_t(8, 16, 16, 4, 8))
+    self.assertEqual(4, stage3.compute_b_t(8, 16, 4, 4, 8))
+    self.assertEqual(2, stage3.compute_b_t(8, 16, 4, 8, 2))
+    for free_frames in range(0, 20):
+      value = stage3.compute_b_t(8, 16, free_frames, 8, 5)
+      self.assertGreaterEqual(value, 0)
+      self.assertLessEqual(value, 8)
+      self.assertLessEqual(value, max(0, 16 - free_frames))
+      self.assertLessEqual(value, 5)
+
+  def test_stage3_can_evaluate_bmax_equal_K_without_changing_old_default(self):
+    with self.assertRaises(proactive_replay.ReplayConfigurationError):
+      proactive_replay.ReplayParameters(
+          policy_name="proactive_lru", dram_capacity_pages=40,
+          F_low=4, F_target=8, b_max=8, candidate_size_K=8)
+    old = proactive_replay.ReplayParameters(
+        policy_name="proactive_lru", dram_capacity_pages=40,
+        F_low=4, F_target=8, b_max=4, candidate_size_K=8)
+    self.assertNotIn("allow_b_max_equal_candidate_size", old.to_dict())
+    value = proactive_replay.ReplayParameters(
+        policy_name="proactive_lru", dram_capacity_pages=40,
+        F_low=4, F_target=8, b_max=8, candidate_size_K=8,
+        allow_b_max_equal_candidate_size=True)
+    self.assertEqual(8, value.b_max)
+    self.assertTrue(value.allow_b_max_equal_candidate_size)
+    self.assertTrue(value.to_dict()["allow_b_max_equal_candidate_size"])
+
+  def test_pressure_eligibility_records_every_failure_reason(self):
+    self.assertEqual(["eligible"], stage3.pressure_eligibility(30, 20, 4, 100))
+    reasons = stage3.pressure_eligibility(24, 20, 4, 99)
+    self.assertIn("unique_pages_not_greater_than_D_plus_F_target", reasons)
+    self.assertIn("lru_replacement_decisions_below_100", reasons)
+    self.assertIn("invalid_capacity_or_watermark",
+                  stage3.pressure_eligibility(12, 8, 3, 100))
+    self.assertIn("split_boundary_violation",
+                  stage3.pressure_eligibility(30, 20, 4, 100,
+                                              split_boundary_valid=False))
+
+  def test_reactive_only_sentinel_selection_rejects_policy_metrics(self):
+    rows = [
+        {"start_record": 0, "unique_pages": 30,
+         "lru_replacement_decisions": 120, "eligible": True},
+        {"start_record": 10000, "unique_pages": 40,
+         "lru_replacement_decisions": 120, "eligible": True}]
+    selected = stage3.choose_reactive_sentinels(rows)
+    self.assertEqual(10000, selected["pressure"]["start_record"])
+    bad = copy.deepcopy(rows)
+    bad[0]["oracle_headroom"] = 1
+    with self.assertRaises(stage3.Stage3Stage7Error):
+      stage3.choose_reactive_sentinels(bad)
+    bad = copy.deepcopy(rows)
+    bad[0]["weighted_cost"] = 1
+    with self.assertRaises(stage3.Stage3Stage7Error):
+      stage3.choose_reactive_sentinels(bad)
+
+  def test_oracle_zero_headroom_blocks_stage4_candidate(self):
+    blocked = stage3.oracle_headroom_gate([
+        {"oracle_headroom": 0.0}, {"oracle_headroom": 0.0}])
+    self.assertFalse(blocked["passed"])
+    self.assertFalse(blocked["stage4_candidate_allowed"])
+    passed = stage3.oracle_headroom_gate([
+        {"oracle_headroom": 0.0}, {"oracle_headroom": 1.0}])
+    self.assertTrue(passed["passed"])
+
+  def test_validation_low_pressure_rejects_pointless_demotion(self):
+    reactive = {"default_weighted_cost": 100, "dram_hits": 90,
+                "reactive_demotions": 0, "page_enter_dram_count": 2}
+    proactive = {"default_weighted_cost": 110, "dram_hits": 80,
+                 "proactive_demotions": 5, "early_reuse_rate": 0.5}
+    result = stage3.validation_safety_gate(
+        reactive, proactive, self.config["validation_safety"])
+    self.assertFalse(result["passed"])
+    self.assertIn("meaningless_proactive_demotions", result["reasons"])
+    self.assertIn("weighted_cost_regression", result["reasons"])
+    self.assertIn("high_early_reuse", result["reasons"])
+    self.assertIn("normal_dram_residency_degraded", result["reasons"])
+
+  def test_pareto_frontier_and_tie_break_are_deterministic(self):
+    rows = [
+        {"candidate_id": "a", "weighted_cost_delta": -2.0,
+         "empty_frame_exhaustion_reduction": 1.0,
+         "minimum_free_frames": 2.0, "early_reuse_ratio": 0.1,
+         "proactive_demotion_count": 10, "oracle_headroom_utilization": 0.5,
+         "pressure_coverage": 0.5, "validation_safety_passed": True},
+        {"candidate_id": "b", "weighted_cost_delta": -1.0,
+         "empty_frame_exhaustion_reduction": 2.0,
+         "minimum_free_frames": 3.0, "early_reuse_ratio": 0.1,
+         "proactive_demotion_count": 9, "oracle_headroom_utilization": 0.4,
+         "pressure_coverage": 0.5, "validation_safety_passed": True},
+        {"candidate_id": "dominated", "weighted_cost_delta": 1.0,
+         "empty_frame_exhaustion_reduction": 0.0,
+         "minimum_free_frames": 0.0, "early_reuse_ratio": 0.5,
+         "proactive_demotion_count": 20, "oracle_headroom_utilization": 0.0,
+         "pressure_coverage": 0.2, "validation_safety_passed": True}]
+    first = stage3.pareto_frontier(rows)
+    second = stage3.pareto_frontier(list(reversed(rows)))
+    self.assertEqual(first, second)
+    self.assertEqual(["a", "b"],
+                     sorted(row["candidate_id"] for row in first))
+    selected = stage3.select_from_frontier(first, self.config["selection"])
+    self.assertIn(selected["candidate_id"], ("a", "b"))
+
+  def test_resume_identity_changes_when_input_config_or_code_changes(self):
+    base = stage3.run_identity_payload("r", "a", "b", ["c"], ["d"])
+    self.assertNotEqual(
+        stage3.fingerprint_value(base),
+        stage3.fingerprint_value(stage3.run_identity_payload(
+            "r", "x", "b", ["c"], ["d"])))
+    self.assertNotEqual(
+        stage3.fingerprint_value(base),
+        stage3.fingerprint_value(stage3.run_identity_payload(
+            "r", "a", "b", ["changed"], ["d"])))
+
+  def test_all_phases_stop_before_freeze_and_freeze_is_explicit(self):
+    self.assertEqual(
+        ("preflight", "profile", "search", "select", "verify"),
+        stage3.ALL_PHASES)
+    self.assertNotIn("freeze", stage3.ALL_PHASES)
+    with self.assertRaises(stage3.Stage3Stage7Error):
+      stage3.require_freeze_confirmation(False, "candidate.json")
+    stage3.require_freeze_confirmation(True, "candidate.json")
+
+  def test_pressure_contract_forbids_test_results(self):
+    contract = stage3.build_pressure_contract_candidate({
+        "selected_window_records": 300000,
+        "W_ref_quantile": 0.75,
+        "standard_capacity_matrix": [],
+        "pressure_capacity_matrix": [],
+        "watermarks": [], "b_max": 4}, self.config)
+    self.assertFalse(contract["test_used_for_stage3_selection"])
+    self.assertFalse(contract["capd_or_oracle_used_for_pressure_selection"])
+    self.assertFalse(contract["pressure_overhead_claims_allowed"])
+    self.assertNotIn("test_results", contract)
+    stage3.assert_no_forbidden_result_dependency(contract)
+
+  def test_verification_boundary_flags_are_explicitly_false(self):
+    value = stage3.verification_boundary()
+    self.assertEqual({
+        "test_payload_opened": False,
+        "test_used_for_selection": False,
+        "stage8_results_used": False,
+        "pressure_test_generated": False}, value)
+
+
+if __name__ == "__main__":
+  unittest.main()
