@@ -1,657 +1,509 @@
-# CAPD Stage 7 Refit And Pressure Evaluation Repair Implementation Plan
+# CAPD Stage 7 Recalibration, Refit, and Final Evaluation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans` to implement this plan task-by-task. Stop at every explicit human freeze gate; a verified candidate is not approval.
 
-**Goal:** Preserve the six genuine Stage 7 raw traces, refit one global CAPD model from all six Train/Validation pairs with the already selected model settings, and rerun Stage 8 with separately reported Standard Test and traceable Pressure Test results.
+**Goal:** 基于六个真实 Stage 7 trace，重新校准 Stage 3 控制器与容量配置、重新搜索 Stage 4 模型超参数，并在冻结后的 Standard Test 和 Pressure Test 上完成最终 Stage 8。最终实验不继承旧固定参数，也不与旧实验做性能比较。
 
-**Architecture:** Keep every existing Stage 4/7/8 artifact immutable and create a repair namespace with new run IDs. A repair preparer audits raw SHA identities, builds a six-workload Train/Validation manifest, derives policy-independent contiguous Pressure Test windows, and freezes a versioned Stage 8 plan that points to newly trained checkpoints. Standard and Pressure results remain separate; Pressure results are forbidden from supporting memory, CPU, inference-time, or end-to-end latency claims.
+**Architecture:** R1 提供只读数据身份链；Stage 3 只用 Train/Validation 搜索 working set、窗口、容量、水位和批量机制；人工 freeze 后，一条分支在本地按冻结合同派生 Pressure Test，另一条分支在服务器搜索并训练统一 CAPD；两条分支冻结后才生成 Stage 8 计划。Test 永不反馈到 Stage 3/4。
 
-**Execution boundary:** Raw-trace audit, capacity analysis, Pressure-window scanning, derived Pressure CSV creation, and the local SHA bundle run only on the local workstation. All other executable work, including tests for training/replay code, dataset generation, vocabulary construction, training, checkpoint selection, Stage 8 replay, aggregation, and overhead measurement, runs only on the Linux server. The server may verify the local bundle but must not rescan, reselect, or regenerate Pressure windows.
+**Execution boundary:** 本地负责代码修改、R1 审计和 Pressure 派生；服务器负责测试、Stage 3、Stage 4、Stage 8 及统计运行。服务器只验证本地 Pressure 包，不能重新选窗。
 
-**Tech Stack:** Python 3.7-compatible code, PyTorch, CSV/JSON manifests, existing synchronous replay modules, `unittest`, Linux shell validation scripts.
+**Tech Stack:** Python 3.7-compatible code、PyTorch、CSV/JSON manifest、现有同步 replay 模块、`unittest`、PowerShell、Linux shell。
 
 ---
 
 ## Material Passport
 
 - Origin Skill: `academic-research-suite/experiment-agent`
-- Origin Mode: `plan`
-- Origin Date: `2026-08-01`
-- Verification Status: `UNVERIFIED_PLAN`
-- Version Label: `capd_stage7_repair_plan_v1`
+- Origin Mode: `implementation-plan`
+- Origin Date: `2026-08-02`
+- Verification Status: `PARTIALLY_IMPLEMENTED_STAGE3_RUNNING`
+- Version Label: `capd_stage7_recalibration_plan_v2`
 - Raw data access: read-only
-- Formal Test status: previously opened by invalid Stage 8; repaired evaluation must be reported as a protocol correction
+- Test selection status: forbidden for Stage 3/4
+- Performance comparison policy: current final experiment only; no old/new comparison
 
-## 1. Repair Decision And Boundaries
+---
 
-### 1.1 What is retained
+## 1. 当前事实与废止项
 
-- The six raw traces under `dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/` remain the only source data.
-- Existing chronological splits remain the Standard track:
-  - Train: `[0, 1800000)`
-  - Validation: `[1800000, 2400000)`
-  - Standard Test: `[2400000, 3000000)`
-- Frozen controller/model settings remain:
-  - `F_low=8`
-  - `F_target=16`
-  - `b_max=4`
-  - `K=8`
-  - `H=20`
-  - `L=256`
-  - `lambda=(1,1,2)`
-  - seeds `3136859`, `42`, `2026`
-  - TPP-inspired `epoch_length=1024`, `cold_threshold=1`, `dirty_tie_break=false`
-  - cost profile `1:2:8:10`
+### 1.1 当前事实
 
-### 1.2 What is invalidated
+- R1 原始 trace 审计已经完成。
+- `stage3-stage7-calibration-r2` 当前正在服务器运行。
+- Stage 3 尚未产生经人工同意的正式 freeze，所有超参数均未确定。
+- 新 Stage 4 Stage 7 专用实现尚未完成。
+- Pressure Test 尚未生成，必须等待 Stage 3 freeze。
+- 最终 Stage 8 尚不能执行。
 
-- `outputs/capd_proactive_stage8/stage8-sync-replay-r3/` remains on disk but is classified as `invalid_old_checkpoint_new_trace_diagnostic`.
-- The three Stage 4 checkpoints in `stage4-f8-f16-r3` are calibration checkpoints, not repaired final checkpoints.
-- The roles `seen_calibration_workload` and `held_out_unseen_workload` are removed from the repaired main experiment. All six workloads contribute Train/Validation data to one global CAPD model.
-- Standard and Pressure results must never be merged into one macro average.
+### 1.2 已废止的假设
 
-### 1.3 Integrity rules
-
-- Do not edit, reorder, duplicate, delete, synthesize, or relabel raw access records.
-- Every derived CSV records raw trace SHA256, source trace ID, half-open interval, derivation rule version, and derived SHA256.
-- Pressure windows may use only Reactive-LRU pressure features. CAPD, TPP-inspired, Oracle, weighted cost, and previous policy results are prohibited selection inputs.
-- Pressure Test is a post-hoc, method-independent secondary evaluation because the original Standard Test has already been inspected.
-- Pressure Test cannot support claims about:
-  - model memory footprint;
-  - per-decision inference latency;
-  - CPU cycles;
-  - total execution time;
-  - foreground blocking time;
-  - end-to-end system overhead.
-- Those overhead claims may use only the unselected Standard Test, fixed microbenchmarks, or the later asynchronous experiment.
-
-## 2. Output Namespace And File Map
-
-Do not modify the contents of any existing verified output directory.
-
-**Create:**
-
-- `configs/finals/capd_proactive_stage7_repair.json`: immutable repair policy, window rule, capacity guard, and six-workload training scope.
-- `configs/finals/capd_proactive_stage8_repair.json`: repaired Stage 8 authority paths and dual-track reporting contract.
-- `qmap/proactive_stage7_repair.py`: raw audit, fixed-capacity derivation, pressure scan, manifest construction, and freeze validation.
-- `scripts/run_capd_proactive_stage7_repair.py`: local `preflight`/`scan-pressure`/`export-local-bundle` commands and server `verify-local-bundle`/`build-training-manifest`/`freeze`/`verify` commands.
-- `scripts/run_capd_proactive_stage4_refit.py`: fixed-parameter six-workload refit CLI; it must not run the Stage 4 hyperparameter grid.
-- `tests/test_capd_proactive_stage7_repair.py`: raw immutability, interval, deterministic scan, and manifest tests.
-- `tests/test_capd_proactive_stage4_refit.py`: fixed parameters, six-workload merge, train-only vocabulary, and checkpoint tests.
-- `tests/test_capd_proactive_stage8_repair.py`: repaired plan, dual-track aggregation, and overhead-claim rejection tests.
-- `docs/CAPD_PROACTIVE_STAGE7_REPAIR_SERVER_CN.md`: server commands and artifact return checklist.
-
-**Modify while preserving v1 compatibility:**
-
-- `qmap/proactive_stage8_contract.py`: accept the repaired v2 execution plan and reject mixed Standard/Pressure aggregates.
-- `qmap/proactive_stage8_results.py`: group by `evaluation_track` before any aggregation.
-- `scripts/run_capd_proactive_stage8.py`: include `evaluation_track` in job identities and result manifests.
-- `scripts/validate_capd_proactive_stage8_server.sh`: accept an optional repair config path.
-- `docs/CAPD_PROACTIVE_STAGE8_SERVER_CN.md`: mark `stage8-sync-replay-r3` as historical diagnostic authority only.
-
-**Generated artifacts:**
+下列值和规则不得再被当作最终配置：
 
 ```text
-outputs/capd_proactive_stage7_repair/stage7-repair-r1/
-  raw_identity_audit.json
-  frozen_parameters.json
-  capacity_matrix_standard.json
-  capacity_matrix_guarded.json
-  pressure_candidates.csv
-  pressure_window_manifest.json
-  derived_pressure/<workload>/<capacity>.csv
-  local_pressure_bundle_manifest.json
-  stage4_input_manifest.json
-  standard_test_lock.json
-  pressure_test_lock.json
-  stage8_execution_plan_v2.json
-  verification.json
-
-outputs/capd_proactive_stage4/stage4-stage7-refit-r1/
-  final_rebuild/L256_lam1-1-2_K8_H20/
-  final_freeze_candidate.json
-  verification.json
-
-outputs/capd_proactive_stage8/stage8-repair-r1/
-  jobs/
-  artifacts/standard/
-  artifacts/pressure/
-  verification.json
+F_low=8
+F_target=16
+b_max=4
+L=256
+H=20
+K=8
+lambda=(1,1,2)
+window_records=100000
+D_guard_min=64
 ```
 
-## 3. Chronological Repair Sequence
+不得保留以下旧流程：
 
-The mandatory order is:
+- 用旧 Stage 3/4 参数在 Stage 7 Test 上直接重跑；
+- 固定模型参数后只做 refit；
+- 用固定 100k 窗口先生成 Pressure，再补做 Stage 3；
+- 用 20/40/60% 容量维持与旧实验可比；
+- 把旧 run ID 作为本轮正式 run ID；
+- 将旧 Stage 8 结果放入最终对比表。
+
+旧代码和旧输出可以留在磁盘用于追溯，但不得参与选择、训练、聚合和结论。
+
+---
+
+## 2. 实施总图
 
 ```text
-archive old result
-  -> [local] audit immutable Stage 7 inputs
-  -> [local] freeze repair contract and compute capacities
-  -> [local] scan/derive/freeze Pressure windows with Reactive-LRU only
-  -> [transfer] upload immutable local bundle and verify SHA on server
-  -> [server] build six-workload Train/Validation manifest
-  -> [server] refit three final CAPD checkpoints
-  -> [server] freeze repaired Stage 7/Stage 8 plan
-  -> [server] run Standard Stage 8
-  -> [server] run Pressure Stage 8 from verified derived CSV files
-  -> [server] aggregate the two tracks separately
-  -> [server] verify and report
+Task 0  文档与合同更新
+Task 1  Stage 3 服务器运行（进行中）
+Task 2  Stage 3 结果审计与人工 freeze
+          |
+          +---------------------------+
+          |                           |
+Task 3  本地 Pressure 派生实现      Task 4  本地 Stage 4 实现
+Task 5  本地生成 Pressure           Task 6  服务器 Stage 4 搜索/训练
+          |                           |
+          +-------------+-------------+
+                        |
+Task 7  Stage 8 计划生成与冻结
+Task 8  服务器 Standard + Pressure Replay
+Task 9  分轨聚合、统计与最终报告
 ```
 
-No step may read CAPD Test results before both locks and the execution plan are frozen.
-
-## 4. Capacity And Pressure Rules
-
-### 4.1 Standard capacity
-
-Retain the original reproducibility matrix:
+严格依赖：
 
 ```text
-W_i = unique pages in Stage 7 Train union Validation
-D_base(i, r) = ceil(r * W_i), r in {0.20, 0.40, 0.60}
+R1 -> Stage 3 run -> Stage 3 review -> explicit freeze
+Stage 3 freeze -> Pressure generation
+Stage 3 freeze -> Stage 4 execution
+Pressure freeze + Stage 4 freeze -> Stage 8
 ```
 
-These cells reproduce the original capacity definition and remain the Standard track.
+Stage 3 freeze 后，Task 5 和 Task 6 可以分别在本地与服务器并行。Stage 4 代码可以提前开发，但不得把未冻结 Stage 3 候选硬编码为最终值。
 
-### 4.2 Mechanism-compatible guarded capacity
+---
 
-Pressure evaluation must keep the fixed absolute watermarks from consuming most of a tiny DRAM:
+## 3. 全局不可违反的合同
 
-```text
-reserve_fraction_cap = 0.25
-D_guard_min = ceil(F_target / reserve_fraction_cap) = 64
-D_guarded(i, r) = max(D_base(i, r), 64)
-effective_ratio = D_guarded(i, r) / W_i
-```
+### 3.1 数据合同
 
-Every table must report `requested_ratio`, `D_base`, `D_guarded`, and `effective_ratio`. A clamped cell must not be described as an exact 20%, 40%, or 60% capacity experiment.
+- 六个 Stage 7 raw trace 和 R1 SHA 链是唯一数据源。
+- 原始 trace 和已有 split 只读。
+- Train/Validation 保持时间顺序，不 shuffle，不跨 split 取窗。
+- Stage 3/4 输入必须是 `6 Train + 6 Validation + 0 Test`。
+- 词表只从 Train 构建，冻结后不得由 Validation/Test 扩展。
+- Test 不得用于容量、水位、模型结构、损失、seed 或 checkpoint 选择。
 
-### 4.3 Pressure candidate scan
+### 3.2 选择合同
 
-Scan only inside the existing Standard Test interval `[2400000, 3000000)`:
+- Stage 3 只用 Train 做 blocked calibration，用 Validation 做安全门禁和选择验证。
+- Stage 4 只用 Train 训练，用 Validation 搜索模型和选择 checkpoint。
+- Pressure 选择只使用 Stage 3 已冻结的 Reactive-LRU 压力规则。
+- Oracle 只表示优化空间上界，不参与 Pressure 选窗。
+- 每个选择步骤必须预先固定聚合指标、tie-break 和失败条件。
 
-```text
-window_records = 100000
-scan_step = 10000
-candidate starts = 2400000, 2410000, ..., 2900000
-```
+### 3.3 报告合同
 
-For every workload and guarded capacity, replay Reactive-LRU from an empty DRAM for each candidate. Record:
+- Standard 与 Pressure 分开报告。
+- 不将旧实验作为 baseline 或前后对照。
+- Pressure 不用于时间、内存、CPU、前台阻塞或端到端开销结论。
+- 同步 replay 只证明 ranking、cost 和状态轨迹，不能证明真实异步收益。
 
-- unique pages;
-- misses;
-- LRU replacement decisions;
-- write ratio;
-- page-entry count;
-- candidate source interval.
+---
 
-Eligibility requires both:
-
-```text
-unique_pages > D_guarded + F_target
-LRU replacement decisions >= 100
-```
-
-Select by this fixed tuple:
-
-```text
-highest LRU replacement decisions
-then highest unique pages
-then earliest start index
-```
-
-If no candidate passes, emit `pressure_eligible=false`; do not manufacture a Pressure Test for that workload/capacity cell. Save all candidates so the selected window is auditable.
-
-The local derivation must materialize each selected source interval as a new CSV. Each row must equal the corresponding source-Test row in the same order. `local_pressure_bundle_manifest.json` records source SHA, start/end indices, row count, derived SHA, config SHA, and every included file SHA. After upload, the server verifies this bundle byte-for-byte and must reject any missing or changed artifact; it does not rerun window selection.
-
-## 5. Stage 3 Repair Audit
-
-Stage 3 is rerun as a six-workload Train/Validation diagnostic, not as a Test-driven parameter search.
-
-- Recompute `W_i`, `D_base`, `D_guarded`, page-entry bursts, Reactive-LRU misses, and decision counts from Train followed by Validation.
-- Keep `F_low=8`, `F_target=16`, and `b_max=4` fixed.
-- Reject any Test path passed to Stage 3.
-- Write `frozen_parameters.json` with the inherited values and `selection_source=stage4-f8-f16-r3_calibration`.
-- Do not promote a guarded capacity to Standard capacity; they are separate tracks.
-
-Gate:
-
-```text
-STAGE7_REPAIR_STAGE3_AUDIT_READY
-```
-
-## 6. Stage 4 Fixed Refit
-
-The repaired Stage 4 operation is a refit, not a second hyperparameter search.
-
-- Merge all six Stage 7 Train splits into the global training dataset.
-- Merge all six Stage 7 Validation splits into the global validation dataset.
-- Generate proactive training samples with the inherited controller settings.
-- Use exactly `L=256`, `lambda=(1,1,2)`, `K=8`, and `H=20`.
-- Fit page/PC vocabularies from Train only, then freeze them before Validation.
-- Train all three seeds for 10 epochs.
-- Select each seed's checkpoint by minimum global Validation loss, tie-breaking on earliest epoch.
-- Do not select a best seed; Stage 8 runs all three.
-- Record per-workload Validation OOV and ranking metrics, but do not use Test.
-
-Gate:
-
-```text
-STAGE4_STAGE7_REFIT_VERIFIED
-```
-
-Required verification fields:
-
-```json
-{
-  "training_workloads": 6,
-  "validation_workloads": 6,
-  "formal_test_opened": false,
-  "hyperparameters_reselected": false,
-  "vocabulary_fit_split": "train_only",
-  "checkpoint_selection_split": "validation_only",
-  "checkpoint_count": 3
-}
-```
-
-## 7. Stage 7 Repair Freeze
-
-After checkpoint verification, freeze a v2 plan with:
-
-- six `training_seen_workload` entries;
-- three repaired checkpoint paths and SHA256 values;
-- Standard Test locks for all six workloads;
-- Pressure locks only for eligible workload/capacity cells;
-- Standard job count exactly `6 * 3 * (5 + 3) = 144`;
-- Pressure job count exactly `eligible_cells * (5 + 3)`;
-- OOV diagnostics retained for both tracks;
-- no `held_out_direct_checkpoint_inference` field;
-- `checkpoint_retraining_completed=true`;
-- `vocabulary_source=stage7_train_all_six`;
-- `pressure_overhead_claims_allowed=false`.
-
-Gate:
-
-```text
-STAGE7_REPAIR_EXECUTION_PLAN_VERIFIED
-```
-
-## 8. Stage 8 Execution And Reporting
-
-### 8.1 Standard track
-
-Run all 144 jobs on the unselected 600,000-access Standard Test splits. Report:
-
-- DRAM hits;
-- NVM reads and writes;
-- proactive/reactive/emergency demotions;
-- weighted cost;
-- proactive cycles and rounds;
-- early-reuse rates;
-- OOV diagnostics;
-- synchronous inference and memory overhead, with the existing interpretation boundary.
-
-### 8.2 Pressure track
-
-Run all six policies and all three CAPD seeds only for eligible cells. Report:
-
-- the same page-event and weighted-cost metrics;
-- Oracle headroom;
-- LRU decision count;
-- proactive trigger coverage;
-- early-reuse rates;
-- source interval and selection score.
-
-The Pressure aggregate must set:
-
-```json
-{
-  "overhead_claim_status": "not_reported_for_overhead_claim",
-  "memory_overhead": null,
-  "inference_latency": null,
-  "cpu_cycles": null,
-  "foreground_blocking_time": null
-}
-```
-
-The verifier must fail if a Pressure report contains a non-null overhead value or if Standard and Pressure rows are combined in one confidence interval.
-
-## 9. Implementation Tasks
-
-### Task 1: Freeze the repair configuration
+## 4. Task 0：同步文档与权威入口
 
 **Files:**
-- Create: `configs/finals/capd_proactive_stage7_repair.json`
-- Create: `configs/finals/capd_proactive_stage8_repair.json`
-- Test: `tests/test_capd_proactive_stage7_repair.py`
 
-- [ ] **Step 1: Write a failing config-contract test**
+- Modify: `docs/CAPD_PROACTIVE_STAGE7_REPAIR_FLOW_CN.md`
+- Modify: `docs/superpowers/plans/2026-08-01-capd-stage7-refit-pressure-repair.md`
+- Reference: `docs/CAPD_PROACTIVE_STAGE3_STAGE7_SERVER_CN.md`
+- Reference: `configs/finals/capd_proactive_stage3_stage7_calibration.json`
 
-Assert exact inherited parameters, six training workloads, `reserve_fraction_cap=0.25`, immutable source run `stage7-server-suite-r1`, and `pressure_overhead_claims_allowed=false`.
+**Steps:**
 
-- [ ] **Step 2: Run the focused test**
+- [x] 删除固定参数、固定窗口和固定容量保护的正式表述。
+- [x] 将 Stage 3 重校准放在 Pressure 和 Stage 4 之前。
+- [x] 明确 Stage 3 当前正在服务器运行，所有参数仍未确定。
+- [x] 明确 Stage 4 必须重新搜索而不是固定 refit。
+- [x] 删除新旧性能对比目标。
+- [x] 保留 Pressure 的开销证据禁区。
 
-```bash
-python3 -m unittest tests.test_capd_proactive_stage7_repair -v
+**Gate:** 文档不得把任何 Stage 3/4 候选数值称为 final、selected 或 frozen。
+
+---
+
+## 5. Task 1：完成 Stage 3 服务器运行
+
+**Implemented files:**
+
+- `configs/finals/capd_proactive_stage3_stage7_calibration.json`
+- `qmap/proactive_stage3_stage7.py`
+- `scripts/run_capd_proactive_stage3_stage7.py`
+- `tests/test_capd_proactive_stage3_stage7.py`
+- `docs/CAPD_PROACTIVE_STAGE3_STAGE7_SERVER_CN.md`
+
+**Run identity:**
+
+```text
+stage3-stage7-calibration-r2
 ```
 
-Expected: FAIL because the repair configs do not exist.
+**Current status:** 正在服务器运行。不得因为中间点估计提前宣布某组参数胜出。
 
-- [ ] **Step 3: Add the two JSON configs**
+**Search candidates, not final values:**
 
-The Stage 7 config must contain the exact rules in Sections 1 and 4. The Stage 8 config must point only to `stage7-repair-r1` artifacts and must not overwrite `configs/finals/capd_proactive_stage8.json`.
-
-- [ ] **Step 4: Rerun the test**
-
-Expected: config-contract tests PASS.
-
-### Task 2: Implement immutable audit and pressure selection
-
-**Files:**
-- Create: `qmap/proactive_stage7_repair.py`
-- Create: `scripts/run_capd_proactive_stage7_repair.py`
-- Test: `tests/test_capd_proactive_stage7_repair.py`
-
-- [ ] **Step 1: Add failing tests**
-
-Cover raw SHA mismatch rejection, interval bounds, deterministic tie-breaking, prohibited CAPD/Oracle score inputs, ineligible cells, and derived-row equality with the source interval.
-
-- [ ] **Step 2: Run the focused test**
-
-Expected: FAIL because the repair module is missing.
-
-- [ ] **Step 3: Implement these public functions**
-
-```python
-audit_raw_identities(config, project_root) -> dict
-compute_capacity_matrices(split_manifest, config, project_root) -> dict
-scan_pressure_candidates(test_lock, guarded_capacities, config, project_root) -> list
-select_pressure_windows(candidates, config) -> dict
-build_stage4_input_manifest(split_manifest, raw_audit, project_root) -> dict
-freeze_repair_plan(inputs, checkpoints, output_root) -> dict
+```text
+window_records = [100000, 300000, 500000]
+W_ref quantile = [0.50, 0.75, 0.90]
+r_pressure = [0.05, 0.10, 0.15, 0.20]
+D_min = 8
+alpha = [0.05, 0.10, 0.15, 0.20]
+beta = [0.4, 0.5, 0.6]
+b_max = [1, 2, 4, 8]
 ```
 
-The CLI must expose:
+Dynamic watermark candidates:
+
+```text
+F_target(D) = clamp(round(alpha * D), 2, 16)
+F_low(D) = max(1, round(beta * F_target(D)))
+F_target(D) / D <= 0.25
+```
+
+**Server steps:** 继续严格使用 `docs/CAPD_PROACTIVE_STAGE3_STAGE7_SERVER_CN.md` 中已验证的命令和 resume 规则，不在本计划复制运行命令。
+
+**Required outputs before review:**
+
+```text
+run_state.json
+verification.json
+pressure_coverage.json
+oracle_headroom.json
+validation_safety.json
+pareto_frontier.json
+selection_rationale.json
+final_freeze_candidate.json
+pressure_generation_contract_candidate.json
+```
+
+**Gate:** `all` 完成只表示候选生成完成，不得自动生成正式 freeze。
+
+---
+
+## 6. Task 2：审计 Stage 3 并显式冻结
+
+**Input:** `outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/`
+
+**Review checklist:**
+
+- [ ] R1 input identity、配置 SHA 和代码 SHA 一致。
+- [ ] 全部输入只含 Train/Validation。
+- [ ] Train 各 block 有足够 pressure coverage。
+- [ ] 全局 Oracle headroom 非零。
+- [ ] Reactive/Proactive/Oracle 使用相同 trace、容量、初始状态和 cost profile。
+- [ ] Validation safety 没有 weighted-cost regression、过高 early reuse 或无意义降级。
+- [ ] Pareto 候选与选择理由可以由保存的逐窗统计复算。
+- [ ] 候选没有引用 Test、Stage 8 或 Pressure 结果。
+
+**Human gate:** 向用户展示候选、门禁和 trade-off，等待明确同意。没有明确同意时停止，不能执行 freeze。
+
+**Formal outputs after approval:**
+
+```text
+final_freeze.json
+pressure_generation_contract.json
+```
+
+二者必须包含自身 SHA 链并固定：窗口、步长、每 workload 容量、水位函数/结果、`b_max`、资格规则和 Reactive-LRU tie-break。
+
+**Failure rule:** 若无候选通过，保留本轮失败结果；只能回到 Train/Validation 设计新的 Stage 3 搜索合同并使用新 run ID，禁止查看 Test 后调参。
+
+---
+
+## 7. Task 3：实现本地 Pressure 派生工具
+
+**Target files:**
+
+- Create: `configs/finals/capd_proactive_pressure_stage7.json`
+- Create: `qmap/proactive_pressure_stage7.py`
+- Create: `scripts/run_capd_proactive_pressure_stage7.py`
+- Create: `tests/test_capd_proactive_pressure_stage7.py`
+- Create: `docs/CAPD_PROACTIVE_PRESSURE_STAGE7_LOCAL_CN.md`
+
+文件名是目标接口；实现时若仓库已有更合适的模块边界，可调整名称，但必须同步文档和 manifest schema。
+
+**Implementation requirements:**
+
+- [ ] 从 Stage 3 正式 `pressure_generation_contract.json` 读取全部规则。
+- [ ] 拒绝 candidate 合同、缺 SHA 合同和未 freeze 合同。
+- [ ] 原 Test 只读，派生窗口必须逐行等于声明的连续源区间。
+- [ ] 保存所有候选窗口统计，而非只保存获选窗口。
+- [ ] 排序只允许 Reactive-LRU replacements、unique pages 和冻结 tie-break。
+- [ ] 禁止导入 CAPD checkpoint 或读取 CAPD/Oracle/TPP cost。
+- [ ] 无合格窗口时写 `pressure_eligible=false`。
+- [ ] 生成 source/derived SHA 和不可变 lock。
+
+**Tests first:**
+
+- [ ] 非冻结合同被拒绝。
+- [ ] Stage 3 contract SHA 不匹配被拒绝。
+- [ ] 选窗确定性测试通过。
+- [ ] 派生 CSV 与源连续区间逐行一致。
+- [ ] CAPD/Oracle/weighted-cost 字段参与排序时测试失败。
+- [ ] 无合格窗口正常输出 false，不人工放宽规则。
+
+**Gate:** 本任务只实现和本地测试，不在 Stage 3 freeze 前生成正式 Pressure 产物。
+
+---
+
+## 8. Task 4：实现 Stage 4 Stage 7 专用搜索
+
+**Target files:**
+
+- Create: `configs/finals/capd_proactive_stage4_stage7_search.json`
+- Create: `qmap/proactive_stage4_stage7.py`
+- Create: `scripts/run_capd_proactive_stage4_stage7.py`
+- Create: `tests/test_capd_proactive_stage4_stage7.py`
+- Create: `docs/CAPD_PROACTIVE_STAGE4_STAGE7_SERVER_CN.md`
+
+**Reuse boundary:** `configs/finals/capd_proactive_stage4.json` 和既有 Stage 4 代码可以提供 dataset、model、trainer、checkpoint 基础设施，但其中旧 grid 与选中值均不具有权威性。
+
+**Search contract to define before server execution:**
+
+- [ ] `L` 候选及其含义。
+- [ ] `H` 候选及其与标签生成的关系。
+- [ ] `K` 候选及其与 Stage 3 `b_max` 的合法性约束。
+- [ ] `lambda` 候选与损失聚合规则。
+- [ ] 模型结构、隐藏维度、层数、dropout/regularization 候选。
+- [ ] learning rate、batch size、epoch、early stopping。
+- [ ] 三个训练 seed。
+- [ ] 六 workload Validation 聚合指标和确定性 tie-break。
+- [ ] 资源上限、断点续跑和 candidate checkpoint 保留策略。
+
+此处不预填最终值。若复用旧 grid，必须在新合同中说明每个候选的 Stage 7 Train/Validation 依据；不能因为旧实验曾使用它就直接冻结。
+
+**Implementation requirements:**
+
+- [ ] 输入 manifest 正好包含六个 Train 和六个 Validation。
+- [ ] Test、Pressure、Stage 8 路径硬拒绝。
+- [ ] 引用 Stage 3 `final_freeze.json` 与 SHA。
+- [ ] 训练样本和 page/PC 词表只由六个 Train 构建。
+- [ ] 六个 workload 训练一个统一模型，而非逐 workload 独立模型。
+- [ ] Validation 可搜索超参数和选 checkpoint，但不可扩词表。
+- [ ] 每个 seed 独立训练，不选择“最好 seed”代替 seed 汇总。
+- [ ] 候选配置、输入、代码、词表和 checkpoint 全部记录 SHA。
+
+**Tests first:**
+
+- [ ] Test/Pressure 输入拒绝测试。
+- [ ] Stage 3 freeze SHA 约束测试。
+- [ ] Train-only vocabulary 测试。
+- [ ] 六 workload manifest 完整性测试。
+- [ ] 候选复现与 tie-break 测试。
+- [ ] resume 身份不一致拒绝测试。
+
+---
+
+## 9. Task 5：本地生成并冻结 Pressure Test
+
+**Precondition:** Stage 3 已正式 freeze；Task 3 测试通过。
+
+**Local actions:**
+
+- [ ] 验证 Stage 3 freeze 和 R1 SHA。
+- [ ] 扫描原 Standard Test 中的全部连续候选窗口。
+- [ ] 按冻结 Reactive-LRU 规则选择或判定不合格。
+- [ ] 导出派生连续 CSV。
+- [ ] 验证逐行一致性、行数和 source interval。
+- [ ] 生成 manifest、lock 和 SHA 清单。
+
+**Required outputs:**
+
+```text
+pressure_candidates.csv
+pressure_window_manifest.json
+pressure_test_lock.json
+derived_pressure/<workload>/<capacity>.csv
+local_pressure_bundle_manifest.json
+verification.json
+```
+
+**Server acceptance:** 上传后服务器只重算 SHA、行数和逐行来源证明；不得重新扫描或替换窗口。
+
+**No feedback gate:** Pressure 生成结果无论好坏，都不得反馈到 Stage 3/4。若合同本身存在代码错误，应修复工具、递增 Pressure run ID 并保留旧产物；不得改变冻结选择规则。
+
+---
+
+## 10. Task 6：服务器运行 Stage 4 搜索、训练与冻结
+
+**Preconditions:**
+
+- Stage 3 正式 freeze；
+- Task 4 代码、测试和搜索合同完成；
+- 服务器代码身份与本地审核版本一致。
+
+**Server sequence:**
 
 ```text
 preflight
-scan-pressure
-export-local-bundle
-verify-local-bundle
-build-training-manifest
-freeze
-verify
+  -> build Train-only vocabulary and datasets
+  -> execute hyperparameter search
+  -> aggregate six Validation workloads
+  -> train/evaluate all required seeds
+  -> select per-seed checkpoints by frozen rule
+  -> verify candidate freeze
+  -> human review
+  -> explicit freeze
 ```
 
-- [ ] **Step 4: Rerun the focused test**
-
-Expected: all repair audit and selection tests PASS.
-
-### Task 3: Implement fixed six-workload refit
-
-**Files:**
-- Create: `scripts/run_capd_proactive_stage4_refit.py`
-- Test: `tests/test_capd_proactive_stage4_refit.py`
-- Reuse: `qmap/proactive_stage4.py`
-- Reuse: `scripts/run_capd_proactive_stage4.py`
-
-- [ ] **Step 1: Add failing tests**
-
-Verify that the refit rejects Test entries, rejects any parameter other than `L256/lambda1-1-2/K8/H20`, includes six workload pairs, fits vocabulary from Train only, and emits three checkpoints.
-
-- [ ] **Step 2: Run the focused test**
-
-```bash
-python3 -m unittest tests.test_capd_proactive_stage4_refit -v
-```
-
-Expected: FAIL because the refit runner is missing.
-
-- [ ] **Step 3: Implement the runner**
-
-The runner may reuse Stage 4 dataset generation, training, validation, resume, and verification helpers, but it must bypass `lookahead`, `label-weights`, and `candidate-history` grid selection. Its command set is:
+**Required outputs:**
 
 ```text
-preflight
-build-dataset
-train
-validate
-verify
-all
+input_manifest.json
+stage3_freeze_identity.json
+vocabulary_manifest.json
+dataset_manifest.json
+search_contract.json
+candidate_results.jsonl
+validation_summary.json
+selected_hyperparameters_candidate.json
+checkpoint_manifest_candidate.json
+verification.json
 ```
 
-- [ ] **Step 4: Rerun the focused test**
-
-Expected: all fixed-refit tests PASS.
-
-### Task 4: Add repaired Stage 8 contract support
-
-**Files:**
-- Modify: `qmap/proactive_stage8_contract.py`
-- Modify: `qmap/proactive_stage8_results.py`
-- Modify: `scripts/run_capd_proactive_stage8.py`
-- Test: `tests/test_capd_proactive_stage8_repair.py`
-
-- [ ] **Step 1: Add failing v2 contract tests**
-
-Test 144 Standard jobs, variable eligible Pressure jobs, repaired checkpoint SHA enforcement, track-separated aggregates, and rejection of Pressure overhead claims.
-
-- [ ] **Step 2: Run existing and new Stage 8 tests**
-
-```bash
-python3 -m unittest tests.test_capd_proactive_stage8 tests.test_capd_proactive_stage8_repair -v
-```
-
-Expected: existing v1 tests PASS; new v2 tests FAIL.
-
-- [ ] **Step 3: Implement backward-compatible v2 handling**
-
-Keep all v1 schemas readable. Add `evaluation_track` to repaired jobs and dispatch aggregation by track before workload/capacity grouping.
-
-- [ ] **Step 4: Rerun both suites**
-
-Expected: v1 and v2 tests PASS.
-
-### Task 5: Add server validation and documentation
-
-**Files:**
-- Modify: `scripts/validate_capd_proactive_stage8_server.sh`
-- Create: `docs/CAPD_PROACTIVE_STAGE7_REPAIR_SERVER_CN.md`
-- Modify: `docs/CAPD_PROACTIVE_STAGE8_SERVER_CN.md`
-
-- [ ] **Step 1: Add an optional repair config argument**
-
-The existing two-argument invocation must keep working. The repaired invocation is:
-
-```bash
-bash scripts/validate_capd_proactive_stage8_server.sh \
-  stage8-repair-r1 cuda:0 \
-  configs/finals/capd_proactive_stage8_repair.json
-```
-
-- [ ] **Step 2: Document failure recovery**
-
-Never delete a failed run. Reuse a Stage 4 refit run ID only when identity and contract hashes match; Stage 8 failures require a new run ID under the existing resume contract.
-
-- [ ] **Step 3: Mark the old result correctly**
-
-Documentation must call `stage8-sync-replay-r3` a verified execution of the invalid old-checkpoint/new-trace protocol, not the repaired formal result.
-
-### Task 6: Respect the local/server execution split
-
-- [ ] **Step 1: Run only trace audit/derivation checks locally**
-
-```powershell
-python scripts/run_capd_proactive_stage7_repair.py preflight --config configs/finals/capd_proactive_stage7_repair.json --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 --run-id stage7-repair-r1
-python scripts/run_capd_proactive_stage7_repair.py scan-pressure --config configs/finals/capd_proactive_stage7_repair.json --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 --run-id stage7-repair-r1
-python scripts/run_capd_proactive_stage7_repair.py export-local-bundle --run-id stage7-repair-r1
-```
-
-- [ ] **Step 2: Verify the local handoff artifact**
-
-Expected assertions: raw SHA unchanged, deterministic window selection, derived rows exactly match the selected source intervals, and the bundle contains all source/derived/config SHA values. Required marker: `STAGE7_REPAIR_LOCAL_PRESSURE_BUNDLE_VERIFIED`.
-
-- [ ] **Step 3: Upload the frozen bundle without editing it**
-
-The upload includes `pressure_candidates.csv`, both capacity matrices, the pressure window/test locks, every derived Pressure CSV, and `local_pressure_bundle_manifest.json`.
-
-- [ ] **Step 4: Run all non-trace executable verification on the server**
-
-Compilation, Stage 4 refit tests, Stage 8 contract tests, regression suites, training, replay, aggregation, and overhead measurements are server-only.
-
-## 10. Linux Server Run Order
-
-Run only after the local trace bundle is frozen and uploaded. The Linux server consumes that bundle; it must not scan or derive Pressure traces.
-
-### 10.1 Environment and local-bundle verification
-
-```bash
-cd /home/likc/Q-former-for-OS
-conda activate capd
-git status --short
-python3 -c 'import sys,torch; print(sys.version); print(torch.__version__); print(torch.cuda.is_available())'
-
-python3 scripts/run_capd_proactive_stage7_repair.py verify-local-bundle \
-  --bundle outputs/capd_proactive_stage7_repair/stage7-repair-r1/local_pressure_bundle_manifest.json \
-  --run-id stage7-repair-r1
-```
-
-Stop unless the terminal prints:
+**Human gate:** Stage 4 runner 不得自动 freeze。人工确认 Validation 结果、seed 稳定性、OOV、训练完整性和选择规则后，才生成：
 
 ```text
-STAGE7_REPAIR_SERVER_ACCEPTED_LOCAL_BUNDLE
+selected_hyperparameters.json
+checkpoint_manifest.json
+final_freeze.json
 ```
 
-### 10.2 Compile and test server-only code
+**Failure rule:** 若搜索失败，只能在 Train/Validation 范围内修订 Stage 4 合同并使用新 run ID；不得读取 Standard/Pressure Test。
 
-```bash
-python3 -m py_compile \
-  scripts/run_capd_proactive_stage4_refit.py \
-  qmap/proactive_stage8_contract.py \
-  qmap/proactive_stage8_results.py \
-  scripts/run_capd_proactive_stage8.py
+---
 
-python3 -m unittest \
-  tests.test_capd_proactive_stage4_refit \
-  tests.test_capd_proactive_stage8_repair \
-  tests.test_capd_proactive_stage3 \
-  tests.test_capd_proactive_stage4 \
-  tests.test_capd_proactive_stage4_e2e \
-  tests.test_capd_proactive_stage7 \
-  tests.test_capd_proactive_stage8 -v
-```
+## 11. Task 7：生成并冻结 Stage 8 执行计划
 
-The server must not invoke `scan-pressure` or `export-local-bundle`.
+**Target files:** 根据仓库现有 Stage 8 模块边界修改或新增 Stage 7 final runner、config 和测试。不得覆盖旧 Stage 8 目录。
 
-Inspect the uploaded manifest without editing:
+**Plan inputs:**
 
-```bash
-python3 -m json.tool \
-  outputs/capd_proactive_stage7_repair/stage7-repair-r1/pressure_window_manifest.json
-```
+- R1 raw/split identity；
+- Stage 3 `final_freeze.json`；
+- Stage 4 `final_freeze.json`；
+- Train-only vocabulary manifest；
+- 三个 seed checkpoint manifest；
+- Standard Test lock；
+- Pressure Test lock 和 eligibility manifest。
 
-Stop unless every selected window has `selection_features=["reactive_lru_decisions","unique_pages","earliest_start"]` and every ineligible cell has an explicit reason.
+**Plan requirements:**
 
-### 10.3 Build the six-workload Stage 4 input manifest
+- [ ] 所有输入写入路径、SHA、schema 和 run ID。
+- [ ] Standard 与 Pressure job 使用不同 `evaluation_track`。
+- [ ] 两轨使用各自冻结 trace，但相同单元内所有策略共享容量、初始状态和 cost profile。
+- [ ] CAPD seed job 与 deterministic baseline job 数量可复算。
+- [ ] Standard 容量来自本轮冻结合同，不以旧实验可比为理由。
+- [ ] Pressure 仅包含 eligible 单元，同时保留完整资格分母。
+- [ ] `pressure_overhead_claims_allowed=false`。
+- [ ] Test lock 后禁止改变参数、词表和 checkpoint。
 
-```bash
-python3 scripts/run_capd_proactive_stage7_repair.py build-training-manifest \
-  --config configs/finals/capd_proactive_stage7_repair.json \
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 \
-  --run-id stage7-repair-r1
-```
+**Gate:** 计划 verification 通过并人工审核 job matrix 后，才允许第一次正式 Test replay。
 
-Stop unless the manifest contains exactly 12 entries: six Train and six Validation, with zero Test entries.
+---
 
-### 10.4 Train the repaired CAPD checkpoints
+## 12. Task 8：服务器执行 Stage 8
 
-```bash
-python3 scripts/run_capd_proactive_stage4_refit.py all \
-  --manifest outputs/capd_proactive_stage7_repair/stage7-repair-r1/stage4_input_manifest.json \
-  --frozen-parameters outputs/capd_proactive_stage7_repair/stage7-repair-r1/frozen_parameters.json \
-  --run-id stage4-stage7-refit-r1 \
-  --project-root "$PWD" \
-  --device cuda:0
-```
+### 12.1 Standard track
 
-Monitor:
+- [ ] 先验证完整未筛选 Test 的 lock 和 SHA。
+- [ ] 对每个冻结 workload/capacity/strategy/seed 执行 replay。
+- [ ] 保存逐 job metrics、日志和失败状态。
+- [ ] 输出 OOV、fallback/emergency 路径和完整性指标。
 
-```bash
-tail -f outputs/capd_proactive_stage4/stage4-stage7-refit-r1/logs/progress.jsonl
-```
+Standard 用于总体性能和同步 replay 范围内的开销统计。真实异步前台延迟仍需独立实验。
 
-Stop unless verification reports six training workloads, no Test access, unchanged fixed parameters, frozen Train vocabularies, and three valid checkpoints.
+### 12.2 Pressure track
 
-### 10.5 Freeze the repaired Stage 7 execution plan
+- [ ] 只读取本地冻结且服务器验签通过的 Pressure CSV。
+- [ ] 不重新选窗，不跳过不利 eligible 单元。
+- [ ] 对全部冻结策略使用同一窗口、容量和初始状态。
+- [ ] 将内存、推理时间、CPU、总运行时间、前台阻塞等开销字段置为 `null` 或明确 `not_reported_for_overhead_claim`。
 
-```bash
-python3 scripts/run_capd_proactive_stage7_repair.py freeze \
-  --config configs/finals/capd_proactive_stage7_repair.json \
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 \
-  --checkpoint-freeze outputs/capd_proactive_stage4/stage4-stage7-refit-r1/final_freeze_candidate.json \
-  --run-id stage7-repair-r1
+Pressure 用于机制压力分析，不用于系统开销结论。
 
-python3 scripts/run_capd_proactive_stage7_repair.py verify \
-  --config configs/finals/capd_proactive_stage7_repair.json \
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 \
-  --run-id stage7-repair-r1
-```
+### 12.3 Resume 与失败
 
-Required final marker:
+- [ ] 只在输入、配置、代码和 checkpoint SHA 完全一致时 resume。
+- [ ] 任何身份变化都使用新 run ID。
+- [ ] 不删除失败目录后假装首次成功。
+- [ ] 最终结果必须列出缺失和失败 job。
+
+---
+
+## 13. Task 9：分轨聚合与最终结论
+
+**Output layout:**
 
 ```text
-STAGE7_REPAIR_EXECUTION_PLAN_VERIFIED
+artifacts/standard/
+artifacts/pressure/
+artifacts/integrity/
 ```
 
-### 10.6 Run repaired Stage 8
+**Standard report:**
 
-```bash
-set -o pipefail
-bash scripts/validate_capd_proactive_stage8_server.sh \
-  stage8-repair-r1 cuda:0 \
-  configs/finals/capd_proactive_stage8_repair.json \
-  2>&1 | tee stage8-stage8-repair-r1-console.log
-```
+- 全部 workload/capacity 的配对结果；
+- 三 seed 均值、方差和逐 seed 方向；
+- paired difference 与 bootstrap confidence interval；
+- OOV、fallback、失败/缺失 job；
+- 不把点估计直接写成稳定优势。
 
-Required final marker:
+**Pressure report:**
 
-```text
-[FINAL] STAGE8_REPAIR_STANDARD_PRESSURE_VERIFIED
-```
+- eligible/total coverage；
+- replacement decisions 与 Oracle headroom；
+- proactive demotions、early reuse、free-frame 指标；
+- weighted cost 和逐单元 paired results；
+- 所有 ineligible 单元及原因；
+- 明确禁止的开销字段不参与统计。
 
-## 11. Final Acceptance Gates
+**Prohibited aggregation:**
 
-The repair is complete only when all are true:
+- [ ] 不合并 Standard 与 Pressure macro average。
+- [ ] 不与旧 Stage 8 或旧数据集做表格对比。
+- [ ] 不只挑选 CAPD 获胜单元。
+- [ ] 不把 Pressure 派生窗口称为独立采集 Test。
+- [ ] 不把同步 replay 结论外推为真实异步延迟收益。
 
-- Raw Stage 7 SHA identities match the original Stage 7 manifests.
-- No raw trace has changed.
-- The Stage 4 refit manifest contains all six Train/Validation pairs and no Test.
-- Fixed parameters exactly match the inherited Stage 4 selection.
-- Three new checkpoints exist and point to Stage 7 Train vocabularies.
-- Standard Test has exactly 144 completed jobs.
-- Pressure Test contains only eligible cells and identical windows across policies.
-- Standard and Pressure aggregates are separate.
-- Pressure reports contain no memory/time/CPU/end-to-end overhead claims.
-- OOV is reported for both tracks and is no longer assumed to be zero.
-- Existing historical outputs remain present and unchanged.
-- The report discloses that Pressure Test is a post-hoc, method-independent continuous slice of genuinely collected traces.
+---
 
-## 12. Server Return Package
+## 14. 完成定义
 
-```bash
-tar -czf capd-stage7-repair-r1-results.tar.gz \
-  outputs/capd_proactive_stage7_repair/stage7-repair-r1 \
-  outputs/capd_proactive_stage4/stage4-stage7-refit-r1 \
-  outputs/capd_proactive_stage8/stage8-repair-r1 \
-  stage8-stage8-repair-r1-console.log
+本计划只有在以下项目全部满足后才完成：
 
-sha256sum capd-stage7-repair-r1-results.tar.gz
-```
-
-Return the archive, its SHA256, the last 100 console lines, and these three verification files:
-
-```text
-outputs/capd_proactive_stage7_repair/stage7-repair-r1/verification.json
-outputs/capd_proactive_stage4/stage4-stage7-refit-r1/verification.json
-outputs/capd_proactive_stage8/stage8-repair-r1/verification.json
-```
+- [ ] R1 审计证据保持通过。
+- [ ] Stage 3 在服务器完成、人工复核并正式 freeze。
+- [ ] Pressure Test 按 Stage 3 合同在本地派生、冻结和验签。
+- [ ] Stage 4 使用六个 Train/Validation 完成搜索、统一训练和人工 freeze。
+- [ ] Stage 8 job matrix、Test lock、checkpoint 和全部 SHA 冻结。
+- [ ] Standard 和 Pressure 两轨完成或完整披露失败项。
+- [ ] 统计分析包含配对差值、seed 稳定性和不确定性。
+- [ ] 最终材料不含旧实验性能对比。
+- [ ] Pressure 未被用于算法内存、时间或系统开销结论。
+- [ ] 结论严格限定在实际实验能够支持的证据范围内。

@@ -1,381 +1,275 @@
-# CAPD Stage 7 数据重训与 Pressure Test 修复流程指南
+# CAPD Stage 7 数据链与最终实验修复流程指南
 
-## 0. 文档目的
+## 0. 文档状态与目标
 
-本指南规定如何在**不重新采集、不修改原始访问记录**的前提下，修复当前 Stage 8 的数据链错误，并使用现有六个 Stage 7 workload 完成：
+本文档定义 CAPD 最终实验的当前唯一流程。此前以固定水位、固定模型超参数和旧 checkpoint 为前提的修复方案已经废止，不再作为执行依据。
 
-1. 六个 Train 的统一 CAPD 训练；
-2. 六个 Validation 的 checkpoint 选择；
-3. 原始 Standard Test 的正式回放；
-4. 从真实 trace 派生的连续 Pressure Test 回放；
-5. Standard 与 Pressure 两条结果线的独立报告。
 
-代码实现任务详见：
+
+最终目标是：
+
+1. 只用六个 Stage 7 Train/Validation （所在路径--dataset\raw_traces\capd_proactive_stage7\stage7-local-collection-r1）重新选择控制器、容量和模型超参数；
+2. 用六个 Train 训练一个统一 CAPD，用六个 Validation 选择 checkpoint；
+3. 在未参与选择的完整 Standard Test 上评测一般表现；
+4. 在按冻结规则派生的连续 Pressure Test 上评测有替换压力时的机制表现；
+5. Standard 与 Pressure 分开报告，不与任何旧实验结果进行性能对比。
+
+工程实现计划见：
 
 `docs/superpowers/plans/2026-08-01-capd-stage7-refit-pressure-repair.md`
 
-本次修复的成功标准是数据链正确、产物可追溯、比较公平。修复**不预先保证** CAPD 的 weighted cost 一定优于所有 baseline。
+---
+
+## 1. 为什么必须重跑 Stage 3 和 Stage 4
+
+旧 Stage 8 使用了老 trace 上选出的参数与 checkpoint，却在 Stage 7 新 trace 上评测。该数据链导致身份特征大面积 OOV，同时旧的容量、水位和批量机制也不适合 Stage 7 trace 的工作集与页面进入强度。
+
+因此，本轮不是在旧参数下简单重训，而是分两层重新校准：
+
+```text
+Stage 3：选择工作集定义、窗口、容量、水位和批量控制机制
+Stage 4：在 Stage 3 冻结合同下选择 L、H、K、lambda、模型结构及训练配置
+```
+
+Stage 3 和 Stage 4 的选择数据只能来自 Stage 7 Train/Validation。Test、Pressure Test、旧 Stage 8 结果和旧 checkpoint 均不得参与选择。
 
 ---
 
-## 1. 当前错误与修复目标
-
-当前已完成的 `stage8-sync-replay-r3` 使用：
+## 2. 唯一有效的数据流
 
 ```text
-Stage 3/4 老 trace 训练出的 checkpoint
-                  +
-Stage 7 新 trace 的 Test
+R1 原始 trace 与 SHA 审计（已完成）
+  |
+  v
+Stage 3 服务器校准
+  - 只读六个 Train/Validation
+  - 搜索 working set、窗口、容量、水位、b_max
+  - Reactive-LRU / Proactive-LRU / Oracle 门禁
+  |
+  v
+人工复核 Stage 3 候选并显式 freeze
+  - final_freeze.json
+  - pressure_generation_contract.json
+  |
+  +-------------------------------+
+  |                               |
+  v                               v
+本地派生 Pressure Test             服务器实施并运行 Stage 4
+  - 只按冻结合同扫描 Test           - 只读六个 Train/Validation
+  - 连续时间片，不改访问内容         - 搜索模型与训练超参数
+  - 冻结来源区间与 SHA              - 训练统一 CAPD
+  |                               - Validation 选 checkpoint
+  |                               |
+  +---------------+---------------+
+                  v
+          冻结 Stage 8 执行计划
+          - Standard Test
+          - Pressure Test
+                  |
+                  v
+          服务器执行 Stage 8
+                  |
+                  v
+          分轨聚合、统计和结论
 ```
 
-由于模型把绝对 page/PC 作为身份特征，新旧进程地址空间不同，Stage 8 中 page/PC 全部落入 UNK。该运行虽然工程验收通过，但不能作为最终 CAPD 性能结果。
-
-修复后的数据链必须是：
-
-```text
-Stage 7 Train
-  -> 生成训练样本与 Train 词表
-  -> 训练三个 seed 的统一 CAPD
-
-Stage 7 Validation
-  -> 选择每个 seed 的最终 checkpoint
-
-冻结 checkpoint、容量、Standard/Pressure Test 身份
-  -> Stage 8 Test 回放
-```
-
-六个 workload 均参与 Train/Validation，因此修复后不再区分 `seen` 和 `held-out unseen`。Test 仍然是按时间顺序隔离、未参与模型拟合的测试区间。
+Stage 3 freeze 是不可逆选择边界。Pressure 派生后，禁止根据 Pressure 是否好看返回 Stage 3 或 Stage 4 调参；如果合同执行正确但某 workload 没有合格窗口，应如实标记 `pressure_eligible=false`。
 
 ---
 
-## 2. 不可违反的边界
+## 3. 参数状态：候选不等于冻结值
 
-### 2.1 原始 trace 不变
-
-以下目录只读：
+以下旧值不再是最终参数：
 
 ```text
-dataset/raw_traces/capd_proactive_stage7/stage7-local-collection-r1/
-outputs/capd_proactive_stage7/stage7-server-suite-r1/
-outputs/capd_proactive_stage4/stage4-f8-f16-r3/
-outputs/capd_proactive_stage8/stage8-sync-replay-r3/
+F_low=8
+F_target=16
+b_max=4
+L=256
+H=20
+K=8
+lambda=(1,1,2)
+window_records=100000
+D_guard_min=64
 ```
+
+它们可以出现在历史文件、旧实现或搜索候选中，但不得写入最终实验合同，除非新 Stage 3/4 在 Stage 7 Train/Validation 上独立选中这些值。
+
+### 3.1 Stage 3 当前搜索空间
+
+权威配置：
+
+`configs/finals/capd_proactive_stage3_stage7_calibration.json`
+
+当前搜索包括：
+
+```text
+window_records = 100000 / 300000 / 500000
+W_ref quantile = 0.50 / 0.75 / 0.90
+r_pressure = 0.05 / 0.10 / 0.15 / 0.20
+D_min = 8
+alpha = 0.05 / 0.10 / 0.15 / 0.20
+beta = 0.4 / 0.5 / 0.6
+b_max = 1 / 2 / 4 / 8
+```
+
+水位按容量动态计算：
+
+```text
+F_target(D) = clamp(round(alpha * D), 2, 16)
+F_low(D) = max(1, round(beta * F_target(D)))
+F_target(D) / D <= 0.25
+```
+
+配置中的 `standard_capacity.ratios=[0.20,0.40,0.60]` 当前只属于 Stage 3 的参考 profile 输入，不能解释为为了与旧实验对比，也不能自动成为最终 Stage 8 容量矩阵。最终容量必须由本轮 Stage 3 freeze 和后续 Stage 8 合同明确生成。
+
+Stage 3 内部暂用的候选集大小、历史长度和 Oracle 标签权重只服务于控制器校准与上界审计，不自动冻结为最终 Stage 4 模型超参数。
+
+### 3.2 Stage 4 待建立搜索合同
+
+新 Stage 4 必须在运行前建立 Stage 7 专用配置，至少明确搜索或固定依据：
+
+- `L`：候选历史长度或特征时间尺度；
+- `H`：预测范围；
+- `K`：候选页集合大小；
+- `lambda`：标签或损失权重；
+- 模型结构、隐藏维度、层数和正则化；
+- 学习率、batch size、epoch 与 early stopping；
+- 三个训练 seed 和 checkpoint 选择规则。
+
+现有 `configs/finals/capd_proactive_stage4.json` 及旧 Stage 4 代码只能作为可复用的搜索基础设施，不能作为本轮冻结参数的证据。任何最终值都必须由六个 Stage 7 Train/Validation 产生。
+
+---
+
+## 4. 不可违反的数据边界
+
+### 4.1 原始 trace 只读
+
+允许：
+
+- 校验原始文件和 split 的 SHA；
+- 按既有时间顺序读取 Train/Validation；
+- 在 Stage 3 freeze 后，从原 Test 复制一个连续区间作为 Pressure Test；
+- 保存来源文件、起止索引、行数和派生文件 SHA。
 
 禁止：
 
-- 修改 PC、Address 或 RW；
-- 删除不利访问；
-- 复制、重排或合成访问；
-- 覆盖旧 split、checkpoint 或 Stage 8 结果；
-- 把派生 Pressure Test 描述成未经选择的 Standard Test。
+- 修改 PC、Address、RW 或时间顺序；
+- 删除不利访问、复制访问、重排或合成访问；
+- 为适配模型而改变 workload 行为；
+- 把派生 Pressure Test 宣称为独立重新采集的 Test。
 
-### 2.2 Pressure Test 的准确表述
+统一表述：
 
-统一表述为：
+> Pressure Test 是从真实采集 trace 中，按照 Stage 3 预先冻结的、只依赖 Reactive-LRU 压力统计的规则派生出的连续时间片。
 
-> Pressure Test 是从真实采集 trace 中，按照固定且与 CAPD 结果无关的 Reactive-LRU 压力规则，派生得到的连续时间片。
+### 4.2 Test 隔离
 
-必须公开：
+Stage 3 和 Stage 4 均禁止：
 
-- 原始 trace ID 与 SHA256；
-- 起止访问索引；
-- 窗口长度与扫描步长；
-- 全部候选窗口统计；
-- 固定选择规则；
-- 派生 CSV 的 SHA256。
+- 读取 Standard Test 或 Pressure Test；
+- 使用 Test loss、准确率、weighted cost 或 OOV 选择参数；
+- 使用 Test 扩词表、选择 seed 或 checkpoint；
+- 根据 Test 结果改变 workload、容量、水位或 Pressure 资格规则。
 
-### 2.3 Pressure Test 禁止用于开销结论
+Stage 3 freeze 后允许本地工具按 `pressure_generation_contract.json` 访问 Test，但该访问只用于生成已冻结的 Pressure 轨道，不得反馈到 Stage 3/4。
 
-Pressure Test 只报告：
+### 4.3 旧产物的地位
 
-- DRAM hit；
-- NVM read/write；
-- demotion；
-- weighted cost；
-- Oracle headroom；
-- proactive cycle/round；
-- early-reuse；
-- OOV；
-- LRU replacement decision 数量。
+旧输出可以留在磁盘上用于追溯，但必须从本轮正式流程中隔离：
 
-Pressure Test 不报告或不用于声称：
+- 不参与参数选择；
+- 不作为 checkpoint 来源；
+- 不进入最终图表或汇总表；
+- 不与新结果做性能高低对比；
+- 不用于论证本轮方法改善。
 
-- 模型内存开销；
-- metadata 内存开销；
-- 推理时间；
-- CPU cycles；
-- 总执行时间；
-- 前台阻塞时间；
-- 端到端系统开销。
-
-这些开销只能来自未挑选的 Standard Test、固定微基准或后续异步实验。
-
-### 2.4 本地与服务器执行边界
-
-执行位置固定如下，不得临时互换：
-
-- **本地（R1-R4）**：校验原始 trace、计算容量、扫描连续窗口、派生 Pressure CSV、生成来源清单和 SHA256；
-- **服务器（R5-R11）**：生成训练 manifest、训练与 Validation 选 checkpoint、冻结执行计划、运行 Standard/Pressure Stage 8、聚合和验证；
-- **本地禁止运行**：训练、checkpoint 选择、正式 Replay、性能统计或开销测量；
-- **服务器禁止运行**：重新扫描窗口、改变窗口选择、重新派生 Pressure CSV。
-
-这里的“本地派生”只允许把原 Test 中已经存在的连续行复制到新的 Pressure 文件。原始 CSV 仍为只读，不允许修改、重排、删行、复制行或合成访问。
+最终报告只描述当前最终方法和 Stage 7 数据链上的新结果。
 
 ---
 
-## 3. 固定配置
+## 5. Stage 3：服务器重新校准控制器
 
-本轮不重新搜索下列模型配置：
+### 5.1 当前实现
 
-```text
-F_low = 8
-F_target = 16
-b_max = 4
-K = 8
-H = 20
-L = 256
-lambda = (1, 1, 2)
-seeds = 3136859, 42, 2026
-```
-
-同时继承：
+已实现文件：
 
 ```text
-TPP epoch_length = 1024
-TPP cold_threshold = 1
-TPP dirty_tie_break = false
-Cost = DRAM Hit 1, NVM Read 2, NVM Write 8, Demotion 10
+configs/finals/capd_proactive_stage3_stage7_calibration.json
+qmap/proactive_stage3_stage7.py
+scripts/run_capd_proactive_stage3_stage7.py
+tests/test_capd_proactive_stage3_stage7.py
+docs/CAPD_PROACTIVE_STAGE3_STAGE7_SERVER_CN.md
 ```
 
-这里的“固定”表示不根据已查看的 Stage 8 结果重新选择这些值。Stage 4 老 checkpoint 不再固定为最终 checkpoint。
+权威 run ID：
+
+```text
+stage3-stage7-calibration-r2
+```
+
+服务器执行命令、断点续跑和产物检查以 `docs/CAPD_PROACTIVE_STAGE3_STAGE7_SERVER_CN.md` 为准，本文不复制可能漂移的命令。
+
+### 5.2 输入与计算
+
+Stage 3 正好读取：
+
+```text
+6 Train + 6 Validation + 0 Test
+```
+
+主要工作：
+
+1. 对 Train 做连续 blocked calibration，Validation 保持独立；
+2. 统计窗口 working set、page-entry、reuse 与 Reactive-LRU 替换压力；
+3. 搜索容量、动态水位和 `b_max`；
+4. 在相同 trace、容量和初始状态下运行 Reactive-LRU、Proactive-LRU 和 Oracle；
+5. 检查压力覆盖、Oracle 非零优化空间、Validation 安全性和 Pareto 前沿。
+
+### 5.3 Stage 3 人工冻结门禁
+
+`all` 只能生成候选，不能自动冻结。必须先人工检查：
+
+```text
+pressure_coverage.json
+oracle_headroom.json
+validation_safety.json
+pareto_frontier.json
+selection_rationale.json
+final_freeze_candidate.json
+pressure_generation_contract_candidate.json
+```
+
+确认后才显式生成：
+
+```text
+final_freeze.json
+pressure_generation_contract.json
+```
+
+若 Oracle headroom 全为 0、压力覆盖不足或 Validation 安全门禁失败，Stage 3 必须阻断。不得查看 Test 后补调参数。
 
 ---
 
-## 4. 容量双轨
+## 6. Pressure Test：Stage 3 freeze 后在本地派生
 
-### 4.1 Standard 容量
+### 6.1 派生合同
 
-Standard Test 保留原口径：
+本地派生工具必须逐项读取 Stage 3 正式合同，而不是在脚本中再次硬编码：
 
-```text
-W_i = |UniquePages(Train union Validation)|
-D_base(i,r) = ceil(r * W_i)
-r = 0.20 / 0.40 / 0.60
-```
+- 冻结窗口长度和扫描步长；
+- 每 workload 的冻结容量；
+- 动态 `F_low/F_target`；
+- 冻结 `b_max`；
+- unique-page 与最小 replacement 资格规则；
+- 只使用 Reactive-LRU 的确定性排序规则；
+- 平局时的固定 tie-break。
 
-Standard 结果用于保持与原正式矩阵的可比性。
+选择过程中禁止使用 CAPD、TPP、Oracle、weighted cost、模型准确率或 Stage 8 结果。
 
-### 4.2 Pressure 的机制兼容容量
+### 6.2 冻结产物
 
-固定 `F_target=16` 时，22页 DRAM 会让储备占比过高。Pressure 轨采用预先声明的容量保护：
-
-```text
-reserve_fraction_cap = 0.25
-D_guard_min = ceil(16 / 0.25) = 64
-D_guarded = max(D_base, 64)
-```
-
-报告必须同时列出：
-
-```text
-requested_ratio
-D_base
-D_guarded
-effective_ratio = D_guarded / W_i
-```
-
-被提升到64页的单元不得继续简称为“严格20%容量”。
-
----
-
-## 5. Pressure 窗口规则
-
-Pressure 候选只从原 Standard Test `[2400000,3000000)` 内产生，不能与 Train/Validation 重叠。
-
-固定扫描参数：
-
-```text
-window_records = 100000
-scan_step = 10000
-```
-
-候选起点为：
-
-```text
-2400000, 2410000, ..., 2900000
-```
-
-每个候选窗口只运行 Reactive-LRU，记录：
-
-- unique pages；
-- misses；
-- replacement decisions；
-- write ratio；
-- page-entry count。
-
-某个 workload/capacity 单元成为 Pressure Test 的必要条件：
-
-```text
-unique_pages > D_guarded + F_target
-LRU replacement decisions >= 100
-```
-
-固定选择顺序：
-
-```text
-1. replacement decisions 更多
-2. unique pages 更多
-3. start index 更早
-```
-
-如果没有候选通过，写入：
-
-```text
-pressure_eligible = false
-```
-
-该单元只保留 Standard 结果，不得人为制造 Pressure 窗口。
-
----
-
-## 6. 总体时间顺序
-
-```text
-R0  [文档]   保留旧结果并声明失效原因
-R1  [本地]   审计六条原始 trace 的身份和 SHA
-R2  [本地]   冻结修复配置、Standard 容量和 guarded 容量
-R3  [本地]   运行 Stage 3 Train/Validation 压力审计
-R4  [本地]   扫描、派生并冻结 Pressure Test 连续窗口
-    [传输]   将本地冻结包上传服务器并验签
-R5  [服务器] 生成六 workload Stage 4 Train/Validation manifest
-R6  [服务器] 用固定超参数训练三个新 checkpoint
-R7  [服务器] 用六个 Validation 选择并冻结 checkpoint
-R8  [服务器] 生成修复后的 Stage 7 / Stage 8 执行计划
-R9  [服务器] 先运行 Standard Stage 8
-R10 [服务器] 再运行 Pressure Stage 8
-R11 [服务器] 分轨聚合、验证和报告
-```
-
-只有前一步门禁通过，才能进入下一步。
-
-### 6.1 实际执行方式
-
-R0-R11 是产物门禁，不是12次独立人工操作。实际压缩为四个批处理：
-
-```text
-批处理A [本地]   R1-R4：审计 + 扫描 + 派生 + SHA 冻结
-批处理B [服务器] R5-R8：验签 + manifest + 训练 + checkpoint/计划冻结
-批处理C [服务器] R9-R10：Standard + Pressure Replay
-批处理D [服务器] R11：分轨聚合 + 验证 + 报告
-```
-
-四个批处理都必须支持断点续跑：已通过且身份哈希一致的步骤直接跳过；输入、配置或 checkpoint SHA 变化时拒绝复用旧产物并要求新 run ID。这样任何中断都从最近的有效门禁继续，而不是重跑整个流程。
-
----
-
-## 7. 分步骤执行说明
-
-### R0：保留并隔离旧结果
-
-旧结果不删除、不覆盖。
-
-将其状态解释为：
-
-```text
-verified execution of invalid old-checkpoint/new-trace protocol
-```
-
-新 run ID 固定为：
-
-```text
-Stage 7 repair: stage7-repair-r1
-Stage 4 refit:  stage4-stage7-refit-r1
-Stage 8 repair: stage8-repair-r1
-```
-
-### R1：原始身份审计
-
-**执行位置：本地。**
-
-读取并交叉验证：
-
-```text
-raw_trace_manifest.json
-collection_manifest.json
-split_manifest.json
-实际 raw CSV SHA256
-实际 split CSV SHA256
-```
-
-检查每个 workload：
-
-- 一个 PID；
-- 一个 TID；
-- `page_shift=12`；
-- 3,000,000 条访问；
-- Train/Validation/Test 区间无重叠；
-- raw SHA 与 Stage 7 原记录一致。
-
-输出：
-
-```text
-outputs/capd_proactive_stage7_repair/stage7-repair-r1/raw_identity_audit.json
-```
-
-门禁：
-
-```text
-STAGE7_REPAIR_RAW_IDENTITY_VERIFIED
-```
-
-### R2：冻结修复合同和容量
-
-**执行位置：本地。**
-
-生成：
-
-```text
-frozen_parameters.json
-capacity_matrix_standard.json
-capacity_matrix_guarded.json
-```
-
-检查：
-
-- 固定参数与旧 Stage 4 最终选择一致；
-- Standard 使用 `D_base`；
-- Pressure 使用 `D_guarded`；
-- 没有根据 CAPD Test 指标调整容量。
-
-### R3：Stage 3 修复审计
-
-**执行位置：本地。** 本步骤只做 trace 统计与压力可达性审计，不训练模型、不运行正式 Stage 8。
-
-只读取六个 Train/Validation，按 Train 后接 Validation 的顺序运行 Reactive-LRU 和页面进入统计。
-
-本步骤重新计算：
-
-- working set；
-- page-entry burst；
-- LRU miss；
-- LRU replacement decisions；
-- Standard/guarded 容量可达性。
-
-本步骤不修改 `F_low/F_target/b_max`，也不读取 Test。
-
-门禁：
-
-```text
-STAGE7_REPAIR_STAGE3_AUDIT_READY
-```
-
-### R4：冻结 Pressure Test
-
-**执行位置：本地。** 服务器不得重新执行选择规则。
-
-使用第5节固定规则扫描原 Standard Test，保存所有候选，不只保存最终窗口。
-
-输出：
+至少生成：
 
 ```text
 pressure_candidates.csv
@@ -385,152 +279,116 @@ derived_pressure/<workload>/<capacity>.csv
 local_pressure_bundle_manifest.json
 ```
 
-人工复核只能检查规则是否正确执行，不允许手动替换窗口。
-
-每个派生 CSV 必须逐行等于其声明的原 Test 连续区间，并在 `local_pressure_bundle_manifest.json` 中记录源 SHA、起止索引、派生 SHA 和行数。上传服务器后必须先验签；任一 SHA 不一致立即停止，不能在服务器重建或替换窗口。
-
-### R5：生成六 workload Stage 4 manifest
-
-**执行位置：服务器。** 输入为服务器上的六个 Stage 7 Train/Validation，以及已验签的本地冻结包；本步骤不得重新派生 Pressure trace。
-
-manifest 必须正好包含12项：
+每个派生文件必须能追溯到原 Test 的：
 
 ```text
-6 Train
-6 Validation
-0 Test
+source trace ID
+source SHA256
+start index
+end index
+row count
+derived SHA256
+Stage 3 contract SHA256
 ```
 
-每项保存：
+服务器只验签和读取本地冻结包，不得重新扫描、重选或再生成 Pressure 窗口。
 
-- workload；
-- split；
-- source trace ID；
-- source interval；
-- CSV SHA256；
-- `formal_test=false`。
+### 6.3 Pressure 不是开销数据集
 
-输出：
+Pressure Test 只用于分析在明确页面替换压力下的策略行为，例如：
+
+- DRAM hit、NVM read/write；
+- demotion、early reuse；
+- empty-frame exhaustion 与 minimum free frames；
+- weighted cost 与 Oracle headroom；
+- proactive cycle/round 和 replacement decisions。
+
+Pressure Test 不得用于声称：
+
+- 模型或 metadata 内存开销；
+- 推理时间、CPU cycles 或总运行时间；
+- 前台阻塞时间；
+- 端到端系统开销。
+
+这些开销只能来自未按压力筛选的 Standard Test、固定微基准或后续真实异步实验。同步 Replay 本身也不能证明异步后台执行或前台延迟收益。
+
+---
+
+## 7. Stage 4：本地改代码，服务器搜索和训练
+
+### 7.1 实施前置条件
+
+Stage 4 只有在下列条件成立后才能执行：
+
+- Stage 3 已人工确认并正式 freeze；
+- Stage 4 输入 manifest 只含六个 Train/Validation；
+- Stage 4 配置引用 Stage 3 `final_freeze.json` 及 SHA；
+- 新的 Stage 7 专用搜索空间、选择指标和 tie-break 已写入版本化配置；
+- Test/Pressure 路径硬拒绝已实现并有测试。
+
+### 7.2 训练与选择原则
+
+Stage 4 必须：
+
+- 用六个 Stage 7 Train 生成训练样本和 Train-only page/PC 词表；
+- 训练一个覆盖六个 workload 的统一 CAPD；
+- 用六个 Validation 完成模型超参数搜索和每个 seed 的 checkpoint 选择；
+- 冻结后不扩展词表；
+- 保存每个候选、seed、checkpoint、配置和输入的 SHA；
+- 预先定义聚合指标与 tie-break，不手选“最好看的 seed”。
+
+Stage 4 不得把 Pressure Test 作为 Validation，也不得因 Pressure 资格或 Stage 8 表现改模型。
+
+### 7.3 Stage 4 输出
+
+目标输出至少包括：
 
 ```text
 stage4_input_manifest.json
+stage4_search_contract.json
+candidate_results.jsonl
+validation_summary.json
+selected_hyperparameters.json
+checkpoint_manifest.json
+final_freeze.json
+verification.json
 ```
 
-### R6：固定参数重新训练
+当前这些目标接口尚未实现。实施时必须使用新的 run ID，不得沿用旧 refit 计划中的占位 run ID。
 
-**执行位置：服务器。**
+---
 
-使用所有六个 Train：
+## 8. Stage 8：两条独立 Test 轨道
 
-```text
-canneal
-streamcluster_pressure
-dedup_pressure
-blackscholes
-swaptions
-fluidanimate
-```
+### 8.1 执行前冻结
 
-训练要求：
+Stage 8 执行计划必须同时锁定：
 
-- 一个 global CAPD；
-- 三个 seed 独立训练；
-- page/PC 词表只从 Train 拟合；
-- 拟合后立即冻结词表；
-- 不执行 L、lambda、K、H 网格搜索；
-- 不读取任何 Test；
-- 保留断点续训和 deterministic 设置。
+- R1 原始数据身份及 SHA；
+- Stage 3 freeze 及 SHA；
+- Stage 4 模型配置、词表、checkpoint 及 SHA；
+- Standard Test lock；
+- Pressure Test lock；
+- workload、容量、策略、seed 和 cost profile；
+- 每条轨道允许报告的指标。
 
-### R7：Validation 选择 checkpoint
+缺少任一锁文件或 SHA 不匹配时立即停止。
 
-**执行位置：服务器。**
+### 8.2 Standard 轨道
 
-六个 Validation 只用于：
+Standard Test 是未经压力窗口选择的完整时间隔离 Test。它用于回答：最终方法在正常、未筛选测试区间上的总体表现如何。
 
-- 每个 seed 的 minimum validation loss checkpoint；
-- 相同 loss 时选择更早 epoch；
-- 输出逐 workload Validation 指标和 OOV。
+Standard 的容量矩阵必须由本轮正式合同定义，不能因“与旧实验可比”而保留某组容量，也不能在看过 Test 后调整。
 
-不得：
+### 8.3 Pressure 轨道
 
-- 选择“最好 seed”；
-- 根据 Test 修改 epoch、学习率或模型结构；
-- 扩展冻结后的词表。
+Pressure Test 只运行 `pressure_eligible=true` 的冻结单元。它用于回答：当确实存在页面替换机会和 Oracle headroom 时，控制器与模型能否有效利用这些机会。
 
-门禁：
+未通过资格门禁的 workload/capacity 必须保留在资格汇总中，不能从分母或覆盖率报告中消失。
 
-```text
-STAGE4_STAGE7_REFIT_VERIFIED
-```
+### 8.4 结果报告
 
-### R8：生成修复后的执行计划
-
-**执行位置：服务器。**
-
-修复计划必须：
-
-- 将六个 workload 全部标为 `training_seen_workload`；
-- 指向三个新 checkpoint 及其 SHA；
-- Standard jobs 固定为144个；
-- Pressure jobs 数量为 `eligible_cells * 8`；
-- 为每个 job 写入 `evaluation_track=standard|pressure`；
-- 保存 Standard 与 Pressure 各自的 Test lock；
-- 要求两条轨道都输出 OOV；
-- 写入 `pressure_overhead_claims_allowed=false`。
-
-门禁：
-
-```text
-STAGE7_REPAIR_EXECUTION_PLAN_VERIFIED
-```
-
-### R9：运行 Standard Stage 8
-
-**执行位置：服务器。**
-
-先完整运行144个 Standard job。
-
-Standard 是：
-
-- 固定600,000访问的原 Test；
-- 所有策略使用同一 trace 和容量；
-- CAPD 使用三个新 seed checkpoint；
-- 可用于同步 Replay 范围内的时间和内存开销报告。
-
-### R10：运行 Pressure Stage 8
-
-**执行位置：服务器。** 只读取已验签的本地派生 CSV，不得重新选窗。
-
-只运行 `pressure_eligible=true` 的单元。
-
-所有策略必须使用同一个：
-
-- 起止区间；
-- guarded capacity；
-- 初始空 DRAM 状态；
-- cost profile；
-- 主动控制参数。
-
-Pressure result 中下列字段必须为 `null`：
-
-```text
-memory_overhead
-inference_latency
-cpu_cycles
-foreground_blocking_time
-```
-
-并写入：
-
-```text
-overhead_claim_status = not_reported_for_overhead_claim
-```
-
-### R11：分轨聚合和最终结论
-
-**执行位置：服务器。**
-
-生成两个独立目录：
+必须分别输出：
 
 ```text
 artifacts/standard/
@@ -540,141 +398,77 @@ artifacts/pressure/
 禁止：
 
 - 将两条轨道混成一个 macro average；
-- 将 Pressure 时间片当作独立新采集 trace；
-- 用 Pressure 结果声称算法时间/内存开销更低；
-- 只报告有利 Pressure 单元而隐藏未通过资格门禁的单元。
+- 只报告有利的 Pressure 单元；
+- 用 Pressure 结果回答开销问题；
+- 与旧 Stage 8、旧 checkpoint 或旧数据集结果做性能比较；
+- 由点估计直接声称稳定优势。
+
+报告应包含配对差值、seed 波动、置信区间、压力覆盖率、OOV、Oracle headroom 和失败单元。证据只支持同步 Replay 时，结论也必须限定在同步 Replay。
 
 ---
 
-## 8. 执行命令与交接
+## 9. 执行位置与可并行关系
 
-以下命令是修复代码实现后的目标接口。除 trace 审计与派生外，所有需要运行代码的步骤都在服务器完成。
+### 9.1 本地执行
 
-### 8.1 本地：审计并派生 Pressure trace
+- 修改和评审 Stage 3/4/Pressure/Stage 8 代码；
+- R1 原始 trace 审计（已完成）；
+- Stage 3 freeze 后派生并冻结 Pressure Test；
+- 生成来源清单和 SHA 包。
 
-```powershell
-Set-Location 'D:\计算机系统大赛\功能赛道\cache_replacement'
+### 9.2 服务器执行
 
-python scripts/run_capd_proactive_stage7_repair.py preflight `
-  --config configs/finals/capd_proactive_stage7_repair.json `
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 `
-  --run-id stage7-repair-r1
+- Python 编译与测试；
+- Stage 3 profile、search、select、verify；
+- Stage 3 人工确认后的 freeze 命令；
+- Stage 4 数据生成、词表、搜索、训练和 checkpoint 选择；
+- Stage 8 Standard/Pressure Replay、聚合和统计。
 
-python scripts/run_capd_proactive_stage7_repair.py scan-pressure `
-  --config configs/finals/capd_proactive_stage7_repair.json `
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 `
-  --run-id stage7-repair-r1
+### 9.3 依赖关系
 
-python scripts/run_capd_proactive_stage7_repair.py export-local-bundle `
-  --run-id stage7-repair-r1
-```
-
-本地结束门禁：
+严格串行：
 
 ```text
-STAGE7_REPAIR_LOCAL_PRESSURE_BUNDLE_VERIFIED
+R1 -> Stage 3 run -> Stage 3 review -> Stage 3 freeze
+Stage 3 freeze -> Stage 4
+Stage 3 freeze -> Pressure generation
+Stage 4 freeze + Pressure freeze -> Stage 8
 ```
 
-本地冻结包至少包含容量矩阵、全部候选统计、窗口清单、派生 CSV、源/派生 SHA 和配置 SHA。冻结后不得手工编辑；将整个目录原样上传服务器。
-
-### 8.2 服务器：环境检查与本地冻结包验签
-
-```bash
-cd /home/likc/Q-former-for-OS
-conda activate capd
-git status --short
-python3 -c 'import sys,torch; print(sys.version); print(torch.__version__); print(torch.cuda.is_available())'
-
-python3 scripts/run_capd_proactive_stage7_repair.py verify-local-bundle \
-  --bundle outputs/capd_proactive_stage7_repair/stage7-repair-r1/local_pressure_bundle_manifest.json \
-  --run-id stage7-repair-r1
-```
-
-服务器验签只能核对来源、内容和 SHA，不得重算候选排序或生成新的 Pressure 文件。必须得到：
+可并行：
 
 ```text
-STAGE7_REPAIR_SERVER_ACCEPTED_LOCAL_BUNDLE
+Stage 3 freeze 后：
+  本地派生 Pressure Test
+  服务器运行 Stage 4
 ```
 
-### 8.3 服务器：生成训练 manifest
-
-```bash
-python3 scripts/run_capd_proactive_stage7_repair.py build-training-manifest \
-  --config configs/finals/capd_proactive_stage7_repair.json \
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 \
-  --run-id stage7-repair-r1
-```
-
-### 8.4 服务器：训练三个 checkpoint
-
-```bash
-python3 scripts/run_capd_proactive_stage4_refit.py all \
-  --manifest outputs/capd_proactive_stage7_repair/stage7-repair-r1/stage4_input_manifest.json \
-  --frozen-parameters outputs/capd_proactive_stage7_repair/stage7-repair-r1/frozen_parameters.json \
-  --run-id stage4-stage7-refit-r1 \
-  --project-root "$PWD" \
-  --device cuda:0
-```
-
-监控：
-
-```bash
-tail -f outputs/capd_proactive_stage4/stage4-stage7-refit-r1/logs/progress.jsonl
-```
-
-### 8.5 服务器：冻结修复执行计划
-
-```bash
-python3 scripts/run_capd_proactive_stage7_repair.py freeze \
-  --config configs/finals/capd_proactive_stage7_repair.json \
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 \
-  --checkpoint-freeze outputs/capd_proactive_stage4/stage4-stage7-refit-r1/final_freeze_candidate.json \
-  --run-id stage7-repair-r1
-
-python3 scripts/run_capd_proactive_stage7_repair.py verify \
-  --config configs/finals/capd_proactive_stage7_repair.json \
-  --source-stage7-run outputs/capd_proactive_stage7/stage7-server-suite-r1 \
-  --run-id stage7-repair-r1
-```
-
-### 8.6 服务器：运行修复后的 Stage 8
-
-```bash
-set -o pipefail
-bash scripts/validate_capd_proactive_stage8_server.sh \
-  stage8-repair-r1 cuda:0 \
-  configs/finals/capd_proactive_stage8_repair.json \
-  2>&1 | tee stage8-stage8-repair-r1-console.log
-```
+没有任何时间表或耗时承诺；是否继续只由产物门禁决定。
 
 ---
 
-## 9. 失败处理
+## 10. 失败处理
 
-- 任一 raw SHA 不一致：停止，不生成后续 manifest。
-- Pressure 单元不合格：保留 `pressure_eligible=false`，继续其他单元。
-- Stage 4 中断且身份一致：使用同一 refit run ID 续跑。
-- Stage 4 参数或输入 SHA 改变：必须换新 run ID。
-- Stage 8 job 失败或结果损坏：保留现场，修复后使用新 Stage 8 run ID。
-- 不允许删除失败目录后伪装首次成功。
+- Stage 3 没有合格候选：保留失败产物，重新审查 Train/Validation 上的机制假设；禁止用 Test 救场。
+- 某 workload 没有 Pressure 窗口：标记 `pressure_eligible=false`，不修改 trace，不放宽规则。
+- Stage 4 没有稳定模型候选：保留搜索结果，在 Train/Validation 范围内修订模型合同并使用新 run ID。
+- SHA 或代码身份改变：原目录保持不动，递增 run ID，禁止跨身份 resume。
+- Stage 8 单元失败：保留成功和失败清单，不用删目录重跑伪装首次成功。
+- 任何选择规则发生变化：回到对应阶段重新冻结其下游全部产物，但不得改写历史产物。
 
 ---
 
-## 10. 最终验收清单
+## 11. 最终完成门禁
 
-- [ ] 六条 raw trace SHA 与原 Stage 7 一致。
-- [ ] 原始 CSV 和旧输出未发生修改。
-- [ ] Pressure 扫描、派生和冻结只在本地完成。
-- [ ] 服务器验签通过，且未重新选窗或重新派生 Pressure CSV。
-- [ ] Stage 4 manifest 为6 Train + 6 Validation + 0 Test。
-- [ ] L/H/K/lambda 与旧 Stage 4 选择完全一致。
-- [ ] 新 checkpoint 共3个，词表来源为六个 Stage 7 Train。
-- [ ] Validation 负责 checkpoint 选择，Test 未参与训练或选择。
-- [ ] Standard job 为144个且全部完成。
-- [ ] Pressure 只包含合格单元，所有策略窗口完全一致。
-- [ ] Standard 与 Pressure 分开聚合。
-- [ ] Pressure 报告不存在时间、内存、CPU 或端到端开销结论。
-- [ ] 两条轨道均报告 page/PC OOV。
-- [ ] 报告明确披露旧 Stage 8 的数据域错配和 Pressure 的派生规则。
+只有全部满足时，本轮最终实验才算完成：
 
-全部通过后，才能把 `stage8-repair-r1` 作为修复后的正式实验结果。
+- R1 身份审计通过；
+- Stage 3 正式 freeze，控制器参数来自 Stage 7 Train/Validation；
+- Pressure Test 按 Stage 3 合同派生并完成 SHA 冻结；
+- Stage 4 正式 freeze，统一 CAPD 与 checkpoint 来自 Stage 7 Train/Validation；
+- Stage 8 计划锁定全部输入、参数和 checkpoint；
+- Standard 与 Pressure 两条轨道分别完成或明确列出失败单元；
+- Test 没有参与任何参数、词表或 checkpoint 选择；
+- 最终报告不含新旧实验性能对比；
+- Pressure 未被用于时间、内存或端到端开销结论；
+- 所有结论与同步/异步证据边界一致。
