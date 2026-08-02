@@ -3,6 +3,7 @@
 
 import argparse
 import copy
+import json
 import os
 import tempfile
 import unittest
@@ -105,6 +106,7 @@ class Stage4Stage7SyntheticE2ETest(unittest.TestCase):
     self.assertEqual(stage4.fingerprint_value(rows_a),
                      stage4.fingerprint_value(rows_b))
     self.assertEqual(diagnostics_a["method"], diagnostics_b["method"])
+    self.assertEqual(diagnostics_a["valid_decision_count"], len(rows_a))
     self.assertTrue(all(row["candidate_size_K"] == 8 for row in rows_a))
     self.assertTrue(all(row["b_max"] == 2 for row in rows_a))
     self.assertTrue(all(row["D"] == 8 and row["F_low"] == 1 and
@@ -136,6 +138,101 @@ class Stage4Stage7SyntheticE2ETest(unittest.TestCase):
                                      "--candidate", "selected"])
     self.assertEqual(candidate_args.command, "candidate")
     self.assertTrue(freeze_args.confirm_stage4_freeze)
+
+  def test_sample_gate_code_contains_no_training_or_selection_call(self):
+    source = open(runner.__file__, "r", encoding="utf-8").read()
+    start = source.index("def generate_draft_samples")
+    end = source.index("def verify_candidate_outputs")
+    block = source[start:end]
+    self.assertNotIn("ensure_training(", block)
+    self.assertNotIn("run_search(", block)
+    self.assertNotIn("confirm_contract(", block)
+    self.assertNotIn("freeze(", block)
+
+  def test_sample_structure_report_detects_one_zero_workload_split(self):
+    with tempfile.TemporaryDirectory() as root:
+      key = "synthetic-semantic-key"
+      dataset_root = os.path.join(root, "datasets", key)
+      os.makedirs(dataset_root)
+      manifest_path = os.path.join(dataset_root, "sample_manifest.json")
+      with open(manifest_path, "w", encoding="utf-8") as handle:
+        json.dump({"synthetic": True}, handle)
+      diagnostics = []
+      for workload in stage4.WORKLOADS:
+        for split in stage4.SPLITS:
+          count = 0 if (workload == "canneal" and
+                        split == "validation") else 1
+          diagnostics.append({
+              "workload": workload, "split_role": split,
+              "sample_count": count, "valid_decision_count": count,
+              "path": "{}.jsonl".format(split), "sha256": "1" * 64,
+              "sample_generation_contract_sha256": "2" * 64})
+      empty_oov = {workload: {
+          "page_total": 0, "page_oov_count": 0, "page_oov_unique": 0,
+          "page_oov_rate": 0.0, "pc_total": 0, "pc_oov_count": 0,
+          "pc_oov_unique": 0, "pc_oov_rate": 0.0}
+                   for workload in stage4.WORKLOADS}
+      vocabulary = {
+          "fit_scope": "six_train_only", "validation_used_for_fit": False,
+          "test_used_for_fit": False, "pressure_used_for_fit": False,
+          "page_vocabulary_size": 1, "pc_vocabulary_size": 1,
+          "page_vocabulary_sha256": "3" * 64,
+          "pc_vocabulary_sha256": "4" * 64,
+          "vocabulary_sha256": "5" * 64,
+          "page_vocabulary_file_sha256": "6" * 64,
+          "pc_vocabulary_file_sha256": "7" * 64,
+          "manifest_path": "vocabulary_manifest.json",
+          "manifest_sha256": "8" * 64,
+          "validation_oov_by_workload": empty_oov}
+      manifest = {
+          "semantic_key": key, "sample_cache_identity_sha256": "9" * 64,
+          "merged": {split: {"path": split + ".jsonl",
+                             "sample_count": 5, "sha256": "a" * 64}
+                     for split in stage4.SPLITS},
+          "vocabulary": vocabulary, "per_workload": diagnostics}
+      config = stage4.load_json(CONFIG_PATH)
+      candidate = stage4.resolve_phase_candidates(config, "semantic")[0]
+      report = runner.sample_structure_dataset_report(
+          root, candidate, manifest, fake_authority())
+      self.assertEqual(report["zero_sample_workload_splits"],
+                       ["canneal/validation"])
+      self.assertEqual(report["zero_valid_decision_workload_splits"],
+                       ["canneal/validation"])
+
+  def test_sample_gate_refuses_confirmation_flag_and_checkpoint(self):
+    with tempfile.TemporaryDirectory() as root:
+      invocation = args(root)
+      invocation.input_manifest = os.path.join(root, "input_manifest.json")
+      with open(invocation.input_manifest, "w", encoding="utf-8") as handle:
+        json.dump({"entries": []}, handle)
+      output = os.path.join(root, "outputs", "gate")
+      os.makedirs(os.path.join(output, "checkpoints"))
+      resolved = {
+          "run_id": stage4.RUN_ID,
+          "runtime": {
+              "run_id": stage4.RUN_ID,
+              "source_config_sha256": stage4.fingerprint_file(CONFIG_PATH),
+              "input_manifest_sha256": stage4.fingerprint_file(
+                  invocation.input_manifest)}}
+      stage4.write_json_atomic(os.path.join(output, "resolved_config.json"),
+                               resolved)
+      stage4.write_json_atomic(os.path.join(output, "run_state.json"), {
+          "status": "preflight_passed_awaiting_confirmation",
+          "formal_freeze": False, "search_contract_confirmed": False,
+          "test_trace_opened": False, "pressure_trace_opened": False})
+      stage4.write_json_atomic(os.path.join(output, "search_state.json"), {
+          "status": "not_started", "active_training_processes": 0,
+          "completed_phases": [], "formal_freeze": False})
+      invocation.confirm_stage4_search = True
+      with self.assertRaises(RuntimeError):
+        runner.require_sample_structure_gate_ready(
+            invocation, output, stage4.load_json(CONFIG_PATH))
+      invocation.confirm_stage4_search = False
+      with open(os.path.join(output, "checkpoints", "model.pt"), "wb") as handle:
+        handle.write(b"not-a-real-checkpoint")
+      with self.assertRaises(RuntimeError):
+        runner.require_sample_structure_gate_ready(
+            invocation, output, stage4.load_json(CONFIG_PATH))
 
 
 if __name__ == "__main__":

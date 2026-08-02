@@ -153,7 +153,7 @@ python3 scripts/run_capd_proactive_stage4_stage7.py preflight \
 preflight 只读校验输入并写证据，不生成正式候选，不训练，不 freeze。CUDA 不可用
 或可见 GPU 不是恰好一张时立即失败，不会退回 CPU。
 
-## 8. 可选：确认前生成语义样本缓存
+## 8. 搜索确认前的样本结构检查门
 
 ```bash
 python3 scripts/run_capd_proactive_stage4_stage7.py samples \
@@ -165,8 +165,26 @@ python3 scripts/run_capd_proactive_stage4_stage7.py samples \
   --train-workers 4 --sample-workers 6 --replay-workers 6
 ```
 
-这一步只为 semantic 阶段的七种 L/H/lambda 生成样本和 Train-only 词表，按
-workload 使用多进程临时文件后按固定顺序合并；不会启动训练。
+这一步必须在 `confirm-contract` 之前执行。它只为 semantic 阶段的七种
+L/H/lambda 生成样本缓存，并且只使用六个 Train 建立统一 page/PC 词表；六个
+Validation 只用于逐 workload 统计 page/PC OOV，不参与词表 fit。程序显式统计
+每个 semantic 数据集、每个 workload、每个 Train/Validation 的样本数和有效决策
+数；任一 workload/split 为零时门状态为 FAIL，禁止后续确认和搜索。
+
+检查门会生成：
+
+- `sample_structure_report.json`：逐 workload 样本数、有效决策数、Validation OOV，
+  以及样本、词表、R4、R2、配置与输入合同 SHA；
+- `sample_structure_verification.json`：PASS/FAIL 和上述根级产物 SHA；
+- `sample_manifest.json`、`vocabulary_manifest.json` 及 `datasets/`、`vocabulary/`
+  下的七组语义缓存。
+
+运行前后都必须保持 `search_state.status=not_started`、训练进程数为 0、
+`search_contract_confirmed=false`、`formal_freeze=false`，并且不得存在 search、
+checkpoint、candidate、Test 或 Pressure 产物。`samples` 命令会拒绝确认、候选和
+freeze 参数，也不会调用训练、搜索、candidate 或 freeze 入口。只有
+`sample_structure_verification.json.status=PASS` 且 SHA 链仍匹配时，后续
+`confirm-contract` 才允许执行。
 
 ## 9. 人工确认门、搜索与 resume
 

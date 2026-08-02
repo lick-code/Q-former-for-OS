@@ -168,11 +168,16 @@ def confirm_contract(args):
   source_sha = stage4.fingerprint_file(args.config)
   if resolved["runtime"]["source_config_sha256"] != source_sha:
     raise RuntimeError("Search config changed after preflight")
+  sample_gate = require_sample_structure_gate_passed(root)
   confirmation = {
       "schema_version": "capd_proactive_stage4_stage7_search_confirmation_v1_0",
       "run_id": args.run_id, "human_confirmation": True,
       "search_config_sha256": source_sha, "confirmed_at": utc_now(),
       "candidate_count": 15, "training_run_count": 45,
+      "sample_structure_verification_sha256": stage4.fingerprint_file(
+          os.path.join(root, "sample_structure_verification.json")),
+      "sample_structure_report_sha256": sample_gate[
+          "sample_structure_report_sha256"],
       "formal_freeze": False,
   }
   confirmed_contract = copy.deepcopy(config)
@@ -195,6 +200,7 @@ def confirm_contract(args):
 
 
 def require_search_confirmation(root, args):
+  require_sample_structure_gate_passed(root)
   path = os.path.join(root, "search_contract_confirmation.json")
   if not os.path.isfile(path):
     raise RuntimeError("Full search is locked: explicit confirmation is missing")
@@ -206,6 +212,104 @@ def require_search_confirmation(root, args):
       value.get("confirmed_search_contract_sha256") !=
       stage4.fingerprint_file(confirmed_path)):
     raise RuntimeError("Search confirmation identity mismatch")
+
+
+SAMPLE_GATE_FORBIDDEN_TOP_LEVEL = (
+    "confirmed_search_contract.json", "search_contract_confirmation.json",
+    "stage4_candidate.json", "validation_selection_report.json",
+    "checkpoint_manifest.json", "verification.json",
+    "final_stage4_freeze.json", "stage8_model_contract.json",
+    "formal_checkpoint_manifest.json", "validation_metrics.csv",
+    "validation_metrics_by_workload.csv")
+
+
+def sample_gate_forbidden_artifacts(root):
+  """Return search/training/selection/freeze artifacts forbidden at this gate."""
+  found = []
+  for name in SAMPLE_GATE_FORBIDDEN_TOP_LEVEL:
+    if os.path.exists(os.path.join(root, name)):
+      found.append(name)
+  for directory in ("search", "checkpoints"):
+    base = os.path.join(root, directory)
+    if not os.path.isdir(base):
+      continue
+    for current, _, files in os.walk(base):
+      for name in files:
+        found.append(os.path.relpath(os.path.join(current, name), root))
+  return sorted(set(found))
+
+
+def require_sample_structure_gate_ready(args, root, config):
+  """Fail closed unless the run is still an untouched pre-search draft."""
+  if (args.confirm_stage4_search or args.confirm_stage4_freeze or
+      args.candidate is not None):
+    raise RuntimeError(
+        "samples forbids confirmation, freeze, and candidate arguments")
+  resolved_path = os.path.join(root, "resolved_config.json")
+  if not os.path.isfile(resolved_path):
+    raise RuntimeError("Run preflight before sample generation")
+  resolved = stage4.load_json(resolved_path)
+  if (resolved.get("run_id") != args.run_id or
+      resolved.get("runtime", {}).get("run_id") != args.run_id):
+    raise RuntimeError("Sample gate run_id differs from preflight")
+  if (resolved.get("runtime", {}).get("source_config_sha256") !=
+      stage4.fingerprint_file(args.config) or
+      resolved.get("runtime", {}).get("input_manifest_sha256") !=
+      stage4.fingerprint_file(args.input_manifest)):
+    raise RuntimeError("Sample gate config/input identity differs from preflight")
+  run_state = stage4.load_json(os.path.join(root, "run_state.json"))
+  allowed_statuses = {
+      "preflight_passed_awaiting_confirmation",
+      "sample_structure_gate_passed_awaiting_search_confirmation",
+      "sample_structure_gate_failed"}
+  if (run_state.get("status") not in allowed_statuses or
+      run_state.get("formal_freeze") is not False or
+      run_state.get("search_contract_confirmed") is not False or
+      run_state.get("test_trace_opened") is not False or
+      run_state.get("pressure_trace_opened") is not False):
+    raise RuntimeError("Sample gate requires an unconfirmed, unfrozen run")
+  search_state = stage4.load_json(os.path.join(root, "search_state.json"))
+  if (search_state.get("status") != "not_started" or
+      search_state.get("active_training_processes") != 0 or
+      search_state.get("completed_phases") != [] or
+      search_state.get("formal_freeze") is not False):
+    raise RuntimeError("Sample gate requires search_state.status=not_started")
+  forbidden = sample_gate_forbidden_artifacts(root)
+  if forbidden:
+    raise RuntimeError("Sample gate found forbidden artifacts: {}".format(
+        ", ".join(forbidden)))
+  return resolved
+
+
+def require_sample_structure_gate_passed(root):
+  """Validate the persisted pre-training sample gate and its SHA chain."""
+  path = os.path.join(root, "sample_structure_verification.json")
+  if not os.path.isfile(path):
+    raise RuntimeError("Search confirmation requires the sample structure gate")
+  value = stage4.load_json(path)
+  required = {
+      "sample_structure_report.json": value.get(
+          "sample_structure_report_sha256"),
+      "sample_manifest.json": value.get("sample_manifest_sha256"),
+      "vocabulary_manifest.json": value.get("vocabulary_manifest_sha256")}
+  if (value.get("status") != "PASS" or value.get("gate_pass") is not True or
+      value.get("training_started") is not False or
+      value.get("search_started") is not False or
+      value.get("checkpoint_created") is not False or
+      value.get("candidate_selected") is not False or
+      value.get("test_trace_opened") is not False or
+      value.get("pressure_trace_opened") is not False or
+      value.get("search_contract_confirmed") is not False or
+      value.get("zero_sample_workload_splits") != [] or
+      value.get("zero_valid_decision_workload_splits") != [] or
+      value.get("formal_freeze") is not False):
+    raise RuntimeError("Sample structure gate is not a clean PASS")
+  for name, expected in required.items():
+    artifact = os.path.join(root, name)
+    if (not expected or not os.path.isfile(artifact) or
+        stage4.fingerprint_file(artifact) != expected):
+      raise RuntimeError("Sample structure gate SHA mismatch: {}".format(name))
+  return value
 
 
 def write_jsonl(path, rows):
@@ -295,8 +399,6 @@ def ensure_dataset(args, root, candidate, authority, entries):
         with open(source_path, "r", encoding="utf-8") as source:
           for line in source:
             output.write(line); count += 1
-    if count <= 0:
-      raise RuntimeError("{} generated zero samples".format(split))
     merged[split] = {"path": os.path.abspath(path), "sample_count": count}
   vocabulary = stage4.build_train_only_vocabulary(
       merged["train"]["path"], merged["validation"]["path"])
@@ -340,26 +442,192 @@ def ensure_dataset(args, root, candidate, authority, entries):
   return manifest
 
 
+def sample_structure_dataset_report(root, candidate, manifest, authority):
+  """Build one semantic-cache report with explicit per-workload decisions."""
+  diagnostics = {}
+  for row in manifest.get("per_workload", []):
+    key = (row.get("workload"), row.get("split_role"))
+    if key in diagnostics:
+      raise RuntimeError("Duplicate sample diagnostics: {}/{}".format(*key))
+    diagnostics[key] = row
+  expected = {(workload, split) for workload in stage4.WORKLOADS
+              for split in stage4.SPLITS}
+  if set(diagnostics) != expected:
+    missing = sorted(expected - set(diagnostics))
+    extra = sorted(set(diagnostics) - expected)
+    raise RuntimeError(
+        "Sample diagnostics coverage mismatch: missing={} extra={}".format(
+            missing, extra))
+  contracts = {row.get("sample_generation_contract_sha256")
+               for row in diagnostics.values()}
+  if len(contracts) != 1 or None in contracts:
+    raise RuntimeError("Sample generation contract SHA is not unified")
+  per_workload = {}
+  zero_samples, zero_decisions = [], []
+  oov = manifest["vocabulary"]["validation_oov_by_workload"]
+  for workload in stage4.WORKLOADS:
+    splits = {}
+    for split in stage4.SPLITS:
+      row = diagnostics[(workload, split)]
+      sample_count = int(row.get("sample_count", 0))
+      valid_count = int(row.get("valid_decision_count", sample_count))
+      splits[split] = {
+          "sample_count": sample_count,
+          "valid_decision_count": valid_count,
+          "sample_path": row.get("path"),
+          "sample_sha256": row.get("sha256"),
+          "sample_generation_contract_sha256": row.get(
+              "sample_generation_contract_sha256")}
+      identity = "{}/{}".format(workload, split)
+      if sample_count <= 0:
+        zero_samples.append(identity)
+      if valid_count <= 0:
+        zero_decisions.append(identity)
+      if valid_count != sample_count:
+        raise RuntimeError("Sample/valid-decision count mismatch: {}".format(
+            identity))
+    per_workload[workload] = {
+        "method": copy.deepcopy(authority["workloads"][workload]),
+        "train": splits["train"], "validation": splits["validation"],
+        "validation_oov": copy.deepcopy(oov[workload])}
+  manifest_path = os.path.join(
+      root, "datasets", manifest["semantic_key"], "sample_manifest.json")
+  return {
+      "candidate_id": candidate["candidate_id"],
+      "semantic_key": manifest["semantic_key"],
+      "sample_cache_identity_sha256": manifest[
+          "sample_cache_identity_sha256"],
+      "sample_generation_contract_sha256": next(iter(contracts)),
+      "sample_manifest_path": os.path.abspath(manifest_path),
+      "sample_manifest_sha256": stage4.fingerprint_file(manifest_path),
+      "merged": copy.deepcopy(manifest["merged"]),
+      "vocabulary": {
+          key: copy.deepcopy(manifest["vocabulary"][key]) for key in (
+              "fit_scope", "validation_used_for_fit", "test_used_for_fit",
+              "pressure_used_for_fit", "page_vocabulary_size",
+              "pc_vocabulary_size", "page_vocabulary_sha256",
+              "pc_vocabulary_sha256", "vocabulary_sha256",
+              "page_vocabulary_file_sha256", "pc_vocabulary_file_sha256",
+              "manifest_path", "manifest_sha256")},
+      "per_workload": per_workload,
+      "zero_sample_workload_splits": zero_samples,
+      "zero_valid_decision_workload_splits": zero_decisions,
+  }
+
+
 def generate_draft_samples(args):
-  """Generate only phase-1 semantic caches; no training or selection."""
+  """Run the pre-training sample structure gate; never train or select."""
   config, authority, _, entries = load_context(args)
   root = run_root(args, config)
-  if not os.path.isfile(os.path.join(root, "resolved_config.json")):
-    raise RuntimeError("Run preflight before sample generation")
-  manifests = []
+  resolved = require_sample_structure_gate_ready(args, root, config)
+  dataset_reports = []
   for candidate in stage4.resolve_phase_candidates(config, "semantic"):
     manifest = ensure_dataset(args, root, candidate, authority, entries)
-    manifests.append({
-        "candidate_id": candidate["candidate_id"],
-        "semantic_key": manifest["semantic_key"],
-        "sample_manifest_sha256": stage4.fingerprint_file(os.path.join(
-            root, "datasets", manifest["semantic_key"], "sample_manifest.json"))})
-  stage4.write_json_atomic(os.path.join(root, "sample_manifest.json"), {
-      "schema_version": "capd_proactive_stage4_stage7_sample_index_v1_0",
-      "status": "phase1_samples_ready_no_training_started",
-      "manifests": manifests, "formal_freeze": False})
-  append_event(root, "draft_samples_completed", count=len(manifests))
-  print("[OK] phase-1 sample caches generated; no training was started")
+    dataset_reports.append(sample_structure_dataset_report(
+        root, candidate, manifest, authority))
+  zero_samples = sorted({item for dataset in dataset_reports
+                         for item in dataset["zero_sample_workload_splits"]})
+  zero_decisions = sorted({item for dataset in dataset_reports
+                           for item in dataset[
+                               "zero_valid_decision_workload_splits"]})
+  gate_pass = not zero_samples and not zero_decisions
+  sample_index = {
+      "schema_version": "capd_proactive_stage4_stage7_sample_index_v1_1",
+      "status": ("sample_structure_gate_passed_no_training_started"
+                 if gate_pass else
+                 "sample_structure_gate_failed_no_training_started"),
+      "run_id": args.run_id,
+      "manifests": [{
+          "candidate_id": item["candidate_id"],
+          "semantic_key": item["semantic_key"],
+          "sample_generation_contract_sha256": item[
+              "sample_generation_contract_sha256"],
+          "sample_manifest_sha256": item["sample_manifest_sha256"]}
+          for item in dataset_reports],
+      "training_started": False, "search_started": False,
+      "checkpoint_created": False, "candidate_selected": False,
+      "test_trace_opened": False, "pressure_trace_opened": False,
+      "search_contract_confirmed": False, "formal_freeze": False}
+  sample_index_path = os.path.join(root, "sample_manifest.json")
+  stage4.write_json_atomic(sample_index_path, sample_index)
+  vocabulary_index = {
+      "schema_version": "capd_proactive_stage4_stage7_vocabulary_index_v1_0",
+      "run_id": args.run_id, "fit_scope": "six_train_only",
+      "validation_used_for_fit": False, "test_used_for_fit": False,
+      "pressure_used_for_fit": False,
+      "datasets": [{
+          "candidate_id": item["candidate_id"],
+          "semantic_key": item["semantic_key"],
+          "vocabulary_sha256": item["vocabulary"]["vocabulary_sha256"],
+          "vocabulary_manifest_sha256": item["vocabulary"]["manifest_sha256"]}
+          for item in dataset_reports],
+      "training_started": False, "formal_freeze": False}
+  vocabulary_index_path = os.path.join(root, "vocabulary_manifest.json")
+  stage4.write_json_atomic(vocabulary_index_path, vocabulary_index)
+  report = {
+      "schema_version": "capd_proactive_stage4_stage7_sample_structure_report_v1_0",
+      "contract_id": stage4.CONTRACT_ID, "run_id": args.run_id,
+      "status": "PASS" if gate_pass else "FAIL", "gate_pass": gate_pass,
+      "input_entry_count": len(entries),
+      "train_entry_count": sum(row["split_role"] == "train" for row in entries),
+      "validation_entry_count": sum(
+          row["split_role"] == "validation" for row in entries),
+      "semantic_dataset_count": len(dataset_reports),
+      "search_config_sha256": resolved["runtime"]["source_config_sha256"],
+      "input_manifest_sha256": resolved["runtime"]["input_manifest_sha256"],
+      "r4_final_freeze_sha256": authority["final_freeze_sha256"],
+      "r2_input_manifest_sha256": resolved["authority"][
+          "r2_input_manifest_sha256"],
+      "datasets": dataset_reports,
+      "zero_sample_workload_splits": zero_samples,
+      "zero_valid_decision_workload_splits": zero_decisions,
+      "training_started": False, "search_started": False,
+      "checkpoint_created": False, "candidate_selected": False,
+      "test_trace_opened": False, "pressure_trace_opened": False,
+      "search_contract_confirmed": False, "formal_freeze": False}
+  report_path = os.path.join(root, "sample_structure_report.json")
+  stage4.write_json_atomic(report_path, report)
+  forbidden_after = sample_gate_forbidden_artifacts(root)
+  if forbidden_after:
+    raise RuntimeError("Sample gate created forbidden artifacts: {}".format(
+        ", ".join(forbidden_after)))
+  verification = {
+      "schema_version":
+          "capd_proactive_stage4_stage7_sample_structure_verification_v1_0",
+      "run_id": args.run_id, "status": report["status"],
+      "gate_pass": gate_pass,
+      "sample_structure_report_sha256": stage4.fingerprint_file(report_path),
+      "sample_manifest_sha256": stage4.fingerprint_file(sample_index_path),
+      "vocabulary_manifest_sha256": stage4.fingerprint_file(
+          vocabulary_index_path),
+      "zero_sample_workload_splits": zero_samples,
+      "zero_valid_decision_workload_splits": zero_decisions,
+      "training_started": False, "search_started": False,
+      "checkpoint_created": False, "candidate_selected": False,
+      "test_trace_opened": False, "pressure_trace_opened": False,
+      "search_contract_confirmed": False, "formal_freeze": False}
+  verification_path = os.path.join(root, "sample_structure_verification.json")
+  stage4.write_json_atomic(verification_path, verification)
+  run_state_path = os.path.join(root, "run_state.json")
+  run_state = stage4.load_json(run_state_path)
+  run_state.update({
+      "status": ("sample_structure_gate_passed_awaiting_search_confirmation"
+                 if gate_pass else "sample_structure_gate_failed"),
+      "sample_structure_gate_passed": gate_pass,
+      "search_contract_confirmed": False, "formal_freeze": False,
+      "test_trace_opened": False, "pressure_trace_opened": False,
+      "updated_at": utc_now()})
+  stage4.write_json_atomic(run_state_path, run_state)
+  append_event(root, "sample_structure_gate_passed" if gate_pass else
+               "sample_structure_gate_failed",
+               semantic_dataset_count=len(dataset_reports),
+               zero_sample_workload_splits=zero_samples,
+               zero_valid_decision_workload_splits=zero_decisions)
+  if not gate_pass:
+    message = ("Sample structure gate failed: zero_samples={} "
+               "zero_valid_decisions={}").format(zero_samples, zero_decisions)
+    raise RuntimeError(message)
+  print("[OK] sample structure gate passed; no training/search/selection/freeze")
 
 
 def verify_candidate_outputs(args):

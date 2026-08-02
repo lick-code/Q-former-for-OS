@@ -686,6 +686,10 @@ def generate_samples_for_trace(
       rows.append(row)
   diagnostics = {
       "workload": workload, "split_role": split, "sample_count": len(rows),
+      # A Stage-4 sample is emitted only for an active demotion decision whose
+      # complete future label window is available.  Keep the decision count
+      # explicit so the pre-training structure gate never has to infer it.
+      "valid_decision_count": len(rows),
       "windows": len(summaries), "method": method,
       "sample_generation_contract_sha256": identity_sha,
   }
