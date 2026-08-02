@@ -3,7 +3,9 @@
   "completed_phases": [
     "preflight",
     "profile",
-    "search"
+    "search",
+    "select",
+    "verify"
   ],
   "created_at": "2026-08-01T12:05:55Z",
   "failed_directory_must_be_preserved": true,
@@ -89,6 +91,35 @@
         "path": "validation_safety.json",
         "sha256": "56cd44d69eb19a8cd7487c1f8aa8c2f2cc80b712a6f3c74731649eb10fcadece"
       }
+    ],
+    "select": [
+      {
+        "bytes": 1271037,
+        "path": "pareto_frontier.json",
+        "sha256": "2b0164dceaf1dee0f50677749d92af0dfbcf5c4b43ec8321d3195aa88a352a3a"
+      },
+      {
+        "bytes": 862974,
+        "path": "selection_rationale.json",
+        "sha256": "f108671850b6b7b6e43fbd9553d64baf2a4bead8b644e695b88bacdf7aa27b1a"
+      },
+      {
+        "bytes": 368,
+        "path": "final_freeze_candidate.json",
+        "sha256": "e8ea4c4f92b6009d309f3e4f08a2a6f2ed8ba89160bcaa7a29494cf641e6c9c2"
+      },
+      {
+        "bytes": 359,
+        "path": "pressure_generation_contract_candidate.json",
+        "sha256": "71b462107ac4de9ac2b9cd532602352a1a4c2ee0d1b4536d30279ffc6f954f05"
+      }
+    ],
+    "verify": [
+      {
+        "bytes": 3945,
+        "path": "verification.json",
+        "sha256": "f672df27b1646e7c0f248794151b36d8b5b96b65c140cedb90b6f9f7a2ad1e0c"
+      }
     ]
   },
   "run_id": "stage3-stage7-calibration-r2",
@@ -120,6 +151,6 @@
   },
   "run_identity_sha256": "4397ed9971077733898fa214c6f3e48952ac3f882ff60c83dbd3c97c0a974587",
   "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
-  "status": "ready",
-  "updated_at": "2026-08-02T09:23:58Z"
+  "status": "freeze_candidate_ready",
+  "updated_at": "2026-08-02T09:31:39Z"
 }
