@@ -1,0 +1,17 @@
+{
+  "no_eligible_exclusions": [],
+  "parent_contract_exclusions": [
+    {
+      "pressure_generated": false,
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "pressure_generated": false,
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "fluidanimate"
+    }
+  ],
+  "run_id": "stage7-pressure-derive-r2",
+  "schema_version": "capd_proactive_pressure_stage7_v1_0"
+}

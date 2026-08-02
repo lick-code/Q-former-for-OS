@@ -1,0 +1,40 @@
+{
+  "allowed_workload_current_sha256": {
+    "blackscholes": {
+      "raw_sha256": "0b24c5597d30f82a793e43a8905de180853913f0c11038ecfd2c4b37291efdea",
+      "test_sha256": "27f4f7107f15ea52ec2052efdcffab3e2cb6cb605f4ac6cd79c6aa49a23d2a3f"
+    },
+    "canneal": {
+      "raw_sha256": "dae1921a662cf887b8e0739f202bbff154b006d971e811f86bc951f8cec8b687",
+      "test_sha256": "dbf4707925d63710ef36eb37dcc7d10b7aced2ad41890a0de590f863c9ca5d48"
+    },
+    "dedup_pressure": {
+      "raw_sha256": "c9f024d0c3f5254d50b7bb6f4757de296d5121a21b39e0dda21162cdf08c04a6",
+      "test_sha256": "7910bdc116b3ff0414feaca3dfeb553dd84b2ef1955c4d4807f92fc643cb2155"
+    },
+    "swaptions": {
+      "raw_sha256": "567bca327bafaa672dc60bf5dc362a51f0b7bf0dc142303b7e8f0941a805b6dd",
+      "test_sha256": "59afbf2923aea4ac6b1375fb3abc602c192b3e789a829b1a0415f50725ce0ef8"
+    }
+  },
+  "authority_sha256": {
+    "final_freeze": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+    "pressure_generation_contract": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+    "pressure_window_selection_addendum": "86b992bcae4ab3d89c47ac8dbc4878bfc813bdeecb162d668c8d106a47230f1b",
+    "r1_raw_identity_audit": "c690b34b9835783d5f33ae6a7461bcb62e994176ecbb194e8c1b48abd1966208",
+    "r1_verification": "3aaa888f6116b732629c51fc3da514d8fbfde7bd5135f83e1ae1ade7b5f31f76",
+    "r4_run_state": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63",
+    "split_manifest": "5b4ebd66d8ef737b7d6c696abb67b0501a10eb60dd09ba9b1eb69bf64bad7fff",
+    "standard_test_lock": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb"
+  },
+  "code_sha256": "cce4e21b4ede41b6f7d0897f60615e4774ec4cfef90dac39120470f58ee7a109",
+  "config_sha256": "1e0680e8d5842b0f30ede9dcf3fd655e75ee3adce80f83703cbad5b43e20c326",
+  "excluded_test_payload_opened": false,
+  "excluded_workloads": [
+    "streamcluster_pressure",
+    "fluidanimate"
+  ],
+  "input_identity_sha256": "096eaf904c6f133dcfa34bdf8a895226acb1e960de5601948fafa98c0222e78f",
+  "run_id": "stage7-pressure-derive-r2",
+  "schema_version": "capd_proactive_pressure_stage7_v1_0"
+}

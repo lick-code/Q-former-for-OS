@@ -1,0 +1,60 @@
+{
+  "candidate_total": 44,
+  "eligible_candidate_total": 44,
+  "formal_pressure_generated": false,
+  "schema_version": "capd_proactive_pressure_stage7_v1_0",
+  "selection_order_complete": true,
+  "status": "PRESSURE_CANDIDATES_SCANNED",
+  "workloads": [
+    {
+      "candidate_count": 11,
+      "eligible_candidate_count": 11,
+      "selected_window": null,
+      "status": "scanned",
+      "test_payload_opened": true,
+      "workload": "canneal"
+    },
+    {
+      "candidate_count": 11,
+      "eligible_candidate_count": 11,
+      "selected_window": null,
+      "status": "scanned",
+      "test_payload_opened": true,
+      "workload": "dedup_pressure"
+    },
+    {
+      "candidate_count": 11,
+      "eligible_candidate_count": 11,
+      "selected_window": null,
+      "status": "scanned",
+      "test_payload_opened": true,
+      "workload": "blackscholes"
+    },
+    {
+      "candidate_count": 11,
+      "eligible_candidate_count": 11,
+      "selected_window": null,
+      "status": "scanned",
+      "test_payload_opened": true,
+      "workload": "swaptions"
+    },
+    {
+      "candidate_count": 0,
+      "eligible_candidate_count": 0,
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "selected_window": null,
+      "status": "excluded",
+      "test_payload_opened": false,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "candidate_count": 0,
+      "eligible_candidate_count": 0,
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "selected_window": null,
+      "status": "excluded",
+      "test_payload_opened": false,
+      "workload": "fluidanimate"
+    }
+  ]
+}

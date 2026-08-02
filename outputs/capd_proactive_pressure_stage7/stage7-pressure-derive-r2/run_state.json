@@ -1,0 +1,34 @@
+{
+  "code_sha256": "cce4e21b4ede41b6f7d0897f60615e4774ec4cfef90dac39120470f58ee7a109",
+  "completed_phases": [
+    "preflight",
+    "scan",
+    "derive",
+    "verify"
+  ],
+  "config_sha256": "1e0680e8d5842b0f30ede9dcf3fd655e75ee3adce80f83703cbad5b43e20c326",
+  "input_identity_sha256": "096eaf904c6f133dcfa34bdf8a895226acb1e960de5601948fafa98c0222e78f",
+  "phase_artifacts": {
+    "derive": {
+      "local_pressure_bundle_manifest.json": "898a6b2c85221a1dbd5eb483cc0ef6599ce43065c60dcd7779791cce7f50ad52",
+      "pressure_derivation_exclusions.json": "3228e619e472e814fb8eba5d6704b8d1d85d7323bff48ea75022bef9a832cff6",
+      "pressure_test_lock.json": "929738382e1ac03263f9ea0b56e01cc0892ea3177229aa1604403a2aa3c39d5a",
+      "pressure_window_manifest.json": "ca26f4981c318706f81339f3bb4294fa4a059bd1b0d4abad5c8a9c2c6de3a6fb"
+    },
+    "preflight": {
+      "input_identity.json": "9e3541a8fe5b20de82ed7e55ab89c301b50bbe21d52859109c4d50dd336464a2",
+      "pressure_interval_exclusions.json": "81926b885f4fbcc878090994247d73bdab7ff5ee54c1b6f685e74c2c49e81532",
+      "resolved_contract.json": "e05175e6cc8ba63e7d1c081d2c126cbc4ffafd413e9f5994b734121dbb0ae79a"
+    },
+    "scan": {
+      "pressure_candidates.csv": "478e1043b22246e13f4bd535fd3031cdf8bb4cd1b50d8ddacf44d1261e67e3b3",
+      "pressure_eligibility_summary.json": "fd7338d6e02c2bd27ab687350386fe5e99f614fa7d985dd2813d6aa8382196a3"
+    },
+    "verify": {
+      "verification.json": "2720a65fb777aed1190a903ec3f9399fb65ffc50c3149f170665d95ca5f6e539"
+    }
+  },
+  "run_id": "stage7-pressure-derive-r2",
+  "schema_version": "capd_proactive_pressure_stage7_v1_0",
+  "status": "PRESSURE_TEST_DERIVED_AND_VERIFIED"
+}

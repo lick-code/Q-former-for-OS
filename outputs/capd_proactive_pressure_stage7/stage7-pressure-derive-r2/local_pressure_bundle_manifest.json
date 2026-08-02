@@ -1,0 +1,23 @@
+{
+  "artifacts": {
+    "derived_pressure/blackscholes/pressure.csv": "ce19130b47a4459e05ca6b85e4045d001abfacf4c3d5333c002efd5cef683683",
+    "derived_pressure/canneal/pressure.csv": "14319d0b7c4f4581bdad36e087c08c8e793d68f9505f954645ee847dbc71a3ee",
+    "derived_pressure/dedup_pressure/pressure.csv": "14ed12e17979e7bc793beddc9dd1931c7cefb5d708eac7c7c1bdb38f8cd0eb9b",
+    "derived_pressure/swaptions/pressure.csv": "601bce48c37d1734598cbe6b13906fbdf2b1d510e1753b9bcb60938c5ae9c6fa",
+    "input_identity.json": "9e3541a8fe5b20de82ed7e55ab89c301b50bbe21d52859109c4d50dd336464a2",
+    "pressure_candidates.csv": "478e1043b22246e13f4bd535fd3031cdf8bb4cd1b50d8ddacf44d1261e67e3b3",
+    "pressure_derivation_exclusions.json": "3228e619e472e814fb8eba5d6704b8d1d85d7323bff48ea75022bef9a832cff6",
+    "pressure_eligibility_summary.json": "fd7338d6e02c2bd27ab687350386fe5e99f614fa7d985dd2813d6aa8382196a3",
+    "pressure_interval_exclusions.json": "81926b885f4fbcc878090994247d73bdab7ff5ee54c1b6f685e74c2c49e81532",
+    "pressure_test_lock.json": "929738382e1ac03263f9ea0b56e01cc0892ea3177229aa1604403a2aa3c39d5a",
+    "pressure_window_manifest.json": "ca26f4981c318706f81339f3bb4294fa4a059bd1b0d4abad5c8a9c2c6de3a6fb",
+    "resolved_contract.json": "e05175e6cc8ba63e7d1c081d2c126cbc4ffafd413e9f5994b734121dbb0ae79a"
+  },
+  "authority_sha256": {
+    "parent_pressure_contract": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+    "pressure_window_selection_addendum": "86b992bcae4ab3d89c47ac8dbc4878bfc813bdeecb162d668c8d106a47230f1b"
+  },
+  "formal_pressure_bundle": true,
+  "run_id": "stage7-pressure-derive-r2",
+  "schema_version": "capd_proactive_pressure_stage7_v1_0"
+}

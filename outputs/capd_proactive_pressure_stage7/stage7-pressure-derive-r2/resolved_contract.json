@@ -1,0 +1,53 @@
+{
+  "authority_sha256": {
+    "final_freeze": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+    "pressure_generation_contract": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+    "pressure_window_selection_addendum": "86b992bcae4ab3d89c47ac8dbc4878bfc813bdeecb162d668c8d106a47230f1b",
+    "r1_raw_identity_audit": "c690b34b9835783d5f33ae6a7461bcb62e994176ecbb194e8c1b48abd1966208",
+    "r1_verification": "3aaa888f6116b732629c51fc3da514d8fbfde7bd5135f83e1ae1ade7b5f31f76",
+    "r4_run_state": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63",
+    "split_manifest": "5b4ebd66d8ef737b7d6c696abb67b0501a10eb60dd09ba9b1eb69bf64bad7fff",
+    "standard_test_lock": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb"
+  },
+  "formal_freeze": true,
+  "only_allowed_difference": "evaluation_interval_selection",
+  "page_shift": 12,
+  "pressure_generation_allowed": true,
+  "run_id": "stage7-pressure-derive-r2",
+  "scan_step": 10000,
+  "schema_version": "capd_proactive_pressure_stage7_v1_0",
+  "selection_order": {
+    "complete": true,
+    "contract_value": {
+      "eligibility_filter_first": true,
+      "metrics_for_ranking": [],
+      "no_eligible_action": "exclude_workload_fail_closed",
+      "rule": "earliest_eligible_window_in_source_trace",
+      "scope": "independently_per_workload",
+      "selected_rank": 1,
+      "sort_keys": [
+        {
+          "field": "source_interval.start_inclusive",
+          "order": "ascending"
+        },
+        {
+          "field": "source_interval.end_exclusive",
+          "order": "ascending"
+        },
+        {
+          "field": "source_trace_id",
+          "order": "ascending"
+        },
+        {
+          "field": "candidate_content_sha256",
+          "order": "ascending"
+        }
+      ]
+    },
+    "field_path": "pressure_window_selection_order",
+    "missing_fields": []
+  },
+  "selection_order_addendum_sha256": "86b992bcae4ab3d89c47ac8dbc4878bfc813bdeecb162d668c8d106a47230f1b",
+  "selection_order_contract_sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+  "window_records": 500000
+}
