@@ -4,7 +4,19 @@
     "verify_reselection"
   ],
   "created_at": "2026-08-02T12:27:58Z",
-  "formal_freeze": false,
+  "formal_freeze": true,
+  "freeze_artifacts": [
+    {
+      "bytes": 13884,
+      "path": "final_freeze.json",
+      "sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1"
+    },
+    {
+      "bytes": 12784,
+      "path": "pressure_generation_contract.json",
+      "sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761"
+    }
+  ],
   "phase_artifacts": {
     "reselect": [
       {
@@ -88,6 +100,6 @@
     "source_run_identity_sha256": "4397ed9971077733898fa214c6f3e48952ac3f882ff60c83dbd3c97c0a974587"
   },
   "selection_identity_sha256": "b5fa412f4cfa183be9923b1db1ba2fdb3609f8eb617f03cdc46fb542baf724a9",
-  "status": "derived_freeze_candidate_ready",
-  "updated_at": "2026-08-02T12:28:04Z"
+  "status": "derived_selection_formally_frozen",
+  "updated_at": "2026-08-02T12:43:32Z"
 }
