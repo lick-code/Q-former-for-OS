@@ -1,0 +1,142 @@
+# coding=utf-8
+"""Synthetic orchestration tests; no real Stage7/Test/Pressure payloads."""
+
+import argparse
+import copy
+import os
+import tempfile
+import unittest
+from unittest import mock
+
+from qmap import proactive_stage4_stage7 as stage4
+from scripts import run_capd_proactive_stage4_stage7 as runner
+
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_PATH = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_stage4_stage7_search.json")
+
+
+def fake_authority():
+  methods = {
+      "canneal": {"D": 120, "F_low": 6, "F_target": 16},
+      "streamcluster_pressure": {"D": 22, "F_low": 1, "F_target": 3},
+      "dedup_pressure": {"D": 21, "F_low": 1, "F_target": 3},
+      "blackscholes": {"D": 8, "F_low": 1, "F_target": 2},
+      "swaptions": {"D": 8, "F_low": 1, "F_target": 2},
+      "fluidanimate": {"D": 22, "F_low": 1, "F_target": 3}}
+  return {"run_id": "stage3-stage7-unified-contract-r4",
+          "final_freeze_sha256": stage4.R4_FINAL_SHA256,
+          "window_records": 500000, "capacity_ratio": 0.1,
+          "b_max": 2, "candidate_size_K": 8,
+          "workloads": methods,
+          "cost_profile": {"dram_hit": 1, "nvm_read": 2,
+                           "nvm_write": 8, "demotion": 10}}
+
+
+def args(root):
+  return argparse.Namespace(
+      command="preflight", config=CONFIG_PATH, stage3_freeze="freeze.json",
+      input_manifest="manifest.json", run_id=stage4.RUN_ID,
+      project_root=root, device="cpu", require_cuda=False,
+      train_workers=1, sample_workers=1, replay_workers=1,
+      confirm_stage4_search=False, confirm_stage4_freeze=False,
+      candidate=None)
+
+
+class Stage4Stage7SyntheticE2ETest(unittest.TestCase):
+
+  def test_preflight_creates_expected_gate_artifacts(self):
+    with tempfile.TemporaryDirectory() as root:
+      config = copy.deepcopy(stage4.load_json(CONFIG_PATH))
+      config["output_root"] = "outputs/new-stage4"
+      config["execution"]["require_cuda"] = False
+      manifest = {"entries": [{}] * 12}
+      with mock.patch.object(runner, "load_context",
+                             return_value=(config, fake_authority(), manifest,
+                                           [{}] * 12)), \
+           mock.patch.object(runner, "runtime_device", return_value={
+               "requested": "cpu", "actual": "cpu", "require_cuda": False,
+               "cuda_available": False, "cuda_device_count": 0,
+               "cuda_device_name": None}), \
+           mock.patch.object(runner, "git_state", return_value={
+               "commit": "synthetic", "dirty": False,
+               "status_sha256": "0" * 64}), \
+           mock.patch.object(stage4, "validate_registered_trace_records",
+                             return_value=[{}] * 12), \
+           mock.patch.object(stage4, "fingerprint_file", return_value="1" * 64):
+        output = runner.preflight(args(root))
+      for name in ("resolved_config.json", "stage3_authority.json",
+                   "input_manifest.json", "training_contract.json",
+                   "search_space.json", "search_state.json", "run_state.json"):
+        self.assertTrue(os.path.isfile(os.path.join(output, name)), name)
+      state = stage4.load_json(os.path.join(output, "run_state.json"))
+      self.assertFalse(state["formal_freeze"])
+      self.assertFalse(state["search_contract_confirmed"])
+
+  def test_full_search_refuses_missing_confirmation(self):
+    with tempfile.TemporaryDirectory() as root:
+      with self.assertRaises(RuntimeError):
+        runner.require_search_confirmation(root, args(root))
+
+  def test_confirmation_does_not_start_training(self):
+    source = open(runner.__file__, "r", encoding="utf-8").read()
+    start = source.index("def confirm_contract")
+    end = source.index("def require_search_confirmation")
+    self.assertNotIn("ensure_training", source[start:end])
+    self.assertNotIn("qmap.qmap_train", source[start:end])
+
+  def test_sample_generation_binds_r4_method_and_is_deterministic(self):
+    authority = fake_authority()
+    config = stage4.load_json(CONFIG_PATH)
+    candidate = stage4.resolve_phase_candidates(config, "semantic")[0]
+    entry = {"workload": "blackscholes", "split_role": "train",
+             "source_trace_id": "synthetic-train",
+             "source_interval": {"start_inclusive": 0,
+                                 "end_exclusive": 600}}
+    trace = [{"page": index % 12, "pc": index % 7, "rw": index % 2}
+             for index in range(600)]
+    rows_a, diagnostics_a = stage4.generate_samples_for_trace(
+        trace, entry, candidate, authority, "2" * 64)
+    rows_b, diagnostics_b = stage4.generate_samples_for_trace(
+        trace, entry, candidate, authority, "2" * 64)
+    self.assertTrue(rows_a)
+    self.assertEqual(stage4.fingerprint_value(rows_a),
+                     stage4.fingerprint_value(rows_b))
+    self.assertEqual(diagnostics_a["method"], diagnostics_b["method"])
+    self.assertTrue(all(row["candidate_size_K"] == 8 for row in rows_a))
+    self.assertTrue(all(row["b_max"] == 2 for row in rows_a))
+    self.assertTrue(all(row["D"] == 8 and row["F_low"] == 1 and
+                        row["F_target"] == 2 for row in rows_a))
+
+  def test_architecture_learning_rate_and_seed_reuse_same_sample_identity(self):
+    config = stage4.load_json(CONFIG_PATH)
+    semantic = stage4.resolve_phase_candidates(config, "semantic")[0]
+    architecture = stage4.resolve_phase_candidates(
+        config, "architecture", semantic)[1]
+    optimization = stage4.resolve_phase_candidates(
+        config, "optimization", architecture)[1]
+    authority = fake_authority()
+    manifest_sha = "3" * 64
+    self.assertEqual(
+        stage4.sample_cache_identity(semantic, authority, manifest_sha),
+        stage4.sample_cache_identity(architecture, authority, manifest_sha))
+    self.assertEqual(
+        stage4.sample_cache_identity(architecture, authority, manifest_sha),
+        stage4.sample_cache_identity(optimization, authority, manifest_sha))
+
+  def test_candidate_and_freeze_are_distinct_commands(self):
+    parser = runner.build_parser()
+    common = ["--stage3-freeze", "freeze.json",
+              "--input-manifest", "manifest.json"]
+    candidate_args = parser.parse_args(["candidate"] + common)
+    freeze_args = parser.parse_args(["freeze"] + common +
+                                    ["--confirm-stage4-freeze",
+                                     "--candidate", "selected"])
+    self.assertEqual(candidate_args.command, "candidate")
+    self.assertTrue(freeze_args.confirm_stage4_freeze)
+
+
+if __name__ == "__main__":
+  unittest.main()

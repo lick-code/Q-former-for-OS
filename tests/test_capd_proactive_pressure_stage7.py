@@ -13,6 +13,18 @@ import unittest
 from qmap import proactive_pressure_stage7 as pressure
 
 
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ADDENDUM_PATH = os.path.join(
+    PROJECT_ROOT, "outputs", "capd_proactive_stage3",
+    "stage3-stage7-unified-contract-r4-pressure-addendum-r1",
+    "pressure_window_selection_addendum.json")
+ADDENDUM_AUDIT_PATH = os.path.join(
+    os.path.dirname(ADDENDUM_PATH), "addendum_audit.json")
+ADDENDUM_CONFIG_PATH = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_pressure_stage7_r4_addendum_r1.json")
+
+
 def _write_trace(path, pages):
   with open(path, "w", encoding="utf-8", newline="") as handle:
     writer = csv.writer(handle, lineterminator="\n")
@@ -77,6 +89,23 @@ def _documents():
   }
   state = {"formal_freeze": True, "status": "derived_selection_formally_frozen"}
   return final, contract, state
+
+
+def _approved_addendum():
+  return pressure.load_json(ADDENDUM_PATH)
+
+
+def _selection_candidate(start, end, trace_id, content_sha,
+                         replacements, unique_pages, eligible=True):
+  return {
+      "pressure_eligible": eligible,
+      "source_interval_start_inclusive": start,
+      "source_interval_end_exclusive": end,
+      "source_trace_id": trace_id,
+      "candidate_content_sha256": content_sha,
+      "reactive_lru_replacement_decisions": replacements,
+      "unique_pages": unique_pages,
+  }
 
 
 class AuthorityGateTest(unittest.TestCase):
@@ -199,28 +228,104 @@ class ScanContractTest(unittest.TestCase):
                                 "INCOMPLETE_SELECTION_ORDER"):
       pressure.select_pressure_candidate([], contract)
 
-  def test_multiple_eligible_windows_cannot_be_selected_manually(self):
-    _, contract, _ = _documents()
-    contract["pressure_window_selection_order"] = {
-        "total_order": True,
-        "ordered_keys": [
-            {"field": "reactive_lru_replacement_decisions",
-             "direction": "descending"},
-            {"field": "split_relative_start", "direction": "ascending"}],
-        "final_unique_tie_break": "split_relative_start",
-        "manual_override_allowed": False,
-    }
+  def test_approved_addendum_binds_parent_sha_and_canonical_sha(self):
+    addendum = _approved_addendum()
+    order = pressure.validate_pressure_addendum(
+        addendum,
+        "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+        "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761")
+    self.assertTrue(order["complete"])
+    for field in ("parent_final_freeze_sha256",
+                  "parent_pressure_contract_sha256", "addendum_sha256"):
+      changed = copy.deepcopy(addendum)
+      changed[field] = "0" * 64
+      with self.assertRaises(pressure.PressureStage7Error):
+        pressure.validate_pressure_addendum(
+            changed,
+            "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+            "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761")
+
+  def test_addendum_audit_honestly_binds_blocked_run_and_file_sha(self):
+    audit = pressure.load_json(ADDENDUM_AUDIT_PATH)
+    self.assertEqual(pressure.fingerprint_file(ADDENDUM_PATH),
+                     audit["addendum_file_sha256"])
+    self.assertFalse(audit["formal_pressure_derive_executed"])
+    self.assertFalse(audit["blocked_run_evidence"][
+        "formal_pressure_test_generated"])
+    disclosure = audit["honest_protocol_disclosure"]
+    self.assertTrue(disclosure[
+        "addendum_is_not_claimed_as_pre_registered_in_parent_r4"])
+    self.assertFalse(disclosure[
+        "pressure_intensity_metrics_used_for_eligible_window_ranking"])
+    self.assertFalse(disclosure["capd_or_oracle_used_for_window_ranking"])
+
+  def test_new_config_binds_parent_and_addendum_file_sha(self):
+    config = pressure.load_json(ADDENDUM_CONFIG_PATH)
+    authorities = config["authorities"]
+    self.assertEqual(
+        pressure.fingerprint_file(ADDENDUM_PATH),
+        authorities["pressure_window_selection_addendum"]["sha256"])
+    self.assertEqual(
+        "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+        authorities["final_freeze"]["sha256"])
+    self.assertEqual(
+        "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+        authorities["pressure_generation_contract"]["sha256"])
+
+  def test_multiple_eligible_windows_use_earliest_not_pressure_strength(self):
+    addendum = _approved_addendum()
     rows = [
-        {"pressure_eligible": True, "split_relative_start": 0,
-         "reactive_lru_replacement_decisions": 100},
-        {"pressure_eligible": True, "split_relative_start": 2,
-         "reactive_lru_replacement_decisions": 101},
+        _selection_candidate(2400000, 2900000, "trace", "a" * 64,
+                             replacements=100, unique_pages=11),
+        _selection_candidate(2410000, 2910000, "trace", "b" * 64,
+                             replacements=999999, unique_pages=999999),
     ]
     with self.assertRaises(pressure.PressureStage7Error):
-      pressure.select_pressure_candidate(rows, contract, manual_start=0)
+      pressure.select_pressure_candidate(rows, addendum, manual_start=2400000)
     self.assertEqual(
-        2, pressure.select_pressure_candidate(rows, contract)[
-            "split_relative_start"])
+        2400000, pressure.select_pressure_candidate(rows, addendum)[
+            "source_interval_start_inclusive"])
+
+  def test_approved_tie_break_order_is_exact(self):
+    addendum = _approved_addendum()
+    rows = [
+        _selection_candidate(10, 30, "a", "a" * 64, 100, 11),
+        _selection_candidate(10, 20, "b", "b" * 64, 1000, 1000),
+        _selection_candidate(10, 20, "a", "c" * 64, 999, 999),
+        _selection_candidate(10, 20, "a", "b" * 64, 101, 12),
+    ]
+    selected = pressure.select_pressure_candidate(rows, addendum)
+    self.assertEqual(20, selected["source_interval_end_exclusive"])
+    self.assertEqual("a", selected["source_trace_id"])
+    self.assertEqual("b" * 64, selected["candidate_content_sha256"])
+
+  def test_candidate_content_sha_excludes_eligibility_and_pressure_metrics(self):
+    candidate = {
+        "workload": "w", "source_trace_id": "trace",
+        "source_test_path": "splits/w/test.csv",
+        "source_test_sha256": "f" * 64,
+        "split_relative_start": 0,
+        "split_relative_end_exclusive": 10,
+        "source_interval_start_inclusive": 2400000,
+        "source_interval_end_exclusive": 2400010,
+        "window_records": 10, "scan_step": 2,
+        "unique_pages": 11,
+        "reactive_lru_replacement_decisions": 100,
+    }
+    first = pressure.candidate_content_sha256(candidate)
+    candidate["unique_pages"] = 9999
+    candidate["reactive_lru_replacement_decisions"] = 9999
+    self.assertEqual(first, pressure.candidate_content_sha256(candidate))
+    candidate["candidate_content_sha256"] = first
+    candidate["candidate_content_sha256_semantics"] = (
+        "sha256_of_normalized_source_identity_and_interval")
+    pressure.verify_candidate_content_sha256(candidate)
+
+  def test_no_eligible_window_returns_none_without_fabrication(self):
+    rows = [_selection_candidate(
+        1, 2, "trace", "a" * 64, 100, 11, eligible=False)]
+    self.assertIsNone(pressure.select_pressure_candidate(
+        rows, _approved_addendum()))
 
 
 class DerivationAndResumeTest(unittest.TestCase):

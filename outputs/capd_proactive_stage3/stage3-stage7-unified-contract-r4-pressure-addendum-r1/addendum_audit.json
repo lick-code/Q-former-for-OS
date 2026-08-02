@@ -1,0 +1,40 @@
+{
+  "addendum_canonical_sha256": "e16fa6a493165a0c995199e510517f08a737074fd6cf1a8b99af23ef8a089ea0",
+  "addendum_file_sha256": "86b992bcae4ab3d89c47ac8dbc4878bfc813bdeecb162d668c8d106a47230f1b",
+  "addendum_path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4-pressure-addendum-r1/pressure_window_selection_addendum.json",
+  "blocked_run_evidence": {
+    "eligible_candidate_counts": {
+      "blackscholes": 11,
+      "canneal": 11,
+      "dedup_pressure": 11,
+      "swaptions": 11
+    },
+    "formal_pressure_test_generated": false,
+    "pressure_eligibility_summary_path": "outputs/capd_proactive_pressure_stage7/stage7-pressure-from-r4-r1/pressure_eligibility_summary.json",
+    "pressure_eligibility_summary_sha256": "fb43593aeccef897deea661b25e983082fc718b6ea49e41fc1a66c1db5798d41",
+    "run_id": "stage7-pressure-from-r4-r1",
+    "verification_path": "outputs/capd_proactive_pressure_stage7/stage7-pressure-from-r4-r1/verification.json",
+    "verification_sha256": "1a746196ac45647a7df6293070ad65e19115cb8a01b2cd90afcdd80a667cb795"
+  },
+  "formal_pressure_derive_executed": false,
+  "honest_protocol_disclosure": {
+    "addendum_is_not_claimed_as_pre_registered_in_parent_r4": true,
+    "addendum_timing": "after_local_candidate_scan_before_formal_pressure_test_generation",
+    "capd_or_oracle_used_for_window_ranking": false,
+    "gap": "parent_r4_froze_eligibility_but_not_unique_order_among_multiple_eligible_windows",
+    "model_or_stage4_checkpoint_used_for_window_ranking": false,
+    "pressure_intensity_metrics_used_for_eligible_window_ranking": false,
+    "repair": "freeze_pure_source_chronology_before_formal_pressure_test_generation"
+  },
+  "new_pressure_derive_run_id": "stage7-pressure-derive-r2",
+  "parent_final_freeze_sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+  "parent_pressure_contract_sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+  "selection_sort_keys": [
+    "source_interval.start_inclusive:ascending",
+    "source_interval.end_exclusive:ascending",
+    "source_trace_id:ascending",
+    "candidate_content_sha256:ascending"
+  ],
+  "schema_version": "capd_proactive_pressure_selection_addendum_audit_v1_0",
+  "status": "ADDENDUM_FROZEN_AWAITING_FORMAL_DERIVE_CONFIRMATION"
+}

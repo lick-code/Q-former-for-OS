@@ -20,6 +20,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
 SCHEMA_VERSION = "capd_proactive_pressure_stage7_v1_0"
+ADDENDUM_SCHEMA_VERSION = "capd_proactive_pressure_selection_addendum_v1_0"
 BLOCKED_STATE = "PRESSURE_CONTRACT_INCOMPLETE_SELECTION_ORDER"
 BLOCKED_COMPLETION = "PRESSURE_DERIVATION_IMPLEMENTED_BUT_CONTRACT_BLOCKED"
 FORMAL_COMPLETION = "PRESSURE_TEST_DERIVED_AND_VERIFIED"
@@ -29,23 +30,27 @@ EXCLUDED_WORKLOADS = ("streamcluster_pressure", "fluidanimate")
 PROHIBITED_SELECTION_TOKENS = (
     "capd", "oracle", "tpp", "weighted_cost", "stage8", "model_accuracy",
     "stage4", "checkpoint", "seed", "policy_result")
-ALLOWED_ORDER_FIELDS = (
-    "reactive_lru_replacement_decisions", "unique_pages",
-    "split_relative_start")
+APPROVED_SORT_KEYS = (
+    ("source_interval.start_inclusive", "ascending"),
+    ("source_interval.end_exclusive", "ascending"),
+    ("source_trace_id", "ascending"),
+    ("candidate_content_sha256", "ascending"))
 OVERHEAD_FIELDS = (
     "pressure_overhead", "memory_overhead", "metadata_memory_overhead",
     "inference_latency", "cpu_cycles", "total_execution_time",
     "foreground_blocking_time", "end_to_end_overhead", "throughput",
     "latency")
 CANDIDATE_FIELDS = (
-    "workload", "source_test_path", "source_test_sha256",
+    "workload", "source_trace_id", "source_test_path", "source_test_sha256",
     "split_relative_start", "split_relative_end_exclusive",
+    "source_interval_start_inclusive", "source_interval_end_exclusive",
     "raw_trace_start", "raw_trace_end_exclusive", "window_records",
     "scan_step", "D", "F_low", "F_target", "unique_pages",
     "reactive_lru_misses", "reactive_lru_replacement_decisions",
     "pressure_eligible", "ineligibility_reasons",
-    "selection_features_used", "contract_sha256", "code_sha256",
-    "config_sha256")
+    "selection_features_used", "candidate_content_sha256",
+    "candidate_content_sha256_semantics",
+    "contract_sha256", "addendum_sha256", "code_sha256", "config_sha256")
 
 
 class PressureStage7Error(ValueError):
@@ -78,6 +83,18 @@ def fingerprint_value(value: Any) -> str:
       value, ensure_ascii=False, sort_keys=True,
       separators=(",", ":")).encode("utf-8")
   return hashlib.sha256(payload).hexdigest()
+
+
+def candidate_content_sha256(candidate: Mapping[str, Any]) -> str:
+  """Hash only immutable source/interval identity, never ranking metrics."""
+  fields = (
+      "workload", "source_trace_id", "source_test_path",
+      "source_test_sha256", "split_relative_start",
+      "split_relative_end_exclusive", "source_interval_start_inclusive",
+      "source_interval_end_exclusive", "window_records", "scan_step")
+  _require(all(field in candidate for field in fields),
+           "Candidate source/interval identity is incomplete.")
+  return fingerprint_value({field: candidate[field] for field in fields})
 
 
 def write_json_atomic(path: str, value: Any) -> None:
@@ -288,48 +305,129 @@ def reject_prohibited_selection_fields(rows: Sequence[Mapping[str, Any]]) -> Non
             "Prohibited Pressure selection field: {}.".format(field))
 
 
-def inspect_selection_order(contract: Mapping[str, Any]) -> Dict[str, Any]:
+def inspect_selection_order(contract: Mapping[str, Any],
+                            addendum: Optional[Mapping[str, Any]] = None
+                            ) -> Dict[str, Any]:
   path = "pressure_window_selection_order"
-  value = contract.get(path)
+  source = addendum if isinstance(addendum, Mapping) else contract
+  value = source.get(path)
   missing = []
   if not isinstance(value, Mapping):
     missing.append(path)
     return {"complete": False, "field_path": path,
             "missing_fields": missing, "contract_value": None}
-  if value.get("total_order") is not True:
-    missing.append(path + ".total_order=true")
-  ordered = value.get("ordered_keys")
-  if not isinstance(ordered, list) or not ordered:
-    missing.append(path + ".ordered_keys")
-    ordered = []
-  seen = []
-  for index, item in enumerate(ordered):
-    if not isinstance(item, Mapping):
-      missing.append("{}.ordered_keys[{}]".format(path, index))
-      continue
-    field = item.get("field")
-    direction = item.get("direction")
-    if field not in ALLOWED_ORDER_FIELDS:
-      missing.append("{}.ordered_keys[{}].field_allowed".format(path, index))
-    if direction not in ("ascending", "descending"):
-      missing.append("{}.ordered_keys[{}].direction".format(path, index))
-    seen.append(field)
-  final_tie = value.get("final_unique_tie_break")
-  if final_tie != "split_relative_start" or final_tie not in seen:
-    missing.append(path + ".final_unique_tie_break=split_relative_start")
-  if value.get("manual_override_allowed") is not False:
-    missing.append(path + ".manual_override_allowed=false")
-  if value.get("random_selection_allowed", False) is not False:
-    missing.append(path + ".random_selection_allowed=false")
+  expected_sort_keys = [
+      {"field": field, "order": order}
+      for field, order in APPROVED_SORT_KEYS]
+  for field, expected in (
+      ("rule", "earliest_eligible_window_in_source_trace"),
+      ("scope", "independently_per_workload"),
+      ("eligibility_filter_first", True),
+      ("sort_keys", expected_sort_keys),
+      ("selected_rank", 1),
+      ("metrics_for_ranking", []),
+      ("no_eligible_action", "exclude_workload_fail_closed")):
+    if value.get(field) != expected:
+      missing.append("{}.{}={}".format(path, field, expected))
   return {"complete": not missing, "field_path": path,
           "missing_fields": missing, "contract_value": dict(value)}
 
 
+def validate_pressure_addendum(addendum: Mapping[str, Any],
+                               parent_final_freeze_sha256: str,
+                               parent_pressure_contract_sha256: str
+                               ) -> Dict[str, Any]:
+  _require(addendum.get("schema_version") == ADDENDUM_SCHEMA_VERSION,
+           "Pressure selection addendum schema mismatch.")
+  _require(addendum.get("addendum_run_id") ==
+           "stage3-stage7-unified-contract-r4-pressure-addendum-r1",
+           "Pressure selection addendum run ID mismatch.")
+  _require(addendum.get("parent_stage3_run_id") ==
+           "stage3-stage7-unified-contract-r4",
+           "Pressure selection addendum parent run mismatch.")
+  _require(addendum.get("parent_final_freeze_path") ==
+           "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/"
+           "final_freeze.json",
+           "Pressure selection addendum parent final_freeze path mismatch.")
+  _require(addendum.get("parent_pressure_contract_path") ==
+           "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/"
+           "pressure_generation_contract.json",
+           "Pressure selection addendum parent contract path mismatch.")
+  _require(addendum.get("parent_final_freeze_sha256") ==
+           parent_final_freeze_sha256,
+           "Pressure selection addendum parent final_freeze SHA mismatch.")
+  _require(addendum.get("parent_pressure_contract_sha256") ==
+           parent_pressure_contract_sha256,
+           "Pressure selection addendum parent contract SHA mismatch.")
+  _require(addendum.get("approval_status") == "FORMALLY_APPROVED_BY_USER" and
+           bool(addendum.get("approval_timestamp")),
+           "Pressure selection addendum lacks explicit approval evidence.")
+  _require(addendum.get("pressure_window_selection_rule") ==
+           "earliest_eligible_window_in_source_trace",
+           "Pressure selection rule mismatch.")
+  eligibility = addendum.get("eligibility_rule", {})
+  _require(eligibility == {
+      "minimum_reactive_lru_replacement_decisions": 100,
+      "selection_policy": "fixed_reactive_lru_only",
+      "unique_pages_rule":
+          "strictly_greater_than_D_pressure_plus_F_target"},
+      "Addendum changed the parent R4 eligibility rule.")
+  excluded = _map_by_workload(addendum.get("excluded_workloads", []))
+  _require(excluded == {
+      "streamcluster_pressure": {
+          "workload": "streamcluster_pressure",
+          "reason": "insufficient_replacement_decisions_across_train_blocks"},
+      "fluidanimate": {
+          "workload": "fluidanimate",
+          "reason": "insufficient_replacement_decisions_across_train_blocks"}},
+      "Addendum changed the frozen excluded workload set.")
+  order = inspect_selection_order({}, addendum)
+  _require(order["complete"],
+           "Approved addendum selection order is incomplete: {}.".format(
+               order["missing_fields"]))
+  _require(addendum.get("selection_sort_keys") == [
+      "{}:{}".format(field, direction)
+      for field, direction in APPROVED_SORT_KEYS],
+      "Addendum selection_sort_keys do not match the approved order.")
+  _require(addendum.get("tie_break") == [
+      "{}:{}".format(field, direction)
+      for field, direction in APPROVED_SORT_KEYS[1:]],
+      "Addendum tie_break does not match the approved order.")
+  prohibited = set(addendum.get("ranking_prohibitions", []))
+  _require({
+      "reactive_lru_replacement_decisions", "unique_pages",
+      "replacement_rate", "oracle_headroom", "capd_cost",
+      "capd_relative_improvement", "stage4_model_prediction",
+      "manual_posthoc_selection"}.issubset(prohibited),
+      "Addendum ranking prohibitions are incomplete.")
+  disclosure = addendum.get("honest_protocol_disclosure", {})
+  _require(disclosure.get(
+      "original_r4_froze_eligibility_but_not_unique_selection_order") is True and
+      disclosure.get("gap_discovered_after_local_candidate_scan") is True and
+      disclosure.get("formal_pressure_test_generated_before_addendum") is False and
+      disclosure.get("capd_or_oracle_used_for_selection") is False and
+      disclosure.get("model_or_stage4_checkpoint_used_for_selection") is False and
+      disclosure.get("pressure_intensity_or_method_effect_used_for_ranking") is False and
+      disclosure.get("original_r4_rule_pre_registered_claim_allowed") is False and
+      disclosure.get("eligible_candidate_counts_known_at_gap_discovery") == {
+          "canneal": 11, "dedup_pressure": 11,
+          "blackscholes": 11, "swaptions": 11},
+      "Addendum honest protocol disclosure is incomplete or inaccurate.")
+  _require(addendum.get("addendum_sha256_semantics") ==
+           "sha256_of_canonical_json_excluding_addendum_sha256_field",
+           "Addendum canonical SHA semantics mismatch.")
+  canonical = dict(addendum)
+  declared = canonical.pop("addendum_sha256", None)
+  _require(declared == fingerprint_value(canonical),
+           "Addendum canonical SHA256 mismatch.")
+  return order
+
+
 def select_pressure_candidate(candidates: Sequence[Mapping[str, Any]],
-                              contract: Mapping[str, Any],
+                              selection_authority: Mapping[str, Any],
                               manual_start: Optional[int] = None
                               ) -> Optional[Dict[str, Any]]:
-  order = inspect_selection_order(contract)
+  order = inspect_selection_order({}, selection_authority)
   _require(order["complete"],
            BLOCKED_STATE + ": formal deterministic total order is missing.")
   _require(manual_start is None,
@@ -338,14 +436,12 @@ def select_pressure_candidate(candidates: Sequence[Mapping[str, Any]],
   reject_prohibited_selection_fields(rows)
   if not rows:
     return None
-  keys = order["contract_value"]["ordered_keys"]
-
-  def sort_key(row: Mapping[str, Any]) -> Tuple[int, ...]:
-    result = []
-    for item in keys:
-      value = int(row[item["field"]])
-      result.append(-value if item["direction"] == "descending" else value)
-    return tuple(result)
+  def sort_key(row: Mapping[str, Any]) -> Tuple[Any, ...]:
+    return (
+        int(row["source_interval_start_inclusive"]),
+        int(row["source_interval_end_exclusive"]),
+        str(row["source_trace_id"]),
+        str(row["candidate_content_sha256"]))
 
   return dict(sorted(rows, key=sort_key)[0])
 
@@ -675,6 +771,14 @@ def _prepare_context(config_path: str, run_id: str, project_root: str
   validate_r4_documents(
       values["final_freeze"], values["pressure_generation_contract"],
       values["r4_run_state"])
+  addendum = values.get("pressure_window_selection_addendum")
+  if addendum is not None:
+    selection_order = validate_pressure_addendum(
+        addendum, authority_hashes["final_freeze"],
+        authority_hashes["pressure_generation_contract"])
+  else:
+    selection_order = inspect_selection_order(
+        values["pressure_generation_contract"])
   maps = _validate_r1_and_stage7_authorities(values)
   code_sha = _code_sha256(project_root)
   config_sha = fingerprint_file(config_path)
@@ -711,8 +815,9 @@ def _prepare_context(config_path: str, run_id: str, project_root: str
       "input_identity_sha256": fingerprint_value(identity_value),
       "config_sha256": config_sha, "code_sha256": code_sha,
       "contract_sha256": authority_hashes["pressure_generation_contract"],
-      "selection_order": inspect_selection_order(
-          values["pressure_generation_contract"]),
+      "addendum_sha256": authority_hashes.get(
+          "pressure_window_selection_addendum"),
+      "selection_order": selection_order,
       "output": output_root(project_root, run_id), "run_id": run_id,
   }
 
@@ -796,6 +901,7 @@ def run_preflight(config_path: str, run_id: str, project_root: str,
       "page_shift": context["config"]["scan"]["page_shift"],
       "selection_order": context["selection_order"],
       "selection_order_contract_sha256": context["contract_sha256"],
+      "selection_order_addendum_sha256": context["addendum_sha256"],
       "pressure_generation_allowed": context["selection_order"]["complete"],
       "only_allowed_difference": "evaluation_interval_selection",
   }
@@ -844,18 +950,23 @@ def _candidate_from_stats(context: Mapping[str, Any], workload: str,
   watermark = {row["workload"]: row for row in
                context["values"]["final_freeze"]["watermarks"]}[workload]
   source = context["current_inputs"][workload]
+  source_trace_id = context["maps"]["lock"][workload]["test_source_id"]
   scan = context["config"]["scan"]
   start = int(stats["split_relative_start"])
-  return {
+  source_start = scan["raw_test_start"] + start
+  source_end = scan["raw_test_start"] + stats["split_relative_end_exclusive"]
+  candidate = {
       "workload": workload,
+      "source_trace_id": source_trace_id,
       "source_test_path": os.path.relpath(
           source["test_path"], context["project_root"]).replace(os.sep, "/"),
       "source_test_sha256": source["test_sha256"],
       "split_relative_start": start,
       "split_relative_end_exclusive": stats["split_relative_end_exclusive"],
-      "raw_trace_start": scan["raw_test_start"] + start,
-      "raw_trace_end_exclusive":
-          scan["raw_test_start"] + stats["split_relative_end_exclusive"],
+      "source_interval_start_inclusive": source_start,
+      "source_interval_end_exclusive": source_end,
+      "raw_trace_start": source_start,
+      "raw_trace_end_exclusive": source_end,
       "window_records": scan["window_records"],
       "scan_step": scan["scan_step"],
       "D": watermark["D"], "F_low": watermark["F_low"],
@@ -868,13 +979,21 @@ def _candidate_from_stats(context: Mapping[str, Any], workload: str,
       "ineligibility_reasons": json.dumps(
           stats["ineligibility_reasons"], ensure_ascii=False,
           separators=(",", ":")),
-      "selection_features_used": json.dumps(
-          ["unique_pages", "reactive_lru_replacement_decisions"],
-          separators=(",", ":")),
+      "selection_features_used": json.dumps({
+          "eligibility_filter": [
+              "unique_pages", "reactive_lru_replacement_decisions"],
+          "eligible_window_ranking": [
+              field for field, unused in APPROVED_SORT_KEYS]},
+          sort_keys=True, separators=(",", ":")),
       "contract_sha256": context["contract_sha256"],
+      "addendum_sha256": context["addendum_sha256"],
       "code_sha256": context["code_sha256"],
       "config_sha256": context["config_sha256"],
   }
+  candidate["candidate_content_sha256"] = candidate_content_sha256(candidate)
+  candidate["candidate_content_sha256_semantics"] = (
+      "sha256_of_normalized_source_identity_and_interval")
+  return candidate
 
 
 def run_scan(config_path: str, run_id: str, project_root: str,
@@ -957,6 +1076,8 @@ def _read_candidates(path: str) -> List[Dict[str, Any]]:
     for row in csv.DictReader(handle):
       for field in (
           "split_relative_start", "split_relative_end_exclusive",
+          "source_interval_start_inclusive",
+          "source_interval_end_exclusive",
           "raw_trace_start", "raw_trace_end_exclusive", "window_records",
           "scan_step", "D", "F_low", "F_target", "unique_pages",
           "reactive_lru_misses", "reactive_lru_replacement_decisions"):
@@ -966,23 +1087,48 @@ def _read_candidates(path: str) -> List[Dict[str, Any]]:
   return rows
 
 
+def verify_candidate_content_sha256(candidate: Mapping[str, Any]) -> None:
+  declared = candidate.get("candidate_content_sha256")
+  _require(isinstance(declared, str) and len(declared) == 64,
+           "Candidate canonical SHA256 is missing.")
+  _require(candidate.get("candidate_content_sha256_semantics") ==
+           "sha256_of_normalized_source_identity_and_interval",
+           "Candidate canonical SHA semantics mismatch.")
+  _require(candidate_content_sha256(candidate) == declared,
+           "Candidate canonical SHA256 mismatch.")
+
+
 def run_derive(config_path: str, run_id: str, project_root: str,
                resume: bool = False) -> Dict[str, Any]:
-  del resume
   context = _prepare_context(config_path, run_id, project_root)
   state = _load_state(context, require_existing=True)
   _require("scan" in state["completed_phases"],
            "Derive requires completed scan.")
   _require(context["selection_order"]["complete"],
            BLOCKED_STATE + ": formal derive and pressure_test_lock are forbidden.")
+  _require(context["addendum_sha256"] is not None,
+           "Formal Pressure derive requires a separately frozen addendum.")
+  if "derive" in state["completed_phases"]:
+    _require(resume, "Derive already completed; use --resume.")
+    expected = state["phase_artifacts"]["derive"]
+    _require(_artifact_rows(context["output"], sorted(expected)) == expected,
+             "Derive artifact changed; resume rejected.")
+    return {"status": "derive_resumed", "output": context["output"]}
   candidates = _read_candidates(os.path.join(
       context["output"], "pressure_candidates.csv"))
-  contract = context["values"]["pressure_generation_contract"]
+  for candidate in candidates:
+    verify_candidate_content_sha256(candidate)
+  addendum = context["values"]["pressure_window_selection_addendum"]
   manifest_rows = []
+  no_eligible = []
   for workload in ALLOWED_WORKLOADS:
     selected = select_pressure_candidate(
-        [row for row in candidates if row["workload"] == workload], contract)
+        [row for row in candidates if row["workload"] == workload], addendum)
     if selected is None:
+      no_eligible.append({
+          "workload": workload,
+          "reason": "no_candidate_satisfied_parent_r4_eligibility_rule",
+          "pressure_generated": False})
       continue
     source = context["current_inputs"][workload]
     raw_before = fingerprint_file(source["raw_path"])
@@ -1006,8 +1152,22 @@ def run_derive(config_path: str, run_id: str, project_root: str,
         "raw_trace_sha256_after": raw_after,
     })
   _require(manifest_rows, "No eligible Pressure interval exists; no data fabricated.")
-  manifest = {"schema_version": SCHEMA_VERSION, "run_id": run_id,
-              "windows": manifest_rows}
+  derivation_exclusions = {
+      "schema_version": SCHEMA_VERSION, "run_id": run_id,
+      "parent_contract_exclusions": [
+          {"workload": workload,
+           "reason": context["config"]["excluded_workloads"][workload],
+           "pressure_generated": False}
+          for workload in EXCLUDED_WORKLOADS],
+      "no_eligible_exclusions": no_eligible}
+  manifest = {
+      "schema_version": SCHEMA_VERSION, "run_id": run_id,
+      "pressure_window_selection_rule":
+          "earliest_eligible_window_in_source_trace",
+      "parent_pressure_contract_sha256": context["contract_sha256"],
+      "pressure_window_selection_addendum_sha256":
+          context["addendum_sha256"],
+      "windows": manifest_rows}
   lock = {
       "schema_version": SCHEMA_VERSION, "run_id": run_id,
       "pressure_overhead_claims_allowed": False,
@@ -1018,6 +1178,11 @@ def run_derive(config_path: str, run_id: str, project_root: str,
       "only_allowed_difference": "evaluation_interval_selection",
       "selection_order_field_path": context["selection_order"]["field_path"],
       "selection_order_contract_sha256": context["contract_sha256"],
+      "pressure_window_selection_rule":
+          "earliest_eligible_window_in_source_trace",
+      "pressure_window_selection_addendum_sha256":
+          context["addendum_sha256"],
+      "eligible_window_ranking_metrics": [],
       "workloads": manifest_rows,
   }
   assert_no_overhead_claims(lock)
@@ -1025,11 +1190,14 @@ def run_derive(config_path: str, run_id: str, project_root: str,
       context["output"], "pressure_window_manifest.json"), manifest)
   write_json_atomic(os.path.join(
       context["output"], "pressure_test_lock.json"), lock)
+  write_json_atomic(os.path.join(
+      context["output"], "pressure_derivation_exclusions.json"),
+                    derivation_exclusions)
   bundle_files = [
       "input_identity.json", "resolved_contract.json",
       "pressure_candidates.csv", "pressure_eligibility_summary.json",
       "pressure_interval_exclusions.json", "pressure_window_manifest.json",
-      "pressure_test_lock.json"] + [
+      "pressure_test_lock.json", "pressure_derivation_exclusions.json"] + [
           os.path.relpath(row["derived_path"], context["project_root"])
           if os.path.isabs(row["derived_path"]) else
           row["derived_path"].split(
@@ -1038,12 +1206,16 @@ def run_derive(config_path: str, run_id: str, project_root: str,
   bundle = {
       "schema_version": SCHEMA_VERSION, "run_id": run_id,
       "formal_pressure_bundle": True,
+      "authority_sha256": {
+          "parent_pressure_contract": context["contract_sha256"],
+          "pressure_window_selection_addendum": context["addendum_sha256"]},
       "artifacts": _artifact_rows(context["output"], bundle_files),
   }
   write_json_atomic(os.path.join(
       context["output"], "local_pressure_bundle_manifest.json"), bundle)
   _complete_phase(context, state, "derive", "PRESSURE_DERIVED", [
       "pressure_window_manifest.json", "pressure_test_lock.json",
+      "pressure_derivation_exclusions.json",
       "local_pressure_bundle_manifest.json"])
   return {"status": "PRESSURE_DERIVED", "derived_workloads":
           [row["workload"] for row in manifest_rows],
@@ -1071,6 +1243,8 @@ def run_verify(config_path: str, run_id: str, project_root: str,
     return {"status": "verify_resumed", "output": context["output"]}
   candidates = _read_candidates(os.path.join(
       context["output"], "pressure_candidates.csv"))
+  for candidate in candidates:
+    verify_candidate_content_sha256(candidate)
   expected_count = len(ALLOWED_WORKLOADS) * len(candidate_starts(
       context["config"]["scan"]["test_records"],
       context["config"]["scan"]["window_records"],
@@ -1102,6 +1276,77 @@ def run_verify(config_path: str, run_id: str, project_root: str,
   else:
     _require("derive" in state["completed_phases"],
              "Complete selection contract requires derive before verify.")
+    addendum = context["values"]["pressure_window_selection_addendum"]
+    manifest = load_json(os.path.join(
+        context["output"], "pressure_window_manifest.json"))
+    lock = load_json(os.path.join(
+        context["output"], "pressure_test_lock.json"))
+    bundle = load_json(os.path.join(
+        context["output"], "local_pressure_bundle_manifest.json"))
+    _require(manifest.get("pressure_window_selection_rule") ==
+             "earliest_eligible_window_in_source_trace" and
+             manifest.get("parent_pressure_contract_sha256") ==
+             context["contract_sha256"] and
+             manifest.get("pressure_window_selection_addendum_sha256") ==
+             context["addendum_sha256"],
+             "Pressure window manifest authority binding mismatch.")
+    _require(lock.get("pressure_window_selection_rule") ==
+             "earliest_eligible_window_in_source_trace" and
+             lock.get("pressure_window_selection_addendum_sha256") ==
+             context["addendum_sha256"] and
+             lock.get("eligible_window_ranking_metrics") == [] and
+             lock.get("capd_or_oracle_used_for_pressure_selection") is False,
+             "Pressure Test lock selection/audit binding mismatch.")
+    manifest_by_workload = _map_by_workload(manifest.get("windows", []))
+    expected_derived_workloads = set()
+    identity_fields = (
+        "source_interval_start_inclusive", "source_interval_end_exclusive",
+        "source_trace_id", "candidate_content_sha256")
+    for workload in ALLOWED_WORKLOADS:
+      expected = select_pressure_candidate(
+          [row for row in candidates if row["workload"] == workload],
+          addendum)
+      if expected is None:
+        _require(workload not in manifest_by_workload,
+                 "No-eligible workload unexpectedly has Pressure data.")
+        continue
+      expected_derived_workloads.add(workload)
+      _require(workload in manifest_by_workload,
+               "Eligible workload is missing its Pressure window.")
+      actual = manifest_by_workload[workload]
+      _require(all(actual.get(field) == expected.get(field)
+                   for field in identity_fields),
+               "Selected Pressure window does not match the approved earliest "
+               "eligible order for {}.".format(workload))
+      source = context["current_inputs"][workload]
+      derived_path = _project_file(
+          context["project_root"], actual["derived_path"])
+      verify_derived_rows(
+          source["test_path"], derived_path,
+          int(actual["split_relative_start"]),
+          int(actual["window_records"]))
+      _require(fingerprint_file(derived_path) == actual["derived_sha256"],
+               "Derived Pressure SHA mismatch for {}.".format(workload))
+      _require(fingerprint_file(source["test_path"]) ==
+               actual["source_test_sha256"] == source["test_sha256"],
+               "Source Test changed for {}.".format(workload))
+      _require(fingerprint_file(source["raw_path"]) ==
+               actual["raw_trace_sha256_before"] ==
+               actual["raw_trace_sha256_after"] == source["raw_sha256"],
+               "Raw trace changed for {}.".format(workload))
+    _require(set(manifest_by_workload) == expected_derived_workloads,
+             "Pressure manifest workload set differs from eligible workloads.")
+    _require(bundle.get("formal_pressure_bundle") is True and
+             bundle.get("authority_sha256") == {
+                 "parent_pressure_contract": context["contract_sha256"],
+                 "pressure_window_selection_addendum":
+                     context["addendum_sha256"]},
+             "Formal Pressure bundle authority binding mismatch.")
+    expected_bundle_artifacts = bundle.get("artifacts", {})
+    _require(_artifact_rows(
+        context["output"], sorted(expected_bundle_artifacts)) ==
+        expected_bundle_artifacts,
+        "Formal Pressure bundle artifact SHA mismatch.")
     status = FORMAL_COMPLETION
   verification = {
       "schema_version": SCHEMA_VERSION, "run_id": run_id,

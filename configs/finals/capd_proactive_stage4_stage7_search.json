@@ -1,0 +1,143 @@
+{
+  "schema_version": "capd_proactive_stage4_stage7_search_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+  "status": "draft_awaiting_human_confirmation",
+  "run_id": "stage4-stage7-unified-r1",
+  "output_root": "outputs/capd_proactive_stage4_stage7",
+  "authority": {
+    "stage3_run_id": "stage3-stage7-unified-contract-r4",
+    "final_freeze_sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+    "pressure_generation_contract_sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+    "run_state_sha256": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63",
+    "r2_input_manifest_sha256": "108b2c34b5809e911b8b92864b111fc117caea8566997c101607928c590ed85f"
+  },
+  "fixed": {
+    "selected_candidate_id": "win500000-q50-r10-a15-b04-batch2",
+    "window_records": 500000,
+    "W_ref_quantile": 0.5,
+    "capacity_ratio": 0.1,
+    "alpha": 0.15,
+    "beta": 0.4,
+    "b_max": 2,
+    "candidate_size_K": 8,
+    "initial_dram_state": "empty_dram_per_window",
+    "candidate_source": "lru_tail",
+    "selector": "disabled",
+    "trajectory_policy": "proactive_lru",
+    "precision": "fp32",
+    "deterministic_algorithms": true
+  },
+  "formal_seeds": [3136859, 42, 2026],
+  "search": {
+    "strategy": "three_phase_predeclared_coordinate_search",
+    "phase_order": ["semantic", "architecture", "optimization"],
+    "candidate_count": 15,
+    "training_run_count": 45,
+    "reference": {
+      "lookahead_L": 256,
+      "history_H": 20,
+      "label_weights": [1.0, 1.0, 2.0],
+      "model": {
+        "hidden_dim": 32,
+        "address_embed_dim": 16,
+        "pc_embed_dim": 14,
+        "rw_embed_dim": 2,
+        "page_embed_dim": 16,
+        "page_dim": 21,
+        "page_state_dim": 4,
+        "address_vocab_size": 100000,
+        "pc_vocab_size": 50000,
+        "page_vocab_size": 100000,
+        "num_layers": 2,
+        "num_heads": 4,
+        "feedforward_dim": 64,
+        "dropout": 0.1,
+        "num_queries": 4,
+        "ablation": "cross_attention",
+        "position_encoding": "sinusoidal",
+        "context_mode": "cross_attention",
+        "use_page_id_embedding": true,
+        "shared_page_embedding": true
+      },
+      "training": {
+        "learning_rate": 0.0001,
+        "batch_size": 32,
+        "weight_decay": 0.0001,
+        "epochs": 8,
+        "num_workers": 4,
+        "approx_ndcg_alpha": 10.0,
+        "deterministic_algorithms": true,
+        "precision": "fp32",
+        "checkpoint_tie_break": "earliest_epoch"
+      }
+    },
+    "phases": [
+      {
+        "name": "semantic",
+        "inherit": "reference",
+        "candidates": [
+          {"id": "sem-reference"},
+          {"id": "sem-L128", "lookahead_L": 128},
+          {"id": "sem-L512", "lookahead_L": 512},
+          {"id": "sem-H10", "history_H": 10},
+          {"id": "sem-H40", "history_H": 40},
+          {"id": "sem-lam111", "label_weights": [1.0, 1.0, 1.0]},
+          {"id": "sem-lam114", "label_weights": [1.0, 1.0, 4.0]}
+        ]
+      },
+      {
+        "name": "architecture",
+        "inherit": "semantic_winner",
+        "candidates": [
+          {"id": "arch-balanced"},
+          {"id": "arch-compact", "model": {"hidden_dim": 24, "address_embed_dim": 12, "pc_embed_dim": 10, "rw_embed_dim": 2, "page_embed_dim": 12, "num_layers": 1, "num_heads": 2, "feedforward_dim": 48, "dropout": 0.0}},
+          {"id": "arch-wide", "model": {"hidden_dim": 48, "address_embed_dim": 24, "pc_embed_dim": 22, "rw_embed_dim": 2, "page_embed_dim": 24, "num_layers": 2, "num_heads": 4, "feedforward_dim": 96, "dropout": 0.1}},
+          {"id": "arch-deep", "model": {"hidden_dim": 32, "address_embed_dim": 16, "pc_embed_dim": 14, "rw_embed_dim": 2, "page_embed_dim": 16, "num_layers": 3, "num_heads": 4, "feedforward_dim": 128, "dropout": 0.2}}
+        ]
+      },
+      {
+        "name": "optimization",
+        "inherit": "architecture_winner",
+        "candidates": [
+          {"id": "opt-balanced"},
+          {"id": "opt-steady", "training": {"learning_rate": 0.00003, "batch_size": 32, "weight_decay": 0.0001, "epochs": 12}},
+          {"id": "opt-fast", "training": {"learning_rate": 0.0003, "batch_size": 64, "weight_decay": 0.0001, "epochs": 8}},
+          {"id": "opt-regularized", "training": {"learning_rate": 0.0001, "batch_size": 16, "weight_decay": 0.001, "epochs": 12}}
+        ]
+      }
+    ]
+  },
+  "selection": {
+    "primary_metric": "macro_mean_validation_weighted_cost_per_access",
+    "aggregation": "equal_weight_macro_over_six_workloads_then_mean_over_all_three_seeds",
+    "checkpoint_rule": "minimum_validation_loss_per_seed",
+    "checkpoint_tie_break": "earliest_epoch",
+    "early_stopping": "disabled_fixed_epochs_per_candidate",
+    "candidate_tie_break": [
+      "lower_worst_workload_mean_weighted_cost_per_access",
+      "higher_macro_mean_ndcg_at_b_t",
+      "lower_mean_best_validation_loss",
+      "smaller_trainable_parameter_count",
+      "lexicographically_smaller_candidate_id"
+    ],
+    "failure_rule": "reject_candidate_on_any_nan_nonfinite_missing_workload_missing_seed_or_nonzero_training_exit",
+    "empty_workload_rule": "reject_candidate_if_any_validation_workload_has_zero_valid_decisions",
+    "seed_rule": "retain_all_formal_seeds_never_select_or_discard_a_seed"
+  },
+  "execution": {
+    "single_gpu_training_process": true,
+    "device": "cuda",
+    "require_cuda": true,
+    "sample_workers": 6,
+    "replay_workers": 6,
+    "train_workers": 4,
+    "resume": "reuse_only_after_contract_sample_vocabulary_and_checkpoint_sha_validation",
+    "failure": "fail_closed_preserve_partial_outputs_and_resume_state"
+  },
+  "confirmation_gate": {
+    "search_contract_confirmed": false,
+    "full_search_allowed": false,
+    "formal_freeze_allowed": false,
+    "required_freeze_flag": "--confirm-stage4-freeze"
+  }
+}

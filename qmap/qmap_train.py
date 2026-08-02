@@ -31,7 +31,10 @@ from qmap.qmap_generator import read_trace
 
 
 PROACTIVE_STAGE4_SAMPLE_SCHEMA = "capd_proactive_stage4_sample_v1_0"
+PROACTIVE_STAGE4_STAGE7_SAMPLE_SCHEMA = (
+    "capd_proactive_stage4_stage7_sample_v1_0")
 PROACTIVE_STAGE4_CONTRACT_ID = "CAPD-PROACTIVE-STAGE4-1.0"
+PROACTIVE_STAGE4_STAGE7_CONTRACT_ID = "CAPD-PROACTIVE-STAGE4-STAGE7-1.0"
 ABLATION_CHOICES = (
     "full", "cross_attention", "no_pc", "no_rw", "mean_pool",
     "no_qformer", "no_cost")
@@ -107,7 +110,9 @@ class QMAPAccessSequenceDataset(Dataset):
     schema = sample.get("schema_version")
     is_v3 = schema == finals_config.SCHEMA_VERSION
     is_proactive_stage4 = schema == PROACTIVE_STAGE4_SAMPLE_SCHEMA
-    is_structured = is_v3 or is_proactive_stage4
+    is_proactive_stage4_stage7 = (
+        schema == PROACTIVE_STAGE4_STAGE7_SAMPLE_SCHEMA)
+    is_structured = is_v3 or is_proactive_stage4 or is_proactive_stage4_stage7
     required = (self.V3_REQUIRED_FIELDS if is_structured else
                 self.LEGACY_REQUIRED_FIELDS)
     missing = [field for field in required if field not in sample]
@@ -134,7 +139,8 @@ class QMAPAccessSequenceDataset(Dataset):
             line_number))
       expected_contract_id = (
           finals_config.CONTRACT_ID if is_v3
-          else PROACTIVE_STAGE4_CONTRACT_ID)
+          else PROACTIVE_STAGE4_STAGE7_CONTRACT_ID
+          if is_proactive_stage4_stage7 else PROACTIVE_STAGE4_CONTRACT_ID)
       if sample["contract_id"] != expected_contract_id:
         raise ValueError("Line {} contract_id mismatch.".format(line_number))
       if self._expected_identity:
@@ -478,12 +484,16 @@ def apply_proactive_stage4_contract(args, explicit_seed=None):
   if not args.valid_data:
     raise ValueError(
         "Proactive Stage-4 training requires --valid_data.")
-  from qmap import proactive_stage4
   contract_path = os.path.abspath(args.proactive_stage4_contract)
-  value = proactive_stage4.load_json(contract_path)
-  context = proactive_stage4.validate_training_contract(
-      value, args.train_data, args.valid_data,
-      explicit_seed=explicit_seed)
+  with open(contract_path, "r", encoding="utf-8") as input_file:
+    raw_value = json.load(input_file)
+  if raw_value.get("contract_id") == PROACTIVE_STAGE4_STAGE7_CONTRACT_ID:
+    from qmap import proactive_stage4_stage7 as contract_module
+  else:
+    from qmap import proactive_stage4 as contract_module
+  value = contract_module.load_json(contract_path)
+  context = contract_module.validate_training_contract(
+      value, args.train_data, args.valid_data, explicit_seed=explicit_seed)
   training = context["training"]
   weights = context["weights"]
   args.seed = context["seed"]
@@ -493,6 +503,8 @@ def apply_proactive_stage4_contract(args, explicit_seed=None):
   args.epochs = int(training["epochs"])
   args.batch_size = int(training["batch_size"])
   args.lr = float(training["learning_rate"])
+  args.weight_decay = float(training.get("weight_decay", args.weight_decay))
+  args.num_workers = int(training.get("num_workers", args.num_workers))
   args.inactivity_weight = float(weights[0])
   args.coldness_weight = float(weights[1])
   args.write_sensitivity_weight = float(weights[2])
@@ -509,6 +521,24 @@ def apply_proactive_stage4_contract(args, explicit_seed=None):
       training.get("approx_ndcg_alpha", 10.0))
   args.deterministic_algorithms = bool(
       training.get("deterministic_algorithms", True))
+  model_args = context.get("model_args", {})
+  for field in (
+      "hidden_dim", "address_embed_dim", "pc_embed_dim", "rw_embed_dim",
+      "address_vocab_size", "pc_vocab_size", "page_dim", "page_state_dim",
+      "page_embed_dim", "page_vocab_size", "num_queries", "num_layers",
+      "num_heads", "feedforward_dim", "dropout"):
+    if field in model_args:
+      setattr(args, field, model_args[field])
+  for field in ("position_encoding", "context_mode",
+                "use_page_id_embedding", "shared_page_embedding"):
+    if field in model_args:
+      setattr(args, field, model_args[field])
+  if "ablation" in model_args and model_args["ablation"] != args.ablation:
+    raise ValueError("CLI ablation/training contract mismatch.")
+  if context.get("stage7"):
+    expected_device = value.get("execution", {}).get("actual_device")
+    if not expected_device or args.device != expected_device:
+      raise ValueError("CLI device/Stage7 training contract mismatch.")
   if args.ablation != "cross_attention":
     raise ValueError(
         "Proactive Stage-4 training requires cross_attention.")
@@ -639,6 +669,20 @@ def checkpoint_payload(feature_embedder, extractor, scorer, optimizer, epoch,
         "experiment_id": contract["experiment_id"],
         "seed": args.seed,
         "training_seed_source": args.training_seed_source,
+        "training_args": {
+            "learning_rate": args.lr,
+            "batch_size": args.batch_size,
+            "weight_decay": args.weight_decay,
+            "epochs": args.epochs,
+            "num_workers": args.num_workers,
+            "approx_ndcg_alpha": args.approx_ndcg_alpha,
+            "seed": args.seed,
+            "device": getattr(args, "actual_device", str(args.device)),
+            "deterministic_algorithms": bool(getattr(
+                args, "deterministic_algorithms", False)),
+            "precision": "fp32",
+            "checkpoint_tie_break": "earliest_epoch",
+        },
         "stage4_training_contract": contract,
         "stage4_training_contract_fingerprint":
             proactive_context["contract_fingerprint"],
@@ -681,7 +725,8 @@ def _load_resume_checkpoint(path, device, feature_embedder, extractor, scorer,
         "selector_fingerprint"]:
       raise ValueError("Resume checkpoint selector mismatch.")
   elif proactive_context:
-    if checkpoint.get("contract_id") != PROACTIVE_STAGE4_CONTRACT_ID:
+    if checkpoint.get("contract_id") != proactive_context["contract"].get(
+        "contract_id"):
       raise ValueError("Resume checkpoint Stage-4 contract mismatch.")
     if checkpoint.get("stage4_training_contract_fingerprint") != (
         proactive_context["contract_fingerprint"]):
@@ -753,6 +798,7 @@ def main():
   if device_name is None:
     device_name = "cuda" if torch.cuda.is_available() else "cpu"
   device = torch.device(device_name)
+  args.actual_device = str(device)
   active_context = finals_context or proactive_context
   expected_shape = (
       active_context["expected_shape"] if active_context else None)
@@ -823,6 +869,15 @@ def main():
         train_dataset.page_vocab_values()).freeze()
     feature_embedder.pc_embedder.fit(
         train_dataset.pc_vocab_values()).freeze()
+    expected_vocabulary = proactive_context.get("vocabulary", {})
+    if expected_vocabulary:
+      page_sha = finals_config.fingerprint_value(
+          feature_embedder.page_embedder.input_to_index)
+      pc_sha = finals_config.fingerprint_value(
+          feature_embedder.pc_embedder.input_to_index)
+      if (page_sha != expected_vocabulary.get("page_vocabulary_sha256") or
+          pc_sha != expected_vocabulary.get("pc_vocabulary_sha256")):
+        raise ValueError("Train-only vocabulary fingerprint mismatch.")
   if feature_embedder.embed_dim != args.hidden_dim:
     raise ValueError("hidden_dim ({}) must equal embedding dimension ({})."
                      .format(args.hidden_dim, feature_embedder.embed_dim))
@@ -1012,6 +1067,21 @@ def main():
           "run", {}).get("git_commit", "unknown") if finals_context else None),
       "code_fingerprint": _training_code_fingerprint(),
       "command": _command_text(),
+      "model_args": vars(args).copy(),
+      "training_args": {
+          "learning_rate": args.lr,
+          "batch_size": args.batch_size,
+          "weight_decay": args.weight_decay,
+          "epochs": args.epochs,
+          "num_workers": args.num_workers,
+          "approx_ndcg_alpha": args.approx_ndcg_alpha,
+          "seed": args.seed,
+          "device": getattr(args, "actual_device", str(args.device)),
+          "deterministic_algorithms": bool(getattr(
+              args, "deterministic_algorithms", False)),
+          "precision": "fp32",
+          "checkpoint_tie_break": "earliest_epoch",
+      },
   }
   if is_v3:
     manifest.update(finals_config.artifact_identity_from_config(

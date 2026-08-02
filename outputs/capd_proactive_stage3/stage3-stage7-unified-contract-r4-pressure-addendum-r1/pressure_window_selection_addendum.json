@@ -1,0 +1,93 @@
+{
+  "addendum_run_id": "stage3-stage7-unified-contract-r4-pressure-addendum-r1",
+  "addendum_sha256": "e16fa6a493165a0c995199e510517f08a737074fd6cf1a8b99af23ef8a089ea0",
+  "addendum_sha256_semantics": "sha256_of_canonical_json_excluding_addendum_sha256_field",
+  "approval_status": "FORMALLY_APPROVED_BY_USER",
+  "approval_timestamp": "2026-08-02T21:23:44+08:00",
+  "eligibility_rule": {
+    "minimum_reactive_lru_replacement_decisions": 100,
+    "selection_policy": "fixed_reactive_lru_only",
+    "unique_pages_rule": "strictly_greater_than_D_pressure_plus_F_target"
+  },
+  "excluded_workloads": [
+    {
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "fluidanimate"
+    }
+  ],
+  "honest_protocol_disclosure": {
+    "addendum_timing": "after_local_candidate_scan_before_formal_pressure_test_generation",
+    "capd_or_oracle_used_for_selection": false,
+    "eligible_candidate_counts_known_at_gap_discovery": {
+      "blackscholes": 11,
+      "canneal": 11,
+      "dedup_pressure": 11,
+      "swaptions": 11
+    },
+    "formal_pressure_test_generated_before_addendum": false,
+    "gap_discovered_after_local_candidate_scan": true,
+    "model_or_stage4_checkpoint_used_for_selection": false,
+    "original_r4_froze_eligibility_but_not_unique_selection_order": true,
+    "original_r4_rule_pre_registered_claim_allowed": false,
+    "pressure_intensity_or_method_effect_used_for_ranking": false,
+    "protocol_repair_description": "deterministic_protocol_repair_frozen_before_formal_pressure_test_generation"
+  },
+  "parent_final_freeze_path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/final_freeze.json",
+  "parent_final_freeze_sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+  "parent_pressure_contract_path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/pressure_generation_contract.json",
+  "parent_pressure_contract_sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+  "parent_stage3_run_id": "stage3-stage7-unified-contract-r4",
+  "pressure_window_selection_order": {
+    "eligibility_filter_first": true,
+    "metrics_for_ranking": [],
+    "no_eligible_action": "exclude_workload_fail_closed",
+    "rule": "earliest_eligible_window_in_source_trace",
+    "scope": "independently_per_workload",
+    "selected_rank": 1,
+    "sort_keys": [
+      {
+        "field": "source_interval.start_inclusive",
+        "order": "ascending"
+      },
+      {
+        "field": "source_interval.end_exclusive",
+        "order": "ascending"
+      },
+      {
+        "field": "source_trace_id",
+        "order": "ascending"
+      },
+      {
+        "field": "candidate_content_sha256",
+        "order": "ascending"
+      }
+    ]
+  },
+  "pressure_window_selection_rule": "earliest_eligible_window_in_source_trace",
+  "ranking_prohibitions": [
+    "reactive_lru_replacement_decisions",
+    "unique_pages",
+    "replacement_rate",
+    "oracle_headroom",
+    "capd_cost",
+    "capd_relative_improvement",
+    "stage4_model_prediction",
+    "manual_posthoc_selection"
+  ],
+  "schema_version": "capd_proactive_pressure_selection_addendum_v1_0",
+  "selection_sort_keys": [
+    "source_interval.start_inclusive:ascending",
+    "source_interval.end_exclusive:ascending",
+    "source_trace_id:ascending",
+    "candidate_content_sha256:ascending"
+  ],
+  "tie_break": [
+    "source_interval.end_exclusive:ascending",
+    "source_trace_id:ascending",
+    "candidate_content_sha256:ascending"
+  ]
+}

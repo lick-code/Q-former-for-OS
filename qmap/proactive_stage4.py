@@ -557,7 +557,7 @@ class TrainingSampleRanking(proactive_replay.CandidateRankingPolicy):
   def __init__(
       self, trace: Sequence[Any], workload: str, split: str, lookahead: int,
       history_H: int, candidate_K: int, weights: Sequence[float],
-      experiment_id: str):
+      experiment_id: str, label_provider=None):
     self.trace = trace
     self.workload = workload
     self.split = split
@@ -566,6 +566,7 @@ class TrainingSampleRanking(proactive_replay.CandidateRankingPolicy):
     self.candidate_K = candidate_K
     self.weights = tuple(float(value) for value in weights)
     self.experiment_id = experiment_id
+    self.label_provider = label_provider or label_components
     self.rows = []
     self.tail_excluded = 0
     self.empty_future_windows = 0
@@ -576,7 +577,7 @@ class TrainingSampleRanking(proactive_replay.CandidateRankingPolicy):
     del candidate_features
     self.total_rounds_seen += 1
     components = [
-        label_components(
+        self.label_provider(
             self.trace, state.access_index, page, self.lookahead)
         for page in candidates]
     complete = all(item["complete_future_window"] for item in components)
