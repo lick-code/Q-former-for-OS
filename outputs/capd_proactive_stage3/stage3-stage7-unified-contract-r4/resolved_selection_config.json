@@ -1,0 +1,139 @@
+{
+  "b_max_decision_evidence": {
+    "active_oracle_headroom_relative_change": -0.000179638208647783,
+    "b_max_1_proactive_rounds": 124406,
+    "b_max_2_proactive_rounds": 62600,
+    "compared_candidate_ids": [
+      "win500000-q50-r10-a15-b04-batch1",
+      "win500000-q50-r10-a15-b04-batch2"
+    ],
+    "cost_demotion_reserve_and_early_reuse_equal": true,
+    "decision": "select_b_max_2_as_batch_knee_after_human_review",
+    "round_reduction_fraction": 0.496808835586708
+  },
+  "contract_version": "CAPD-PROACTIVE-STAGE3-STAGE7-SELECTION-REPAIR-1.0",
+  "default_run_id": "stage3-stage7-unified-contract-r4",
+  "disclosure": {
+    "confirmatory_status": "engineering_calibration_not_independent_validation",
+    "derived_selection_only": true,
+    "human_b_max_override_after_r3_review": true,
+    "model_training_executed": false,
+    "pressure_test_generated": false,
+    "selection_rule_revised_after_r2_validation_review": true,
+    "source_profile_or_search_rerun": false,
+    "stage8_results_used": false,
+    "test_payload_opened": false,
+    "test_used_for_selection": false
+  },
+  "experiment_scope": {
+    "asynchronous_efficiency_claims_allowed_before_runtime_evidence": false,
+    "asynchronous_replay_required": true,
+    "foreground_background_parallelism_required": true,
+    "oracle_role": "active_demotion_ranking_upper_bound",
+    "primary_comparison": "active_demotion_baselines_under_the_same_controller",
+    "proactive_lru_role": "active_demotion_mechanism_baseline",
+    "reactive_lru_role": "pressure_qualification_and_descriptive_reference_only",
+    "synchronous_efficiency_claims_allowed": false,
+    "synchronous_replay_role": "mechanism_calibration_ranking_and_risk_audit_only"
+  },
+  "output_root": "outputs/capd_proactive_stage3",
+  "schema_name": "capd_proactive_stage3_stage7_selection_repair",
+  "schema_version": "capd_proactive_stage3_stage7_selection_repair_v1_0",
+  "selection": {
+    "auto_freeze": false,
+    "human_review_required": true,
+    "pareto_objectives": [
+      "maximize_pressure_coverage",
+      "maximize_empty_frame_exhaustion_reduction",
+      "maximize_minimum_free_frames",
+      "minimize_early_reuse_ratio",
+      "minimize_proactive_demotion_count",
+      "maximize_active_oracle_headroom"
+    ],
+    "require_any_train_pressure_coverage": true,
+    "require_low_pressure_mechanism_safety": true,
+    "require_positive_active_oracle_headroom": true,
+    "required_b_max": 2,
+    "tie_break": [
+      "higher_pressure_coverage",
+      "higher_empty_frame_exhaustion_reduction",
+      "higher_minimum_free_frames",
+      "lower_early_reuse_ratio",
+      "lower_proactive_demotion_count",
+      "higher_active_oracle_headroom",
+      "lexical_candidate_id"
+    ]
+  },
+  "source": {
+    "artifacts": {
+      "capacity_standard_matrix.json": "7982e51f2504a0b5dcb38b3feb52d0f5d23db1e55ca73928bb25476864a8331e",
+      "controller_candidates.json": "b85688b3d5615fe0018bfacb9d1cbee94d06b9c16b4457a38314a7bc5182c94e",
+      "input_manifest.json": "108b2c34b5809e911b8b92864b111fc117caea8566997c101607928c590ed85f",
+      "policy_results.json": "59daf1ae3d525061a42eda5e10f25d3a3f1dd4829fc512a96871cd8ad48a78ac",
+      "provenance.json": "4eeac6573accfaea3332dba17aaad835ee2a46ea803b73a8eb94260ce19347fc",
+      "resolved_config.json": "5375a69b8337c6461f8b8664d03a9a3ab7c7953357d497664ab8600afb84339e",
+      "run_identity.json": "25627c77eb0a31cf0a3b31435c52a0bd4fabe3e73d03d89f69ab6151a3fab1f0",
+      "validation_safety.json": "56cd44d69eb19a8cd7487c1f8aa8c2f2cc80b712a6f3c74731649eb10fcadece",
+      "verification.json": "f672df27b1646e7c0f248794151b36d8b5b96b65c140cedb90b6f9f7a2ad1e0c"
+    },
+    "formal_freeze": false,
+    "required_completed_phases": [
+      "preflight",
+      "profile",
+      "search",
+      "select",
+      "verify"
+    ],
+    "required_verification_status": "STAGE3_STAGE7_GATES_BLOCKED",
+    "run_id": "stage3-stage7-calibration-r2",
+    "run_identity_sha256": "4397ed9971077733898fa214c6f3e48952ac3f882ff60c83dbd3c97c0a974587"
+  },
+  "standard_pressure_hard_principle": {
+    "W_ref_quantile": 0.5,
+    "alpha": 0.15,
+    "beta": 0.4,
+    "capacity_ratio": 0.1,
+    "enabled": true,
+    "identical_fields": [
+      "capacity_matrix",
+      "working_set_definition",
+      "watermarks",
+      "batch_mechanism",
+      "model",
+      "checkpoint",
+      "seed",
+      "cost_profile",
+      "initial_state",
+      "policy_configuration"
+    ],
+    "initial_state": "empty_dram_per_window",
+    "model_checkpoint_seed_binding": "bind_once_after_stage4_then_require_identical_sha_and_seed",
+    "only_allowed_difference": "evaluation_interval_selection",
+    "pressure_interval_unavailable_action": "record_exclusion_and_do_not_fabricate_pressure_data",
+    "window_records": 500000,
+    "working_set_definition": "train_chronological_window_unique_pages_quantile"
+  },
+  "validation_gate": {
+    "all_sync_reactive_comparisons_are_reported": true,
+    "low_pressure": {
+      "hard_fail_reasons": [
+        "meaningless_proactive_demotions"
+      ],
+      "maximum_pointless_demotion_count": 1,
+      "maximum_pointless_demotion_fraction_of_page_entries": 0.01
+    },
+    "pressure": {
+      "hard_fail_reasons": [],
+      "metrics_forwarded_to_pareto": [
+        "empty_frame_exhaustion_reduction",
+        "minimum_free_frames",
+        "early_reuse_ratio",
+        "proactive_demotion_count",
+        "active_oracle_headroom"
+      ]
+    },
+    "sync_dram_hit_delta_vs_reactive_is_hard_gate": false,
+    "sync_early_reuse_ratio_is_hard_gate": false,
+    "sync_weighted_cost_delta_vs_reactive_is_hard_gate": false
+  }
+}

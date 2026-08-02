@@ -1,0 +1,448 @@
+{
+  "W_ref_quantile": 0.5,
+  "active_oracle_headroom_gate": {
+    "comparison": "proactive_lru_minus_proactive_oracle",
+    "evaluated_window_count": 26496,
+    "passed": true,
+    "positive_headroom_window_count": 15800,
+    "reason": "nonzero_active_ranking_optimization_space_confirmed",
+    "total_active_oracle_headroom": 451753319.0
+  },
+  "all_command_auto_freeze": false,
+  "alpha": 0.15,
+  "async_efficiency_claim_requires_runtime_evidence": true,
+  "b_max": 2,
+  "beta": 0.4,
+  "candidate_size_K": 8,
+  "excluded_pressure_capacity_cells": [
+    {
+      "coverage_id": "coverage-7cfecdf210178f4192c6",
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "coverage_id": "coverage-fc2f7d6a034b8ed73685",
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "fluidanimate"
+    }
+  ],
+  "formal_freeze": false,
+  "pressure_capacity_matrix": [
+    {
+      "D_pressure": 120,
+      "D_standard": 120,
+      "W_ref": 1196,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "canneal"
+    },
+    {
+      "D_pressure": 22,
+      "D_standard": 22,
+      "W_ref": 219,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "D_pressure": 21,
+      "D_standard": 21,
+      "W_ref": 203,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "dedup_pressure"
+    },
+    {
+      "D_pressure": 8,
+      "D_standard": 8,
+      "W_ref": 22,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": true,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "blackscholes"
+    },
+    {
+      "D_pressure": 8,
+      "D_standard": 8,
+      "W_ref": 36,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": true,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "swaptions"
+    },
+    {
+      "D_pressure": 22,
+      "D_standard": 22,
+      "W_ref": 216,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "fluidanimate"
+    }
+  ],
+  "pressure_interval_exclusions": [
+    {
+      "coverage_id": "coverage-7cfecdf210178f4192c6",
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "coverage_id": "coverage-fc2f7d6a034b8ed73685",
+      "reason": "insufficient_replacement_decisions_across_train_blocks",
+      "workload": "fluidanimate"
+    }
+  ],
+  "pressure_interval_unavailable_action": "record_exclusion_and_do_not_fabricate_pressure_data",
+  "requested_pressure_ratio": 0.1,
+  "requires_human_review": true,
+  "run_id": "stage3-stage7-unified-contract-r4",
+  "schema_version": "capd_proactive_stage3_stage7_selection_repair_result_v1_0",
+  "selected_candidate_id": "win500000-q50-r10-a15-b04-batch2",
+  "selected_window_records": 500000,
+  "selection_metrics": {
+    "active_mechanism_effect_passed": true,
+    "active_oracle_headroom": 27828.722222222223,
+    "active_oracle_headroom_gate_passed": true,
+    "b_max": 2,
+    "candidate_id": "win500000-q50-r10-a15-b04-batch2",
+    "early_reuse_ratio": 0.2741524014616831,
+    "eligible_for_active_pareto": true,
+    "empty_frame_exhaustion_reduction": 2551.6111111111113,
+    "evaluated_window_count": 18,
+    "low_pressure_mechanism_safety_passed": true,
+    "minimum_free_frames": 2.2222222222222223,
+    "minimum_free_frames_delta": 1.1111111111111112,
+    "pressure_coverage": 0.8295454545454546,
+    "pressure_coverage_gate_passed": true,
+    "proactive_demotion_count": 124406,
+    "proactive_round_count": 62600,
+    "required_b_max_gate_passed": true,
+    "sync_reactive_comparison_role": "descriptive_not_selection_gate",
+    "sync_weighted_cost_delta_vs_reactive": 11356.0,
+    "tie_break_rank": 1,
+    "total_active_oracle_headroom": 500917.0,
+    "unified_parameter_gate_passed": true
+  },
+  "selection_repair_disclosure": {
+    "asynchronous_replay_required": true,
+    "confirmatory_status": "engineering_calibration_not_independent_validation",
+    "derived_selection_only": true,
+    "human_b_max_override_after_r3_review": true,
+    "model_training_executed": false,
+    "pressure_test_generated": false,
+    "reactive_lru_role": "pressure_qualification_and_descriptive_reference_only",
+    "selection_rule_revised_after_r2_validation_review": true,
+    "source_profile_or_search_rerun": false,
+    "source_run_id": "stage3-stage7-calibration-r2",
+    "source_run_identity_sha256": "4397ed9971077733898fa214c6f3e48952ac3f882ff60c83dbd3c97c0a974587",
+    "stage8_results_used": false,
+    "synchronous_replay_role": "mechanism_calibration_ranking_and_risk_audit_only",
+    "test_payload_opened": false,
+    "test_used_for_selection": false
+  },
+  "shared_standard_pressure_execution_contract": {
+    "batch_mechanism": {
+      "b_max": 2,
+      "b_t_rule": "min(b_max,max(0,F_target-free_frames),candidate_count)",
+      "human_decision_evidence": {
+        "active_oracle_headroom_relative_change": -0.000179638208647783,
+        "b_max_1_proactive_rounds": 124406,
+        "b_max_2_proactive_rounds": 62600,
+        "compared_candidate_ids": [
+          "win500000-q50-r10-a15-b04-batch1",
+          "win500000-q50-r10-a15-b04-batch2"
+        ],
+        "cost_demotion_reserve_and_early_reuse_equal": true,
+        "decision": "select_b_max_2_as_batch_knee_after_human_review",
+        "round_reduction_fraction": 0.496808835586708
+      }
+    },
+    "candidate_size_K": 8,
+    "checkpoint": "pending_stage4",
+    "chronological": true,
+    "cost_profile": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    },
+    "initial_state": "empty_dram_per_window",
+    "model": "pending_stage4",
+    "model_checkpoint_seed_binding": "bind_once_after_stage4_then_require_identical_sha_and_seed",
+    "only_allowed_difference": "evaluation_interval_selection",
+    "policy_configuration_binding": "one_frozen_policy_config_sha_for_standard_and_pressure",
+    "pressure_capacity_matrix_ref": "unified_capacity_matrix",
+    "seed": "pending_stage4",
+    "shuffle": false,
+    "standard_capacity_matrix_ref": "unified_capacity_matrix",
+    "watermarks": [
+      {
+        "D": 120,
+        "F_low": 6,
+        "F_target": 16,
+        "F_target_over_D": 0.13333333333333333,
+        "alpha": 0.15,
+        "beta": 0.4,
+        "workload": "canneal"
+      },
+      {
+        "D": 22,
+        "F_low": 1,
+        "F_target": 3,
+        "F_target_over_D": 0.13636363636363635,
+        "alpha": 0.15,
+        "beta": 0.4,
+        "workload": "streamcluster_pressure"
+      },
+      {
+        "D": 21,
+        "F_low": 1,
+        "F_target": 3,
+        "F_target_over_D": 0.14285714285714285,
+        "alpha": 0.15,
+        "beta": 0.4,
+        "workload": "dedup_pressure"
+      },
+      {
+        "D": 8,
+        "F_low": 1,
+        "F_target": 2,
+        "F_target_over_D": 0.25,
+        "alpha": 0.15,
+        "beta": 0.4,
+        "workload": "blackscholes"
+      },
+      {
+        "D": 8,
+        "F_low": 1,
+        "F_target": 2,
+        "F_target_over_D": 0.25,
+        "alpha": 0.15,
+        "beta": 0.4,
+        "workload": "swaptions"
+      },
+      {
+        "D": 22,
+        "F_low": 1,
+        "F_target": 3,
+        "F_target_over_D": 0.13636363636363635,
+        "alpha": 0.15,
+        "beta": 0.4,
+        "workload": "fluidanimate"
+      }
+    ],
+    "working_set_definition": "train_chronological_window_unique_pages_quantile"
+  },
+  "stage4_entry_allowed": true,
+  "standard_capacity_matrix": [
+    {
+      "D_pressure": 120,
+      "D_standard": 120,
+      "W_ref": 1196,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "canneal"
+    },
+    {
+      "D_pressure": 22,
+      "D_standard": 22,
+      "W_ref": 219,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "D_pressure": 21,
+      "D_standard": 21,
+      "W_ref": 203,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "dedup_pressure"
+    },
+    {
+      "D_pressure": 8,
+      "D_standard": 8,
+      "W_ref": 22,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": true,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "blackscholes"
+    },
+    {
+      "D_pressure": 8,
+      "D_standard": 8,
+      "W_ref": 36,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": true,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "swaptions"
+    },
+    {
+      "D_pressure": 22,
+      "D_standard": 22,
+      "W_ref": 216,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "fluidanimate"
+    }
+  ],
+  "standard_pressure_hard_principle_satisfied": true,
+  "status": "candidate_ready_for_human_review",
+  "sync_efficiency_claim_allowed": false,
+  "unified_capacity_matrix": [
+    {
+      "D_pressure": 120,
+      "D_standard": 120,
+      "W_ref": 1196,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "canneal"
+    },
+    {
+      "D_pressure": 22,
+      "D_standard": 22,
+      "W_ref": 219,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "D_pressure": 21,
+      "D_standard": 21,
+      "W_ref": 203,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "dedup_pressure"
+    },
+    {
+      "D_pressure": 8,
+      "D_standard": 8,
+      "W_ref": 22,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": true,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "blackscholes"
+    },
+    {
+      "D_pressure": 8,
+      "D_standard": 8,
+      "W_ref": 36,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": true,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "swaptions"
+    },
+    {
+      "D_pressure": 22,
+      "D_standard": 22,
+      "W_ref": 216,
+      "W_ref_quantile": 0.5,
+      "minimum_capacity_applied": false,
+      "requested_ratio": 0.1,
+      "window_records": 500000,
+      "working_set_definition": "train_chronological_window_unique_pages_quantile",
+      "workload": "fluidanimate"
+    }
+  ],
+  "validation_safety_passed": true,
+  "watermarks": [
+    {
+      "D": 120,
+      "F_low": 6,
+      "F_target": 16,
+      "F_target_over_D": 0.13333333333333333,
+      "alpha": 0.15,
+      "beta": 0.4,
+      "workload": "canneal"
+    },
+    {
+      "D": 22,
+      "F_low": 1,
+      "F_target": 3,
+      "F_target_over_D": 0.13636363636363635,
+      "alpha": 0.15,
+      "beta": 0.4,
+      "workload": "streamcluster_pressure"
+    },
+    {
+      "D": 21,
+      "F_low": 1,
+      "F_target": 3,
+      "F_target_over_D": 0.14285714285714285,
+      "alpha": 0.15,
+      "beta": 0.4,
+      "workload": "dedup_pressure"
+    },
+    {
+      "D": 8,
+      "F_low": 1,
+      "F_target": 2,
+      "F_target_over_D": 0.25,
+      "alpha": 0.15,
+      "beta": 0.4,
+      "workload": "blackscholes"
+    },
+    {
+      "D": 8,
+      "F_low": 1,
+      "F_target": 2,
+      "F_target_over_D": 0.25,
+      "alpha": 0.15,
+      "beta": 0.4,
+      "workload": "swaptions"
+    },
+    {
+      "D": 22,
+      "F_low": 1,
+      "F_target": 3,
+      "F_target_over_D": 0.13636363636363635,
+      "alpha": 0.15,
+      "beta": 0.4,
+      "workload": "fluidanimate"
+    }
+  ]
+}

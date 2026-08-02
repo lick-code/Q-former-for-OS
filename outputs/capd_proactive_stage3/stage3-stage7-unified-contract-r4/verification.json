@@ -1,0 +1,76 @@
+{
+  "artifact_count": 9,
+  "artifacts": [
+    {
+      "bytes": 5607,
+      "path": "resolved_selection_config.json",
+      "sha256": "7d493366bc59ff725c322674f94d871e119eac46cf32eaa83ae052af32fd7b10"
+    },
+    {
+      "bytes": 1596,
+      "path": "selection_run_identity.json",
+      "sha256": "0b39d9d13e66f7785dbacacdceb2a38d7adc96b16a7ea77275d21e1e54159f86"
+    },
+    {
+      "bytes": 1920,
+      "path": "source_run_reference.json",
+      "sha256": "90b1da0e873beec3ff8d1654618d445cf1dff7218667febc218d491029f22507"
+    },
+    {
+      "bytes": 6360381,
+      "path": "validation_safety_reinterpreted.json",
+      "sha256": "e610c051afc0dc31720c24f52db2d750a72282ee7084c5d0ca903996b43efd5e"
+    },
+    {
+      "bytes": 8799582,
+      "path": "active_oracle_headroom.json",
+      "sha256": "10bc179a21d96e4f5941f2d63bba9b4ffe8990d7e08594961fdbf93f2aacdb40"
+    },
+    {
+      "bytes": 1742220,
+      "path": "pareto_frontier.json",
+      "sha256": "2786be1c00b04ab553366cadf56cbd6ce81a04ac7920030aadded0fce738e0d7"
+    },
+    {
+      "bytes": 1098515,
+      "path": "selection_rationale.json",
+      "sha256": "07eea461d227a17abff24ba480ed1ca5737ee06a62418dc8b435ed88e00ac896"
+    },
+    {
+      "bytes": 13704,
+      "path": "final_freeze_candidate.json",
+      "sha256": "ad43ca7abfdfcdc29b9eff29f4e2f2ffcaaf7e32dc687c431cc526d9e44f3cd9"
+    },
+    {
+      "bytes": 12607,
+      "path": "pressure_generation_contract_candidate.json",
+      "sha256": "9e13e126f242e1041dc35064ccc12126d7cf798c9f61aac2a60ca3acc2a1e516"
+    }
+  ],
+  "asynchronous_runtime_evaluation_required": true,
+  "capd_or_oracle_used_for_pressure_selection": false,
+  "confirmatory_status": "engineering_calibration_not_independent_validation",
+  "foreground_background_parallelism_required": true,
+  "formal_freeze_created": false,
+  "model_training_executed": false,
+  "pressure_overhead_claims_allowed": false,
+  "pressure_selection_policy": "fixed_reactive_lru_only",
+  "pressure_test_generated": false,
+  "reactive_lru_role": "pressure_qualification_and_descriptive_reference_only",
+  "required_b_max": 2,
+  "run_id": "stage3-stage7-unified-contract-r4",
+  "schema_version": "capd_proactive_stage3_stage7_selection_repair_result_v1_0",
+  "selection_rule_revised_after_r2_validation_review": true,
+  "source_profile_or_search_rerun": false,
+  "source_run_id": "stage3-stage7-calibration-r2",
+  "source_run_identity_sha256": "4397ed9971077733898fa214c6f3e48952ac3f882ff60c83dbd3c97c0a974587",
+  "stage4_entry_allowed": true,
+  "stage4_executed": false,
+  "stage8_results_used": false,
+  "standard_pressure_hard_principle_satisfied": true,
+  "status": "STAGE3_STAGE7_DERIVED_SELECTION_CANDIDATE_VERIFIED",
+  "synchronous_efficiency_claims_allowed": false,
+  "synchronous_replay_role": "mechanism_calibration_ranking_and_risk_audit_only",
+  "test_payload_opened": false,
+  "test_used_for_selection": false
+}
