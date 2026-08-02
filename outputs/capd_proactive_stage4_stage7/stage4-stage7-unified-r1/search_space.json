@@ -1,0 +1,224 @@
+{
+  "fixed": {
+    "W_ref_quantile": 0.5,
+    "alpha": 0.15,
+    "b_max": 2,
+    "beta": 0.4,
+    "candidate_size_K": 8,
+    "candidate_source": "lru_tail",
+    "capacity_ratio": 0.1,
+    "deterministic_algorithms": true,
+    "initial_dram_state": "empty_dram_per_window",
+    "precision": "fp32",
+    "selected_candidate_id": "win500000-q50-r10-a15-b04-batch2",
+    "selector": "disabled",
+    "trajectory_policy": "proactive_lru",
+    "window_records": 500000
+  },
+  "formal_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "schema_version": "capd_proactive_stage4_stage7_search_v1_0",
+  "search": {
+    "candidate_count": 15,
+    "phase_order": [
+      "semantic",
+      "architecture",
+      "optimization"
+    ],
+    "phases": [
+      {
+        "candidates": [
+          {
+            "id": "sem-reference"
+          },
+          {
+            "id": "sem-L128",
+            "lookahead_L": 128
+          },
+          {
+            "id": "sem-L512",
+            "lookahead_L": 512
+          },
+          {
+            "history_H": 10,
+            "id": "sem-H10"
+          },
+          {
+            "history_H": 40,
+            "id": "sem-H40"
+          },
+          {
+            "id": "sem-lam111",
+            "label_weights": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          {
+            "id": "sem-lam114",
+            "label_weights": [
+              1.0,
+              1.0,
+              4.0
+            ]
+          }
+        ],
+        "inherit": "reference",
+        "name": "semantic"
+      },
+      {
+        "candidates": [
+          {
+            "id": "arch-balanced"
+          },
+          {
+            "id": "arch-compact",
+            "model": {
+              "address_embed_dim": 12,
+              "dropout": 0.0,
+              "feedforward_dim": 48,
+              "hidden_dim": 24,
+              "num_heads": 2,
+              "num_layers": 1,
+              "page_embed_dim": 12,
+              "pc_embed_dim": 10,
+              "rw_embed_dim": 2
+            }
+          },
+          {
+            "id": "arch-wide",
+            "model": {
+              "address_embed_dim": 24,
+              "dropout": 0.1,
+              "feedforward_dim": 96,
+              "hidden_dim": 48,
+              "num_heads": 4,
+              "num_layers": 2,
+              "page_embed_dim": 24,
+              "pc_embed_dim": 22,
+              "rw_embed_dim": 2
+            }
+          },
+          {
+            "id": "arch-deep",
+            "model": {
+              "address_embed_dim": 16,
+              "dropout": 0.2,
+              "feedforward_dim": 128,
+              "hidden_dim": 32,
+              "num_heads": 4,
+              "num_layers": 3,
+              "page_embed_dim": 16,
+              "pc_embed_dim": 14,
+              "rw_embed_dim": 2
+            }
+          }
+        ],
+        "inherit": "semantic_winner",
+        "name": "architecture"
+      },
+      {
+        "candidates": [
+          {
+            "id": "opt-balanced"
+          },
+          {
+            "id": "opt-steady",
+            "training": {
+              "batch_size": 32,
+              "epochs": 12,
+              "learning_rate": 3e-05,
+              "weight_decay": 0.0001
+            }
+          },
+          {
+            "id": "opt-fast",
+            "training": {
+              "batch_size": 64,
+              "epochs": 8,
+              "learning_rate": 0.0003,
+              "weight_decay": 0.0001
+            }
+          },
+          {
+            "id": "opt-regularized",
+            "training": {
+              "batch_size": 16,
+              "epochs": 12,
+              "learning_rate": 0.0001,
+              "weight_decay": 0.001
+            }
+          }
+        ],
+        "inherit": "architecture_winner",
+        "name": "optimization"
+      }
+    ],
+    "reference": {
+      "history_H": 20,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "model": {
+        "ablation": "cross_attention",
+        "address_embed_dim": 16,
+        "address_vocab_size": 100000,
+        "context_mode": "cross_attention",
+        "dropout": 0.1,
+        "feedforward_dim": 64,
+        "hidden_dim": 32,
+        "num_heads": 4,
+        "num_layers": 2,
+        "num_queries": 4,
+        "page_dim": 21,
+        "page_embed_dim": 16,
+        "page_state_dim": 4,
+        "page_vocab_size": 100000,
+        "pc_embed_dim": 14,
+        "pc_vocab_size": 50000,
+        "position_encoding": "sinusoidal",
+        "rw_embed_dim": 2,
+        "shared_page_embedding": true,
+        "use_page_id_embedding": true
+      },
+      "training": {
+        "approx_ndcg_alpha": 10.0,
+        "batch_size": 32,
+        "checkpoint_tie_break": "earliest_epoch",
+        "deterministic_algorithms": true,
+        "epochs": 8,
+        "learning_rate": 0.0001,
+        "num_workers": 4,
+        "precision": "fp32",
+        "weight_decay": 0.0001
+      }
+    },
+    "strategy": "three_phase_predeclared_coordinate_search",
+    "training_run_count": 45
+  },
+  "search_config_sha256": "b90b7b76564772bf589d323bfbd1a150b044092c6fd6512323fa17944b258315",
+  "selection": {
+    "aggregation": "equal_weight_macro_over_six_workloads_then_mean_over_all_three_seeds",
+    "candidate_tie_break": [
+      "lower_worst_workload_mean_weighted_cost_per_access",
+      "higher_macro_mean_ndcg_at_b_t",
+      "lower_mean_best_validation_loss",
+      "smaller_trainable_parameter_count",
+      "lexicographically_smaller_candidate_id"
+    ],
+    "checkpoint_rule": "minimum_validation_loss_per_seed",
+    "checkpoint_tie_break": "earliest_epoch",
+    "early_stopping": "disabled_fixed_epochs_per_candidate",
+    "empty_workload_rule": "reject_candidate_if_any_validation_workload_has_zero_valid_decisions",
+    "failure_rule": "reject_candidate_on_any_nan_nonfinite_missing_workload_missing_seed_or_nonzero_training_exit",
+    "primary_metric": "macro_mean_validation_weighted_cost_per_access",
+    "seed_rule": "retain_all_formal_seeds_never_select_or_discard_a_seed"
+  }
+}
