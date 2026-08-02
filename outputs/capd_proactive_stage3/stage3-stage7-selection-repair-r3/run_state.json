@@ -1,0 +1,93 @@
+{
+  "completed_phases": [
+    "reselect",
+    "verify_reselection"
+  ],
+  "created_at": "2026-08-02T12:03:27Z",
+  "formal_freeze": false,
+  "phase_artifacts": {
+    "reselect": [
+      {
+        "bytes": 4219,
+        "path": "resolved_selection_config.json",
+        "sha256": "fac8df4ccaa978c7a197443ea4275f346a0aaf2adae0065202bb6862fd57ebfc"
+      },
+      {
+        "bytes": 1596,
+        "path": "selection_run_identity.json",
+        "sha256": "6f6adea9b7b676394f71848c8e565853e15710b92efc7dd71adb5635ba3c7db0"
+      },
+      {
+        "bytes": 1920,
+        "path": "source_run_reference.json",
+        "sha256": "90b1da0e873beec3ff8d1654618d445cf1dff7218667febc218d491029f22507"
+      },
+      {
+        "bytes": 6360381,
+        "path": "validation_safety_reinterpreted.json",
+        "sha256": "e610c051afc0dc31720c24f52db2d750a72282ee7084c5d0ca903996b43efd5e"
+      },
+      {
+        "bytes": 8799582,
+        "path": "active_oracle_headroom.json",
+        "sha256": "10bc179a21d96e4f5941f2d63bba9b4ffe8990d7e08594961fdbf93f2aacdb40"
+      },
+      {
+        "bytes": 1783137,
+        "path": "pareto_frontier.json",
+        "sha256": "b0d5aa7e657976e02436e463c1571444cc03eadf2b6a2966a9d12d063afed451"
+      },
+      {
+        "bytes": 968564,
+        "path": "selection_rationale.json",
+        "sha256": "a3084ea28e86c661906d97f8278c9937df177ac4176f57be5b33aa0a9efea180"
+      },
+      {
+        "bytes": 9151,
+        "path": "final_freeze_candidate.json",
+        "sha256": "3d5b037ff4eab46d8cbfc67ec36dc87ca1258f7e3abbbd55d2c79fd68e1db41d"
+      },
+      {
+        "bytes": 8153,
+        "path": "pressure_generation_contract_candidate.json",
+        "sha256": "11caea26ff2053a338b670dbc50ac073d737d81cc9b91307c08f768252f9f46c"
+      }
+    ],
+    "verify_reselection": [
+      {
+        "bytes": 2804,
+        "path": "verification.json",
+        "sha256": "917815fb6e1ce3df62fd98742562ec3be6072042980bdfa6bd5b451428f321c1"
+      }
+    ]
+  },
+  "run_id": "stage3-stage7-selection-repair-r3",
+  "schema_version": "capd_proactive_stage3_stage7_selection_repair_result_v1_0",
+  "selection_identity": {
+    "code_sha256": [
+      "36bec97e6bf6546384c36583be8b63c4b5a6d95fe1ec29b89a846096b82b71cd",
+      "62c623817504deaf4ff6126bf72c9ceb718b35919a6d0aca3410529bb9137d29",
+      "63772283412ba47993b10b30907211f66380af5479e351a6e548ec767e33d697",
+      "8a7e9476a57de7c090a026ad301af137df36b1200cbe5462d9164474775d83a5"
+    ],
+    "run_id": "stage3-stage7-selection-repair-r3",
+    "schema_version": "capd_proactive_stage3_stage7_selection_repair_identity_v1_0",
+    "selection_config_sha256": "efb82a34f04c4709b43c8870308968a364b9e035cc1486d11ab8f98d22b85173",
+    "source_artifact_sha256": {
+      "capacity_standard_matrix.json": "7982e51f2504a0b5dcb38b3feb52d0f5d23db1e55ca73928bb25476864a8331e",
+      "controller_candidates.json": "b85688b3d5615fe0018bfacb9d1cbee94d06b9c16b4457a38314a7bc5182c94e",
+      "input_manifest.json": "108b2c34b5809e911b8b92864b111fc117caea8566997c101607928c590ed85f",
+      "policy_results.json": "59daf1ae3d525061a42eda5e10f25d3a3f1dd4829fc512a96871cd8ad48a78ac",
+      "provenance.json": "4eeac6573accfaea3332dba17aaad835ee2a46ea803b73a8eb94260ce19347fc",
+      "resolved_config.json": "5375a69b8337c6461f8b8664d03a9a3ab7c7953357d497664ab8600afb84339e",
+      "run_identity.json": "25627c77eb0a31cf0a3b31435c52a0bd4fabe3e73d03d89f69ab6151a3fab1f0",
+      "validation_safety.json": "56cd44d69eb19a8cd7487c1f8aa8c2f2cc80b712a6f3c74731649eb10fcadece",
+      "verification.json": "f672df27b1646e7c0f248794151b36d8b5b96b65c140cedb90b6f9f7a2ad1e0c"
+    },
+    "source_run_id": "stage3-stage7-calibration-r2",
+    "source_run_identity_sha256": "4397ed9971077733898fa214c6f3e48952ac3f882ff60c83dbd3c97c0a974587"
+  },
+  "selection_identity_sha256": "37c565d68153f525ca4ad45077f8a10565d8a9db1a6742602a21a07f68e3265b",
+  "status": "derived_freeze_candidate_ready",
+  "updated_at": "2026-08-02T12:03:34Z"
+}
