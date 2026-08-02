@@ -1,0 +1,80 @@
+{
+  "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+  "fit_scope": "six_train_only",
+  "page_vocabulary_file_sha256": "5d8b1c455f05e7ae837b827cb811e6ee153f165ad88a04f0ea8ce8d75e36340c",
+  "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/00a4f3c66a508576c92b/page_input_to_index.json",
+  "page_vocabulary_sha256": "c48f37bca9483b318bac0cbb0f747e059a67fc63c68d2e99dd3f84ee4c14121b",
+  "page_vocabulary_size": 33456,
+  "pc_vocabulary_file_sha256": "cff51a7e1c1029931a4708f4a65001eb2506c85df857117e148f07f8b9ce9a0c",
+  "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/00a4f3c66a508576c92b/pc_input_to_index.json",
+  "pc_vocabulary_sha256": "84c4b6f8fc985529e415d2f52f35c1f520c2ee14e2613bb7bec5a949b01bdb69",
+  "pc_vocabulary_size": 16314,
+  "pressure_used_for_fit": false,
+  "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+  "test_used_for_fit": false,
+  "unk_index": 0,
+  "validation_oov_by_workload": {
+    "blackscholes": {
+      "page_oov_count": 6210,
+      "page_oov_rate": 0.011764572156042557,
+      "page_oov_unique": 2,
+      "page_total": 527856,
+      "pc_oov_count": 15,
+      "pc_oov_rate": 3.410020914794944e-05,
+      "pc_oov_unique": 15,
+      "pc_total": 439880
+    },
+    "canneal": {
+      "page_oov_count": 26640,
+      "page_oov_rate": 0.8333333333333334,
+      "page_oov_unique": 1271,
+      "page_total": 31968,
+      "pc_oov_count": 0,
+      "pc_oov_rate": 0.0,
+      "pc_oov_unique": 0,
+      "pc_total": 26640
+    },
+    "dedup_pressure": {
+      "page_oov_count": 1534,
+      "page_oov_rate": 0.2708333333333333,
+      "page_oov_unique": 256,
+      "page_total": 5664,
+      "pc_oov_count": 0,
+      "pc_oov_rate": 0.0,
+      "pc_oov_unique": 0,
+      "pc_total": 4720
+    },
+    "fluidanimate": {
+      "page_oov_count": 0,
+      "page_oov_rate": 0.0,
+      "page_oov_unique": 0,
+      "page_total": 0,
+      "pc_oov_count": 0,
+      "pc_oov_rate": 0.0,
+      "pc_oov_unique": 0,
+      "pc_total": 0
+    },
+    "streamcluster_pressure": {
+      "page_oov_count": 0,
+      "page_oov_rate": 0.0,
+      "page_oov_unique": 0,
+      "page_total": 0,
+      "pc_oov_count": 0,
+      "pc_oov_rate": 0.0,
+      "pc_oov_unique": 0,
+      "pc_total": 0
+    },
+    "swaptions": {
+      "page_oov_count": 0,
+      "page_oov_rate": 0.0,
+      "page_oov_unique": 0,
+      "page_total": 129024,
+      "pc_oov_count": 0,
+      "pc_oov_rate": 0.0,
+      "pc_oov_unique": 0,
+      "pc_total": 107520
+    }
+  },
+  "validation_used_for_fit": false,
+  "vocabulary_sha256": "c7394f8253d0c897368177c3b1251bea5398453986eada77feac9ca52b293d9d"
+}
