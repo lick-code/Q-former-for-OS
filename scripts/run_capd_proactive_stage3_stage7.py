@@ -20,6 +20,10 @@ DEFAULT_CONFIG = os.path.join(
     PROJECT_ROOT, "configs", "finals",
     "capd_proactive_stage3_stage7_calibration.json")
 DEFAULT_RUN_ID = "stage3-stage7-calibration-r2"
+DEFAULT_SELECTION_REPAIR_CONFIG = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_stage3_stage7_selection_repair.json")
+DEFAULT_SELECTION_REPAIR_RUN_ID = "stage3-stage7-selection-repair-r3"
 
 
 def _common(value: argparse.ArgumentParser) -> None:
@@ -30,6 +34,15 @@ def _common(value: argparse.ArgumentParser) -> None:
   value.add_argument(
       "--resume", action="store_true",
       help="Reuse only exact-matching phase artifacts and checkpoints")
+
+
+def _selection_repair_common(value: argparse.ArgumentParser) -> None:
+  value.add_argument(
+      "--selection-config", default=DEFAULT_SELECTION_REPAIR_CONFIG)
+  value.add_argument("--run-id", default=DEFAULT_SELECTION_REPAIR_RUN_ID)
+  value.add_argument("--project-root", default=PROJECT_ROOT)
+  value.add_argument("--output-root")
+  value.add_argument("--source-run-directory", required=True)
 
 
 def parser() -> argparse.ArgumentParser:
@@ -47,11 +60,44 @@ def parser() -> argparse.ArgumentParser:
   freeze.add_argument(
       "--confirm-stage3-stage7-freeze", action="store_true",
       help="Confirm human review of the exact candidate file")
+  reselect = commands.add_parser("reselect")
+  _selection_repair_common(reselect)
+  verify_reselection = commands.add_parser("verify-reselection")
+  _selection_repair_common(verify_reselection)
+  freeze_reselection = commands.add_parser("freeze-reselection")
+  _selection_repair_common(freeze_reselection)
+  freeze_reselection.add_argument("--candidate", required=True)
+  freeze_reselection.add_argument(
+      "--confirm-stage3-stage7-freeze", action="store_true",
+      help="Confirm human review of the exact derived candidate file")
   return value
 
 
 def main(argv=None) -> int:
   args = parser().parse_args(argv)
+  if args.command in ("reselect", "verify-reselection", "freeze-reselection"):
+    repair_common = {
+        "selection_config_path": args.selection_config,
+        "run_id": args.run_id,
+        "project_root": args.project_root,
+        "source_run_directory": args.source_run_directory,
+        "output_root": args.output_root,
+    }
+    if args.command == "reselect":
+      result = proactive_stage3_stage7.run_reselect(**repair_common)
+    elif args.command == "verify-reselection":
+      result = proactive_stage3_stage7.run_verify_reselection(**repair_common)
+    else:
+      result = proactive_stage3_stage7.run_freeze_reselection(
+          candidate_path=args.candidate,
+          confirmed=args.confirm_stage3_stage7_freeze, **repair_common)
+    print(result.get("output_directory", ""))
+    print(result["status"])
+    if args.command == "freeze-reselection":
+      print("STAGE3_STAGE7_DERIVED_SELECTION_FORMAL_FREEZE_COMPLETE")
+    else:
+      print("STAGE3_STAGE7_DERIVED_SELECTION_FREEZE_NOT_EXECUTED")
+    return 0
   common = {
       "config_path": args.config,
       "run_id": args.run_id,

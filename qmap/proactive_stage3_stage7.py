@@ -36,6 +36,10 @@ SCHEMA_NAME = "capd_proactive_stage3_stage7_calibration"
 SCHEMA_VERSION = "capd_proactive_stage3_stage7_v1_0"
 CONTRACT_VERSION = "CAPD-PROACTIVE-STAGE3-STAGE7-1.0"
 RESULT_SCHEMA = "capd_proactive_stage3_stage7_result_v1_0"
+SELECTION_REPAIR_SCHEMA = (
+    "capd_proactive_stage3_stage7_selection_repair_v1_0")
+SELECTION_REPAIR_RESULT_SCHEMA = (
+    "capd_proactive_stage3_stage7_selection_repair_result_v1_0")
 WORKLOADS = (
     "canneal", "streamcluster_pressure", "dedup_pressure",
     "blackscholes", "swaptions", "fluidanimate")
@@ -239,6 +243,75 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
            execution.get("profile_checkpoint_granularity") == "window" and
            execution.get("search_in_memory_cache") is True,
            "Bounded profile/checkpoint execution contract changed.")
+  return value
+
+
+def validate_selection_repair_config(
+    value: Mapping[str, Any]
+) -> Mapping[str, Any]:
+  """Validates the disclosed, selection-only repair applied to frozen R2 data."""
+  _require(isinstance(value, Mapping), "Selection repair config must be an object.")
+  _require(value.get("schema_name") ==
+           "capd_proactive_stage3_stage7_selection_repair" and
+           value.get("schema_version") == SELECTION_REPAIR_SCHEMA and
+           value.get("contract_version") ==
+           "CAPD-PROACTIVE-STAGE3-STAGE7-SELECTION-REPAIR-1.0",
+           "Unexpected Stage-3 selection repair schema.")
+  source = value.get("source", {})
+  _require(source.get("run_id") == "stage3-stage7-calibration-r2" and
+           source.get("formal_freeze") is False and
+           source.get("required_verification_status") ==
+           "STAGE3_STAGE7_GATES_BLOCKED",
+           "Selection repair must use the disclosed, unfrozen R2 source.")
+  for digest in [source.get("run_identity_sha256")] + list(
+      source.get("artifacts", {}).values()):
+    _require(isinstance(digest, str) and len(digest) == 64,
+             "Selection repair source SHA-256 is invalid.")
+  scope = value.get("experiment_scope", {})
+  _require(scope.get("primary_comparison") ==
+           "active_demotion_baselines_under_the_same_controller" and
+           scope.get("reactive_lru_role") ==
+           "pressure_qualification_and_descriptive_reference_only" and
+           scope.get("synchronous_replay_role") ==
+           "mechanism_calibration_ranking_and_risk_audit_only" and
+           scope.get("asynchronous_replay_required") is True and
+           scope.get("foreground_background_parallelism_required") is True and
+           scope.get("synchronous_efficiency_claims_allowed") is False and
+           scope.get(
+               "asynchronous_efficiency_claims_allowed_before_runtime_evidence")
+           is False,
+           "Active-baseline and asynchronous-evidence scope changed.")
+  gate = value.get("validation_gate", {})
+  _require(gate.get("low_pressure", {}).get("hard_fail_reasons") ==
+           ["meaningless_proactive_demotions"] and
+           gate.get("pressure", {}).get("hard_fail_reasons") == [] and
+           gate.get("sync_weighted_cost_delta_vs_reactive_is_hard_gate")
+           is False and
+           gate.get("sync_dram_hit_delta_vs_reactive_is_hard_gate") is False and
+           gate.get("sync_early_reuse_ratio_is_hard_gate") is False and
+           gate.get("all_sync_reactive_comparisons_are_reported") is True,
+           "Role-aware Validation gate changed.")
+  selection = value.get("selection", {})
+  _require(selection.get("require_any_train_pressure_coverage") is True and
+           selection.get("require_low_pressure_mechanism_safety") is True and
+           selection.get("require_positive_active_oracle_headroom") is True and
+           selection.get("human_review_required") is True and
+           selection.get("auto_freeze") is False,
+           "Selection repair safety/freeze contract changed.")
+  disclosure = value.get("disclosure", {})
+  _require(disclosure.get(
+      "selection_rule_revised_after_r2_validation_review") is True and
+      disclosure.get("source_profile_or_search_rerun") is False and
+      disclosure.get("derived_selection_only") is True and
+      disclosure.get("confirmatory_status") ==
+      "engineering_calibration_not_independent_validation",
+      "Selection repair disclosure is incomplete.")
+  for field in (
+      "test_payload_opened", "test_used_for_selection",
+      "stage8_results_used", "pressure_test_generated",
+      "model_training_executed"):
+    _require(disclosure.get(field) is False,
+             "{} must remain false.".format(field))
   return value
 
 
@@ -689,6 +762,114 @@ def validation_safety_gate(
   }
 
 
+def role_aware_validation_gate(
+    source_row: Mapping[str, Any], repair_config: Mapping[str, Any]
+) -> Dict[str, Any]:
+  """Reinterprets R2 Validation evidence for an active-baseline experiment.
+
+  Low-pressure needless actuation remains a hard failure.  Synchronous cost,
+  DRAM-hit, and early-reuse comparisons against Reactive-LRU are preserved as
+  diagnostics, but do not decide whether an active controller reaches Pareto.
+  """
+  validate_selection_repair_config(repair_config)
+  role = source_row.get("evaluation_role")
+  _require(role in ("validation_pressure", "validation_low_pressure"),
+           "Unexpected Validation evaluation role.")
+  diagnostics = [str(value) for value in source_row.get("reasons", [])
+                 if value != "validation_safety_passed"]
+  hard_failures = []
+  if (role == "validation_low_pressure" and
+      int(source_row.get("proactive_demotions", 0)) >
+      int(source_row.get("pointless_demotion_limit", 0))):
+    hard_failures.append("meaningless_proactive_demotions")
+  return {
+      "candidate_id": source_row.get("candidate_id"),
+      "workload": source_row.get("workload"),
+      "evaluation_role": role,
+      "start_record": source_row.get("start_record"),
+      "hard_gate_passed": not hard_failures,
+      "hard_failures": hard_failures,
+      "diagnostic_flags": diagnostics,
+      "sync_weighted_cost_delta_vs_reactive":
+          float(source_row.get("weighted_cost_delta", 0.0)),
+      "sync_dram_hit_delta_vs_reactive":
+          int(source_row.get("dram_hit_delta", 0)),
+      "sync_early_reuse_ratio": source_row.get("early_reuse_ratio"),
+      "proactive_demotions": int(source_row.get("proactive_demotions", 0)),
+      "pointless_demotion_limit":
+          int(source_row.get("pointless_demotion_limit", 0)),
+      "reactive_comparison_role": "descriptive_not_hard_gate",
+  }
+
+
+def active_oracle_headroom_gate(
+    rows: Sequence[Mapping[str, Any]]
+) -> Dict[str, Any]:
+  """Requires ranking headroom between two active-demotion baselines."""
+  values = [max(0.0, float(row.get("active_oracle_headroom", 0.0)))
+            for row in rows]
+  total = sum(values)
+  positive = sum(1 for value in values if value > 0)
+  passed = bool(values) and positive > 0 and total > 0
+  return {
+      "passed": passed,
+      "comparison": "proactive_lru_minus_proactive_oracle",
+      "evaluated_window_count": len(values),
+      "positive_headroom_window_count": positive,
+      "total_active_oracle_headroom": total,
+      "reason": (
+          "nonzero_active_ranking_optimization_space_confirmed" if passed else
+          "no_active_ranking_optimization_space"),
+  }
+
+
+def _active_dominates(
+    left: Mapping[str, Any], right: Mapping[str, Any]
+) -> bool:
+  minimize = ("early_reuse_ratio", "proactive_demotion_count")
+  maximize = (
+      "empty_frame_exhaustion_reduction", "minimum_free_frames",
+      "active_oracle_headroom", "pressure_coverage")
+  weak = all(float(left[field]) <= float(right[field]) for field in minimize)
+  weak = weak and all(
+      float(left[field]) >= float(right[field]) for field in maximize)
+  strict = any(float(left[field]) < float(right[field]) for field in minimize)
+  strict = strict or any(
+      float(left[field]) > float(right[field]) for field in maximize)
+  return weak and strict
+
+
+def active_baseline_pareto_frontier(
+    rows: Sequence[Mapping[str, Any]]
+) -> List[Dict[str, Any]]:
+  eligible = [dict(row) for row in rows
+              if row.get("eligible_for_active_pareto") is True]
+  result = []
+  for row in eligible:
+    if not any(_active_dominates(other, row) for other in eligible
+               if other["candidate_id"] != row["candidate_id"]):
+      result.append(row)
+  return sorted(result, key=lambda item: item["candidate_id"])
+
+
+def select_active_baseline_frontier(
+    rows: Sequence[Mapping[str, Any]], repair_config: Mapping[str, Any]
+) -> Dict[str, Any]:
+  validate_selection_repair_config(repair_config)
+  _require(rows, "No active-baseline Pareto candidate passed Stage-3 gates.")
+  ordered = sorted(rows, key=lambda row: (
+      -float(row["pressure_coverage"]),
+      -float(row["empty_frame_exhaustion_reduction"]),
+      -float(row["minimum_free_frames"]),
+      _nullable_high(row.get("early_reuse_ratio")),
+      float(row["proactive_demotion_count"]),
+      -float(row["active_oracle_headroom"]),
+      str(row["candidate_id"])))
+  selected = copy.deepcopy(ordered[0])
+  selected["tie_break_rank"] = 1
+  return selected
+
+
 def _dominates(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
   minimize = (
       "weighted_cost_delta", "early_reuse_ratio",
@@ -806,6 +987,75 @@ def build_pressure_contract_candidate(
       "test_used_for_stage3_selection": False,
       "pressure_test_generated": False,
   }
+
+
+def build_selected_freeze_payloads(
+    selected: Mapping[str, Any], controller: Mapping[str, Any],
+    standard_matrix: Sequence[Mapping[str, Any]], config: Mapping[str, Any],
+    run_id: str, disclosure: Optional[Mapping[str, Any]] = None
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+  """Builds the common human-review candidate and Pressure contract."""
+  actual = controller["actual_by_workload"]
+  pressure_cells = []
+  watermarks = []
+  excluded_pressure_cells = []
+  for workload in WORKLOADS:
+    cell = actual[workload]
+    if not cell["all_train_blocks_covered"]:
+      excluded_pressure_cells.append({
+          "workload": workload,
+          "reason": "insufficient_replacement_decisions_across_train_blocks",
+          "coverage_id": cell["coverage_id"]})
+      continue
+    pressure_cells.append({
+        "workload": workload,
+        "window_records": controller["window_records"],
+        "W_ref_quantile": controller["W_ref_quantile"],
+        "W_ref": cell["W_ref"],
+        "requested_ratio": controller["requested_ratio"],
+        "D_pressure_raw": cell["D_pressure_raw"],
+        "D_pressure": cell["D_pressure"],
+        "minimum_capacity_applied": cell["minimum_capacity_applied"]})
+    watermarks.append({
+        "workload": workload, "D": cell["D_pressure"],
+        "alpha": controller["alpha"], "beta": controller["beta"],
+        "F_low": cell["F_low"], "F_target": cell["F_target"],
+        "F_target_over_D": cell["F_target_over_D"]})
+  freeze_candidate = {
+      "schema_version": RESULT_SCHEMA,
+      "run_id": run_id,
+      "status": "candidate_ready_for_human_review",
+      "requires_human_review": True,
+      "formal_freeze": False,
+      "selected_candidate_id": selected["candidate_id"],
+      "stage4_entry_allowed": True,
+      "selected_window_records": controller["window_records"],
+      "W_ref_quantile": controller["W_ref_quantile"],
+      "requested_pressure_ratio": controller["requested_ratio"],
+      "alpha": controller["alpha"], "beta": controller["beta"],
+      "b_max": controller["b_max"], "candidate_size_K": 8,
+      "standard_capacity_matrix": list(standard_matrix),
+      "pressure_capacity_matrix": pressure_cells,
+      "excluded_pressure_capacity_cells": excluded_pressure_cells,
+      "watermarks": watermarks,
+      "selection_metrics": dict(selected),
+      "validation_safety_passed": True,
+      "all_command_auto_freeze": False,
+  }
+  if disclosure is not None:
+    freeze_candidate["selection_repair_disclosure"] = copy.deepcopy(
+        dict(disclosure))
+  pressure_contract = build_pressure_contract_candidate({
+      "selected_window_records": controller["window_records"],
+      "W_ref_quantile": controller["W_ref_quantile"],
+      "standard_capacity_matrix": list(standard_matrix),
+      "pressure_capacity_matrix": pressure_cells,
+      "watermarks": watermarks,
+      "b_max": controller["b_max"]}, config)
+  if disclosure is not None:
+    pressure_contract["selection_repair_disclosure"] = copy.deepcopy(
+        dict(disclosure))
+  return freeze_candidate, pressure_contract
 
 
 class _TraceView(Sequence[Mapping[str, Any]]):
@@ -2373,61 +2623,9 @@ def run_select(
       }
     else:
       controller = by_controller[selected["candidate_id"]]
-      actual = controller["actual_by_workload"]
-      pressure_cells = []
-      watermarks = []
-      excluded_pressure_cells = []
-      for workload in WORKLOADS:
-        cell = actual[workload]
-        if not cell["all_train_blocks_covered"]:
-          excluded_pressure_cells.append({
-              "workload": workload,
-              "reason": "insufficient_replacement_decisions_across_train_blocks",
-              "coverage_id": cell["coverage_id"]})
-          continue
-        pressure_cells.append({
-            "workload": workload,
-            "window_records": controller["window_records"],
-            "W_ref_quantile": controller["W_ref_quantile"],
-            "W_ref": cell["W_ref"],
-            "requested_ratio": controller["requested_ratio"],
-            "D_pressure_raw": cell["D_pressure_raw"],
-            "D_pressure": cell["D_pressure"],
-            "minimum_capacity_applied": cell["minimum_capacity_applied"]})
-        watermarks.append({
-            "workload": workload, "D": cell["D_pressure"],
-            "alpha": controller["alpha"], "beta": controller["beta"],
-            "F_low": cell["F_low"], "F_target": cell["F_target"],
-            "F_target_over_D": cell["F_target_over_D"]})
-      freeze_candidate = {
-          "schema_version": RESULT_SCHEMA,
-          "run_id": run_id,
-          "status": "candidate_ready_for_human_review",
-          "requires_human_review": True,
-          "formal_freeze": False,
-          "selected_candidate_id": selected["candidate_id"],
-          "stage4_entry_allowed": True,
-          "selected_window_records": controller["window_records"],
-          "W_ref_quantile": controller["W_ref_quantile"],
-          "requested_pressure_ratio": controller["requested_ratio"],
-          "alpha": controller["alpha"], "beta": controller["beta"],
-          "b_max": controller["b_max"], "candidate_size_K": 8,
-          "standard_capacity_matrix": standard_matrix,
-          "pressure_capacity_matrix": pressure_cells,
-          "excluded_pressure_capacity_cells": excluded_pressure_cells,
-          "watermarks": watermarks,
-          "selection_metrics": selected,
-          "oracle_headroom_gate": global_oracle_gate,
-          "validation_safety_passed": True,
-          "all_command_auto_freeze": False,
-      }
-      pressure_contract = build_pressure_contract_candidate({
-          "selected_window_records": controller["window_records"],
-          "W_ref_quantile": controller["W_ref_quantile"],
-          "standard_capacity_matrix": standard_matrix,
-          "pressure_capacity_matrix": pressure_cells,
-          "watermarks": watermarks,
-          "b_max": controller["b_max"]}, config)
+      freeze_candidate, pressure_contract = build_selected_freeze_payloads(
+          selected, controller, standard_matrix, config, run_id)
+      freeze_candidate["oracle_headroom_gate"] = global_oracle_gate
     rationale = {
         "schema_version": RESULT_SCHEMA,
         "run_id": run_id,
@@ -2593,6 +2791,519 @@ def run_freeze(
       "output_directory": directory,
       "final_freeze": final_path,
       "pressure_generation_contract": contract_path,
+  }
+
+
+def _selection_repair_identity(
+    project_root: str, repair_config_path: str, run_id: str,
+    repair_config: Mapping[str, Any]
+) -> Dict[str, Any]:
+  code_paths = _code_paths(project_root)
+  return {
+      "schema_version":
+          "capd_proactive_stage3_stage7_selection_repair_identity_v1_0",
+      "run_id": run_id,
+      "selection_config_sha256": fingerprint_file(repair_config_path),
+      "source_run_id": repair_config["source"]["run_id"],
+      "source_run_identity_sha256":
+          repair_config["source"]["run_identity_sha256"],
+      "source_artifact_sha256": copy.deepcopy(
+          repair_config["source"]["artifacts"]),
+      "code_sha256": sorted(fingerprint_file(path) for path in code_paths),
+  }
+
+
+def _verify_selection_repair_source(
+    source_run_directory: str, repair_config: Mapping[str, Any]
+) -> Dict[str, Any]:
+  validate_selection_repair_config(repair_config)
+  source_directory = os.path.abspath(source_run_directory)
+  reject_forbidden_input({"source_run_directory": source_directory})
+  state_path = os.path.join(source_directory, "run_state.json")
+  _require(os.path.isfile(state_path), "Selection repair source has no run_state.json.")
+  state = load_json(state_path)
+  source = repair_config["source"]
+  _require(state.get("run_id") == source["run_id"] and
+           state.get("run_identity_sha256") ==
+           source["run_identity_sha256"] and
+           state.get("formal_freeze") is False,
+           "Selection repair source run identity/freeze state changed.")
+  completed = set(state.get("completed_phases", []))
+  _require(set(source["required_completed_phases"]).issubset(completed),
+           "Selection repair source did not complete the required phases.")
+  recorded = {}
+  for phase_rows in state.get("phase_artifacts", {}).values():
+    for artifact in phase_rows:
+      recorded[artifact["path"]] = artifact["sha256"]
+  verified = []
+  for name, expected in sorted(source["artifacts"].items()):
+    _require(recorded.get(name) == expected,
+             "Source run_state SHA changed for {}.".format(name))
+    path = os.path.join(source_directory, name)
+    _verify_sha(path, expected, "selection repair source {}".format(name))
+    verified.append({"path": name, "sha256": expected,
+                     "bytes": os.path.getsize(path)})
+  manifest = load_json(os.path.join(source_directory, "input_manifest.json"))
+  validate_input_manifest(manifest)
+  source_config = load_json(os.path.join(
+      source_directory, "resolved_config.json"))
+  validate_config(source_config)
+  provenance = load_json(os.path.join(source_directory, "provenance.json"))
+  assert_no_forbidden_result_dependency(provenance)
+  verification = load_json(os.path.join(source_directory, "verification.json"))
+  assert_no_forbidden_result_dependency(verification)
+  _require(verification.get("status") ==
+           source["required_verification_status"],
+           "Selection repair source verification status changed.")
+  for field, expected in verification_boundary().items():
+    _require(verification.get(field) is expected,
+             "Source verification boundary changed: {}.".format(field))
+  return {
+      "source_directory": source_directory,
+      "source_state": state,
+      "source_config": source_config,
+      "source_manifest": manifest,
+      "verified_artifacts": verified,
+  }
+
+
+def _load_or_create_selection_repair_state(
+    directory: str, identity: Mapping[str, Any], run_id: str
+) -> Dict[str, Any]:
+  path = _state_path(directory)
+  if os.path.isfile(path):
+    state = load_json(path)
+    _require(state.get("selection_identity") == identity and
+             state.get("selection_identity_sha256") ==
+             fingerprint_value(identity),
+             "Derived selection resume refused: identity changed; use a new run ID.")
+    return state
+  _require(not os.path.exists(directory) or not os.listdir(directory),
+           "Derived selection directory exists without a valid run_state.json.")
+  os.makedirs(directory, exist_ok=True)
+  state = {
+      "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+      "run_id": run_id,
+      "status": "created",
+      "completed_phases": [],
+      "formal_freeze": False,
+      "selection_identity": copy.deepcopy(dict(identity)),
+      "selection_identity_sha256": fingerprint_value(identity),
+      "created_at": _utc_now(),
+      "updated_at": _utc_now(),
+  }
+  _write_state(directory, state)
+  return state
+
+
+def _active_selection_from_source(
+    source_directory: str, source_config: Mapping[str, Any],
+    repair_config: Mapping[str, Any], run_id: str
+) -> Dict[str, Any]:
+  controllers = load_json(os.path.join(
+      source_directory, "controller_candidates.json"))["candidates"]
+  policy_rows = load_json(os.path.join(
+      source_directory, "policy_results.json"))["rows"]
+  source_safety_rows = load_json(os.path.join(
+      source_directory, "validation_safety.json"))["rows"]
+  standard_matrix = load_json(os.path.join(
+      source_directory, "capacity_standard_matrix.json"))["cells"]
+  by_controller = {row["candidate_id"]: row for row in controllers}
+  policies = collections.defaultdict(dict)
+  for row in policy_rows:
+    identity = (
+        row["candidate_id"], row["workload"], row["evaluation_role"],
+        row["split_role"], row["block_index"], row["start_record"])
+    policies[identity][row["policy"]] = row
+  comparisons = collections.defaultdict(list)
+  active_headroom_rows = []
+  for identity, policy_map in policies.items():
+    _require(set(policy_map) == set(REQUIRED_POLICIES),
+             "Every source window requires Reactive/Proactive/Oracle.")
+    reactive = policy_map["reactive_lru"]
+    proactive = policy_map["proactive_lru"]
+    oracle = policy_map["oracle"]
+    headroom = max(
+        0.0, float(proactive["default_weighted_cost"]) -
+        float(oracle["default_weighted_cost"]))
+    row = {
+        "candidate_id": identity[0], "workload": identity[1],
+        "evaluation_role": identity[2], "split_role": identity[3],
+        "block_index": identity[4], "start_record": identity[5],
+        "active_oracle_headroom": headroom,
+        "comparison": "proactive_lru_minus_proactive_oracle",
+    }
+    active_headroom_rows.append(row)
+    comparisons[identity[0]].append({
+        "sync_weighted_cost_delta_vs_reactive": (
+            float(proactive["default_weighted_cost"]) -
+            float(reactive["default_weighted_cost"])),
+        "empty_frame_exhaustion_reduction": (
+            float(reactive["free_frame_exhaustion_count"]) -
+            float(proactive["free_frame_exhaustion_count"])),
+        "minimum_free_frames": float(proactive["minimum_free_frames"]),
+        "minimum_free_frames_delta": (
+            float(proactive["minimum_free_frames"]) -
+            float(reactive["minimum_free_frames"])),
+        "early_reuse_ratio": proactive["early_reuse_rate"],
+        "proactive_demotion_count": int(proactive["proactive_demotions"]),
+        "active_oracle_headroom": headroom,
+    })
+  revised_safety_rows = [
+      role_aware_validation_gate(row, repair_config)
+      for row in source_safety_rows]
+  safety_by_candidate = collections.defaultdict(list)
+  for row in revised_safety_rows:
+    safety_by_candidate[row["candidate_id"]].append(row)
+  headroom_by_candidate = collections.defaultdict(list)
+  for row in active_headroom_rows:
+    headroom_by_candidate[row["candidate_id"]].append(row)
+  aggregate_rows = []
+  gate_rows = []
+  for candidate_id in sorted(by_controller):
+    controller = by_controller[candidate_id]
+    values = comparisons.get(candidate_id, [])
+    safety_values = safety_by_candidate[candidate_id]
+    low_pressure_safe = bool(safety_values) and all(
+        row["hard_gate_passed"] for row in safety_values)
+    oracle_gate = active_oracle_headroom_gate(
+        headroom_by_candidate[candidate_id])
+    pressure_coverage = float(controller["pressure_coverage"])
+    pressure_passed = (
+        controller["train_pressure_workload_count"] > 0 and
+        pressure_coverage > 0)
+    exhaustion_reduction = _mean([
+        row["empty_frame_exhaustion_reduction"] for row in values])
+    minimum_free = _mean([row["minimum_free_frames"] for row in values])
+    minimum_free_delta = _mean([
+        row["minimum_free_frames_delta"] for row in values])
+    early_values = [float(row["early_reuse_ratio"]) for row in values
+                    if row["early_reuse_ratio"] is not None]
+    active_effect = bool(values) and (
+        exhaustion_reduction > 0 or minimum_free_delta > 0)
+    eligible = (
+        pressure_passed and low_pressure_safe and oracle_gate["passed"] and
+        active_effect)
+    aggregate = {
+        "candidate_id": candidate_id,
+        "pressure_coverage": pressure_coverage,
+        "empty_frame_exhaustion_reduction": exhaustion_reduction,
+        "minimum_free_frames": minimum_free,
+        "minimum_free_frames_delta": minimum_free_delta,
+        "early_reuse_ratio": _mean(early_values),
+        "proactive_demotion_count": sum(
+            row["proactive_demotion_count"] for row in values),
+        "active_oracle_headroom": _mean([
+            row["active_oracle_headroom"] for row in values]),
+        "total_active_oracle_headroom": sum(
+            row["active_oracle_headroom"] for row in values),
+        "sync_weighted_cost_delta_vs_reactive": _mean([
+            row["sync_weighted_cost_delta_vs_reactive"] for row in values]),
+        "sync_reactive_comparison_role": "descriptive_not_selection_gate",
+        "low_pressure_mechanism_safety_passed": low_pressure_safe,
+        "active_oracle_headroom_gate_passed": oracle_gate["passed"],
+        "pressure_coverage_gate_passed": pressure_passed,
+        "active_mechanism_effect_passed": active_effect,
+        "eligible_for_active_pareto": eligible,
+        "evaluated_window_count": len(values),
+    }
+    aggregate_rows.append(aggregate)
+    gate_rows.append({
+        "candidate_id": candidate_id,
+        "pressure_gate": pressure_passed,
+        "active_oracle_gate": oracle_gate,
+        "active_mechanism_gate": active_effect,
+        "low_pressure_mechanism_safety_gate": low_pressure_safe,
+        "eligible_for_active_pareto": eligible,
+    })
+  frontier = active_baseline_pareto_frontier(aggregate_rows)
+  selected = select_active_baseline_frontier(frontier, repair_config)
+  controller = by_controller[selected["candidate_id"]]
+  disclosure = copy.deepcopy(repair_config["disclosure"])
+  disclosure.update({
+      "source_run_id": repair_config["source"]["run_id"],
+      "source_run_identity_sha256":
+          repair_config["source"]["run_identity_sha256"],
+      "reactive_lru_role":
+          repair_config["experiment_scope"]["reactive_lru_role"],
+      "synchronous_replay_role":
+          repair_config["experiment_scope"]["synchronous_replay_role"],
+      "asynchronous_replay_required": True,
+  })
+  freeze_candidate, pressure_contract = build_selected_freeze_payloads(
+      selected, controller, standard_matrix, source_config, run_id,
+      disclosure=disclosure)
+  freeze_candidate.update({
+      "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+      "active_oracle_headroom_gate": active_oracle_headroom_gate(
+          active_headroom_rows),
+      "sync_efficiency_claim_allowed": False,
+      "async_efficiency_claim_requires_runtime_evidence": True,
+  })
+  pressure_contract.update({
+      "schema_version":
+          "capd_proactive_stage3_stage7_pressure_contract_candidate_v1_1",
+      "sync_efficiency_claim_allowed": False,
+      "async_efficiency_claim_requires_runtime_evidence": True,
+  })
+  rationale = {
+      "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+      "run_id": run_id,
+      "selection_layers": [
+          "reactive_only_pressure_qualification",
+          "active_oracle_ranking_space",
+          "active_mechanism_effect",
+          "low_pressure_mechanism_safety",
+          "active_baseline_pareto_frontier"],
+      "gate_results": gate_rows,
+      "pareto_candidate_count": len(frontier),
+      "selected_candidate_id": selected["candidate_id"],
+      "tie_break": repair_config["selection"]["tie_break"],
+      "reactive_lru_is_primary_comparison_baseline": False,
+      "synchronous_replay_is_efficiency_evidence": False,
+      "selection_repair_disclosure": disclosure,
+      "human_review_required": True,
+      "test_used": False,
+  }
+  return {
+      "revised_safety_rows": revised_safety_rows,
+      "active_headroom_rows": active_headroom_rows,
+      "aggregate_rows": aggregate_rows,
+      "frontier": frontier,
+      "rationale": rationale,
+      "freeze_candidate": freeze_candidate,
+      "pressure_contract": pressure_contract,
+  }
+
+
+def run_reselect(
+    selection_config_path: str, run_id: str, project_root: str,
+    source_run_directory: str, output_root: Optional[str] = None
+) -> Dict[str, Any]:
+  """Creates a disclosed selection-only R3 from immutable R2 search evidence."""
+  repair_config = validate_selection_repair_config(load_json(
+      selection_config_path))
+  source = _verify_selection_repair_source(
+      source_run_directory, repair_config)
+  directory = _run_directory(
+      project_root, repair_config, run_id, output_root)
+  identity = _selection_repair_identity(
+      project_root, selection_config_path, run_id, repair_config)
+  state = _load_or_create_selection_repair_state(directory, identity, run_id)
+  if "reselect" in state.get("completed_phases", []):
+    for artifact in state.get("phase_artifacts", {}).get("reselect", []):
+      _verify_sha(os.path.join(directory, artifact["path"]),
+                  artifact["sha256"], "resumed reselect artifact")
+    return {"status": "reselect_resumed", "output_directory": directory}
+  _write_json_atomic(os.path.join(directory, "resolved_selection_config.json"),
+                     repair_config)
+  _write_json_atomic(os.path.join(directory, "selection_run_identity.json"),
+                     identity)
+  source_reference = {
+      "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+      "source_run_id": repair_config["source"]["run_id"],
+      "source_run_identity_sha256":
+          repair_config["source"]["run_identity_sha256"],
+      "source_directory_recorded": os.path.abspath(source_run_directory),
+      "verified_source_artifacts": source["verified_artifacts"],
+      "source_trace_payload_opened": False,
+      "source_profile_or_search_rerun": False,
+      "derived_selection_only": True,
+  }
+  _write_json_atomic(os.path.join(directory, "source_run_reference.json"),
+                     source_reference)
+  result = _active_selection_from_source(
+      source["source_directory"], source["source_config"], repair_config,
+      run_id)
+  _write_json_atomic(os.path.join(
+      directory, "validation_safety_reinterpreted.json"), {
+          "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+          "rows": result["revised_safety_rows"],
+          "rule": repair_config["validation_gate"]})
+  _write_json_atomic(os.path.join(
+      directory, "active_oracle_headroom.json"), {
+          "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+          "rows": result["active_headroom_rows"],
+          "gate": active_oracle_headroom_gate(result["active_headroom_rows"]),
+          "comparison": "proactive_lru_minus_proactive_oracle"})
+  _write_json_atomic(os.path.join(directory, "pareto_frontier.json"), {
+      "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+      "frontier": result["frontier"],
+      "all_candidate_aggregates": result["aggregate_rows"],
+      "objectives": repair_config["selection"]["pareto_objectives"]})
+  _write_json_atomic(os.path.join(directory, "selection_rationale.json"),
+                     result["rationale"])
+  _write_json_atomic(os.path.join(directory, "final_freeze_candidate.json"),
+                     result["freeze_candidate"])
+  _write_json_atomic(os.path.join(
+      directory, "pressure_generation_contract_candidate.json"),
+      result["pressure_contract"])
+  artifact_names = (
+      "resolved_selection_config.json", "selection_run_identity.json",
+      "source_run_reference.json", "validation_safety_reinterpreted.json",
+      "active_oracle_headroom.json", "pareto_frontier.json",
+      "selection_rationale.json", "final_freeze_candidate.json",
+      "pressure_generation_contract_candidate.json")
+  state["phase_artifacts"] = {"reselect": _artifact_rows(
+      directory, artifact_names)}
+  state["completed_phases"] = ["reselect"]
+  state["status"] = "selection_candidate_ready_for_verification"
+  state["updated_at"] = _utc_now()
+  _write_state(directory, state)
+  return {
+      "status": "reselect_complete",
+      "output_directory": directory,
+      "selected_candidate_id":
+          result["freeze_candidate"]["selected_candidate_id"],
+      "pareto_candidate_count": len(result["frontier"]),
+  }
+
+
+def _selection_repair_context(
+    selection_config_path: str, run_id: str, project_root: str,
+    source_run_directory: str, output_root: Optional[str]
+) -> Tuple[Mapping[str, Any], Dict[str, Any], str]:
+  repair_config = validate_selection_repair_config(load_json(
+      selection_config_path))
+  _verify_selection_repair_source(source_run_directory, repair_config)
+  identity = _selection_repair_identity(
+      project_root, selection_config_path, run_id, repair_config)
+  directory = _run_directory(
+      project_root, repair_config, run_id, output_root)
+  state = _load_or_create_selection_repair_state(directory, identity, run_id)
+  return repair_config, state, directory
+
+
+def run_verify_reselection(
+    selection_config_path: str, run_id: str, project_root: str,
+    source_run_directory: str, output_root: Optional[str] = None
+) -> Dict[str, Any]:
+  repair_config, state, directory = _selection_repair_context(
+      selection_config_path, run_id, project_root, source_run_directory,
+      output_root)
+  _require("reselect" in state.get("completed_phases", []),
+           "verify-reselection requires completed reselect.")
+  if "verify_reselection" in state.get("completed_phases", []):
+    verification = load_json(os.path.join(directory, "verification.json"))
+    _verify_sha(os.path.join(directory, "verification.json"),
+                state["phase_artifacts"]["verify_reselection"][0]["sha256"],
+                "resumed reselection verification")
+    return verification
+  required = (
+      "resolved_selection_config.json", "selection_run_identity.json",
+      "source_run_reference.json", "validation_safety_reinterpreted.json",
+      "active_oracle_headroom.json", "pareto_frontier.json",
+      "selection_rationale.json", "final_freeze_candidate.json",
+      "pressure_generation_contract_candidate.json")
+  artifacts = _artifact_rows(directory, required)
+  for name in required:
+    assert_no_forbidden_result_dependency(load_json(os.path.join(
+        directory, name)))
+  candidate = load_json(os.path.join(directory, "final_freeze_candidate.json"))
+  _require(candidate.get("status") == "candidate_ready_for_human_review" and
+           candidate.get("stage4_entry_allowed") is True,
+           "Derived selection did not produce a reviewable candidate.")
+  _require(not os.path.exists(os.path.join(directory, "final_freeze.json")) and
+           not os.path.exists(os.path.join(
+               directory, "pressure_generation_contract.json")),
+           "Reselection/verification must not auto-freeze.")
+  verification = {
+      "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
+      "run_id": run_id,
+      "status": "STAGE3_STAGE7_DERIVED_SELECTION_CANDIDATE_VERIFIED",
+      "stage4_entry_allowed": True,
+      "formal_freeze_created": False,
+      "source_run_id": repair_config["source"]["run_id"],
+      "source_run_identity_sha256":
+          repair_config["source"]["run_identity_sha256"],
+      "source_profile_or_search_rerun": False,
+      "selection_rule_revised_after_r2_validation_review": True,
+      "confirmatory_status":
+          "engineering_calibration_not_independent_validation",
+      "reactive_lru_role":
+          repair_config["experiment_scope"]["reactive_lru_role"],
+      "synchronous_replay_role":
+          repair_config["experiment_scope"]["synchronous_replay_role"],
+      "synchronous_efficiency_claims_allowed": False,
+      "asynchronous_runtime_evaluation_required": True,
+      "foreground_background_parallelism_required": True,
+      "pressure_selection_policy": "fixed_reactive_lru_only",
+      "capd_or_oracle_used_for_pressure_selection": False,
+      "pressure_overhead_claims_allowed": False,
+      "stage4_executed": False,
+      "model_training_executed": False,
+      "artifact_count": len(artifacts),
+      "artifacts": artifacts,
+  }
+  verification.update(verification_boundary())
+  _write_json_atomic(os.path.join(directory, "verification.json"), verification)
+  state.setdefault("phase_artifacts", {})["verify_reselection"] = _artifact_rows(
+      directory, ("verification.json",))
+  state["completed_phases"] = ["reselect", "verify_reselection"]
+  state["status"] = "derived_freeze_candidate_ready"
+  state["updated_at"] = _utc_now()
+  _write_state(directory, state)
+  return dict(verification, output_directory=directory)
+
+
+def run_freeze_reselection(
+    selection_config_path: str, run_id: str, project_root: str,
+    source_run_directory: str, candidate_path: str, confirmed: bool,
+    output_root: Optional[str] = None
+) -> Dict[str, Any]:
+  require_freeze_confirmation(confirmed, candidate_path)
+  _, state, directory = _selection_repair_context(
+      selection_config_path, run_id, project_root, source_run_directory,
+      output_root)
+  _require("verify_reselection" in state.get("completed_phases", []),
+           "freeze-reselection requires completed verify-reselection.")
+  _require(state.get("formal_freeze") is False,
+           "This derived selection is already frozen.")
+  expected_path = os.path.realpath(os.path.join(
+      directory, "final_freeze_candidate.json"))
+  supplied_path = os.path.realpath(candidate_path)
+  _require(supplied_path == expected_path,
+           "freeze candidate must be this derived run's candidate file.")
+  candidate = load_json(supplied_path)
+  verification = load_json(os.path.join(directory, "verification.json"))
+  _require(candidate.get("status") == "candidate_ready_for_human_review" and
+           candidate.get("stage4_entry_allowed") is True and
+           verification.get("status") ==
+           "STAGE3_STAGE7_DERIVED_SELECTION_CANDIDATE_VERIFIED",
+           "Derived candidate verification did not pass.")
+  contract_path = os.path.join(
+      directory, "pressure_generation_contract_candidate.json")
+  contract = load_json(contract_path)
+  frozen_at = _utc_now()
+  frozen = copy.deepcopy(candidate)
+  frozen.update({
+      "status": "STAGE3_STAGE7_DERIVED_SELECTION_FORMALLY_FROZEN",
+      "formal_freeze": True, "human_confirmation": True,
+      "frozen_at": frozen_at,
+      "source_candidate_sha256": fingerprint_file(supplied_path)})
+  formal_contract = copy.deepcopy(contract)
+  formal_contract.update({
+      "status": "STAGE3_STAGE7_PRESSURE_CONTRACT_FORMALLY_FROZEN",
+      "formal_freeze": True, "frozen_at": frozen_at,
+      "source_candidate_sha256": fingerprint_file(contract_path)})
+  assert_no_forbidden_result_dependency(frozen)
+  assert_no_forbidden_result_dependency(formal_contract)
+  final_path = os.path.join(directory, "final_freeze.json")
+  final_contract_path = os.path.join(
+      directory, "pressure_generation_contract.json")
+  _write_json_atomic(final_path, frozen)
+  _write_json_atomic(final_contract_path, formal_contract)
+  state["formal_freeze"] = True
+  state["status"] = "derived_selection_formally_frozen"
+  state["freeze_artifacts"] = _artifact_rows(directory, (
+      "final_freeze.json", "pressure_generation_contract.json"))
+  state["updated_at"] = _utc_now()
+  _write_state(directory, state)
+  return {
+      "status": "STAGE3_STAGE7_DERIVED_SELECTION_FORMALLY_FROZEN",
+      "output_directory": directory,
+      "final_freeze": final_path,
+      "pressure_generation_contract": final_contract_path,
   }
 
 

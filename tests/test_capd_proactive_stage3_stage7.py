@@ -21,6 +21,9 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 CONFIG_PATH = os.path.join(
     PROJECT_ROOT, "configs", "finals",
     "capd_proactive_stage3_stage7_calibration.json")
+SELECTION_REPAIR_CONFIG_PATH = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_stage3_stage7_selection_repair.json")
 
 
 class Stage3Stage7ContractTest(unittest.TestCase):
@@ -28,6 +31,8 @@ class Stage3Stage7ContractTest(unittest.TestCase):
   def setUp(self):
     with open(CONFIG_PATH, "r", encoding="utf-8") as handle:
       self.config = json.load(handle)
+    with open(SELECTION_REPAIR_CONFIG_PATH, "r", encoding="utf-8") as handle:
+      self.selection_repair_config = json.load(handle)
 
   def test_config_freezes_six_workloads_and_stage3_only_search_space(self):
     stage3.validate_config(self.config)
@@ -263,6 +268,91 @@ class Stage3Stage7ContractTest(unittest.TestCase):
     self.assertIn("weighted_cost_regression", result["reasons"])
     self.assertIn("high_early_reuse", result["reasons"])
     self.assertIn("normal_dram_residency_degraded", result["reasons"])
+
+  def test_selection_repair_scope_is_active_baselines_and_async_runtime(self):
+    stage3.validate_selection_repair_config(self.selection_repair_config)
+    scope = self.selection_repair_config["experiment_scope"]
+    self.assertEqual(
+        "pressure_qualification_and_descriptive_reference_only",
+        scope["reactive_lru_role"])
+    self.assertTrue(scope["asynchronous_replay_required"])
+    self.assertTrue(scope["foreground_background_parallelism_required"])
+    self.assertFalse(scope["synchronous_efficiency_claims_allowed"])
+    self.assertTrue(
+        self.selection_repair_config["disclosure"][
+            "selection_rule_revised_after_r2_validation_review"])
+    self.assertFalse(
+        self.selection_repair_config["disclosure"][
+            "source_profile_or_search_rerun"])
+
+  def test_role_aware_gate_keeps_sync_reactive_deltas_descriptive(self):
+    pressure = stage3.role_aware_validation_gate({
+        "candidate_id": "c", "workload": "blackscholes",
+        "evaluation_role": "validation_pressure", "start_record": 0,
+        "weighted_cost_delta": 1000, "dram_hit_delta": -100,
+        "early_reuse_ratio": 0.9, "proactive_demotions": 100,
+        "pointless_demotion_limit": 1,
+        "reasons": ["weighted_cost_regression", "high_early_reuse",
+                    "normal_dram_residency_degraded"]},
+        self.selection_repair_config)
+    self.assertTrue(pressure["hard_gate_passed"])
+    self.assertEqual("descriptive_not_hard_gate",
+                     pressure["reactive_comparison_role"])
+    self.assertIn("weighted_cost_regression",
+                  pressure["diagnostic_flags"])
+    low = stage3.role_aware_validation_gate({
+        "candidate_id": "c", "workload": "dedup_pressure",
+        "evaluation_role": "validation_low_pressure", "start_record": 0,
+        "weighted_cost_delta": 1, "dram_hit_delta": 0,
+        "early_reuse_ratio": 0.0, "proactive_demotions": 2,
+        "pointless_demotion_limit": 1,
+        "reasons": ["meaningless_proactive_demotions"]},
+        self.selection_repair_config)
+    self.assertFalse(low["hard_gate_passed"])
+    self.assertEqual(["meaningless_proactive_demotions"],
+                     low["hard_failures"])
+
+  def test_active_oracle_gate_compares_two_active_policies(self):
+    blocked = stage3.active_oracle_headroom_gate([
+        {"active_oracle_headroom": 0.0}])
+    self.assertFalse(blocked["passed"])
+    passed = stage3.active_oracle_headroom_gate([
+        {"active_oracle_headroom": 0.0},
+        {"active_oracle_headroom": 3.0}])
+    self.assertTrue(passed["passed"])
+    self.assertEqual("proactive_lru_minus_proactive_oracle",
+                     passed["comparison"])
+
+  def test_active_pareto_does_not_gate_on_sync_reactive_cost_delta(self):
+    common = {
+        "empty_frame_exhaustion_reduction": 2.0,
+        "minimum_free_frames": 3.0,
+        "early_reuse_ratio": 0.1,
+        "proactive_demotion_count": 9,
+        "active_oracle_headroom": 4.0,
+        "pressure_coverage": 0.5,
+        "eligible_for_active_pareto": True}
+    first = dict(common, candidate_id="a",
+                 sync_weighted_cost_delta_vs_reactive=100000.0)
+    second = dict(common, candidate_id="b",
+                  sync_weighted_cost_delta_vs_reactive=1.0)
+    frontier = stage3.active_baseline_pareto_frontier([first, second])
+    self.assertEqual(["a", "b"],
+                     [row["candidate_id"] for row in frontier])
+    selected = stage3.select_active_baseline_frontier(
+        frontier, self.selection_repair_config)
+    self.assertEqual("a", selected["candidate_id"])
+
+  def test_selection_repair_never_auto_freezes_or_claims_sync_efficiency(self):
+    self.assertFalse(self.selection_repair_config["selection"]["auto_freeze"])
+    self.assertFalse(
+        self.selection_repair_config["experiment_scope"][
+            "synchronous_efficiency_claims_allowed"])
+    for field in (
+        "test_payload_opened", "test_used_for_selection",
+        "stage8_results_used", "pressure_test_generated",
+        "model_training_executed"):
+      self.assertFalse(self.selection_repair_config["disclosure"][field])
 
   def test_pareto_frontier_and_tie_break_are_deterministic(self):
     rows = [

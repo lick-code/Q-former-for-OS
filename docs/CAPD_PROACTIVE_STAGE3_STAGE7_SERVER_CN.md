@@ -361,3 +361,129 @@ outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_c
 outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/final_freeze.json
 outputs/capd_proactive_stage3/stage3-stage7-calibration-r2/pressure_generation_contract.json
 ```
+
+## 23. R2 门禁修复：只派生重选，不重跑 profile/search
+
+R2 已完整执行，但旧选择规则把同步 `Proactive-LRU - Reactive-LRU` 成本、
+DRAM hit 和 early reuse 同时作为所有 Validation 窗口的硬门禁。这不符合本项目的
+主要比较口径：Reactive-LRU 只负责压力资格和描述性参照，正式比较关注相同主动降级
+控制器下的不同 baseline；同步 Replay 只用于机制、排序和风险审计，效率结论必须由
+前台程序与后台计算/降级并行的异步实验给出。
+
+本修复不会修改或删除 R2，也不会打开 trace、重新 profile、重新 search、训练模型、
+读取 Test 或生成 Pressure Test。它校验 R2 run identity 和关键产物 SHA 后，在新目录中
+重新计算角色化 Validation 门禁、主动 LRU 对主动 Oracle 的 headroom 和 Pareto 选择。
+这是公开披露的 Validation 后工程校准，不冒充独立 Validation 或正式重跑。
+
+固定来源和新 run ID：
+
+```bash
+cd "$HOME/Q-former-for-OS"
+conda activate capd
+
+SOURCE_RUN="$PWD/outputs/capd_proactive_stage3/stage3-stage7-calibration-r2"
+REPAIR_RUN_ID="stage3-stage7-selection-repair-r3"
+REPAIR_CONFIG="configs/finals/capd_proactive_stage3_stage7_selection_repair.json"
+
+test -f "$SOURCE_RUN/run_state.json"
+test -f "$SOURCE_RUN/policy_results.json"
+test -f "$SOURCE_RUN/validation_safety.json"
+test ! -e "$PWD/outputs/capd_proactive_stage3/$REPAIR_RUN_ID"
+```
+
+先编译和运行新旧回归测试：
+
+```bash
+python3 -m py_compile \
+  qmap/proactive_stage3_stage7.py \
+  scripts/run_capd_proactive_stage3_stage7.py \
+  tests/test_capd_proactive_stage3_stage7.py
+
+python3 -m unittest tests.test_capd_proactive_stage3_stage7 -v
+
+python3 -m unittest \
+  tests.test_capd_proactive_stage3 \
+  tests.test_capd_proactive_replay \
+  tests.test_capd_proactive_stage4 -v
+```
+
+执行派生重选和验证；这两步只解析既有 JSON，正常不应再次运行数小时 Replay：
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py reselect \
+  --selection-config "$REPAIR_CONFIG" \
+  --source-run-directory "$SOURCE_RUN" \
+  --run-id "$REPAIR_RUN_ID" \
+  --project-root "$PWD"
+
+python3 scripts/run_capd_proactive_stage3_stage7.py verify-reselection \
+  --selection-config "$REPAIR_CONFIG" \
+  --source-run-directory "$SOURCE_RUN" \
+  --run-id "$REPAIR_RUN_ID" \
+  --project-root "$PWD"
+```
+
+成功标志应为：
+
+```text
+reselect_complete
+STAGE3_STAGE7_DERIVED_SELECTION_CANDIDATE_VERIFIED
+```
+
+查看门禁、主动 Oracle headroom、Pareto 和候选：
+
+```bash
+export REPAIR_RUN="$PWD/outputs/capd_proactive_stage3/$REPAIR_RUN_ID"
+
+python3 -c 'import json,os; p=os.path.join(os.environ["REPAIR_RUN"],"selection_rationale.json"); d=json.load(open(p)); print("pareto",d["pareto_candidate_count"]); print("selected",d["selected_candidate_id"]); print("reactive_primary",d["reactive_lru_is_primary_comparison_baseline"]); print("sync_efficiency_evidence",d["synchronous_replay_is_efficiency_evidence"])'
+
+python3 -c 'import json,os; p=os.path.join(os.environ["REPAIR_RUN"],"active_oracle_headroom.json"); print(json.dumps(json.load(open(p))["gate"],indent=2))'
+
+python3 -m json.tool "$REPAIR_RUN/final_freeze_candidate.json"
+python3 -m json.tool "$REPAIR_RUN/verification.json"
+
+test ! -e "$REPAIR_RUN/final_freeze.json"
+test ! -e "$REPAIR_RUN/pressure_generation_contract.json"
+```
+
+把以下 R3 派生产物先同步回本地人工复核：
+
+```text
+resolved_selection_config.json
+selection_run_identity.json
+source_run_reference.json
+validation_safety_reinterpreted.json
+active_oracle_headroom.json
+pareto_frontier.json
+selection_rationale.json
+final_freeze_candidate.json
+pressure_generation_contract_candidate.json
+verification.json
+run_state.json
+```
+
+人工确认后才能执行派生冻结：
+
+```bash
+python3 scripts/run_capd_proactive_stage3_stage7.py freeze-reselection \
+  --selection-config "$REPAIR_CONFIG" \
+  --source-run-directory "$SOURCE_RUN" \
+  --run-id "$REPAIR_RUN_ID" \
+  --project-root "$PWD" \
+  --candidate "$REPAIR_RUN/final_freeze_candidate.json" \
+  --confirm-stage3-stage7-freeze
+```
+
+freeze 后检查边界声明：
+
+```bash
+python3 -c 'import json,os; p=os.path.join(os.environ["REPAIR_RUN"],"verification.json"); d=json.load(open(p)); keys=["test_payload_opened","test_used_for_selection","stage8_results_used","pressure_test_generated","source_profile_or_search_rerun","synchronous_efficiency_claims_allowed","asynchronous_runtime_evaluation_required"]; print({k:d[k] for k in keys})'
+
+sha256sum \
+  "$REPAIR_RUN/final_freeze.json" \
+  "$REPAIR_RUN/pressure_generation_contract.json"
+```
+
+`synchronous_efficiency_claims_allowed=false` 必须保持不变。后续异步 Replay/运行时实验
+需要真正同时运行前台 workload 与后台候选计算、降级执行，分别报告前台延迟/吞吐、
+后台 CPU/GPU 开销、降级完成率、阻塞/回退和总系统成本；Stage 3 同步结果不能替代这些证据。
