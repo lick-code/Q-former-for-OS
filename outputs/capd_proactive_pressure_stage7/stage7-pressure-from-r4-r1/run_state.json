@@ -1,0 +1,28 @@
+{
+  "code_sha256": "b149ce6bc262d16f2f76c6adee8c8c86d137d36d4ef4650be4420af182824936",
+  "completed_phases": [
+    "preflight",
+    "scan",
+    "verify"
+  ],
+  "config_sha256": "eb5270f1c9853791267860a0ef9fc07df72467300e6d1e032064cf5e34d89a19",
+  "input_identity_sha256": "3e51b28bc7a37861ad9091d0dff26a0cb9bb656e4357a8b7bcb132b73b6d8c13",
+  "phase_artifacts": {
+    "preflight": {
+      "input_identity.json": "cb99b5e0914e7609b69bb5a56410fe4ecf660d9b4c68b75da26657fff60b2727",
+      "pressure_contract_gap_report.json": "10aaf226d6c606dc8a1ae7eaaf934737212192d54ab778cc990f7211e7bd6569",
+      "pressure_interval_exclusions.json": "81926b885f4fbcc878090994247d73bdab7ff5ee54c1b6f685e74c2c49e81532",
+      "resolved_contract.json": "4163faf18da191ca6716904b1925cf2e6be92030ecfcd2ce95f791c4f5d7f649"
+    },
+    "scan": {
+      "pressure_candidates.csv": "b03a0a7a274c4ee66767d564914947ce53fc071f5d7c6e63f6a4cc0c7bd30534",
+      "pressure_eligibility_summary.json": "fb43593aeccef897deea661b25e983082fc718b6ea49e41fc1a66c1db5798d41"
+    },
+    "verify": {
+      "verification.json": "1a746196ac45647a7df6293070ad65e19115cb8a01b2cd90afcdd80a667cb795"
+    }
+  },
+  "run_id": "stage7-pressure-from-r4-r1",
+  "schema_version": "capd_proactive_pressure_stage7_v1_0",
+  "status": "PRESSURE_DERIVATION_IMPLEMENTED_BUT_CONTRACT_BLOCKED"
+}
