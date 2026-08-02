@@ -19,6 +19,9 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(
     PROJECT_ROOT, "configs", "finals",
     "capd_proactive_stage4_stage7_search.json")
+R2_CONFIG_PATH = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_stage4_stage7_search_r2.json")
 
 
 def dump(path, value):
@@ -193,6 +196,69 @@ class Stage4Stage7SearchContractTest(unittest.TestCase):
     args = argparse.Namespace(confirm_stage4_freeze=False)
     with self.assertRaises(RuntimeError):
       runner.freeze(args)
+
+
+class Stage4Stage7ProtocolRepairContractTest(unittest.TestCase):
+
+  def setUp(self):
+    self.config = stage4.load_json(R2_CONFIG_PATH)
+
+  def test_repaired_search_draft_is_valid_and_has_new_identity(self):
+    stage4.validate_search_config(self.config)
+    self.assertEqual(self.config["run_id"], stage4.PROTOCOL_REPAIR_RUN_ID)
+    self.assertEqual(self.config["contract_id"],
+                     stage4.PROTOCOL_REPAIR_CONTRACT_ID)
+
+  def test_training_six_selection_four_and_structural_two_are_exact(self):
+    protocol = self.config["validation_protocol"]
+    self.assertEqual(tuple(protocol["training_workloads"]), stage4.WORKLOADS)
+    self.assertEqual(tuple(protocol["active_selection_workloads"]),
+                     stage4.ACTIVE_SELECTION_WORKLOADS)
+    self.assertEqual(tuple(protocol["checkpoint_validation_scope"]),
+                     stage4.ACTIVE_SELECTION_WORKLOADS)
+    self.assertEqual(tuple(protocol["structural_zero_decision_validation"]),
+                     stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)
+
+  def test_active_or_structural_identity_change_fails(self):
+    for field in ("active_selection_workloads",
+                  "structural_zero_decision_validation",
+                  "checkpoint_validation_scope"):
+      value = copy.deepcopy(self.config)
+      value["validation_protocol"][field] = list(reversed(
+          value["validation_protocol"][field]))
+      with self.assertRaises(stage4.Stage4Stage7ContractError, msg=field):
+        stage4.validate_search_config(value)
+
+  def test_repair_rejects_test_pressure_checkpoint_or_performance_use(self):
+    for field in ("test_used", "pressure_used", "checkpoint_used",
+                  "model_performance_used"):
+      value = copy.deepcopy(self.config)
+      value["protocol_repair"][field] = True
+      with self.assertRaises(stage4.Stage4Stage7ContractError, msg=field):
+        stage4.validate_search_config(value)
+
+  def test_r1_audit_sha_change_fails(self):
+    value = copy.deepcopy(self.config)
+    value["cache_reuse"]["source_artifact_sha256"][
+        "sample_structure_report_sha256"] = "0" * 64
+    with self.assertRaises(stage4.Stage4Stage7ContractError):
+      stage4.validate_search_config(value)
+
+  def test_structural_zero_row_is_na_and_never_selection_eligible(self):
+    row = stage4.structural_zero_validation_row(
+        "fluidanimate", 42, {"candidate_id": "synthetic"}, {
+            "workloads": fake_workloads_for_protocol_test()})
+    self.assertIsNone(row["weighted_cost_per_access"])
+    self.assertIsNone(row["ndcg_at_b_t"])
+    self.assertEqual(row["valid_decision_count"], 0)
+    self.assertFalse(row["model_invoked"])
+    self.assertFalse(row["selection_eligible"])
+
+
+def fake_workloads_for_protocol_test():
+  return {
+      workload: copy.deepcopy(stage4.EXPECTED_WORKLOAD_METHODS[workload])
+      for workload in stage4.WORKLOADS}
 
 
 class Stage4Stage7ManifestBoundaryTest(unittest.TestCase):

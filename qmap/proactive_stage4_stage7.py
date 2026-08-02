@@ -29,16 +29,25 @@ from qmap import proactive_stage4 as shared_stage4
 
 SCHEMA_VERSION = "capd_proactive_stage4_stage7_v1_0"
 CONTRACT_ID = "CAPD-PROACTIVE-STAGE4-STAGE7-1.0"
+PROTOCOL_REPAIR_CONTRACT_ID = "CAPD-PROACTIVE-STAGE4-STAGE7-1.1"
 MANIFEST_SCHEMA = "capd_proactive_stage4_stage7_input_manifest_v1_0"
 SAMPLE_SCHEMA = "capd_proactive_stage4_stage7_sample_v1_0"
 TRAINING_CONTRACT_SCHEMA = (
     "capd_proactive_stage4_stage7_training_contract_v1_0")
+PROTOCOL_REPAIR_TRAINING_CONTRACT_SCHEMA = (
+    "capd_proactive_stage4_stage7_training_contract_v1_1")
 SEARCH_SCHEMA = "capd_proactive_stage4_stage7_search_v1_0"
+PROTOCOL_REPAIR_SEARCH_SCHEMA = "capd_proactive_stage4_stage7_search_v1_1"
 RUN_ID = "stage4-stage7-unified-r1"
+PROTOCOL_REPAIR_RUN_ID = "stage4-stage7-unified-r2"
 OUTPUT_ROOT = "outputs/capd_proactive_stage4_stage7"
 WORKLOADS = (
     "canneal", "streamcluster_pressure", "dedup_pressure", "blackscholes",
     "swaptions", "fluidanimate")
+ACTIVE_SELECTION_WORKLOADS = (
+    "canneal", "dedup_pressure", "blackscholes", "swaptions")
+STRUCTURAL_ZERO_DECISION_VALIDATION = (
+    "streamcluster_pressure", "fluidanimate")
 SPLITS = ("train", "validation")
 FORMAL_SEEDS = (3136859, 42, 2026)
 EXPECTED_WORKLOAD_METHODS = {
@@ -57,6 +66,16 @@ R4_RUN_STATE_SHA256 = (
     "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63")
 R2_MANIFEST_SHA256 = (
     "108b2c34b5809e911b8b92864b111fc117caea8566997c101607928c590ed85f")
+R1_PREPARED_INPUT_MANIFEST_SHA256 = (
+    "444cd59dddaa84d73e6f55c3d0c8aa052360e16f4e0687c632be65a3b7b13c50")
+R1_SAMPLE_STRUCTURE_REPORT_SHA256 = (
+    "61bca2f6d8a3632c5c15fb0c836c151e69f0ace03e42de1f6ad0bad81dd65ab1")
+R1_SAMPLE_STRUCTURE_VERIFICATION_SHA256 = (
+    "7ac28d2ec58ffcd745742a45c6d501d31869d5855c0e9a122fa602e0bc02fabb")
+R1_SAMPLE_INDEX_SHA256 = (
+    "393d3909456f25708359b5b71b7d89f8bfe7f0190b0806e04cb85b6c318036f6")
+R1_VOCABULARY_INDEX_SHA256 = (
+    "0520206e5498208aaad4a3445d6a8e54f785057f9d14d74553c37cef75f8494d")
 FORBIDDEN_ROLES = ("test", "pressure", "pressure_test")
 FORBIDDEN_PATH_PATTERNS = (
     re.compile(r"(^|[/\\])test([/\\]|$)", re.IGNORECASE),
@@ -452,8 +471,21 @@ def _deep_merge(base: Mapping[str, Any], override: Mapping[str, Any]) -> Dict[st
 
 
 def validate_search_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
-  _require(value.get("schema_version") == SEARCH_SCHEMA, "Search schema mismatch")
-  _require(value.get("contract_id") == CONTRACT_ID, "Search contract mismatch")
+  identity = (value.get("schema_version"), value.get("contract_id"),
+              value.get("run_id"))
+  allowed = {
+      (SEARCH_SCHEMA, CONTRACT_ID, RUN_ID),
+      (PROTOCOL_REPAIR_SEARCH_SCHEMA, PROTOCOL_REPAIR_CONTRACT_ID,
+       PROTOCOL_REPAIR_RUN_ID),
+  }
+  _require(identity in allowed, "Search schema/contract/run identity mismatch")
+  authority = value.get("authority", {})
+  _require(authority.get("final_freeze_sha256") == R4_FINAL_SHA256 and
+           authority.get("pressure_generation_contract_sha256") ==
+           R4_PRESSURE_CONTRACT_SHA256 and
+           authority.get("run_state_sha256") == R4_RUN_STATE_SHA256 and
+           authority.get("r2_input_manifest_sha256") == R2_MANIFEST_SHA256,
+           "Search authority SHA registry mismatch")
   fixed = value.get("fixed", {})
   _require(fixed.get("candidate_size_K") == 8, "Fixed K must be 8")
   _require(fixed.get("b_max") == 2, "Fixed b_max must be 2")
@@ -476,13 +508,108 @@ def validate_search_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
   validate_candidate(reference, "reference")
   selection = value.get("selection", {})
   _require(selection.get("seed_rule") ==
-           "retain_all_formal_seeds_never_select_or_discard_a_seed",
-           "Seed selection is forbidden")
+            "retain_all_formal_seeds_never_select_or_discard_a_seed",
+            "Seed selection is forbidden")
+  if identity[0] == PROTOCOL_REPAIR_SEARCH_SCHEMA:
+    protocol = value.get("validation_protocol", {})
+    _require(tuple(protocol.get("training_workloads", [])) == WORKLOADS,
+             "Protocol repair must retain all six Train workloads")
+    _require(tuple(protocol.get("active_selection_workloads", [])) ==
+             ACTIVE_SELECTION_WORKLOADS,
+             "Active Validation selection workload identity mismatch")
+    _require(tuple(protocol.get(
+        "structural_zero_decision_validation", [])) ==
+        STRUCTURAL_ZERO_DECISION_VALIDATION,
+        "Structural-zero Validation workload identity mismatch")
+    _require(tuple(protocol.get("checkpoint_validation_scope", [])) ==
+             ACTIVE_SELECTION_WORKLOADS,
+             "Checkpoint Validation scope must be the four active workloads")
+    _require(tuple(protocol.get("stage8_standard_workloads", [])) == WORKLOADS,
+             "Stage8 Standard must retain all six workloads")
+    _require(tuple(protocol.get("stage8_pressure_workloads", [])) ==
+             ACTIVE_SELECTION_WORKLOADS,
+             "Stage8 Pressure workload identity mismatch")
+    _require(selection.get("aggregation") ==
+             "equal_weight_macro_over_four_active_selection_workloads_then_"
+             "mean_over_all_three_seeds",
+             "Selection aggregation must use four active workloads")
+    _require(selection.get("primary_metric") ==
+             "macro_mean_validation_weighted_cost_per_access_over_active_"
+             "selection_workloads",
+             "Selection primary metric must use four active workloads")
+    _require(tuple(selection.get("checkpoint_validation_scope", [])) ==
+             ACTIVE_SELECTION_WORKLOADS,
+             "Selection checkpoint scope mismatch")
+    _require(selection.get("checkpoint_rule") ==
+             "minimum_validation_loss_over_four_active_selection_workloads_"
+             "per_seed", "Checkpoint rule scope mismatch")
+    _require(selection.get("empty_workload_rule") ==
+             "fail_active_zero_require_exact_declared_structural_zero_set",
+             "Repaired empty-workload rule mismatch")
+    _require(selection.get("failure_rule") ==
+             "reject_on_any_zero_active_validation_missing_seed_missing_"
+             "active_workload_missing_checkpoint_nan_inf_or_nonzero_"
+             "training_exit", "Repaired failure rule mismatch")
+    _require(selection.get("structural_zero_metric_rule") ==
+             "N/A_never_zero_never_train_copy_never_selection",
+             "Structural-zero N/A rule mismatch")
+    _require(selection.get("candidate_tie_break") == [
+        "lower_worst_active_workload_mean_weighted_cost_per_access",
+        "higher_macro_mean_ndcg_at_b_t_over_active_selection_workloads",
+        "lower_mean_best_validation_loss_over_active_selection_workloads",
+        "smaller_trainable_parameter_count",
+        "lexicographically_smaller_candidate_id"],
+        "Repaired candidate tie-break mismatch")
+    repair = value.get("protocol_repair", {})
+    _require(repair.get("source_run_id") == RUN_ID,
+             "Protocol repair must cite failed r1")
+    _require(repair.get("source_run_audit_classification") ==
+             "sample_structure_gate_failed_before_training",
+             "Protocol repair r1 audit classification mismatch")
+    _require(repair.get("timing") ==
+             "after_sample_structure_gate_before_any_training_or_performance",
+             "Protocol repair timing declaration mismatch")
+    _require(repair.get("test_used") is False and
+             repair.get("pressure_used") is False and
+             repair.get("checkpoint_used") is False and
+             repair.get("model_performance_used") is False,
+             "Protocol repair used forbidden evidence")
+    cache = value.get("cache_reuse", {})
+    _require(cache.get("mode") ==
+             "verified_external_read_only_reference" and
+             cache.get("source_run_id") == RUN_ID and
+             cache.get("copy_cache_files") is False and
+             cache.get("selection_protocol_changes_sample_content") is False,
+             "r2 cache reuse must be a read-only r1 reference")
+    expected_hashes = {
+        "prepared_input_manifest_sha256": R1_PREPARED_INPUT_MANIFEST_SHA256,
+        "sample_structure_report_sha256": R1_SAMPLE_STRUCTURE_REPORT_SHA256,
+        "sample_structure_verification_sha256":
+            R1_SAMPLE_STRUCTURE_VERIFICATION_SHA256,
+        "sample_manifest_sha256": R1_SAMPLE_INDEX_SHA256,
+        "vocabulary_manifest_sha256": R1_VOCABULARY_INDEX_SHA256,
+    }
+    _require(cache.get("source_artifact_sha256") == expected_hashes,
+             "r1 cache audit SHA registry mismatch")
   gate = value.get("confirmation_gate", {})
   _require(gate.get("full_search_allowed") is False and
            gate.get("formal_freeze_allowed") is False,
            "Draft config must remain behind confirmation gate")
   return value
+
+
+def validation_protocol(config: Mapping[str, Any]) -> Dict[str, Any]:
+  """Return an explicit selection protocol for legacy r1 or repaired r2."""
+  if config.get("schema_version") == PROTOCOL_REPAIR_SEARCH_SCHEMA:
+    return copy.deepcopy(config["validation_protocol"])
+  return {
+      "training_workloads": list(WORKLOADS),
+      "active_selection_workloads": list(WORKLOADS),
+      "structural_zero_decision_validation": [],
+      "checkpoint_validation_scope": list(WORKLOADS),
+      "stage8_standard_workloads": list(WORKLOADS),
+      "stage8_pressure_workloads": [],
+  }
 
 
 def validate_candidate(candidate: Mapping[str, Any], context: str) -> None:
@@ -784,8 +911,11 @@ def validate_training_contract(value: Mapping[str, Any], train_path: str,
               "test_trace_opened", "pressure_trace_opened"}
   _require(isinstance(value, Mapping) and not (required - set(value)),
            "Stage7 training contract is incomplete")
-  _require(value["schema_version"] == TRAINING_CONTRACT_SCHEMA and
-           value["contract_id"] == CONTRACT_ID, "Training identity mismatch")
+  identity = (value["schema_version"], value["contract_id"])
+  _require(identity in {
+      (TRAINING_CONTRACT_SCHEMA, CONTRACT_ID),
+      (PROTOCOL_REPAIR_TRAINING_CONTRACT_SCHEMA,
+       PROTOCOL_REPAIR_CONTRACT_ID)}, "Training identity mismatch")
   _require(value["test_trace_opened"] is False and
            value["pressure_trace_opened"] is False,
            "Training contract is contaminated")
@@ -832,7 +962,31 @@ def validate_training_contract(value: Mapping[str, Any], train_path: str,
   _require(identity == {"schema_version": SAMPLE_SCHEMA,
                         "contract_id": CONTRACT_ID,
                         "experiment_id": value["experiment_id"]},
-           "Sample identity mismatch")
+            "Sample identity mismatch")
+  if value["contract_id"] == PROTOCOL_REPAIR_CONTRACT_ID:
+    protocol = value.get("validation_protocol", {})
+    _require(tuple(protocol.get("training_workloads", [])) == WORKLOADS,
+             "Training contract lost a Train workload")
+    _require(tuple(protocol.get("checkpoint_validation_scope", [])) ==
+             ACTIVE_SELECTION_WORKLOADS,
+             "Training checkpoint Validation scope mismatch")
+    _require(tuple(protocol.get(
+        "structural_zero_decision_validation", [])) ==
+        STRUCTURAL_ZERO_DECISION_VALIDATION,
+        "Training structural-zero set mismatch")
+    counts = protocol.get("validation_sample_count_by_workload", {})
+    _require(set(counts) == set(WORKLOADS),
+             "Training Validation sample-count coverage mismatch")
+    _require(all(_positive_int(counts[workload],
+                               workload + ".validation_sample_count")
+                 for workload in ACTIVE_SELECTION_WORKLOADS),
+             "Active Validation workload has zero samples")
+    _require(all(counts[workload] == 0
+                 for workload in STRUCTURAL_ZERO_DECISION_VALIDATION),
+             "Structural-zero Validation identity changed")
+    _require(value["data"]["validation"].get("sample_count") == sum(
+        counts[workload] for workload in ACTIVE_SELECTION_WORKLOADS),
+        "Merged Validation is not exactly the four-workload checkpoint scope")
   return {
       "contract": value, "contract_fingerprint": fingerprint_value(value),
       "expected_shape": copy.deepcopy(shape), "sample_identity": identity,
@@ -841,7 +995,8 @@ def validate_training_contract(value: Mapping[str, Any], train_path: str,
                   value["labels"]["lambda_3"]],
       "seed": seed, "training": value["training_args"],
       "model_args": value["model_args"], "data": value["data"],
-      "vocabulary": vocab, "stage7": True,
+      "vocabulary": vocab, "validation_protocol": copy.deepcopy(
+          value.get("validation_protocol", {})), "stage7": True,
   }
 
 
@@ -872,7 +1027,8 @@ class Stage7ModelRanking(shared_stage4.ModelRanking):
     from qmap import qmap_eval
     import torch
     checkpoint = torch.load(checkpoint_path, map_location=torch.device("cpu"))
-    _require(checkpoint.get("contract_id") == CONTRACT_ID,
+    _require(checkpoint.get("contract_id") in {
+        CONTRACT_ID, PROTOCOL_REPAIR_CONTRACT_ID},
              "Replay rejects non-Stage7 checkpoint")
     contract = checkpoint.get("stage4_training_contract")
     _require(isinstance(contract, Mapping), "Checkpoint lacks training contract")
@@ -949,6 +1105,8 @@ def evaluate_checkpoint_windows(
       "F_target": method["F_target"], "b_max": 2, "candidate_size_K": 8,
       "checkpoint_path": os.path.abspath(checkpoint_path),
       "checkpoint_sha256": fingerprint_file(checkpoint_path),
+      "validation_role": "active_selection", "metric_status": "available",
+      "model_invoked": True, "selection_eligible": True,
       "total_accesses": totals["total_accesses"],
       "weighted_cost": weighted_cost,
       "weighted_cost_per_access": weighted_cost / totals["total_accesses"],
@@ -960,6 +1118,30 @@ def evaluate_checkpoint_windows(
       "valid_decision_count": len(metric_rows),
       "emergency_fallback_count": totals["emergency_demotions"],
       "exhaustion_count": totals["free_frame_exhaustion_count"],
+      "test_trace_opened": False, "pressure_trace_opened": False,
+  }
+
+
+def structural_zero_validation_row(
+    workload: str, seed: int, candidate: Mapping[str, Any],
+    authority: Mapping[str, Any]) -> Dict[str, Any]:
+  """Represent a declared zero-decision Validation workload without replay."""
+  _require(workload in STRUCTURAL_ZERO_DECISION_VALIDATION,
+           "Unregistered structural-zero Validation workload")
+  method = authority["workloads"][workload]
+  return {
+      "schema_version": "capd_proactive_stage4_stage7_validation_v1_1",
+      "contract_id": PROTOCOL_REPAIR_CONTRACT_ID,
+      "candidate_id": candidate["candidate_id"], "seed": int(seed),
+      "workload": workload, "split_role": "validation",
+      "validation_role": "structural_zero_decision_validation",
+      "metric_status": "N/A", "model_invoked": False,
+      "D": method["D"], "F_low": method["F_low"],
+      "F_target": method["F_target"], "b_max": 2, "candidate_size_K": 8,
+      "weighted_cost_per_access": None, "ndcg_at_b_t": None,
+      "top_b_t_overlap": None, "valid_decision_count": 0,
+      "selection_eligible": False,
+      "reason": "no_comparable_validation_selection_signal_under_frozen_r4",
       "test_trace_opened": False, "pressure_trace_opened": False,
   }
 

@@ -17,6 +17,9 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(
     PROJECT_ROOT, "configs", "finals",
     "capd_proactive_stage4_stage7_search.json")
+R2_CONFIG_PATH = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_stage4_stage7_search_r2.json")
 
 
 def fake_authority():
@@ -40,6 +43,7 @@ def args(root):
   return argparse.Namespace(
       command="preflight", config=CONFIG_PATH, stage3_freeze="freeze.json",
       input_manifest="manifest.json", run_id=stage4.RUN_ID,
+      reuse_sample_cache_from=None,
       project_root=root, device="cpu", require_cuda=False,
       train_workers=1, sample_workers=1, replay_workers=1,
       confirm_stage4_search=False, confirm_stage4_freeze=False,
@@ -148,6 +152,77 @@ class Stage4Stage7SyntheticE2ETest(unittest.TestCase):
     self.assertNotIn("run_search(", block)
     self.assertNotIn("confirm_contract(", block)
     self.assertNotIn("freeze(", block)
+
+  def test_protocol_repair_candidate_summary_uses_only_active_four(self):
+    config = stage4.load_json(R2_CONFIG_PATH)
+    resolved = stage4.resolve_phase_candidates(config, "semantic")[0]
+    seed_results = {}
+    for seed in stage4.FORMAL_SEEDS:
+      rows = []
+      for index, workload in enumerate(stage4.ACTIVE_SELECTION_WORKLOADS):
+        rows.append({
+            "seed": seed, "workload": workload,
+            "weighted_cost_per_access": float(index + 1),
+            "ndcg_at_b_t": 0.5, "valid_decision_count": 10,
+            "validation_role": "active_selection",
+            "metric_status": "available", "model_invoked": True,
+            "selection_eligible": True})
+      rows.extend(stage4.structural_zero_validation_row(
+          workload, seed, resolved, fake_authority())
+                  for workload in stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)
+      rows.sort(key=lambda row: stage4.WORKLOADS.index(row["workload"]))
+      seed_results[seed] = rows
+    manifests = {seed: {
+        "best_validation_loss": 0.25,
+        "checkpoint_validation_scope": list(
+            stage4.ACTIVE_SELECTION_WORKLOADS),
+        "structural_zero_decision_validation": list(
+            stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)}
+                 for seed in stage4.FORMAL_SEEDS}
+    summary = runner.candidate_summary(
+        config, resolved, seed_results, manifests)
+    self.assertEqual(summary["primary_metric"], 2.5)
+    self.assertEqual(summary["worst_workload_metric"], 4.0)
+    self.assertEqual(summary["selection_scope"],
+                     list(stage4.ACTIVE_SELECTION_WORKLOADS))
+    self.assertEqual(set(summary["per_workload"]),
+                     set(stage4.ACTIVE_SELECTION_WORKLOADS))
+
+  def test_protocol_repair_candidate_summary_rejects_nonzero_structural_row(self):
+    config = stage4.load_json(R2_CONFIG_PATH)
+    resolved = stage4.resolve_phase_candidates(config, "semantic")[0]
+    seed_results = {}
+    for seed in stage4.FORMAL_SEEDS:
+      rows = [{"seed": seed, "workload": workload,
+               "weighted_cost_per_access": 1.0, "ndcg_at_b_t": 0.5,
+               "valid_decision_count": 1, "validation_role": "active_selection",
+               "metric_status": "available", "model_invoked": True,
+               "selection_eligible": True}
+              for workload in stage4.ACTIVE_SELECTION_WORKLOADS]
+      rows.extend(stage4.structural_zero_validation_row(
+          workload, seed, resolved, fake_authority())
+                  for workload in stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)
+      rows[-1]["valid_decision_count"] = 1
+      rows.sort(key=lambda row: stage4.WORKLOADS.index(row["workload"]))
+      seed_results[seed] = rows
+    with self.assertRaises(RuntimeError):
+      runner.candidate_summary(
+          config, resolved, seed_results,
+          {seed: {
+              "best_validation_loss": 0.25,
+              "checkpoint_validation_scope": list(
+                  stage4.ACTIVE_SELECTION_WORKLOADS),
+              "structural_zero_decision_validation": list(
+                  stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)}
+           for seed in stage4.FORMAL_SEEDS})
+
+  def test_external_cache_registration_contains_no_copy_operation(self):
+    source = open(runner.__file__, "r", encoding="utf-8").read()
+    start = source.index("def verify_and_register_external_cache")
+    end = source.index("def load_verified_external_dataset")
+    block = source[start:end]
+    self.assertNotIn("shutil.copy", block)
+    self.assertIn("copy_cache_files\": False", block)
 
   def test_sample_structure_report_detects_one_zero_workload_split(self):
     with tempfile.TemporaryDirectory() as root:

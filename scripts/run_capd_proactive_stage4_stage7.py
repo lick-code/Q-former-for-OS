@@ -15,7 +15,6 @@ import datetime
 import json
 import math
 import os
-import shutil
 import subprocess
 import sys
 import time
@@ -83,6 +82,8 @@ def load_context(args, require_traces=True):
 
 
 def run_root(args, config):
+  if args.run_id != config.get("run_id"):
+    raise RuntimeError("CLI run_id must exactly match the search config run_id")
   expected = os.path.abspath(os.path.join(args.project_root,
                                           config["output_root"], args.run_id))
   forbidden = os.path.abspath(os.path.join(args.project_root,
@@ -103,6 +104,17 @@ def preflight(args):
   if config.get("execution", {}).get("require_cuda") and not args.require_cuda:
     raise RuntimeError("Formal config requires explicit --require-cuda")
   root = run_root(args, config)
+  repaired = config.get("schema_version") == stage4.PROTOCOL_REPAIR_SEARCH_SCHEMA
+  if repaired:
+    if not args.reuse_sample_cache_from:
+      raise RuntimeError("r2 preflight requires --reuse-sample-cache-from")
+    expected_source = os.path.abspath(os.path.join(
+        args.project_root, config["cache_reuse"]["source_output_root"]))
+    if os.path.abspath(args.reuse_sample_cache_from) != expected_source:
+      raise RuntimeError("r2 cache source differs from the registered r1 root")
+    if stage4.fingerprint_file(args.input_manifest) != (
+        stage4.R1_PREPARED_INPUT_MANIFEST_SHA256):
+      raise RuntimeError("r2 must reuse the registered r1 prepared input manifest")
   ensure_layout(root)
   device = runtime_device(args.device, args.require_cuda)
   if device["actual"] == "cuda" and device["cuda_device_count"] != 1:
@@ -117,6 +129,9 @@ def preflight(args):
       "source_config_path": os.path.abspath(args.config),
       "source_config_sha256": stage4.fingerprint_file(args.config),
       "input_manifest_sha256": stage4.fingerprint_file(args.input_manifest),
+      "validation_protocol": stage4.validation_protocol(config),
+      "external_cache_source": (os.path.abspath(args.reuse_sample_cache_from)
+                                if repaired else None),
       "trace_record_validation": trace_validation,
       "preflight_at": utc_now(),
   }
@@ -127,17 +142,48 @@ def preflight(args):
       "schema_version": config["schema_version"],
       "search": config["search"], "selection": config["selection"],
       "fixed": config["fixed"], "formal_seeds": config["formal_seeds"],
+      "validation_protocol": stage4.validation_protocol(config),
+      "protocol_repair": copy.deepcopy(config.get("protocol_repair")),
+      "cache_reuse": copy.deepcopy(config.get("cache_reuse")),
       "search_config_sha256": stage4.fingerprint_file(args.config),
   })
   stage4.write_json_atomic(os.path.join(root, "training_contract.json"), {
-      "schema_version": "capd_proactive_stage4_stage7_training_plan_v1_0",
-      "contract_id": stage4.CONTRACT_ID, "run_id": args.run_id,
+      "schema_version": ("capd_proactive_stage4_stage7_training_plan_v1_1"
+                         if repaired else
+                         "capd_proactive_stage4_stage7_training_plan_v1_0"),
+      "contract_id": (stage4.PROTOCOL_REPAIR_CONTRACT_ID
+                      if repaired else stage4.CONTRACT_ID),
+      "run_id": args.run_id,
       "model_scope": "one_unified_model_per_seed_across_six_workloads",
       "formal_seeds": config["formal_seeds"],
       "checkpoint_rule": config["selection"]["checkpoint_rule"],
+      "checkpoint_validation_scope": stage4.validation_protocol(config)[
+          "checkpoint_validation_scope"],
+      "training_workloads": list(stage4.WORKLOADS),
+      "structural_zero_decision_validation": stage4.validation_protocol(config)[
+          "structural_zero_decision_validation"],
       "search_confirmation_required": True,
       "test_trace_opened": False, "pressure_trace_opened": False,
   })
+  if repaired:
+    stage4.write_json_atomic(os.path.join(root, "protocol_repair.json"), {
+        "schema_version": "capd_proactive_stage4_stage7_protocol_repair_v1_0",
+        "run_id": args.run_id,
+        "source_failed_run_id": stage4.RUN_ID,
+        "source_failed_run_audit_classification":
+            "sample_structure_gate_failed_before_training",
+        "repair": copy.deepcopy(config["protocol_repair"]),
+        "validation_protocol": copy.deepcopy(config["validation_protocol"]),
+        "cache_reuse": copy.deepcopy(config["cache_reuse"]),
+        "search_config_sha256": stage4.fingerprint_file(args.config),
+        "r4_freeze_sha256": authority["final_freeze_sha256"],
+        "r2_source_manifest_sha256": stage4.R2_MANIFEST_SHA256,
+        "prepared_input_manifest_sha256": stage4.fingerprint_file(
+            args.input_manifest),
+        "training_started": False, "model_performance_used": False,
+        "test_trace_opened": False, "pressure_trace_opened": False,
+        "search_contract_confirmed": False, "formal_freeze": False,
+    })
   state = {
       "schema_version": "capd_proactive_stage4_stage7_run_state_v1_0",
       "run_id": args.run_id, "status": "preflight_passed_awaiting_confirmation",
@@ -170,7 +216,10 @@ def confirm_contract(args):
     raise RuntimeError("Search config changed after preflight")
   sample_gate = require_sample_structure_gate_passed(root)
   confirmation = {
-      "schema_version": "capd_proactive_stage4_stage7_search_confirmation_v1_0",
+      "schema_version": (
+          "capd_proactive_stage4_stage7_search_confirmation_v1_1"
+          if is_protocol_repair(config) else
+          "capd_proactive_stage4_stage7_search_confirmation_v1_0"),
       "run_id": args.run_id, "human_confirmation": True,
       "search_config_sha256": source_sha, "confirmed_at": utc_now(),
       "candidate_count": 15, "training_run_count": 45,
@@ -178,8 +227,16 @@ def confirm_contract(args):
           os.path.join(root, "sample_structure_verification.json")),
       "sample_structure_report_sha256": sample_gate[
           "sample_structure_report_sha256"],
+      "validation_protocol": stage4.validation_protocol(config),
       "formal_freeze": False,
   }
+  if config.get("schema_version") == stage4.PROTOCOL_REPAIR_SEARCH_SCHEMA:
+    for name in ("protocol_repair.json", "external_cache_reference.json"):
+      path = os.path.join(root, name)
+      if not os.path.isfile(path):
+        raise RuntimeError("r2 confirmation evidence is missing: " + name)
+      confirmation[name.replace(".json", "_sha256")] = (
+          stage4.fingerprint_file(path))
   confirmed_contract = copy.deepcopy(config)
   confirmed_contract["status"] = "search_contract_human_confirmed"
   confirmed_contract["confirmation_gate"].update({
@@ -292,6 +349,16 @@ def require_sample_structure_gate_passed(root):
           "sample_structure_report_sha256"),
       "sample_manifest.json": value.get("sample_manifest_sha256"),
       "vocabulary_manifest.json": value.get("vocabulary_manifest_sha256")}
+  repaired = bool(value.get("protocol_repair"))
+  expected_structural = sorted(
+      workload + "/validation" for workload in
+      stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)
+  zero_samples_ok = (value.get("zero_sample_workload_splits") == (
+      expected_structural) if repaired else
+      value.get("zero_sample_workload_splits") == [])
+  zero_decisions_ok = (value.get("zero_valid_decision_workload_splits") == (
+      expected_structural) if repaired else
+      value.get("zero_valid_decision_workload_splits") == [])
   if (value.get("status") != "PASS" or value.get("gate_pass") is not True or
       value.get("training_started") is not False or
       value.get("search_started") is not False or
@@ -300,8 +367,7 @@ def require_sample_structure_gate_passed(root):
       value.get("test_trace_opened") is not False or
       value.get("pressure_trace_opened") is not False or
       value.get("search_contract_confirmed") is not False or
-      value.get("zero_sample_workload_splits") != [] or
-      value.get("zero_valid_decision_workload_splits") != [] or
+      not zero_samples_ok or not zero_decisions_ok or
       value.get("formal_freeze") is not False):
     raise RuntimeError("Sample structure gate is not a clean PASS")
   for name, expected in required.items():
@@ -309,6 +375,13 @@ def require_sample_structure_gate_passed(root):
     if (not expected or not os.path.isfile(artifact) or
         stage4.fingerprint_file(artifact) != expected):
       raise RuntimeError("Sample structure gate SHA mismatch: {}".format(name))
+  if repaired:
+    for name in ("protocol_repair.json", "external_cache_reference.json"):
+      expected = value.get(name.replace(".json", "_sha256"))
+      path = os.path.join(root, name)
+      if (not expected or not os.path.isfile(path) or
+          stage4.fingerprint_file(path) != expected):
+        raise RuntimeError("Repaired sample gate SHA mismatch: " + name)
   return value
 
 
@@ -341,6 +414,271 @@ def semantic_key(candidate):
       "lambda": candidate["label_weights"]})[:20]
 
 
+def is_protocol_repair(config):
+  return config.get("schema_version") == stage4.PROTOCOL_REPAIR_SEARCH_SCHEMA
+
+
+def _verified_file(path, expected_sha, role):
+  if not os.path.isfile(path):
+    raise RuntimeError("Missing {}: {}".format(role, path))
+  actual = stage4.fingerprint_file(path)
+  if actual != expected_sha:
+    raise RuntimeError("{} SHA mismatch: expected {}, got {}".format(
+        role, expected_sha, actual))
+  return {"path": os.path.abspath(path), "sha256": actual,
+          "bytes": os.path.getsize(path)}
+
+
+def verify_failed_r1_audit(source_root, config):
+  """Verify that the immutable cache source is the failed-before-training r1."""
+  expected = config["cache_reuse"]["source_artifact_sha256"]
+  artifact_fields = {
+      "input_manifest.json": "prepared_input_manifest_sha256",
+      "sample_structure_report.json": "sample_structure_report_sha256",
+      "sample_structure_verification.json":
+          "sample_structure_verification_sha256",
+      "sample_manifest.json": "sample_manifest_sha256",
+      "vocabulary_manifest.json": "vocabulary_manifest_sha256",
+  }
+  verified = {}
+  for name, field in artifact_fields.items():
+    verified[name] = _verified_file(
+        os.path.join(source_root, name), expected[field], "r1 " + name)
+  run_state = stage4.load_json(os.path.join(source_root, "run_state.json"))
+  search_state = stage4.load_json(os.path.join(source_root, "search_state.json"))
+  for name in ("run_state.json", "search_state.json"):
+    path = os.path.join(source_root, name)
+    verified[name] = {"path": os.path.abspath(path),
+                      "sha256": stage4.fingerprint_file(path),
+                      "bytes": os.path.getsize(path)}
+  verification = stage4.load_json(os.path.join(
+      source_root, "sample_structure_verification.json"))
+  expected_zero = sorted(workload + "/validation" for workload in
+                         stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)
+  if (run_state.get("run_id") != stage4.RUN_ID or
+      run_state.get("status") != "sample_structure_gate_failed" or
+      run_state.get("sample_structure_gate_passed") is not False or
+      run_state.get("search_contract_confirmed") is not False or
+      run_state.get("formal_freeze") is not False or
+      run_state.get("test_trace_opened") is not False or
+      run_state.get("pressure_trace_opened") is not False):
+    raise RuntimeError("r1 is not the immutable failed-before-training audit")
+  if (search_state.get("status") != "not_started" or
+      search_state.get("active_training_processes") != 0 or
+      search_state.get("completed_phases") != [] or
+      search_state.get("formal_freeze") is not False):
+    raise RuntimeError("r1 search state changed after the failed sample gate")
+  if (verification.get("status") != "FAIL" or
+      verification.get("gate_pass") is not False or
+      verification.get("zero_sample_workload_splits") != expected_zero or
+      verification.get("zero_valid_decision_workload_splits") !=
+      expected_zero or verification.get("training_started") is not False or
+      verification.get("search_started") is not False or
+      verification.get("checkpoint_created") is not False or
+      verification.get("candidate_selected") is not False or
+      verification.get("test_trace_opened") is not False or
+      verification.get("pressure_trace_opened") is not False or
+      verification.get("search_contract_confirmed") is not False or
+      verification.get("formal_freeze") is not False):
+    raise RuntimeError("r1 sample-gate failure evidence changed")
+  if sample_gate_forbidden_artifacts(source_root):
+    raise RuntimeError("r1 contains forbidden post-gate artifacts")
+  return {"artifacts": verified, "run_state": copy.deepcopy(run_state),
+          "search_state": copy.deepcopy(search_state)}
+
+
+def _external_dataset_manifest(source_root, candidate, authority, input_sha,
+                               sample_entry, vocabulary_entry,
+                               verify_payload_files):
+  key = semantic_key(candidate)
+  if (sample_entry.get("candidate_id") != candidate["candidate_id"] or
+      sample_entry.get("semantic_key") != key or
+      vocabulary_entry.get("candidate_id") != candidate["candidate_id"] or
+      vocabulary_entry.get("semantic_key") != key):
+    raise RuntimeError("r1 semantic cache index identity mismatch: " + key)
+  dataset_root = os.path.join(source_root, "datasets", key)
+  manifest_path = os.path.join(dataset_root, "sample_manifest.json")
+  _verified_file(manifest_path, sample_entry["sample_manifest_sha256"],
+                 key + " sample manifest")
+  manifest = stage4.load_json(manifest_path)
+  expected_identity = stage4.sample_cache_identity(
+      candidate, authority, input_sha)
+  if (manifest.get("semantic_key") != key or
+      manifest.get("sample_cache_identity") != expected_identity or
+      manifest.get("sample_cache_identity_sha256") !=
+      stage4.fingerprint_value(expected_identity) or
+      sample_entry.get("sample_generation_contract_sha256") !=
+      manifest.get("sample_cache_identity_sha256")):
+    raise RuntimeError("r1 sample generation identity mismatch: " + key)
+  files = []
+  merged = copy.deepcopy(manifest["merged"])
+  for split in stage4.SPLITS:
+    path = os.path.join(dataset_root, "all_{}.jsonl".format(split))
+    if verify_payload_files:
+      files.append(_verified_file(path, merged[split]["sha256"],
+                                  key + " merged " + split))
+    merged[split]["path"] = os.path.abspath(path)
+  diagnostics = []
+  for row in manifest.get("per_workload", []):
+    workload, split = row.get("workload"), row.get("split_role")
+    if workload not in stage4.WORKLOADS or split not in stage4.SPLITS:
+      raise RuntimeError("r1 per-workload cache identity is invalid")
+    expected_method = dict(authority["workloads"][workload])
+    expected_method.update({
+        "b_max": 2, "candidate_size_K": 8,
+        "capacity_ratio": authority["capacity_ratio"],
+        "cost_profile": authority["cost_profile"]})
+    if (row.get("method") != expected_method or
+        row.get("sample_generation_contract_sha256") !=
+        manifest["sample_cache_identity_sha256"]):
+      raise RuntimeError("r1 method/sample contract changed: {}/{}".format(
+          workload, split))
+    path = os.path.join(dataset_root, "per_workload", workload,
+                        split + ".jsonl")
+    if verify_payload_files:
+      files.append(_verified_file(path, row["sha256"],
+                                  key + " " + workload + "/" + split))
+    copied = copy.deepcopy(row); copied["path"] = os.path.abspath(path)
+    diagnostics.append(copied)
+  expected_pairs = {(workload, split) for workload in stage4.WORKLOADS
+                    for split in stage4.SPLITS}
+  if {(row["workload"], row["split_role"]) for row in diagnostics} != (
+      expected_pairs):
+    raise RuntimeError("r1 per-workload cache coverage mismatch: " + key)
+  for split in stage4.SPLITS:
+    expected_count = sum(int(row["sample_count"]) for row in diagnostics
+                         if row["split_role"] == split)
+    if int(merged[split].get("sample_count", -1)) != expected_count:
+      raise RuntimeError("r1 merged/per-workload count mismatch: {}/{}".format(
+          key, split))
+  vocabulary_root = os.path.join(source_root, "vocabulary", key)
+  vocabulary_path = os.path.join(vocabulary_root, "vocabulary_manifest.json")
+  _verified_file(vocabulary_path,
+                 vocabulary_entry["vocabulary_manifest_sha256"],
+                 key + " vocabulary manifest")
+  vocabulary = stage4.load_json(vocabulary_path)
+  if vocabulary.get("vocabulary_sha256") != vocabulary_entry.get(
+      "vocabulary_sha256"):
+    raise RuntimeError("r1 vocabulary identity mismatch: " + key)
+  for prefix in ("page", "pc"):
+    path = os.path.join(vocabulary_root, prefix + "_input_to_index.json")
+    expected_sha = vocabulary[prefix + "_vocabulary_file_sha256"]
+    if verify_payload_files:
+      files.append(_verified_file(path, expected_sha,
+                                  key + " " + prefix + " vocabulary"))
+      if stage4.fingerprint_value(stage4.load_json(path)) != vocabulary[
+          prefix + "_vocabulary_sha256"]:
+        raise RuntimeError("r1 logical vocabulary SHA mismatch: " + key)
+    vocabulary[prefix + "_vocabulary_path"] = os.path.abspath(path)
+  vocabulary["manifest_path"] = os.path.abspath(vocabulary_path)
+  vocabulary["manifest_sha256"] = vocabulary_entry[
+      "vocabulary_manifest_sha256"]
+  manifest["merged"] = merged
+  manifest["per_workload"] = diagnostics
+  manifest["vocabulary"] = vocabulary
+  manifest["_verified_manifest_path"] = os.path.abspath(manifest_path)
+  manifest["_verified_external_read_only"] = True
+  return manifest, files
+
+
+def verify_and_register_external_cache(args, root, config, authority):
+  source_root = os.path.abspath(args.reuse_sample_cache_from or "")
+  expected_source = os.path.abspath(os.path.join(
+      args.project_root, config["cache_reuse"]["source_output_root"]))
+  if source_root != expected_source or source_root == os.path.abspath(root):
+    raise RuntimeError("External cache source must be the registered r1 root")
+  audit = verify_failed_r1_audit(source_root, config)
+  input_sha = stage4.fingerprint_file(args.input_manifest)
+  if input_sha != stage4.R1_PREPARED_INPUT_MANIFEST_SHA256:
+    raise RuntimeError("External cache prepared input manifest identity changed")
+  sample_index = stage4.load_json(os.path.join(source_root,
+                                                "sample_manifest.json"))
+  vocabulary_index = stage4.load_json(os.path.join(
+      source_root, "vocabulary_manifest.json"))
+  sample_by_id = {row["candidate_id"]: row
+                  for row in sample_index.get("manifests", [])}
+  vocab_by_id = {row["candidate_id"]: row
+                 for row in vocabulary_index.get("datasets", [])}
+  references, manifests = [], {}
+  for candidate in stage4.resolve_phase_candidates(config, "semantic"):
+    candidate_id = candidate["candidate_id"]
+    if candidate_id not in sample_by_id or candidate_id not in vocab_by_id:
+      raise RuntimeError("r1 cache index is missing " + candidate_id)
+    manifest, files = _external_dataset_manifest(
+        source_root, candidate, authority, input_sha,
+        sample_by_id[candidate_id], vocab_by_id[candidate_id], True)
+    key = manifest["semantic_key"]
+    manifests[key] = manifest
+    references.append({
+        "candidate_id": candidate_id, "semantic_key": key,
+        "sample_cache_identity_sha256": manifest[
+            "sample_cache_identity_sha256"],
+        "sample_manifest_path": manifest["_verified_manifest_path"],
+        "sample_manifest_sha256": sample_by_id[candidate_id][
+            "sample_manifest_sha256"],
+        "sample_generation_contract_sha256": sample_by_id[candidate_id][
+            "sample_generation_contract_sha256"],
+        "vocabulary_manifest_sha256": vocab_by_id[candidate_id][
+            "vocabulary_manifest_sha256"],
+        "vocabulary_sha256": vocab_by_id[candidate_id]["vocabulary_sha256"],
+        "verified_payload_files": files,
+    })
+  reference = {
+      "schema_version": "capd_proactive_stage4_stage7_external_cache_v1_0",
+      "run_id": args.run_id, "source_run_id": stage4.RUN_ID,
+      "source_run_audit_classification":
+          "sample_structure_gate_failed_before_training",
+      "mode": "verified_external_read_only_reference",
+      "source_root": source_root, "copy_cache_files": False,
+      "source_audit": audit, "datasets": references,
+      "r4_freeze_sha256": authority["final_freeze_sha256"],
+      "r2_source_manifest_sha256": stage4.R2_MANIFEST_SHA256,
+      "prepared_input_manifest_sha256": input_sha,
+      "verification_scope": (
+          "all_sample_manifests_all_merged_and_per_workload_sample_files_"
+          "all_vocabulary_manifests_and_files"),
+      "training_started": False, "search_started": False,
+      "test_trace_opened": False, "pressure_trace_opened": False,
+      "search_contract_confirmed": False, "formal_freeze": False,
+      "verified_at": utc_now(),
+  }
+  path = os.path.join(root, "external_cache_reference.json")
+  stage4.write_json_atomic(path, reference)
+  return manifests, reference
+
+
+def load_verified_external_dataset(args, root, config, candidate, authority):
+  reference_path = os.path.join(root, "external_cache_reference.json")
+  verification_path = os.path.join(root, "sample_structure_verification.json")
+  if not os.path.isfile(reference_path) or not os.path.isfile(verification_path):
+    raise RuntimeError("r2 external cache has not passed its structure gate")
+  verification = stage4.load_json(verification_path)
+  if (verification.get("external_cache_reference_sha256") !=
+      stage4.fingerprint_file(reference_path)):
+    raise RuntimeError("r2 external cache reference SHA changed")
+  reference = stage4.load_json(reference_path)
+  key = semantic_key(candidate)
+  entry = next((row for row in reference.get("datasets", [])
+                if row.get("semantic_key") == key), None)
+  if entry is None:
+    raise RuntimeError("r2 external cache reference is missing " + key)
+  sample_entry = {"candidate_id": entry["candidate_id"],
+                  "semantic_key": key,
+                  "sample_generation_contract_sha256": entry[
+                      "sample_generation_contract_sha256"],
+                  "sample_manifest_sha256": entry["sample_manifest_sha256"]}
+  vocab_entry = {"candidate_id": entry["candidate_id"],
+                 "semantic_key": key,
+                 "vocabulary_sha256": entry["vocabulary_sha256"],
+                 "vocabulary_manifest_sha256": entry[
+                     "vocabulary_manifest_sha256"]}
+  manifest, _ = _external_dataset_manifest(
+      reference["source_root"], candidate, authority,
+      stage4.fingerprint_file(args.input_manifest), sample_entry, vocab_entry,
+      True)
+  return manifest
+
+
 def replace_vocab_identity(path, vocabulary_sha):
   temporary = path + ".vocab.tmp"
   with open(path, "r", encoding="utf-8") as source, open(
@@ -352,7 +690,11 @@ def replace_vocab_identity(path, vocabulary_sha):
   os.replace(temporary, path)
 
 
-def ensure_dataset(args, root, candidate, authority, entries):
+def ensure_dataset(args, root, candidate, authority, entries, config=None):
+  config = config or stage4.validate_search_config(stage4.load_json(args.config))
+  if is_protocol_repair(config):
+    return load_verified_external_dataset(
+        args, root, config, candidate, authority)
   key = semantic_key(candidate)
   dataset_root = os.path.join(root, "datasets", key)
   manifest_path = os.path.join(dataset_root, "sample_manifest.json")
@@ -490,8 +832,8 @@ def sample_structure_dataset_report(root, candidate, manifest, authority):
         "method": copy.deepcopy(authority["workloads"][workload]),
         "train": splits["train"], "validation": splits["validation"],
         "validation_oov": copy.deepcopy(oov[workload])}
-  manifest_path = os.path.join(
-      root, "datasets", manifest["semantic_key"], "sample_manifest.json")
+  manifest_path = manifest.get("_verified_manifest_path", os.path.join(
+      root, "datasets", manifest["semantic_key"], "sample_manifest.json"))
   return {
       "candidate_id": candidate["candidate_id"],
       "semantic_key": manifest["semantic_key"],
@@ -520,9 +862,18 @@ def generate_draft_samples(args):
   config, authority, _, entries = load_context(args)
   root = run_root(args, config)
   resolved = require_sample_structure_gate_ready(args, root, config)
+  repaired = is_protocol_repair(config)
+  external_manifests = {}
+  if repaired:
+    external_manifests, _ = verify_and_register_external_cache(
+        args, root, config, authority)
   dataset_reports = []
   for candidate in stage4.resolve_phase_candidates(config, "semantic"):
-    manifest = ensure_dataset(args, root, candidate, authority, entries)
+    if repaired:
+      manifest = external_manifests[semantic_key(candidate)]
+    else:
+      manifest = ensure_dataset(
+          args, root, candidate, authority, entries, config=config)
     dataset_reports.append(sample_structure_dataset_report(
         root, candidate, manifest, authority))
   zero_samples = sorted({item for dataset in dataset_reports
@@ -530,7 +881,36 @@ def generate_draft_samples(args):
   zero_decisions = sorted({item for dataset in dataset_reports
                            for item in dataset[
                                "zero_valid_decision_workload_splits"]})
-  gate_pass = not zero_samples and not zero_decisions
+  expected_structural = sorted(
+      workload + "/validation" for workload in
+      stage4.STRUCTURAL_ZERO_DECISION_VALIDATION) if repaired else []
+  structural_identity_violations = []
+  if repaired:
+    for dataset in dataset_reports:
+      for workload in stage4.WORKLOADS:
+        row = dataset["per_workload"][workload]
+        if (row["train"]["sample_count"] <= 0 or
+            row["train"]["valid_decision_count"] <= 0):
+          structural_identity_violations.append(
+              dataset["candidate_id"] + ":" + workload + "/train")
+      for workload in stage4.ACTIVE_SELECTION_WORKLOADS:
+        row = dataset["per_workload"][workload]["validation"]
+        if row["sample_count"] <= 0 or row["valid_decision_count"] <= 0:
+          structural_identity_violations.append(
+              dataset["candidate_id"] + ":" + workload +
+              "/validation_active_zero")
+      for workload in stage4.STRUCTURAL_ZERO_DECISION_VALIDATION:
+        row = dataset["per_workload"][workload]["validation"]
+        if row["sample_count"] != 0 or row["valid_decision_count"] != 0:
+          structural_identity_violations.append(
+              dataset["candidate_id"] + ":" + workload +
+              "/validation_structural_identity_changed")
+  gate_pass = ((zero_samples == expected_structural and
+                zero_decisions == expected_structural and
+                not structural_identity_violations) if repaired else
+               (not zero_samples and not zero_decisions))
+  external_reference_sha = (stage4.fingerprint_file(os.path.join(
+      root, "external_cache_reference.json")) if repaired else None)
   sample_index = {
       "schema_version": "capd_proactive_stage4_stage7_sample_index_v1_1",
       "status": ("sample_structure_gate_passed_no_training_started"
@@ -544,6 +924,9 @@ def generate_draft_samples(args):
               "sample_generation_contract_sha256"],
           "sample_manifest_sha256": item["sample_manifest_sha256"]}
           for item in dataset_reports],
+      "cache_mode": ("verified_external_read_only_reference" if repaired else
+                     "generated_in_run"),
+      "external_cache_reference_sha256": external_reference_sha,
       "training_started": False, "search_started": False,
       "checkpoint_created": False, "candidate_selected": False,
       "test_trace_opened": False, "pressure_trace_opened": False,
@@ -561,12 +944,20 @@ def generate_draft_samples(args):
           "vocabulary_sha256": item["vocabulary"]["vocabulary_sha256"],
           "vocabulary_manifest_sha256": item["vocabulary"]["manifest_sha256"]}
           for item in dataset_reports],
+      "cache_mode": ("verified_external_read_only_reference" if repaired else
+                     "generated_in_run"),
+      "external_cache_reference_sha256": external_reference_sha,
       "training_started": False, "formal_freeze": False}
   vocabulary_index_path = os.path.join(root, "vocabulary_manifest.json")
   stage4.write_json_atomic(vocabulary_index_path, vocabulary_index)
   report = {
-      "schema_version": "capd_proactive_stage4_stage7_sample_structure_report_v1_0",
-      "contract_id": stage4.CONTRACT_ID, "run_id": args.run_id,
+      "schema_version": (
+          "capd_proactive_stage4_stage7_sample_structure_report_v1_1"
+          if repaired else
+          "capd_proactive_stage4_stage7_sample_structure_report_v1_0"),
+      "contract_id": (stage4.PROTOCOL_REPAIR_CONTRACT_ID
+                      if repaired else stage4.CONTRACT_ID),
+      "run_id": args.run_id,
       "status": "PASS" if gate_pass else "FAIL", "gate_pass": gate_pass,
       "input_entry_count": len(entries),
       "train_entry_count": sum(row["split_role"] == "train" for row in entries),
@@ -578,6 +969,18 @@ def generate_draft_samples(args):
       "r4_final_freeze_sha256": authority["final_freeze_sha256"],
       "r2_input_manifest_sha256": resolved["authority"][
           "r2_input_manifest_sha256"],
+      "protocol_repair": repaired,
+      "training_workloads": list(stage4.WORKLOADS),
+      "active_selection_workloads": list(
+          stage4.ACTIVE_SELECTION_WORKLOADS) if repaired else
+          list(stage4.WORKLOADS),
+      "structural_zero_decision_validation": list(
+          stage4.STRUCTURAL_ZERO_DECISION_VALIDATION) if repaired else [],
+      "checkpoint_validation_scope": list(
+          stage4.ACTIVE_SELECTION_WORKLOADS) if repaired else
+          list(stage4.WORKLOADS),
+      "structural_identity_violations": structural_identity_violations,
+      "external_cache_reference_sha256": external_reference_sha,
       "datasets": dataset_reports,
       "zero_sample_workload_splits": zero_samples,
       "zero_valid_decision_workload_splits": zero_decisions,
@@ -592,8 +995,10 @@ def generate_draft_samples(args):
     raise RuntimeError("Sample gate created forbidden artifacts: {}".format(
         ", ".join(forbidden_after)))
   verification = {
-      "schema_version":
-          "capd_proactive_stage4_stage7_sample_structure_verification_v1_0",
+      "schema_version": (
+          "capd_proactive_stage4_stage7_sample_structure_verification_v1_1"
+          if repaired else
+          "capd_proactive_stage4_stage7_sample_structure_verification_v1_0"),
       "run_id": args.run_id, "status": report["status"],
       "gate_pass": gate_pass,
       "sample_structure_report_sha256": stage4.fingerprint_file(report_path),
@@ -602,6 +1007,16 @@ def generate_draft_samples(args):
           vocabulary_index_path),
       "zero_sample_workload_splits": zero_samples,
       "zero_valid_decision_workload_splits": zero_decisions,
+      "protocol_repair": repaired,
+      "active_selection_workloads": list(
+          stage4.ACTIVE_SELECTION_WORKLOADS) if repaired else
+          list(stage4.WORKLOADS),
+      "structural_zero_decision_validation": list(
+          stage4.STRUCTURAL_ZERO_DECISION_VALIDATION) if repaired else [],
+      "structural_identity_violations": structural_identity_violations,
+      "external_cache_reference_sha256": external_reference_sha,
+      "protocol_repair_sha256": (stage4.fingerprint_file(os.path.join(
+          root, "protocol_repair.json")) if repaired else None),
       "training_started": False, "search_started": False,
       "checkpoint_created": False, "candidate_selected": False,
       "test_trace_opened": False, "pressure_trace_opened": False,
@@ -622,7 +1037,9 @@ def generate_draft_samples(args):
                "sample_structure_gate_failed",
                semantic_dataset_count=len(dataset_reports),
                zero_sample_workload_splits=zero_samples,
-               zero_valid_decision_workload_splits=zero_decisions)
+               zero_valid_decision_workload_splits=zero_decisions,
+               protocol_repair=repaired,
+               structural_identity_violations=structural_identity_violations)
   if not gate_pass:
     message = ("Sample structure gate failed: zero_samples={} "
                "zero_valid_decisions={}").format(zero_samples, zero_decisions)
@@ -659,6 +1076,20 @@ def validate_formal_checkpoint_manifests(checkpoint_manifest, candidate):
       raise RuntimeError("Missing checkpoint manifest for seed {}".format(seed))
     if manifest.get("selection_criterion") != "minimum_valid_loss_only":
       raise RuntimeError("Checkpoint was not selected by Validation only")
+    if manifest.get("contract_id") == stage4.PROTOCOL_REPAIR_CONTRACT_ID:
+      if manifest.get("checkpoint_validation_scope") != list(
+          stage4.ACTIVE_SELECTION_WORKLOADS):
+        raise RuntimeError("Checkpoint Validation scope is not the active four")
+      if manifest.get("structural_zero_decision_validation") != list(
+          stage4.STRUCTURAL_ZERO_DECISION_VALIDATION):
+        raise RuntimeError("Checkpoint structural-zero identity mismatch")
+      counts = manifest.get("validation_sample_count_by_workload", {})
+      if (set(counts) != set(stage4.WORKLOADS) or
+          any(counts[workload] <= 0
+              for workload in stage4.ACTIVE_SELECTION_WORKLOADS) or
+          any(counts[workload] != 0
+              for workload in stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)):
+        raise RuntimeError("Checkpoint Validation sample counts violate r2")
     best = manifest.get("checkpoints", {}).get("best", {})
     if (not os.path.isfile(best.get("path", "")) or
         stage4.fingerprint_file(best["path"]) != best.get("fingerprint")):
@@ -677,16 +1108,26 @@ def validate_formal_checkpoint_manifests(checkpoint_manifest, candidate):
 
 
 def training_contract(candidate, seed, dataset, authority, output, device,
-                      train_workers):
+                      train_workers, config):
   candidate = copy.deepcopy(candidate)
   candidate["training"]["num_workers"] = int(train_workers)
   candidate["candidate_sha256"] = stage4.fingerprint_value({
       key: value for key, value in candidate.items()
       if key != "candidate_sha256"})
   experiment_id = dataset["sample_cache_identity_sha256"][:24]
+  protocol = stage4.validation_protocol(config)
+  validation_counts = {
+      row["workload"]: int(row["sample_count"])
+      for row in dataset["per_workload"]
+      if row["split_role"] == "validation"}
+  protocol["validation_sample_count_by_workload"] = validation_counts
+  repaired = is_protocol_repair(config)
   return {
-      "schema_version": stage4.TRAINING_CONTRACT_SCHEMA,
-      "contract_id": stage4.CONTRACT_ID, "experiment_id": experiment_id,
+      "schema_version": (stage4.PROTOCOL_REPAIR_TRAINING_CONTRACT_SCHEMA
+                         if repaired else stage4.TRAINING_CONTRACT_SCHEMA),
+      "contract_id": (stage4.PROTOCOL_REPAIR_CONTRACT_ID
+                      if repaired else stage4.CONTRACT_ID),
+      "experiment_id": experiment_id,
       "candidate_id": candidate["candidate_id"], "candidate": candidate,
       "seed": int(seed),
       "expected_shape": {"H": candidate["history_H"], "K": 8,
@@ -701,6 +1142,7 @@ def training_contract(candidate, seed, dataset, authority, output, device,
       "training_args": copy.deepcopy(candidate["training"]),
       "data": copy.deepcopy(dataset["merged"]),
       "vocabulary": copy.deepcopy(dataset["vocabulary"]),
+      "validation_protocol": protocol,
       "method": {"candidate_size_K": 8, "b_max": 2,
                  "initial_dram_state": "empty_dram_per_window",
                  "workloads": copy.deepcopy(authority["workloads"]),
@@ -714,6 +1156,10 @@ def training_contract(candidate, seed, dataset, authority, output, device,
           "sample_generation_contract_sha256":
               dataset["sample_cache_identity_sha256"],
           "vocabulary_sha256": dataset["vocabulary"]["vocabulary_sha256"],
+          "external_cache_reference_sha256": (
+              stage4.fingerprint_file(os.path.join(
+                  os.path.dirname(os.path.dirname(os.path.dirname(output))),
+                  "external_cache_reference.json")) if repaired else None),
       },
       "execution": {"requested_device": device, "actual_device": device,
                     "train_workers": train_workers,
@@ -723,12 +1169,12 @@ def training_contract(candidate, seed, dataset, authority, output, device,
   }
 
 
-def ensure_training(args, root, candidate, seed, dataset, authority):
+def ensure_training(args, root, candidate, seed, dataset, authority, config):
   output = os.path.join(root, "checkpoints", candidate["candidate_id"],
                         "seed_{}".format(seed))
   os.makedirs(output, exist_ok=True)
   contract = training_contract(candidate, seed, dataset, authority, output,
-                               args.device, args.train_workers)
+                               args.device, args.train_workers, config)
   contract_path = os.path.join(output, "training_contract.json")
   manifest_path = os.path.join(output, "checkpoint_manifest.json")
   if os.path.isfile(contract_path):
@@ -785,11 +1231,15 @@ def replay_worker(payload):
       trace, entry["workload"], checkpoint, "cpu", seed, candidate, authority)
 
 
-def evaluate_seed(args, root, candidate, seed, checkpoint_manifest, authority,
-                  entries):
+def evaluate_seed(args, root, config, candidate, seed, checkpoint_manifest,
+                  authority, entries):
   checkpoint = checkpoint_manifest["checkpoints"]["best"]["path"]
+  protocol = stage4.validation_protocol(config)
+  active = tuple(protocol["active_selection_workloads"])
+  structural = tuple(protocol["structural_zero_decision_validation"])
   validation = [entry for entry in entries
-                if entry["split_role"] == "validation"]
+                if entry["split_role"] == "validation" and
+                entry["workload"] in active]
   payloads = [(entry, checkpoint, candidate, authority, seed)
               for entry in validation]
   if args.replay_workers == 1:
@@ -798,20 +1248,65 @@ def evaluate_seed(args, root, candidate, seed, checkpoint_manifest, authority,
     with concurrent.futures.ProcessPoolExecutor(
         max_workers=min(args.replay_workers, 6)) as executor:
       rows = list(executor.map(replay_worker, payloads))
+  structural_entries = {entry["workload"]: entry for entry in entries
+                        if entry["split_role"] == "validation" and
+                        entry["workload"] in structural}
+  for workload in structural:
+    if workload not in structural_entries:
+      raise RuntimeError("Structural-zero Validation source entry is missing")
+    row = stage4.structural_zero_validation_row(
+        workload, seed, candidate, authority)
+    row.update({
+        "source_trace_sha256": structural_entries[workload]["trace_sha256"],
+        "source_interval": copy.deepcopy(
+            structural_entries[workload]["source_interval"]),
+        "sample_structure_verification_sha256": stage4.fingerprint_file(
+            os.path.join(root, "sample_structure_verification.json")),
+    })
+    rows.append(row)
   rows.sort(key=lambda row: stage4.WORKLOADS.index(row["workload"]))
   path = os.path.join(root, "search", candidate["phase"],
                       candidate["candidate_id"],
                       "validation_seed_{}.json".format(seed))
-  stage4.write_json_atomic(path, {"rows": rows, "seed": seed,
-                                  "candidate_id": candidate["candidate_id"]})
+  stage4.write_json_atomic(path, {
+      "rows": rows, "seed": seed, "candidate_id": candidate["candidate_id"],
+      "active_selection_workloads": list(active),
+      "structural_zero_decision_validation": list(structural)})
   return rows
 
 
-def candidate_summary(candidate, seed_results, checkpoint_manifests):
+def candidate_summary(config, candidate, seed_results, checkpoint_manifests):
   if set(seed_results) != set(stage4.FORMAL_SEEDS):
     raise RuntimeError("Candidate is missing a formal seed")
+  protocol = stage4.validation_protocol(config)
+  active = tuple(protocol["active_selection_workloads"])
+  structural = tuple(protocol["structural_zero_decision_validation"])
+  if is_protocol_repair(config):
+    for seed in stage4.FORMAL_SEEDS:
+      manifest = checkpoint_manifests[seed]
+      if (manifest.get("checkpoint_validation_scope") != list(active) or
+          manifest.get("structural_zero_decision_validation") !=
+          list(structural)):
+        raise RuntimeError("Checkpoint manifest lost repaired Validation scope")
+  for seed in stage4.FORMAL_SEEDS:
+    rows = seed_results[seed]
+    if ([row["workload"] for row in rows] != list(stage4.WORKLOADS) or
+        any(row.get("valid_decision_count", 0) <= 0 or
+            row.get("weighted_cost_per_access") is None or
+            row.get("ndcg_at_b_t") is None
+            for row in rows if row["workload"] in active)):
+      raise RuntimeError("Candidate has missing/non-finite active Validation")
+    for row in rows:
+      if row["workload"] in structural and not (
+          row.get("metric_status") == "N/A" and
+          row.get("model_invoked") is False and
+          row.get("selection_eligible") is False and
+          row.get("valid_decision_count") == 0 and
+          row.get("weighted_cost_per_access") is None and
+          row.get("ndcg_at_b_t") is None):
+        raise RuntimeError("Structural-zero Validation row changed identity")
   per_workload = {}
-  for workload in stage4.WORKLOADS:
+  for workload in active:
     rows = [row for seed in stage4.FORMAL_SEEDS for row in seed_results[seed]
             if row["workload"] == workload]
     if len(rows) != len(stage4.FORMAL_SEEDS):
@@ -819,10 +1314,12 @@ def candidate_summary(candidate, seed_results, checkpoint_manifests):
     per_workload[workload] = stage4.macro_mean(
         [row["weighted_cost_per_access"] for row in rows])
   macro_by_seed = [stage4.macro_mean(
-      [row["weighted_cost_per_access"] for row in seed_results[seed]])
+      [row["weighted_cost_per_access"] for row in seed_results[seed]
+       if row["workload"] in active])
                    for seed in stage4.FORMAL_SEEDS]
-  ndcg = stage4.macro_mean([row["ndcg_at_b_t"]
-                            for rows in seed_results.values() for row in rows])
+  ndcg = stage4.macro_mean([
+      row["ndcg_at_b_t"] for rows in seed_results.values() for row in rows
+      if row["workload"] in active])
   losses = [checkpoint_manifests[seed]["best_validation_loss"]
             for seed in stage4.FORMAL_SEEDS]
   model = candidate["model"]
@@ -835,6 +1332,13 @@ def candidate_summary(candidate, seed_results, checkpoint_manifests):
       "macro_ndcg_at_b_t": ndcg,
       "mean_best_validation_loss": stage4.macro_mean(losses),
       "complexity_proxy": complexity, "per_workload": per_workload,
+      "selection_scope": list(active),
+      "selection_workload_count": len(active),
+      "structural_zero_decision_validation": list(structural),
+      "structural_validation_metrics": {
+          workload: {"status": "N/A", "valid_decision_count": 0,
+                     "selection_eligible": False}
+          for workload in structural},
       "validation_rows": [row for seed in stage4.FORMAL_SEEDS
                            for row in seed_results[seed]],
       "all_formal_seeds_retained": True,
@@ -884,21 +1388,26 @@ def run_search(args):
         candidate["candidate_sha256"] = stage4.fingerprint_value({
             key: value for key, value in candidate.items()
             if key != "candidate_sha256"})
-        dataset = ensure_dataset(args, root, candidate, authority, entries)
+        dataset = ensure_dataset(
+            args, root, candidate, authority, entries, config=config)
+        dataset_manifest_path = dataset.get("_verified_manifest_path", os.path.join(
+            root, "datasets", dataset["semantic_key"], "sample_manifest.json"))
         dataset_indexes[dataset["semantic_key"]] = {
-            "sample_manifest_path": os.path.join(
-                root, "datasets", dataset["semantic_key"], "sample_manifest.json"),
-            "sample_manifest_sha256": stage4.fingerprint_file(os.path.join(
-                root, "datasets", dataset["semantic_key"], "sample_manifest.json")),
+            "sample_manifest_path": dataset_manifest_path,
+            "sample_manifest_sha256": stage4.fingerprint_file(
+                dataset_manifest_path),
+            "cache_mode": ("verified_external_read_only_reference"
+                           if is_protocol_repair(config) else "generated_in_run"),
             "vocabulary": dataset["vocabulary"]}
         seed_results, manifests = {}, {}
         for seed in stage4.FORMAL_SEEDS:  # Deliberately sequential on one GPU.
           manifests[seed], _ = ensure_training(
-              args, root, candidate, seed, dataset, authority)
+              args, root, candidate, seed, dataset, authority, config)
           seed_results[seed] = evaluate_seed(
-              args, root, candidate, seed, manifests[seed], authority, entries)
+              args, root, config, candidate, seed, manifests[seed], authority,
+              entries)
         phase_results.append(candidate_summary(
-            candidate, seed_results, manifests))
+            config, candidate, seed_results, manifests))
       except Exception as error:  # Preserve artifacts and reject this candidate.
         failure = {"candidate_id": candidate["candidate_id"],
                    "status": "rejected", "reason": str(error),
@@ -940,6 +1449,7 @@ def run_search(args):
       "phase_results": all_phase_results, "selected": final,
       "candidate_only": True, "formal_freeze": False,
       "all_formal_seeds_retained": True,
+      "validation_protocol": stage4.validation_protocol(config),
       "test_trace_opened": False, "pressure_trace_opened": False,
   }
   report_path = os.path.join(root, "validation_selection_report.json")
@@ -976,6 +1486,8 @@ def run_search(args):
       "vocabulary_manifest.json", "validation_metrics.csv",
       "validation_metrics_by_workload.csv", "stage4_candidate.json",
       "validation_selection_report.json", "checkpoint_manifest.json")
+  if is_protocol_repair(config):
+    evidence_names += ("protocol_repair.json", "external_cache_reference.json")
   evidence_sha = {name: stage4.fingerprint_file(os.path.join(root, name))
                   for name in evidence_names}
   stage4.write_json_atomic(os.path.join(root, "verification.json"), {
@@ -1004,18 +1516,21 @@ def write_metrics(root, phase_results):
   workload_path = os.path.join(root, "validation_metrics_by_workload.csv")
   with open(aggregate_path, "w", encoding="utf-8", newline="") as handle:
     writer = csv.writer(handle)
-    writer.writerow(["phase", "candidate_id", "primary_metric",
-                     "worst_workload_metric", "macro_ndcg_at_b_t",
+    writer.writerow(["phase", "candidate_id",
+                     "active_selection_workloads", "primary_metric",
+                     "worst_active_workload_metric", "macro_ndcg_at_b_t",
                      "mean_best_validation_loss"])
     for phase in phase_results:
       for item in phase["evaluated"]:
         writer.writerow([phase["phase"], item["candidate"]["candidate_id"],
+                         ",".join(item["selection_scope"]),
                          item["primary_metric"], item["worst_workload_metric"],
                          item["macro_ndcg_at_b_t"],
                          item["mean_best_validation_loss"]])
   with open(workload_path, "w", encoding="utf-8", newline="") as handle:
     writer = csv.writer(handle)
     writer.writerow(["phase", "candidate_id", "seed", "workload",
+                     "validation_role", "metric_status", "selection_eligible",
                      "weighted_cost_per_access", "ndcg_at_b_t",
                      "valid_decision_count"])
     for phase in phase_results:
@@ -1023,6 +1538,9 @@ def write_metrics(root, phase_results):
         for row in item["validation_rows"]:
           writer.writerow([phase["phase"], item["candidate"]["candidate_id"],
                            row["seed"], row["workload"],
+                           row.get("validation_role", "active_selection"),
+                           row.get("metric_status", "available"),
+                           row.get("selection_eligible", True),
                            row["weighted_cost_per_access"],
                            row["ndcg_at_b_t"], row["valid_decision_count"]])
 
@@ -1071,6 +1589,11 @@ def freeze(args):
       "candidate": candidate["candidate"],
       "formal_seeds": list(stage4.FORMAL_SEEDS),
       "standard_pressure_same_model_checkpoint_seed_required": True,
+      "standard_workloads": list(stage4.WORKLOADS),
+      "pressure_workloads": list(stage4.ACTIVE_SELECTION_WORKLOADS),
+      "standard_retains_structural_zero_workloads": True,
+      "structural_zero_standard_reporting_rule": (
+          "execute_and_report_model_not_invoked_or_policy_tie_never_delete"),
       "checkpoint_manifest": formal_checkpoint_manifest,
   })
   state = stage4.load_json(os.path.join(root, "run_state.json"))
@@ -1089,6 +1612,8 @@ def build_parser():
       "configs/finals/capd_proactive_stage4_stage7_search.json"))
   parser.add_argument("--stage3-freeze", required=True)
   parser.add_argument("--input-manifest", required=True)
+  parser.add_argument("--reuse-sample-cache-from", default=None,
+                      help="Verified read-only r1 cache root required by r2")
   parser.add_argument("--run-id", default=stage4.RUN_ID)
   parser.add_argument("--project-root", default=PROJECT_ROOT)
   parser.add_argument("--device", choices=("auto", "cuda", "cpu"),

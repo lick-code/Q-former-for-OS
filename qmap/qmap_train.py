@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import argparse
+import copy
 import json
 import math
 import os
@@ -35,6 +36,8 @@ PROACTIVE_STAGE4_STAGE7_SAMPLE_SCHEMA = (
     "capd_proactive_stage4_stage7_sample_v1_0")
 PROACTIVE_STAGE4_CONTRACT_ID = "CAPD-PROACTIVE-STAGE4-1.0"
 PROACTIVE_STAGE4_STAGE7_CONTRACT_ID = "CAPD-PROACTIVE-STAGE4-STAGE7-1.0"
+PROACTIVE_STAGE4_STAGE7_PROTOCOL_REPAIR_CONTRACT_ID = (
+    "CAPD-PROACTIVE-STAGE4-STAGE7-1.1")
 ABLATION_CHOICES = (
     "full", "cross_attention", "no_pc", "no_rw", "mean_pool",
     "no_qformer", "no_cost")
@@ -487,7 +490,9 @@ def apply_proactive_stage4_contract(args, explicit_seed=None):
   contract_path = os.path.abspath(args.proactive_stage4_contract)
   with open(contract_path, "r", encoding="utf-8") as input_file:
     raw_value = json.load(input_file)
-  if raw_value.get("contract_id") == PROACTIVE_STAGE4_STAGE7_CONTRACT_ID:
+  if raw_value.get("contract_id") in {
+      PROACTIVE_STAGE4_STAGE7_CONTRACT_ID,
+      PROACTIVE_STAGE4_STAGE7_PROTOCOL_REPAIR_CONTRACT_ID}:
     from qmap import proactive_stage4_stage7 as contract_module
   else:
     from qmap import proactive_stage4 as contract_module
@@ -1144,6 +1149,15 @@ def main():
         },
         "sample_identity": proactive_context["sample_identity"],
         "audit_input_scope": "train_jsonl_and_validation_jsonl_only",
+        "checkpoint_validation_scope": copy.deepcopy(
+            proactive_context.get("validation_protocol", {}).get(
+                "checkpoint_validation_scope", [])),
+        "structural_zero_decision_validation": copy.deepcopy(
+            proactive_context.get("validation_protocol", {}).get(
+                "structural_zero_decision_validation", [])),
+        "validation_sample_count_by_workload": copy.deepcopy(
+            proactive_context.get("validation_protocol", {}).get(
+                "validation_sample_count_by_workload", {})),
         "test_trace_opened": False,
         "selector_status": "disabled",
         "checkpoints": dict(manifest["checkpoints"]),
