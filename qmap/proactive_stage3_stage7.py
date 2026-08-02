@@ -312,6 +312,33 @@ def validate_selection_repair_config(
       "model_training_executed"):
     _require(disclosure.get(field) is False,
              "{} must remain false.".format(field))
+  principle = value.get("standard_pressure_hard_principle")
+  if principle is not None:
+    batch_evidence = value.get("b_max_decision_evidence", {})
+    _require(principle.get("enabled") is True and
+             principle.get("only_allowed_difference") ==
+             "evaluation_interval_selection" and
+             set(principle.get("identical_fields", ())) == {
+                 "capacity_matrix", "working_set_definition", "watermarks",
+                 "batch_mechanism", "model", "checkpoint", "seed",
+                 "cost_profile", "initial_state", "policy_configuration"} and
+             principle.get("working_set_definition") ==
+             "train_chronological_window_unique_pages_quantile" and
+             principle.get("window_records") == 500000 and
+             principle.get("W_ref_quantile") == 0.50 and
+             principle.get("capacity_ratio") == 0.10 and
+             principle.get("alpha") == 0.15 and
+             principle.get("beta") == 0.4 and
+             principle.get("initial_state") == "empty_dram_per_window" and
+             selection.get("required_b_max") == 2 and
+             batch_evidence.get("b_max_1_proactive_rounds") == 124406 and
+             batch_evidence.get("b_max_2_proactive_rounds") == 62600 and
+             batch_evidence.get(
+                 "cost_demotion_reserve_and_early_reuse_equal") is True and
+             batch_evidence.get("decision") ==
+             "select_b_max_2_as_batch_knee_after_human_review" and
+             disclosure.get("human_b_max_override_after_r3_review") is True,
+             "Standard/Pressure hard principle or b_max=2 override changed.")
   return value
 
 
@@ -2947,6 +2974,8 @@ def _active_selection_from_source(
             float(reactive["minimum_free_frames"])),
         "early_reuse_ratio": proactive["early_reuse_rate"],
         "proactive_demotion_count": int(proactive["proactive_demotions"]),
+        "proactive_round_count": int(
+            proactive["number_of_proactive_rounds"]),
         "active_oracle_headroom": headroom,
     })
   revised_safety_rows = [
@@ -2981,9 +3010,22 @@ def _active_selection_from_source(
                     if row["early_reuse_ratio"] is not None]
     active_effect = bool(values) and (
         exhaustion_reduction > 0 or minimum_free_delta > 0)
+    required_b_max = repair_config["selection"].get("required_b_max")
+    batch_gate = (
+        required_b_max is None or controller["b_max"] == required_b_max)
+    hard_principle = repair_config.get("standard_pressure_hard_principle")
+    unified_parameter_gate = (
+        hard_principle is None or (
+            controller["window_records"] == hard_principle["window_records"] and
+            controller["W_ref_quantile"] ==
+            hard_principle["W_ref_quantile"] and
+            controller["requested_ratio"] ==
+            hard_principle["capacity_ratio"] and
+            controller["alpha"] == hard_principle["alpha"] and
+            controller["beta"] == hard_principle["beta"]))
     eligible = (
         pressure_passed and low_pressure_safe and oracle_gate["passed"] and
-        active_effect)
+        active_effect and batch_gate and unified_parameter_gate)
     aggregate = {
         "candidate_id": candidate_id,
         "pressure_coverage": pressure_coverage,
@@ -2993,6 +3035,9 @@ def _active_selection_from_source(
         "early_reuse_ratio": _mean(early_values),
         "proactive_demotion_count": sum(
             row["proactive_demotion_count"] for row in values),
+        "proactive_round_count": sum(
+            row["proactive_round_count"] for row in values),
+        "b_max": controller["b_max"],
         "active_oracle_headroom": _mean([
             row["active_oracle_headroom"] for row in values]),
         "total_active_oracle_headroom": sum(
@@ -3004,6 +3049,8 @@ def _active_selection_from_source(
         "active_oracle_headroom_gate_passed": oracle_gate["passed"],
         "pressure_coverage_gate_passed": pressure_passed,
         "active_mechanism_effect_passed": active_effect,
+        "required_b_max_gate_passed": batch_gate,
+        "unified_parameter_gate_passed": unified_parameter_gate,
         "eligible_for_active_pareto": eligible,
         "evaluated_window_count": len(values),
     }
@@ -3013,6 +3060,8 @@ def _active_selection_from_source(
         "pressure_gate": pressure_passed,
         "active_oracle_gate": oracle_gate,
         "active_mechanism_gate": active_effect,
+        "required_b_max_gate": batch_gate,
+        "unified_parameter_gate": unified_parameter_gate,
         "low_pressure_mechanism_safety_gate": low_pressure_safe,
         "eligible_for_active_pareto": eligible,
     })
@@ -3033,6 +3082,96 @@ def _active_selection_from_source(
   freeze_candidate, pressure_contract = build_selected_freeze_payloads(
       selected, controller, standard_matrix, source_config, run_id,
       disclosure=disclosure)
+  hard_principle = repair_config.get("standard_pressure_hard_principle")
+  if hard_principle is not None:
+    _require(controller["window_records"] == hard_principle["window_records"] and
+             controller["W_ref_quantile"] ==
+             hard_principle["W_ref_quantile"] and
+             controller["requested_ratio"] ==
+             hard_principle["capacity_ratio"] and
+             controller["alpha"] == hard_principle["alpha"] and
+             controller["beta"] == hard_principle["beta"] and
+             controller["b_max"] == repair_config["selection"][
+                 "required_b_max"],
+             "Selected controller violates the unified hard principle.")
+    unified_capacity_matrix = []
+    unified_watermarks = []
+    for workload in WORKLOADS:
+      cell = controller["actual_by_workload"][workload]
+      unified_capacity_matrix.append({
+          "workload": workload,
+          "working_set_definition":
+              hard_principle["working_set_definition"],
+          "window_records": controller["window_records"],
+          "W_ref_quantile": controller["W_ref_quantile"],
+          "W_ref": cell["W_ref"],
+          "requested_ratio": controller["requested_ratio"],
+          "D_standard": cell["D_pressure"],
+          "D_pressure": cell["D_pressure"],
+          "minimum_capacity_applied": cell["minimum_capacity_applied"],
+      })
+      unified_watermarks.append({
+          "workload": workload, "D": cell["D_pressure"],
+          "alpha": controller["alpha"], "beta": controller["beta"],
+          "F_low": cell["F_low"], "F_target": cell["F_target"],
+          "F_target_over_D": cell["F_target_over_D"]})
+    shared_execution_contract = {
+        "only_allowed_difference": "evaluation_interval_selection",
+        "standard_capacity_matrix_ref": "unified_capacity_matrix",
+        "pressure_capacity_matrix_ref": "unified_capacity_matrix",
+        "working_set_definition": hard_principle["working_set_definition"],
+        "watermarks": copy.deepcopy(unified_watermarks),
+        "batch_mechanism": {
+            "b_max": controller["b_max"],
+            "b_t_rule": source_config["controller_search"]["b_t_rule"],
+            "human_decision_evidence": copy.deepcopy(
+                repair_config["b_max_decision_evidence"])},
+        "candidate_size_K": source_config["fixed_stage3"][
+            "candidate_size_K"],
+        "cost_profile": copy.deepcopy(
+            source_config["fixed_stage3"]["cost_profile"]),
+        "initial_state": hard_principle["initial_state"],
+        "chronological": True,
+        "shuffle": False,
+        "policy_configuration_binding":
+            "one_frozen_policy_config_sha_for_standard_and_pressure",
+        "model_checkpoint_seed_binding":
+            hard_principle["model_checkpoint_seed_binding"],
+        "model": "pending_stage4",
+        "checkpoint": "pending_stage4",
+        "seed": "pending_stage4",
+    }
+    freeze_candidate.update({
+        "standard_capacity_matrix": copy.deepcopy(unified_capacity_matrix),
+        "pressure_capacity_matrix": copy.deepcopy(unified_capacity_matrix),
+        "unified_capacity_matrix": copy.deepcopy(unified_capacity_matrix),
+        "watermarks": copy.deepcopy(unified_watermarks),
+        "shared_standard_pressure_execution_contract":
+            copy.deepcopy(shared_execution_contract),
+        "pressure_interval_exclusions": copy.deepcopy(
+            freeze_candidate["excluded_pressure_capacity_cells"]),
+        "pressure_interval_unavailable_action":
+            hard_principle["pressure_interval_unavailable_action"],
+        "standard_pressure_hard_principle_satisfied": True,
+    })
+    pressure_contract.update({
+        "working_set_definition": hard_principle["working_set_definition"],
+        "standard_capacity_matrix": copy.deepcopy(unified_capacity_matrix),
+        "pressure_capacity_matrix": copy.deepcopy(unified_capacity_matrix),
+        "unified_capacity_matrix": copy.deepcopy(unified_capacity_matrix),
+        "watermark_rule": {
+            "F_target": source_config["watermark_search"]["F_target_rule"],
+            "F_low": source_config["watermark_search"]["F_low_rule"],
+            "maximum_F_target_over_D": 0.25,
+            "actual_by_capacity": copy.deepcopy(unified_watermarks)},
+        "shared_standard_pressure_execution_contract":
+            copy.deepcopy(shared_execution_contract),
+        "pressure_interval_exclusions": copy.deepcopy(
+            freeze_candidate["excluded_pressure_capacity_cells"]),
+        "pressure_interval_unavailable_action":
+            hard_principle["pressure_interval_unavailable_action"],
+        "standard_pressure_hard_principle_satisfied": True,
+    })
   freeze_candidate.update({
       "schema_version": SELECTION_REPAIR_RESULT_SCHEMA,
       "active_oracle_headroom_gate": active_oracle_headroom_gate(
@@ -3203,6 +3342,32 @@ def run_verify_reselection(
   _require(candidate.get("status") == "candidate_ready_for_human_review" and
            candidate.get("stage4_entry_allowed") is True,
            "Derived selection did not produce a reviewable candidate.")
+  hard_principle = repair_config.get("standard_pressure_hard_principle")
+  if hard_principle is not None:
+    contract = load_json(os.path.join(
+        directory, "pressure_generation_contract_candidate.json"))
+    _require(candidate.get("standard_pressure_hard_principle_satisfied")
+             is True and
+             contract.get("standard_pressure_hard_principle_satisfied")
+             is True and
+             candidate.get("b_max") ==
+             repair_config["selection"]["required_b_max"] and
+             candidate.get("standard_capacity_matrix") ==
+             candidate.get("pressure_capacity_matrix") ==
+             candidate.get("unified_capacity_matrix") and
+             contract.get("standard_capacity_matrix") ==
+             contract.get("pressure_capacity_matrix") ==
+             contract.get("unified_capacity_matrix") and
+             len(candidate.get("unified_capacity_matrix", [])) ==
+             len(WORKLOADS) and
+             len(candidate.get("watermarks", [])) == len(WORKLOADS) and
+             contract.get("working_set_definition") ==
+             hard_principle["working_set_definition"] and
+             candidate.get(
+                 "shared_standard_pressure_execution_contract", {}).get(
+                     "only_allowed_difference") ==
+             "evaluation_interval_selection",
+             "Standard/Pressure unified hard-principle verification failed.")
   _require(not os.path.exists(os.path.join(directory, "final_freeze.json")) and
            not os.path.exists(os.path.join(
                directory, "pressure_generation_contract.json")),
@@ -3227,6 +3392,9 @@ def run_verify_reselection(
       "synchronous_efficiency_claims_allowed": False,
       "asynchronous_runtime_evaluation_required": True,
       "foreground_background_parallelism_required": True,
+      "standard_pressure_hard_principle_satisfied":
+          hard_principle is not None,
+      "required_b_max": repair_config["selection"].get("required_b_max"),
       "pressure_selection_policy": "fixed_reactive_lru_only",
       "capd_or_oracle_used_for_pressure_selection": False,
       "pressure_overhead_claims_allowed": False,

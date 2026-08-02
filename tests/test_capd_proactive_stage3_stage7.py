@@ -24,6 +24,9 @@ CONFIG_PATH = os.path.join(
 SELECTION_REPAIR_CONFIG_PATH = os.path.join(
     PROJECT_ROOT, "configs", "finals",
     "capd_proactive_stage3_stage7_selection_repair.json")
+UNIFIED_CONTRACT_CONFIG_PATH = os.path.join(
+    PROJECT_ROOT, "configs", "finals",
+    "capd_proactive_stage3_stage7_unified_contract.json")
 
 
 class Stage3Stage7ContractTest(unittest.TestCase):
@@ -33,6 +36,8 @@ class Stage3Stage7ContractTest(unittest.TestCase):
       self.config = json.load(handle)
     with open(SELECTION_REPAIR_CONFIG_PATH, "r", encoding="utf-8") as handle:
       self.selection_repair_config = json.load(handle)
+    with open(UNIFIED_CONTRACT_CONFIG_PATH, "r", encoding="utf-8") as handle:
+      self.unified_contract_config = json.load(handle)
 
   def test_config_freezes_six_workloads_and_stage3_only_search_space(self):
     stage3.validate_config(self.config)
@@ -353,6 +358,28 @@ class Stage3Stage7ContractTest(unittest.TestCase):
         "stage8_results_used", "pressure_test_generated",
         "model_training_executed"):
       self.assertFalse(self.selection_repair_config["disclosure"][field])
+
+  def test_unified_contract_freezes_bmax_two_and_only_interval_difference(self):
+    stage3.validate_selection_repair_config(self.unified_contract_config)
+    self.assertEqual(2, self.unified_contract_config["selection"][
+        "required_b_max"])
+    principle = self.unified_contract_config[
+        "standard_pressure_hard_principle"]
+    self.assertTrue(principle["enabled"])
+    self.assertEqual("evaluation_interval_selection",
+                     principle["only_allowed_difference"])
+    self.assertEqual(500000, principle["window_records"])
+    self.assertEqual(0.50, principle["W_ref_quantile"])
+    self.assertEqual(0.10, principle["capacity_ratio"])
+    self.assertEqual(0.15, principle["alpha"])
+    self.assertEqual(0.4, principle["beta"])
+    self.assertEqual(
+        {"capacity_matrix", "working_set_definition", "watermarks",
+         "batch_mechanism", "model", "checkpoint", "seed",
+         "cost_profile", "initial_state", "policy_configuration"},
+        set(principle["identical_fields"]))
+    self.assertTrue(self.unified_contract_config["disclosure"][
+        "human_b_max_override_after_r3_review"])
 
   def test_pareto_frontier_and_tie_break_are_deterministic(self):
     rows = [

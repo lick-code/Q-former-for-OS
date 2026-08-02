@@ -487,3 +487,64 @@ sha256sum \
 `synchronous_efficiency_claims_allowed=false` 必须保持不变。后续异步 Replay/运行时实验
 需要真正同时运行前台 workload 与后台候选计算、降级执行，分别报告前台延迟/吞吐、
 后台 CPU/GPU 开销、降级完成率、阻塞/回退和总系统成本；Stage 3 同步结果不能替代这些证据。
+
+## 24. Standard/Pressure 统一合同与 b_max=2 人工复核修复
+
+R3 候选不能直接 freeze，因为旧 Standard 矩阵使用全局 Train∪Validation working set
+的 20/40/60%，而 Pressure 使用 500k Train 窗口 q50 的 10%。人工复核进一步确定：
+Standard 与 Pressure 除区间选择外，容量矩阵、working-set 定义、水位、批量、模型、
+checkpoint、seed、cost profile、初始状态和策略配置必须完全相同。
+
+`b_max=1` 与 `b_max=2` 在 18 个既有 Replay 窗口上的同步成本、迁移总量、空闲页、
+exhaustion 和 early reuse 相同；`b_max=2` 将 proactive rounds 从 124406 降到
+62600，约减少 49.7%，而 active Oracle headroom 仅下降约 0.018%。因此统一合同显式
+约束 `b_max=2`。这是人工复核后的工程选择，产物中必须公开记录，不能冒充原 R3 自动选择。
+
+本步骤仍只重选既有 R2 JSON，不运行 profile、search 或 Replay：
+
+```bash
+cd "$HOME/Q-former-for-OS"
+conda activate capd
+
+SOURCE_RUN="$PWD/outputs/capd_proactive_stage3/stage3-stage7-calibration-r2"
+UNIFIED_CONFIG="configs/finals/capd_proactive_stage3_stage7_unified_contract.json"
+UNIFIED_RUN_ID="stage3-stage7-unified-contract-r4"
+
+test -f "$SOURCE_RUN/run_state.json"
+test ! -e "$PWD/outputs/capd_proactive_stage3/$UNIFIED_RUN_ID"
+
+python3 -m py_compile \
+  qmap/proactive_stage3_stage7.py \
+  scripts/run_capd_proactive_stage3_stage7.py \
+  tests/test_capd_proactive_stage3_stage7.py
+
+python3 -m unittest tests.test_capd_proactive_stage3_stage7 -v
+
+python3 scripts/run_capd_proactive_stage3_stage7.py reselect \
+  --selection-config "$UNIFIED_CONFIG" \
+  --source-run-directory "$SOURCE_RUN" \
+  --run-id "$UNIFIED_RUN_ID" \
+  --project-root "$PWD"
+
+python3 scripts/run_capd_proactive_stage3_stage7.py verify-reselection \
+  --selection-config "$UNIFIED_CONFIG" \
+  --source-run-directory "$SOURCE_RUN" \
+  --run-id "$UNIFIED_RUN_ID" \
+  --project-root "$PWD"
+```
+
+核对统一合同；四个布尔表达式都必须输出 `True`，`b_max` 必须为 `2`：
+
+```bash
+export UNIFIED_RUN="$PWD/outputs/capd_proactive_stage3/$UNIFIED_RUN_ID"
+
+python3 -c 'import json,os; p=os.path.join(os.environ["UNIFIED_RUN"],"final_freeze_candidate.json"); d=json.load(open(p)); print("candidate",d["selected_candidate_id"]); print("b_max",d["b_max"]); print("hard_principle",d["standard_pressure_hard_principle_satisfied"]); print("same_matrix",d["standard_capacity_matrix"]==d["pressure_capacity_matrix"]==d["unified_capacity_matrix"]); print("workloads",len(d["unified_capacity_matrix"])); print("watermarks",len(d["watermarks"]))'
+
+python3 -c 'import json,os; p=os.path.join(os.environ["UNIFIED_RUN"],"verification.json"); d=json.load(open(p)); print("status",d["status"]); print("hard_principle",d["standard_pressure_hard_principle_satisfied"]); print("required_b_max",d["required_b_max"]); print("test_used",d["test_used_for_selection"]); print("rerun",d["source_profile_or_search_rerun"])'
+
+test ! -e "$UNIFIED_RUN/final_freeze.json"
+```
+
+把整个 `stage3-stage7-unified-contract-r4/` 同步回本地人工复核。R4 复核完成前，
+不要对 R3 或 R4 执行 freeze。正式 freeze 后，Stage 4 只能绑定一份模型 checkpoint
+SHA 和 seed；Standard 与 Pressure 必须引用同一绑定，不允许分别训练或分别选 seed。
