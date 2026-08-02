@@ -2,7 +2,8 @@
   "active_phase": null,
   "completed_phases": [
     "preflight",
-    "profile"
+    "profile",
+    "search"
   ],
   "created_at": "2026-08-01T12:05:55Z",
   "failed_directory_must_be_preserved": true,
@@ -56,6 +57,38 @@
         "path": "capacity_pressure_candidates.json",
         "sha256": "c0a13219204ce3096460efc93fcce428e13e678e40dd81eb1963611e082fa2d0"
       }
+    ],
+    "search": [
+      {
+        "bytes": 3433793,
+        "path": "watermark_candidates.json",
+        "sha256": "40cf8eaaba9e11d50fb6c0cfed5c3eb31c338182c7d0cb7d445ff811bdccdccf"
+      },
+      {
+        "bytes": 58274381,
+        "path": "controller_candidates.json",
+        "sha256": "b85688b3d5615fe0018bfacb9d1cbee94d06b9c16b4457a38314a7bc5182c94e"
+      },
+      {
+        "bytes": 42039220,
+        "path": "pressure_coverage.json",
+        "sha256": "c4594679e8df54d7c3145bbffc1939fb898dcd898f5ec32de495027ce7d0cd24"
+      },
+      {
+        "bytes": 101692299,
+        "path": "policy_results.json",
+        "sha256": "59daf1ae3d525061a42eda5e10f25d3a3f1dd4829fc512a96871cd8ad48a78ac"
+      },
+      {
+        "bytes": 8314448,
+        "path": "oracle_headroom.json",
+        "sha256": "1d0df100630ec145520b751e4a704440b706a2764d9c70a24e3a80aac5368592"
+      },
+      {
+        "bytes": 5192958,
+        "path": "validation_safety.json",
+        "sha256": "56cd44d69eb19a8cd7487c1f8aa8c2f2cc80b712a6f3c74731649eb10fcadece"
+      }
     ]
   },
   "run_id": "stage3-stage7-calibration-r2",
@@ -88,5 +121,5 @@
   "run_identity_sha256": "4397ed9971077733898fa214c6f3e48952ac3f882ff60c83dbd3c97c0a974587",
   "schema_version": "capd_proactive_stage3_stage7_result_v1_0",
   "status": "ready",
-  "updated_at": "2026-08-01T13:05:45Z"
+  "updated_at": "2026-08-02T09:23:58Z"
 }
