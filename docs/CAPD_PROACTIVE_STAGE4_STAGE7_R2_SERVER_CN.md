@@ -106,3 +106,45 @@ PY
 
 本手册不提供上述命令。只有 r2 preflight、外部缓存 SHA 复核和修复后结构门全部通过，并由负责人再次
 明确确认新搜索合同后，才会单独提供正式搜索命令。
+
+## 5. 2026-08-03 architecture 阶段编排修复与恢复
+
+首次正式搜索已完成 semantic 阶段全部 `7 candidate x 3 seed = 21` 次训练，
+随后四个 architecture candidate 在训练前统一失败，错误为：
+
+```text
+r1 semantic cache index identity mismatch: da0dab0afec1945a70ef
+```
+
+原因是旧校验同时要求缓存 owner 的 `candidate_id` 等于当前跨阶段 candidate ID。
+architecture/optimization candidate 继承 semantic winner 的 `L/H/lambda`，其样本内容身份和
+semantic key 不变，但显示 ID 必然不同。修复后仍要求 sample index 与 vocabulary index
+具有同一个 canonical semantic owner，并继续校验 semantic key、sample contract、词表和
+所有文件 SHA；仅取消错误的跨阶段显示 ID 相等要求。搜索配置、样本、词表、训练参数、
+模型、seed、Validation 协议和 checkpoint 均不改变。
+
+失败事件、四个 architecture `failure.json` 和原空的外层 search 日志均保留。
+恢复脚本会先检查固定代码/config/合同/缓存/semantic phase SHA，执行 Stage 4 回归测试，
+核验 21 份既有 training contract、manifest 及 best/last checkpoint SHA，然后写入
+`orchestration_repair_resume_receipt.json` 并执行 `resume`。已完成的 21 次训练不会重跑；
+semantic Validation replay 会重新执行，随后只启动剩余 24 次 GPU 训练。
+
+在现有 tmux 窗口中执行：
+
+```bash
+cd ~/Q-former-for-OS
+conda activate capd
+bash scripts/resume_capd_proactive_stage4_stage7_r2_server.sh "$PWD"
+```
+
+日志和退出码分别写入：
+
+```text
+validation_logs/capd_stage4_r2_resume.log
+validation_logs/capd_stage4_r2_resume.exit
+```
+
+成功终点必须同时满足：退出码为 `0`、45 份 per-seed checkpoint manifest 存在、
+`search_state.status=completed_candidate_ready`、
+`run_state.status=candidate_ready_awaiting_formal_freeze`，且
+`final_stage4_freeze.json` 和 `stage8_model_contract.json` 均不存在。

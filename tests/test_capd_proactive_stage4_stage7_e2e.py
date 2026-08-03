@@ -182,6 +182,48 @@ class Stage4Stage7SyntheticE2ETest(unittest.TestCase):
         stage4.sample_cache_identity(architecture, authority, manifest_sha),
         stage4.sample_cache_identity(optimization, authority, manifest_sha))
 
+  def test_external_cache_index_accepts_cross_phase_semantic_aliases(self):
+    config = stage4.load_json(R2_CONFIG_PATH)
+    semantic = stage4.resolve_phase_candidates(config, "semantic")[0]
+    architecture = stage4.resolve_phase_candidates(
+        config, "architecture", semantic)[0]
+    optimization = stage4.resolve_phase_candidates(
+        config, "optimization", architecture)[0]
+    key = runner.semantic_key(semantic)
+    sample_entry = {"candidate_id": semantic["candidate_id"],
+                    "semantic_key": key}
+    vocabulary_entry = copy.deepcopy(sample_entry)
+
+    self.assertEqual(
+        runner.validate_external_cache_index_binding(
+            architecture, sample_entry, vocabulary_entry),
+        (key, semantic["candidate_id"]))
+    self.assertEqual(
+        runner.validate_external_cache_index_binding(
+            optimization, sample_entry, vocabulary_entry),
+        (key, semantic["candidate_id"]))
+
+  def test_external_cache_index_rejects_owner_or_semantic_mismatch(self):
+    config = stage4.load_json(R2_CONFIG_PATH)
+    semantic = stage4.resolve_phase_candidates(config, "semantic")[0]
+    architecture = stage4.resolve_phase_candidates(
+        config, "architecture", semantic)[0]
+    key = runner.semantic_key(semantic)
+    sample_entry = {"candidate_id": semantic["candidate_id"],
+                    "semantic_key": key}
+
+    with self.assertRaisesRegex(RuntimeError,
+                                "semantic cache index identity mismatch"):
+      runner.validate_external_cache_index_binding(
+          architecture, sample_entry,
+          {"candidate_id": "sem-L128", "semantic_key": key})
+    with self.assertRaisesRegex(RuntimeError,
+                                "semantic cache index identity mismatch"):
+      runner.validate_external_cache_index_binding(
+          architecture, sample_entry,
+          {"candidate_id": semantic["candidate_id"],
+           "semantic_key": "0" * 20})
+
   def test_candidate_and_freeze_are_distinct_commands(self):
     parser = runner.build_parser()
     common = ["--stage3-freeze", "freeze.json",
@@ -273,6 +315,36 @@ class Stage4Stage7SyntheticE2ETest(unittest.TestCase):
     block = source[start:end]
     self.assertNotIn("shutil.copy", block)
     self.assertIn("copy_cache_files\": False", block)
+
+  def test_r2_resume_script_audits_partial_run_before_resume(self):
+    path = os.path.join(
+        PROJECT_ROOT, "scripts",
+        "resume_capd_proactive_stage4_stage7_r2_server.sh")
+    with open(path, "r", encoding="utf-8") as handle:
+      script = handle.read()
+    tests_at = script.index("python3 -m unittest")
+    audit_at = script.index("expected exactly 21 completed semantic runs")
+    resume_at = script.index(
+        "scripts/run_capd_proactive_stage4_stage7.py resume")
+    self.assertLess(tests_at, audit_at)
+    self.assertLess(audit_at, resume_at)
+    self.assertIn("checkpoint_manifest.json", script)
+    self.assertIn("stage4_training_contract_fingerprint", script)
+    self.assertIn("search_contract_confirmation.json", script)
+    self.assertIn("phase_result.json", script)
+    self.assertIn("orchestration_repair_resume_receipt.json", script)
+    self.assertNotIn("confirm-contract", script)
+    self.assertNotIn("--confirm-stage4-freeze", script)
+    self.assertIn(
+        'assert not (root / "final_stage4_freeze.json").exists()', script)
+    self.assertNotIn("rm ", script)
+
+  def test_final_verification_binds_orchestration_repair_receipt(self):
+    source = open(runner.__file__, "r", encoding="utf-8").read()
+    start = source.index("evidence_names = (")
+    end = source.index("evidence_sha =", start)
+    self.assertIn("orchestration_repair_resume_receipt.json",
+                  source[start:end])
 
   def test_sample_structure_report_detects_one_zero_workload_split(self):
     with tempfile.TemporaryDirectory() as root:

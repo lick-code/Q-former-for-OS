@@ -426,6 +426,19 @@ def semantic_key(candidate):
       "lambda": candidate["label_weights"]})[:20]
 
 
+def validate_external_cache_index_binding(candidate, sample_entry,
+                                          vocabulary_entry):
+  """Bind a cross-phase candidate to one canonical semantic cache owner."""
+  key = semantic_key(candidate)
+  owner = sample_entry.get("candidate_id")
+  if (not isinstance(owner, str) or not owner or
+      vocabulary_entry.get("candidate_id") != owner or
+      sample_entry.get("semantic_key") != key or
+      vocabulary_entry.get("semantic_key") != key):
+    raise RuntimeError("r1 semantic cache index identity mismatch: " + key)
+  return key, owner
+
+
 def is_protocol_repair(config):
   return config.get("schema_version") == stage4.PROTOCOL_REPAIR_SEARCH_SCHEMA
 
@@ -506,12 +519,8 @@ def verify_failed_r1_audit(source_root, config):
 def _external_dataset_manifest(source_root, candidate, authority, input_sha,
                                sample_entry, vocabulary_entry,
                                verify_payload_files):
-  key = semantic_key(candidate)
-  if (sample_entry.get("candidate_id") != candidate["candidate_id"] or
-      sample_entry.get("semantic_key") != key or
-      vocabulary_entry.get("candidate_id") != candidate["candidate_id"] or
-      vocabulary_entry.get("semantic_key") != key):
-    raise RuntimeError("r1 semantic cache index identity mismatch: " + key)
+  key, _ = validate_external_cache_index_binding(
+      candidate, sample_entry, vocabulary_entry)
   dataset_root = os.path.join(source_root, "datasets", key)
   manifest_path = os.path.join(dataset_root, "sample_manifest.json")
   _verified_file(manifest_path, sample_entry["sample_manifest_sha256"],
@@ -674,10 +683,16 @@ def load_verified_external_dataset(args, root, config, candidate, authority):
     raise RuntimeError("r2 external cache reference SHA changed")
   reference = stage4.load_json(reference_path)
   key = semantic_key(candidate)
-  entry = next((row for row in reference.get("datasets", [])
-                if row.get("semantic_key") == key), None)
-  if entry is None:
+  entries = [row for row in reference.get("datasets", [])
+             if row.get("semantic_key") == key]
+  if len(entries) != 1:
     raise RuntimeError("r2 external cache reference is missing " + key)
+  entry = entries[0]
+  canonical_owners = {
+      semantic_key(item): item["candidate_id"]
+      for item in stage4.resolve_phase_candidates(config, "semantic")}
+  if entry.get("candidate_id") != canonical_owners.get(key):
+    raise RuntimeError("r2 external cache owner identity mismatch: " + key)
   sample_entry = {"candidate_id": entry["candidate_id"],
                   "semantic_key": key,
                   "sample_generation_contract_sha256": entry[
@@ -1504,6 +1519,9 @@ def run_search(args):
       "validation_selection_report.json", "checkpoint_manifest.json")
   if is_protocol_repair(config):
     evidence_names += ("protocol_repair.json", "external_cache_reference.json")
+  repair_receipt = "orchestration_repair_resume_receipt.json"
+  if os.path.isfile(os.path.join(root, repair_receipt)):
+    evidence_names += (repair_receipt,)
   evidence_sha = {name: stage4.fingerprint_file(os.path.join(root, name))
                   for name in evidence_names}
   stage4.write_json_atomic(os.path.join(root, "verification.json"), {
