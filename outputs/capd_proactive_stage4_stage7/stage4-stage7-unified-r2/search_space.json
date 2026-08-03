@@ -1,0 +1,318 @@
+{
+  "cache_reuse": {
+    "copy_cache_files": false,
+    "mode": "verified_external_read_only_reference",
+    "required_identity_fields": [
+      "r4_freeze_sha256",
+      "r2_manifest_sha256",
+      "prepared_input_manifest_sha256",
+      "sample_generation_contract_sha256",
+      "lookahead_L",
+      "history_H",
+      "label_weights",
+      "D_F_low_F_target",
+      "b_max",
+      "candidate_size_K",
+      "train_validation_source_sha256",
+      "vocabulary_sha256",
+      "sample_file_sha256"
+    ],
+    "selection_protocol_changes_sample_content": false,
+    "source_artifact_sha256": {
+      "prepared_input_manifest_sha256": "444cd59dddaa84d73e6f55c3d0c8aa052360e16f4e0687c632be65a3b7b13c50",
+      "resolved_config_sha256": "697024bca51f2ceeb5cf4b7acd839fdb7ee293848a25968a27a71eca022db851",
+      "sample_manifest_sha256": "393d3909456f25708359b5b71b7d89f8bfe7f0190b0806e04cb85b6c318036f6",
+      "sample_structure_report_sha256": "61bca2f6d8a3632c5c15fb0c836c151e69f0ace03e42de1f6ad0bad81dd65ab1",
+      "sample_structure_verification_sha256": "7ac28d2ec58ffcd745742a45c6d501d31869d5855c0e9a122fa602e0bc02fabb",
+      "vocabulary_manifest_sha256": "0520206e5498208aaad4a3445d6a8e54f785057f9d14d74553c37cef75f8494d"
+    },
+    "source_output_root": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1",
+    "source_run_id": "stage4-stage7-unified-r1"
+  },
+  "fixed": {
+    "W_ref_quantile": 0.5,
+    "alpha": 0.15,
+    "b_max": 2,
+    "beta": 0.4,
+    "candidate_size_K": 8,
+    "candidate_source": "lru_tail",
+    "capacity_ratio": 0.1,
+    "deterministic_algorithms": true,
+    "initial_dram_state": "empty_dram_per_window",
+    "precision": "fp32",
+    "selected_candidate_id": "win500000-q50-r10-a15-b04-batch2",
+    "selector": "disabled",
+    "trajectory_policy": "proactive_lru",
+    "window_records": 500000
+  },
+  "formal_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "protocol_repair": {
+    "checkpoint_used": false,
+    "model_performance_used": false,
+    "original_rule_pre_registered": false,
+    "pressure_used": false,
+    "reason": "sample_structure_gate_found_exactly_two_zero_decision_validation_workloads_across_all_seven_semantic_caches",
+    "repair_class": "effective_validation_selection_set_protocol_repair",
+    "source_run_audit_classification": "sample_structure_gate_failed_before_training",
+    "source_run_id": "stage4-stage7-unified-r1",
+    "test_used": false,
+    "timing": "after_sample_structure_gate_before_any_training_or_performance",
+    "training_started_before_repair": false
+  },
+  "schema_version": "capd_proactive_stage4_stage7_search_v1_1",
+  "search": {
+    "candidate_count": 15,
+    "phase_order": [
+      "semantic",
+      "architecture",
+      "optimization"
+    ],
+    "phases": [
+      {
+        "candidates": [
+          {
+            "id": "sem-reference"
+          },
+          {
+            "id": "sem-L128",
+            "lookahead_L": 128
+          },
+          {
+            "id": "sem-L512",
+            "lookahead_L": 512
+          },
+          {
+            "history_H": 10,
+            "id": "sem-H10"
+          },
+          {
+            "history_H": 40,
+            "id": "sem-H40"
+          },
+          {
+            "id": "sem-lam111",
+            "label_weights": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          {
+            "id": "sem-lam114",
+            "label_weights": [
+              1.0,
+              1.0,
+              4.0
+            ]
+          }
+        ],
+        "inherit": "reference",
+        "name": "semantic"
+      },
+      {
+        "candidates": [
+          {
+            "id": "arch-balanced"
+          },
+          {
+            "id": "arch-compact",
+            "model": {
+              "address_embed_dim": 12,
+              "dropout": 0.0,
+              "feedforward_dim": 48,
+              "hidden_dim": 24,
+              "num_heads": 2,
+              "num_layers": 1,
+              "page_embed_dim": 12,
+              "pc_embed_dim": 10,
+              "rw_embed_dim": 2
+            }
+          },
+          {
+            "id": "arch-wide",
+            "model": {
+              "address_embed_dim": 24,
+              "dropout": 0.1,
+              "feedforward_dim": 96,
+              "hidden_dim": 48,
+              "num_heads": 4,
+              "num_layers": 2,
+              "page_embed_dim": 24,
+              "pc_embed_dim": 22,
+              "rw_embed_dim": 2
+            }
+          },
+          {
+            "id": "arch-deep",
+            "model": {
+              "address_embed_dim": 16,
+              "dropout": 0.2,
+              "feedforward_dim": 128,
+              "hidden_dim": 32,
+              "num_heads": 4,
+              "num_layers": 3,
+              "page_embed_dim": 16,
+              "pc_embed_dim": 14,
+              "rw_embed_dim": 2
+            }
+          }
+        ],
+        "inherit": "semantic_winner",
+        "name": "architecture"
+      },
+      {
+        "candidates": [
+          {
+            "id": "opt-balanced"
+          },
+          {
+            "id": "opt-steady",
+            "training": {
+              "batch_size": 32,
+              "epochs": 12,
+              "learning_rate": 3e-05,
+              "weight_decay": 0.0001
+            }
+          },
+          {
+            "id": "opt-fast",
+            "training": {
+              "batch_size": 64,
+              "epochs": 8,
+              "learning_rate": 0.0003,
+              "weight_decay": 0.0001
+            }
+          },
+          {
+            "id": "opt-regularized",
+            "training": {
+              "batch_size": 16,
+              "epochs": 12,
+              "learning_rate": 0.0001,
+              "weight_decay": 0.001
+            }
+          }
+        ],
+        "inherit": "architecture_winner",
+        "name": "optimization"
+      }
+    ],
+    "reference": {
+      "history_H": 20,
+      "label_weights": [
+        1.0,
+        1.0,
+        2.0
+      ],
+      "lookahead_L": 256,
+      "model": {
+        "ablation": "cross_attention",
+        "address_embed_dim": 16,
+        "address_vocab_size": 100000,
+        "context_mode": "cross_attention",
+        "dropout": 0.1,
+        "feedforward_dim": 64,
+        "hidden_dim": 32,
+        "num_heads": 4,
+        "num_layers": 2,
+        "num_queries": 4,
+        "page_dim": 21,
+        "page_embed_dim": 16,
+        "page_state_dim": 4,
+        "page_vocab_size": 100000,
+        "pc_embed_dim": 14,
+        "pc_vocab_size": 50000,
+        "position_encoding": "sinusoidal",
+        "rw_embed_dim": 2,
+        "shared_page_embedding": true,
+        "use_page_id_embedding": true
+      },
+      "training": {
+        "approx_ndcg_alpha": 10.0,
+        "batch_size": 32,
+        "checkpoint_tie_break": "earliest_epoch",
+        "deterministic_algorithms": true,
+        "epochs": 8,
+        "learning_rate": 0.0001,
+        "num_workers": 4,
+        "precision": "fp32",
+        "weight_decay": 0.0001
+      }
+    },
+    "strategy": "three_phase_predeclared_coordinate_search",
+    "training_run_count": 45
+  },
+  "search_config_sha256": "86b5a7341e8c7eceb9df9827dbbeaa2c4e131531b00fded5ffb1afc4a488ca3a",
+  "selection": {
+    "aggregation": "equal_weight_macro_over_four_active_selection_workloads_then_mean_over_all_three_seeds",
+    "candidate_tie_break": [
+      "lower_worst_active_workload_mean_weighted_cost_per_access",
+      "higher_macro_mean_ndcg_at_b_t_over_active_selection_workloads",
+      "lower_mean_best_validation_loss_over_active_selection_workloads",
+      "smaller_trainable_parameter_count",
+      "lexicographically_smaller_candidate_id"
+    ],
+    "checkpoint_rule": "minimum_validation_loss_over_four_active_selection_workloads_per_seed",
+    "checkpoint_tie_break": "earliest_epoch",
+    "checkpoint_validation_scope": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions"
+    ],
+    "early_stopping": "disabled_fixed_epochs_per_candidate",
+    "empty_workload_rule": "fail_active_zero_require_exact_declared_structural_zero_set",
+    "failure_rule": "reject_on_any_zero_active_validation_missing_seed_missing_active_workload_missing_checkpoint_nan_inf_or_nonzero_training_exit",
+    "primary_metric": "macro_mean_validation_weighted_cost_per_access_over_active_selection_workloads",
+    "seed_rule": "retain_all_formal_seeds_never_select_or_discard_a_seed",
+    "structural_zero_metric_rule": "N/A_never_zero_never_train_copy_never_selection"
+  },
+  "validation_protocol": {
+    "active_selection_workloads": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions"
+    ],
+    "checkpoint_validation_scope": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions"
+    ],
+    "stage8_pressure_workloads": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions"
+    ],
+    "stage8_standard_rule": "execute_all_six_and_report_model_not_invoked_or_policy_tie_without_deletion",
+    "stage8_standard_workloads": [
+      "canneal",
+      "streamcluster_pressure",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions",
+      "fluidanimate"
+    ],
+    "structural_zero_decision_validation": [
+      "streamcluster_pressure",
+      "fluidanimate"
+    ],
+    "structural_zero_identity_change_rule": "stop_if_either_validation_sample_count_or_valid_decision_count_becomes_nonzero",
+    "structural_zero_metric_representation": "N/A_as_JSON_null_never_zero_or_train_copy",
+    "structural_zero_selection_eligible": false,
+    "training_workloads": [
+      "canneal",
+      "streamcluster_pressure",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions",
+      "fluidanimate"
+    ]
+  }
+}

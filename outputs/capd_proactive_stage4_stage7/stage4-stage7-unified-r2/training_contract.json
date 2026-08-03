@@ -1,0 +1,33 @@
+{
+  "checkpoint_rule": "minimum_validation_loss_over_four_active_selection_workloads_per_seed",
+  "checkpoint_validation_scope": [
+    "canneal",
+    "dedup_pressure",
+    "blackscholes",
+    "swaptions"
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.1",
+  "formal_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "model_scope": "one_unified_model_per_seed_across_six_workloads",
+  "pressure_trace_opened": false,
+  "run_id": "stage4-stage7-unified-r2",
+  "schema_version": "capd_proactive_stage4_stage7_training_plan_v1_1",
+  "search_confirmation_required": true,
+  "structural_zero_decision_validation": [
+    "streamcluster_pressure",
+    "fluidanimate"
+  ],
+  "test_trace_opened": false,
+  "training_workloads": [
+    "canneal",
+    "streamcluster_pressure",
+    "dedup_pressure",
+    "blackscholes",
+    "swaptions",
+    "fluidanimate"
+  ]
+}

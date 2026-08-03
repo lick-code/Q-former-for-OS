@@ -1,0 +1,56 @@
+{
+  "W_ref_quantile": 0.5,
+  "alpha": 0.15,
+  "b_max": 2,
+  "beta": 0.4,
+  "candidate_size_K": 8,
+  "capacity_ratio": 0.1,
+  "cost_profile": {
+    "demotion": 10,
+    "dram_hit": 1,
+    "nvm_read": 2,
+    "nvm_write": 8
+  },
+  "final_freeze_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/final_freeze.json",
+  "final_freeze_sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+  "initial_dram_state": "empty_dram_per_window",
+  "pressure_generation_contract_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/pressure_generation_contract.json",
+  "pressure_generation_contract_sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+  "run_id": "stage3-stage7-unified-contract-r4",
+  "run_state_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/run_state.json",
+  "run_state_sha256": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63",
+  "selected_candidate_id": "win500000-q50-r10-a15-b04-batch2",
+  "window_records": 500000,
+  "workloads": {
+    "blackscholes": {
+      "D": 8,
+      "F_low": 1,
+      "F_target": 2
+    },
+    "canneal": {
+      "D": 120,
+      "F_low": 6,
+      "F_target": 16
+    },
+    "dedup_pressure": {
+      "D": 21,
+      "F_low": 1,
+      "F_target": 3
+    },
+    "fluidanimate": {
+      "D": 22,
+      "F_low": 1,
+      "F_target": 3
+    },
+    "streamcluster_pressure": {
+      "D": 22,
+      "F_low": 1,
+      "F_target": 3
+    },
+    "swaptions": {
+      "D": 8,
+      "F_low": 1,
+      "F_target": 2
+    }
+  }
+}

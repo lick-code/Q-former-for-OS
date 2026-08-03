@@ -1,0 +1,39 @@
+{
+  "active_selection_workloads": [
+    "canneal",
+    "dedup_pressure",
+    "blackscholes",
+    "swaptions"
+  ],
+  "candidate_selected": false,
+  "checkpoint_created": false,
+  "external_cache_reference_sha256": "3c09724ae76a48cf07917ac66699d4968e382b34ae2a3344b73005ac50350619",
+  "formal_freeze": false,
+  "gate_pass": true,
+  "pressure_trace_opened": false,
+  "protocol_repair": true,
+  "protocol_repair_sha256": "241eaabdc91742f984b6f05d92f397ab27516d15b79df02fec0ea46fb868699d",
+  "run_id": "stage4-stage7-unified-r2",
+  "sample_manifest_sha256": "f0bb766a0b50613b742dd41f86e16d296c5ef04bc04434d38c3cc61434bc520d",
+  "sample_structure_report_sha256": "0912390a46a38d44c6e2bc61db8be034faa31457b5867ddd441a1b96a67d76e9",
+  "schema_version": "capd_proactive_stage4_stage7_sample_structure_verification_v1_1",
+  "search_contract_confirmed": false,
+  "search_started": false,
+  "status": "PASS",
+  "structural_identity_violations": [],
+  "structural_zero_decision_validation": [
+    "streamcluster_pressure",
+    "fluidanimate"
+  ],
+  "test_trace_opened": false,
+  "training_started": false,
+  "vocabulary_manifest_sha256": "caebc08f2505ad378f1be17ca7b1cc48a9fdac4d22ae008a1f7f6e990db805a4",
+  "zero_sample_workload_splits": [
+    "fluidanimate/validation",
+    "streamcluster_pressure/validation"
+  ],
+  "zero_valid_decision_workload_splits": [
+    "fluidanimate/validation",
+    "streamcluster_pressure/validation"
+  ]
+}
