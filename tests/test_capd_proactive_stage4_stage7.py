@@ -244,6 +244,27 @@ class Stage4Stage7ProtocolRepairContractTest(unittest.TestCase):
     with self.assertRaises(stage4.Stage4Stage7ContractError):
       stage4.validate_search_config(value)
 
+  def test_reused_r1_trace_evidence_binds_all_current_entries(self):
+    entries, rows = [], []
+    for workload in stage4.WORKLOADS:
+      for split, count in (("train", 1800000), ("validation", 600000)):
+        entries.append({"workload": workload, "split_role": split,
+                        "accesses": count})
+        rows.append({"workload": workload, "split_role": split,
+                     "parsed_accesses": count,
+                     "rw_source": "real trace RW column"})
+    resolved = {"run_id": stage4.RUN_ID, "runtime": {
+        "run_id": stage4.RUN_ID,
+        "input_manifest_sha256": stage4.R1_PREPARED_INPUT_MANIFEST_SHA256,
+        "trace_record_validation": rows}}
+    self.assertEqual(stage4.validate_reused_trace_record_evidence(
+        resolved, entries), rows)
+
+    broken = copy.deepcopy(resolved)
+    broken["runtime"]["trace_record_validation"][0]["parsed_accesses"] -= 1
+    with self.assertRaises(stage4.Stage4Stage7ContractError):
+      stage4.validate_reused_trace_record_evidence(broken, entries)
+
   def test_structural_zero_row_is_na_and_never_selection_eligible(self):
     row = stage4.structural_zero_validation_row(
         "fluidanimate", 42, {"candidate_id": "synthetic"}, {

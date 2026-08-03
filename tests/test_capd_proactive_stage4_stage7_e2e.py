@@ -80,6 +80,56 @@ class Stage4Stage7SyntheticE2ETest(unittest.TestCase):
       self.assertFalse(state["formal_freeze"])
       self.assertFalse(state["search_contract_confirmed"])
 
+  def test_r2_preflight_reuses_pinned_r1_parse_evidence(self):
+    with tempfile.TemporaryDirectory() as root:
+      config = copy.deepcopy(stage4.load_json(R2_CONFIG_PATH))
+      config["output_root"] = "outputs/new-stage4"
+      config["execution"]["require_cuda"] = False
+      source_root = os.path.join(root, "r1")
+      invocation = args(root)
+      invocation.config = R2_CONFIG_PATH
+      invocation.input_manifest = "r1-input-manifest.json"
+      invocation.run_id = stage4.PROTOCOL_REPAIR_RUN_ID
+      invocation.reuse_sample_cache_from = source_root
+      config["cache_reuse"]["source_output_root"] = "r1"
+      entries = [{"workload": workload, "split_role": split,
+                  "accesses": 10}
+                 for workload in stage4.WORKLOADS
+                 for split in stage4.SPLITS]
+      rows = [{"workload": entry["workload"],
+               "split_role": entry["split_role"],
+               "parsed_accesses": entry["accesses"],
+               "rw_source": "real trace RW column"}
+              for entry in entries]
+      source_resolved = {"run_id": stage4.RUN_ID, "runtime": {
+          "run_id": stage4.RUN_ID,
+          "input_manifest_sha256": stage4.R1_PREPARED_INPUT_MANIFEST_SHA256,
+          "trace_record_validation": rows}}
+      with mock.patch.object(runner, "load_context", return_value=(
+          config, fake_authority(), {"entries": entries}, entries)), \
+           mock.patch.object(runner, "runtime_device", return_value={
+               "requested": "cpu", "actual": "cpu", "require_cuda": False,
+               "cuda_available": False, "cuda_device_count": 0,
+               "cuda_device_name": None}), \
+           mock.patch.object(runner, "git_state", return_value={
+               "commit": "synthetic", "dirty": False,
+               "status_sha256": "0" * 64}), \
+           mock.patch.object(runner, "verify_failed_r1_audit", return_value={
+               "resolved_config": source_resolved}), \
+           mock.patch.object(stage4, "fingerprint_file", return_value=
+                             stage4.R1_PREPARED_INPUT_MANIFEST_SHA256), \
+           mock.patch.object(stage4, "validate_registered_trace_records") as \
+               parse_current:
+        output = runner.preflight(invocation)
+
+      parse_current.assert_not_called()
+      resolved = stage4.load_json(os.path.join(output, "resolved_config.json"))
+      self.assertEqual(resolved["runtime"]["trace_record_validation"], rows)
+      self.assertEqual(resolved["runtime"]["trace_record_validation_mode"],
+                       "verified_r1_preflight_evidence_reuse")
+      self.assertTrue(resolved["runtime"][
+          "current_trace_payload_sha256_verified"])
+
   def test_full_search_refuses_missing_confirmation(self):
     with tempfile.TemporaryDirectory() as root:
       with self.assertRaises(RuntimeError):

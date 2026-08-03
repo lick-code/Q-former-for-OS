@@ -31,7 +31,13 @@ r1 保持原文件和原状态，不覆盖、不确认、不训练、不 freeze�
 `formal_freeze=false`。
 
 r2 搜索配置：`configs/finals/capd_proactive_stage4_stage7_search_r2.json`。
-本地 SHA-256：`3ea507da8ea119b7b6e4103057611ffbffb234ea2b5f3a6d63e5ddcf44d79c90`。
+本地 SHA-256：`86b5a7341e8c7eceb9df9827dbbeaa2c4e131531b00fded5ffb1afc4a488ca3a`。
+
+r2 preflight 不再重复逐行解析与 r1 完全相同的 14,400,000 条 Train/Validation
+记录。它仍先对当前 12 个源文件逐一验证 SHA-256，然后验证固定 SHA
+`697024bca51f2ceeb5cf4b7acd839fdb7ee293848a25968a27a71eca022db851`
+对应的 r1 `resolved_config.json`，并逐项绑定 r1 已完成的 12 份完整轨迹解析证据。
+这只消除重复解析，不放宽源文件身份、访问数、RW 来源或 Test/Pressure 隔离检查。
 
 ## 缓存处理
 
@@ -41,4 +47,3 @@ R4、R2 manifest、prepared input manifest、L/H/lambda、D/F_low/F_target、`b_
 复制文件。
 
 服务器操作以 `docs/CAPD_PROACTIVE_STAGE4_STAGE7_R2_SERVER_CN.md` 为唯一 r2 手册。
-

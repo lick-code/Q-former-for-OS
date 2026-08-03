@@ -68,6 +68,8 @@ R2_MANIFEST_SHA256 = (
     "108b2c34b5809e911b8b92864b111fc117caea8566997c101607928c590ed85f")
 R1_PREPARED_INPUT_MANIFEST_SHA256 = (
     "444cd59dddaa84d73e6f55c3d0c8aa052360e16f4e0687c632be65a3b7b13c50")
+R1_RESOLVED_CONFIG_SHA256 = (
+    "697024bca51f2ceeb5cf4b7acd839fdb7ee293848a25968a27a71eca022db851")
 R1_SAMPLE_STRUCTURE_REPORT_SHA256 = (
     "61bca2f6d8a3632c5c15fb0c836c151e69f0ace03e42de1f6ad0bad81dd65ab1")
 R1_SAMPLE_STRUCTURE_VERIFICATION_SHA256 = (
@@ -448,6 +450,45 @@ def validate_registered_trace_records(
   return result
 
 
+def validate_reused_trace_record_evidence(
+    value: Mapping[str, Any],
+    entries: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any]]:
+  """Validate r1's pinned full-parse evidence against current SHA-checked inputs.
+
+  The repaired r2 protocol changes only the Validation selection set. Its input
+  manifest and all twelve trace payload SHA-256 values are still checked by
+  validate_input_manifest. Re-parsing 14.4 million unchanged records is
+  therefore unnecessary; this function binds the current entries to the
+  immutable r1 preflight evidence instead.
+  """
+  runtime = value.get("runtime", {})
+  _require(value.get("run_id") == RUN_ID and runtime.get("run_id") == RUN_ID,
+           "Reused trace evidence must come from Stage4 r1")
+  _require(runtime.get("input_manifest_sha256") ==
+           R1_PREPARED_INPUT_MANIFEST_SHA256,
+           "Reused trace evidence input manifest SHA mismatch")
+  evidence = runtime.get("trace_record_validation")
+  _require(isinstance(evidence, list) and len(evidence) == 12,
+           "Reused trace evidence must cover exactly twelve inputs")
+  expected = {(entry["workload"], entry["split_role"]): int(entry["accesses"])
+              for entry in entries}
+  _require(len(expected) == 12, "Current trace inputs must contain twelve pairs")
+  seen = set()
+  result = []
+  for row in evidence:
+    key = (row.get("workload"), row.get("split_role"))
+    _require(key in expected and key not in seen,
+             "Reused trace evidence identity mismatch")
+    _require(int(row.get("parsed_accesses", -1)) == expected[key],
+             "Reused trace evidence access count mismatch: {}/{}".format(*key))
+    _require(row.get("rw_source") == "real trace RW column",
+             "Reused trace evidence must bind the real RW column")
+    seen.add(key)
+    result.append(copy.deepcopy(row))
+  _require(seen == set(expected), "Reused trace evidence coverage mismatch")
+  return result
+
+
 def _walk_keys(value: Any) -> Iterable[str]:
   if isinstance(value, Mapping):
     for key, child in value.items():
@@ -583,6 +624,7 @@ def validate_search_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
              "r2 cache reuse must be a read-only r1 reference")
     expected_hashes = {
         "prepared_input_manifest_sha256": R1_PREPARED_INPUT_MANIFEST_SHA256,
+        "resolved_config_sha256": R1_RESOLVED_CONFIG_SHA256,
         "sample_structure_report_sha256": R1_SAMPLE_STRUCTURE_REPORT_SHA256,
         "sample_structure_verification_sha256":
             R1_SAMPLE_STRUCTURE_VERIFICATION_SHA256,

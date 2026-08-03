@@ -100,11 +100,12 @@ def ensure_layout(root):
 
 def preflight(args):
   config, authority, manifest, entries = load_context(args)
-  trace_validation = stage4.validate_registered_trace_records(entries)
   if config.get("execution", {}).get("require_cuda") and not args.require_cuda:
     raise RuntimeError("Formal config requires explicit --require-cuda")
   root = run_root(args, config)
   repaired = config.get("schema_version") == stage4.PROTOCOL_REPAIR_SEARCH_SCHEMA
+  trace_validation_mode = "parsed_current_inputs"
+  trace_validation_source_sha = None
   if repaired:
     if not args.reuse_sample_cache_from:
       raise RuntimeError("r2 preflight requires --reuse-sample-cache-from")
@@ -115,6 +116,13 @@ def preflight(args):
     if stage4.fingerprint_file(args.input_manifest) != (
         stage4.R1_PREPARED_INPUT_MANIFEST_SHA256):
       raise RuntimeError("r2 must reuse the registered r1 prepared input manifest")
+    source_audit = verify_failed_r1_audit(args.reuse_sample_cache_from, config)
+    trace_validation = stage4.validate_reused_trace_record_evidence(
+        source_audit["resolved_config"], entries)
+    trace_validation_mode = "verified_r1_preflight_evidence_reuse"
+    trace_validation_source_sha = stage4.R1_RESOLVED_CONFIG_SHA256
+  else:
+    trace_validation = stage4.validate_registered_trace_records(entries)
   ensure_layout(root)
   device = runtime_device(args.device, args.require_cuda)
   if device["actual"] == "cuda" and device["cuda_device_count"] != 1:
@@ -133,6 +141,10 @@ def preflight(args):
       "external_cache_source": (os.path.abspath(args.reuse_sample_cache_from)
                                 if repaired else None),
       "trace_record_validation": trace_validation,
+      "trace_record_validation_mode": trace_validation_mode,
+      "trace_record_validation_source_resolved_config_sha256":
+          trace_validation_source_sha,
+      "current_trace_payload_sha256_verified": True,
       "preflight_at": utc_now(),
   }
   stage4.write_json_atomic(os.path.join(root, "resolved_config.json"), resolved)
@@ -434,6 +446,7 @@ def verify_failed_r1_audit(source_root, config):
   expected = config["cache_reuse"]["source_artifact_sha256"]
   artifact_fields = {
       "input_manifest.json": "prepared_input_manifest_sha256",
+      "resolved_config.json": "resolved_config_sha256",
       "sample_structure_report.json": "sample_structure_report_sha256",
       "sample_structure_verification.json":
           "sample_structure_verification_sha256",
@@ -453,6 +466,8 @@ def verify_failed_r1_audit(source_root, config):
                       "bytes": os.path.getsize(path)}
   verification = stage4.load_json(os.path.join(
       source_root, "sample_structure_verification.json"))
+  source_resolved = stage4.load_json(os.path.join(source_root,
+                                                   "resolved_config.json"))
   expected_zero = sorted(workload + "/validation" for workload in
                          stage4.STRUCTURAL_ZERO_DECISION_VALIDATION)
   if (run_state.get("run_id") != stage4.RUN_ID or
@@ -484,7 +499,8 @@ def verify_failed_r1_audit(source_root, config):
   if sample_gate_forbidden_artifacts(source_root):
     raise RuntimeError("r1 contains forbidden post-gate artifacts")
   return {"artifacts": verified, "run_state": copy.deepcopy(run_state),
-          "search_state": copy.deepcopy(search_state)}
+          "search_state": copy.deepcopy(search_state),
+          "resolved_config": copy.deepcopy(source_resolved)}
 
 
 def _external_dataset_manifest(source_root, candidate, authority, input_sha,

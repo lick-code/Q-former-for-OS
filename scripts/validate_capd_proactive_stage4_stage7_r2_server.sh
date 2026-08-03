@@ -8,12 +8,13 @@ R2_ROOT="outputs/capd_proactive_stage4_stage7/${RUN_ID}"
 CONFIG="configs/finals/capd_proactive_stage4_stage7_search_r2.json"
 FREEZE="outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/final_freeze.json"
 MANIFEST="${R1_ROOT}/input_manifest.json"
-CONFIG_SHA256="3ea507da8ea119b7b6e4103057611ffbffb234ea2b5f3a6d63e5ddcf44d79c90"
+CONFIG_SHA256="86b5a7341e8c7eceb9df9827dbbeaa2c4e131531b00fded5ffb1afc4a488ca3a"
 
 cd "$PROJECT_ROOT"
 
 printf '%s  %s\n' "$CONFIG_SHA256" "$CONFIG" | sha256sum --check --strict
 
+printf '[STEP 1/4] compile and run Stage4 regression tests\n'
 python3 -m py_compile \
   qmap/proactive_stage4_stage7.py \
   qmap/qmap_train.py \
@@ -26,6 +27,7 @@ python3 -m unittest \
   tests.test_capd_proactive_stage4_e2e \
   -v
 
+printf '[STEP 2/4] r2 preflight: verify 12 source SHA values and pinned r1 parse evidence\n'
 python3 scripts/run_capd_proactive_stage4_stage7.py preflight \
   --config "$CONFIG" \
   --stage3-freeze "$FREEZE" \
@@ -36,6 +38,7 @@ python3 scripts/run_capd_proactive_stage4_stage7.py preflight \
   --device cuda --require-cuda \
   --train-workers 4 --sample-workers 6 --replay-workers 6
 
+printf '[STEP 3/4] verify the 7.2 GB external sample cache and repaired structure gate\n'
 python3 scripts/run_capd_proactive_stage4_stage7.py samples \
   --config "$CONFIG" \
   --stage3-freeze "$FREEZE" \
@@ -46,6 +49,7 @@ python3 scripts/run_capd_proactive_stage4_stage7.py samples \
   --device cuda --require-cuda \
   --train-workers 4 --sample-workers 6 --replay-workers 6
 
+printf '[STEP 4/4] verify final gate state and forbidden-artifact boundaries\n'
 python3 - "$R1_ROOT" "$R2_ROOT" <<'PY'
 import hashlib
 import json
@@ -69,6 +73,7 @@ r2_search = load(r2, "search_state.json")
 gate = load(r2, "sample_structure_verification.json")
 report = load(r2, "sample_structure_report.json")
 reference = load(r2, "external_cache_reference.json")
+resolved = load(r2, "resolved_config.json")
 
 assert r1_run["status"] == "sample_structure_gate_failed"
 assert r1_run["sample_structure_gate_passed"] is False
@@ -99,6 +104,20 @@ assert report["semantic_dataset_count"] == 7
 assert reference["mode"] == "verified_external_read_only_reference"
 assert reference["copy_cache_files"] is False
 assert len(reference["datasets"]) == 7
+runtime = resolved["runtime"]
+assert runtime["trace_record_validation_mode"] == (
+    "verified_r1_preflight_evidence_reuse")
+assert runtime["trace_record_validation_source_resolved_config_sha256"] == (
+    "697024bca51f2ceeb5cf4b7acd839fdb7ee293848a25968a27a71eca022db851")
+assert runtime["current_trace_payload_sha256_verified"] is True
+assert len(runtime["trace_record_validation"]) == 12
+assert {(row["workload"], row["split_role"])
+        for row in runtime["trace_record_validation"]} == {
+            (workload, split)
+            for workload in ("canneal", "streamcluster_pressure",
+                             "dedup_pressure", "blackscholes", "swaptions",
+                             "fluidanimate")
+            for split in ("train", "validation")}
 
 assert sha(r2, "sample_structure_report.json") == gate[
     "sample_structure_report_sha256"]

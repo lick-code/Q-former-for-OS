@@ -43,14 +43,20 @@ r2 不复制、不改写、也不伪装重新生成约 7.2 GB 的 r1 样本。`s
 下面的脚本会运行 Stage 4 相关测试、r2 preflight、7.2 GB 缓存逐文件 SHA 复核及结构门。
 它不会执行 `confirm-contract`、`search`、`resume`、`all`、`freeze` 或 GPU 训练。
 
+r2 preflight 会逐一验证当前 12 个 Train/Validation 源文件 SHA，但不会再次逐行解析
+与 r1 相同的 14,400,000 条记录。它改为校验固定 SHA 的 r1
+`resolved_config.json`，并将其中已通过的 12 份完整轨迹解析证据绑定到当前输入。
+日志中的 `KeyboardInterrupt` 表示旧流程在重复解析期间收到外部 SIGINT；它不是测试、
+CUDA 或合同断言失败。新流程在 `resolved_config.json` 中登记证据复用模式和来源 SHA。
+
 ```bash
 cd ~/Q-former-for-OS
 conda activate capd
 
-tmux new-session -d -s capd-r2-gate \
-  "cd '$PWD'; bash scripts/validate_capd_proactive_stage4_stage7_r2_server.sh '$PWD' > validation_logs/capd_stage4_r2_gate.log 2>&1; rc=\$?; echo \$rc > validation_logs/capd_stage4_r2_gate.exit; echo '[DONE] exit='\$rc; exec bash"
+tmux new-session -d -s capd-r2-gate-v2 \
+  "cd '$PWD'; bash scripts/validate_capd_proactive_stage4_stage7_r2_server.sh '$PWD' > validation_logs/capd_stage4_r2_gate_v2.log 2>&1; rc=\$?; echo \$rc > validation_logs/capd_stage4_r2_gate_v2.exit; echo '[DONE] exit='\$rc; exec bash"
 
-tmux attach -t capd-r2-gate
+tmux attach -t capd-r2-gate-v2
 ```
 
 这里 `set -e` 只存在于独立子脚本中，不会退出当前登录 shell。无论成功或失败，外层命令最后都会
@@ -61,8 +67,8 @@ tmux attach -t capd-r2-gate
 
 ```bash
 cd ~/Q-former-for-OS
-cat validation_logs/capd_stage4_r2_gate.exit
-tail -n 80 validation_logs/capd_stage4_r2_gate.log
+cat validation_logs/capd_stage4_r2_gate_v2.exit
+tail -n 80 validation_logs/capd_stage4_r2_gate_v2.log
 
 python3 - <<'PY'
 import json
