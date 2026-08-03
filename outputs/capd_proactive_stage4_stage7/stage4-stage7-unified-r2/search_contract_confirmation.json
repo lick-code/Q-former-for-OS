@@ -1,0 +1,59 @@
+{
+  "candidate_count": 15,
+  "confirmed_at": "2026-08-03T02:20:28Z",
+  "confirmed_search_contract_sha256": "086a07011fa9a47e557a820309be26d6b8a02c43c11ba1a25170dd746a967dfc",
+  "external_cache_reference_sha256": "3c09724ae76a48cf07917ac66699d4968e382b34ae2a3344b73005ac50350619",
+  "formal_freeze": false,
+  "human_confirmation": true,
+  "protocol_repair_sha256": "241eaabdc91742f984b6f05d92f397ab27516d15b79df02fec0ea46fb868699d",
+  "run_id": "stage4-stage7-unified-r2",
+  "sample_structure_report_sha256": "0912390a46a38d44c6e2bc61db8be034faa31457b5867ddd441a1b96a67d76e9",
+  "sample_structure_verification_sha256": "419ab4675cb0cd57672728df06e68c1cd5600198b8d36c41dd081fb9a8327a6f",
+  "schema_version": "capd_proactive_stage4_stage7_search_confirmation_v1_1",
+  "search_config_sha256": "86b5a7341e8c7eceb9df9827dbbeaa2c4e131531b00fded5ffb1afc4a488ca3a",
+  "training_run_count": 45,
+  "validation_protocol": {
+    "active_selection_workloads": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions"
+    ],
+    "checkpoint_validation_scope": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions"
+    ],
+    "stage8_pressure_workloads": [
+      "canneal",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions"
+    ],
+    "stage8_standard_rule": "execute_all_six_and_report_model_not_invoked_or_policy_tie_without_deletion",
+    "stage8_standard_workloads": [
+      "canneal",
+      "streamcluster_pressure",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions",
+      "fluidanimate"
+    ],
+    "structural_zero_decision_validation": [
+      "streamcluster_pressure",
+      "fluidanimate"
+    ],
+    "structural_zero_identity_change_rule": "stop_if_either_validation_sample_count_or_valid_decision_count_becomes_nonzero",
+    "structural_zero_metric_representation": "N/A_as_JSON_null_never_zero_or_train_copy",
+    "structural_zero_selection_eligible": false,
+    "training_workloads": [
+      "canneal",
+      "streamcluster_pressure",
+      "dedup_pressure",
+      "blackscholes",
+      "swaptions",
+      "fluidanimate"
+    ]
+  }
+}

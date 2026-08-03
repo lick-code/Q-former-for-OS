@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "scripts/run_capd_proactive_stage4_stage7.py", line 1673, in <module>
+    main()
+  File "scripts/run_capd_proactive_stage4_stage7.py", line 1657, in main
+    run_search(args)
+  File "scripts/run_capd_proactive_stage4_stage7.py", line 1438, in run_search
+    raise RuntimeError("Every candidate failed in phase {}".format(phase_name))
+RuntimeError: Every candidate failed in phase architecture
