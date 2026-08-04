@@ -1,0 +1,123 @@
+{
+  "candidate": {
+    "candidate_id": "opt-balanced",
+    "candidate_sha256": "7a93ea88988c8fce539b841d4eeac2be86841d53d5df7e6c7060018649d302bb",
+    "execution": {
+      "device": "cuda",
+      "replay_workers": 6,
+      "require_cuda": true,
+      "sample_workers": 6,
+      "single_gpu_training_process": true,
+      "train_workers": 4
+    },
+    "history_H": 20,
+    "label_weights": [
+      1.0,
+      1.0,
+      2.0
+    ],
+    "lookahead_L": 256,
+    "model": {
+      "ablation": "cross_attention",
+      "address_embed_dim": 24,
+      "address_vocab_size": 100000,
+      "context_mode": "cross_attention",
+      "dropout": 0.1,
+      "feedforward_dim": 96,
+      "hidden_dim": 48,
+      "num_heads": 4,
+      "num_layers": 2,
+      "num_queries": 4,
+      "page_dim": 21,
+      "page_embed_dim": 24,
+      "page_state_dim": 4,
+      "page_vocab_size": 100000,
+      "pc_embed_dim": 22,
+      "pc_vocab_size": 50000,
+      "position_encoding": "sinusoidal",
+      "rw_embed_dim": 2,
+      "shared_page_embedding": true,
+      "use_page_id_embedding": true
+    },
+    "phase": "optimization",
+    "training": {
+      "approx_ndcg_alpha": 10.0,
+      "batch_size": 32,
+      "checkpoint_tie_break": "earliest_epoch",
+      "deterministic_algorithms": true,
+      "epochs": 8,
+      "learning_rate": 0.0001,
+      "num_workers": 4,
+      "precision": "fp32",
+      "weight_decay": 0.0001
+    }
+  },
+  "checkpoint_manifest_sha256": "4a1ee27f09fa9465a731e1fe233e58f67c27211355d187a725ba374451dd4f15",
+  "formal_freeze": true,
+  "formal_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "frozen_at": "2026-08-04T02:45:21Z",
+  "human_confirmation": true,
+  "run_id": "stage4-stage7-unified-r2",
+  "schema_version": "capd_proactive_stage4_stage7_final_freeze_v1_0",
+  "selection_report_sha256": "92a6e998abedb603674ff8b54b8c7807400de0e4c2833e4d107625c9ff90acce",
+  "stage3_authority": {
+    "W_ref_quantile": 0.5,
+    "alpha": 0.15,
+    "b_max": 2,
+    "beta": 0.4,
+    "candidate_size_K": 8,
+    "capacity_ratio": 0.1,
+    "cost_profile": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    },
+    "final_freeze_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/final_freeze.json",
+    "final_freeze_sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+    "initial_dram_state": "empty_dram_per_window",
+    "pressure_generation_contract_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/pressure_generation_contract.json",
+    "pressure_generation_contract_sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+    "run_id": "stage3-stage7-unified-contract-r4",
+    "run_state_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/run_state.json",
+    "run_state_sha256": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63",
+    "selected_candidate_id": "win500000-q50-r10-a15-b04-batch2",
+    "window_records": 500000,
+    "workloads": {
+      "blackscholes": {
+        "D": 8,
+        "F_low": 1,
+        "F_target": 2
+      },
+      "canneal": {
+        "D": 120,
+        "F_low": 6,
+        "F_target": 16
+      },
+      "dedup_pressure": {
+        "D": 21,
+        "F_low": 1,
+        "F_target": 3
+      },
+      "fluidanimate": {
+        "D": 22,
+        "F_low": 1,
+        "F_target": 3
+      },
+      "streamcluster_pressure": {
+        "D": 22,
+        "F_low": 1,
+        "F_target": 3
+      },
+      "swaptions": {
+        "D": 8,
+        "F_low": 1,
+        "F_target": 2
+      }
+    }
+  }
+}
