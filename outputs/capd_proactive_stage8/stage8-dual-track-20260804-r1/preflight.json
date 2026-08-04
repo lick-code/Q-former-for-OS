@@ -1,0 +1,18 @@
+{
+  "cell_count": 10,
+  "contract_id": "CAPD-PROACTIVE-STAGE8-2.0",
+  "cuda_checkpoint_smoke_required_before_formal_replay": true,
+  "deterministic_runtime_environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "PYTHONHASHSEED": "0"
+  },
+  "frozen_parameters_changed": false,
+  "job_count": 80,
+  "pressure_job_count": 32,
+  "schema_version": "capd_proactive_stage8_preflight_v2_0",
+  "standard_job_count": 48,
+  "status": "passed",
+  "test_payload_operation": "sha256_integrity_only_not_parsed",
+  "test_performance_inspected": false,
+  "test_policy_replay_executed": false
+}

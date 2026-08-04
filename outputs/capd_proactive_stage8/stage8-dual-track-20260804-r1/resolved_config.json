@@ -1,0 +1,228 @@
+{
+  "acceptance": {
+    "awaiting_status": "awaiting_formal_replay_confirmation",
+    "cell_count": 10,
+    "failure_status": "stage8_not_verified",
+    "formal_job_count": 80,
+    "minimum_stage1_through_stage8_regression_tests": 380,
+    "pressure_job_count": 32,
+    "standard_job_count": 48,
+    "verified_status": "stage8_sync_replay_verified"
+  },
+  "authorities": {
+    "cost_config": {
+      "path": "configs/finals/capd_proactive_stage2_cost_profiles.json",
+      "sha256": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0"
+    },
+    "pressure_bundle_manifest": {
+      "path": "outputs/capd_proactive_pressure_stage7/stage7-pressure-derive-r2/local_pressure_bundle_manifest.json",
+      "sha256": "898a6b2c85221a1dbd5eb483cc0ef6599ce43065c60dcd7779791cce7f50ad52"
+    },
+    "pressure_test_lock": {
+      "path": "outputs/capd_proactive_pressure_stage7/stage7-pressure-derive-r2/pressure_test_lock.json",
+      "sha256": "929738382e1ac03263f9ea0b56e01cc0892ea3177229aa1604403a2aa3c39d5a"
+    },
+    "r4_final_freeze": {
+      "path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/final_freeze.json",
+      "sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1"
+    },
+    "r4_pressure_generation_contract": {
+      "path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/pressure_generation_contract.json",
+      "sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761"
+    },
+    "r4_run_state": {
+      "path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/run_state.json",
+      "sha256": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63"
+    },
+    "stage4_checkpoint_manifest": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/formal_checkpoint_manifest.json",
+      "sha256": "61d62d59414b65c0600f29b415246a419199d97a8fd001aa570b6f9012b72dda"
+    },
+    "stage4_final_freeze": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/final_stage4_freeze.json",
+      "sha256": "cb70bce49bee1dba6e1009f327ba0237080f7c59ac76e049989c541b53ef525b"
+    },
+    "stage4_model_contract": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/stage8_model_contract.json",
+      "sha256": "80bd84d4c627461f51ddf2ffafba225a8aca6dafa76104b15c43edb8e422d033"
+    },
+    "stage4_run_state": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/run_state.json",
+      "sha256": "09663106a23445c6ffc7dcae2b9d1cc84cbb5dfbcb4b75380ab38ed77a76ee21"
+    },
+    "standard_test_lock": {
+      "path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/standard_test_lock.json",
+      "sha256": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb"
+    }
+  },
+  "capd": {
+    "best_seed_selection_allowed": false,
+    "history_H": 20,
+    "label_weights": [
+      1,
+      1,
+      2
+    ],
+    "lookahead_L": 256,
+    "unk_index": 0,
+    "vocabulary_expansion_allowed": false
+  },
+  "capd_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE8-2.0",
+  "cost_profile": {
+    "config_path": "configs/finals/capd_proactive_stage2_cost_profiles.json",
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "deterministic_policies": [
+    "reactive_lru",
+    "proactive_lru",
+    "proactive_clock",
+    "tpp_inspired",
+    "oracle"
+  ],
+  "deterministic_runtime": {
+    "cublas_workspace_config": ":4096:8",
+    "cuda_smoke_all_capd_checkpoints_before_test_parse": true,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "pythonhashseed": "0",
+    "torch_deterministic_algorithms": true
+  },
+  "early_reuse_windows": [
+    64,
+    256,
+    1024
+  ],
+  "formal_policies": [
+    "reactive_lru",
+    "proactive_lru",
+    "proactive_clock",
+    "tpp_inspired",
+    "oracle",
+    "capd"
+  ],
+  "frozen_controls": {
+    "b_max": 2,
+    "b_t_rule": "min(b_max,max(0,F_target-F_t),candidate_count)",
+    "candidate_size_K": 8,
+    "candidate_source": "lru_tail",
+    "fallback_policy": "lru",
+    "history_H": 20,
+    "selector": "disabled",
+    "trigger_mode": "low_watermark"
+  },
+  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency, foreground latency, CPU overhead, or memory overhead.",
+  "output_root": "outputs/capd_proactive_stage8",
+  "result_schema": "configs/finals/capd_proactive_stage8_result_schema.json",
+  "result_schema_sha256": "931cebc608559df679f44a4c5138750c499fee3c01df851863330bfb4db67362",
+  "resume_contract": {
+    "atomic_json_writes": true,
+    "automatic_retry": false,
+    "completed_identity_and_schema_and_sha_only": true,
+    "failed_or_running_or_corrupt_requires_new_run_id": true
+  },
+  "run": {
+    "created_at": "2026-08-04T06:32:22.201048Z",
+    "machine": {
+      "platform": "Linux-7.0.0-28-generic-x86_64-with-debian-trixie-sid",
+      "python": "3.7.16 (default, Jan 17 2023, 22:20:44) \n[GCC 11.2.0]"
+    },
+    "run_id": "stage8-dual-track-20260804-r1",
+    "run_identity_sha256": "0e18782bf1fdd5b1f4b79caa9c60891a7bf47f66b0a6832ce21723c9d0ce46ee"
+  },
+  "schema_version": "capd_proactive_stage8_v2_0",
+  "stage_status": "stage8_implemented_awaiting_formal_replay",
+  "statistics": {
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20260801,
+    "bootstrap_unit": "track_workload_cell",
+    "confidence_level": 0.95,
+    "pressure_cell_count": 4,
+    "standard_cell_count": 6,
+    "std": "sample_ddof_1",
+    "zero_denominator_rate": 0.0
+  },
+  "storage": {
+    "initial_state": "empty_dram_all_trace_pages_backed_by_nvm",
+    "nvm_capacity_model": "unbounded_backing_tier",
+    "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+    "page_size_bytes": 4096
+  },
+  "tpp_inspired": {
+    "cold_threshold": 1,
+    "dirty_tie_break": false,
+    "epoch_length": 1024,
+    "promotion_allowed": false
+  },
+  "tracks": {
+    "pressure": {
+      "derived_bundle": "pressure_bundle_manifest",
+      "records_per_test": 500000,
+      "source_lock": "pressure_test_lock",
+      "workloads": [
+        "canneal",
+        "dedup_pressure",
+        "blackscholes",
+        "swaptions"
+      ]
+    },
+    "standard": {
+      "records_per_test": 600000,
+      "source_lock": "standard_test_lock",
+      "structural_zero_workloads": [
+        "streamcluster_pressure",
+        "fluidanimate"
+      ],
+      "workloads": [
+        "canneal",
+        "streamcluster_pressure",
+        "dedup_pressure",
+        "blackscholes",
+        "swaptions",
+        "fluidanimate"
+      ]
+    }
+  },
+  "workload_controls": {
+    "blackscholes": {
+      "D": 8,
+      "F_low": 1,
+      "F_target": 2
+    },
+    "canneal": {
+      "D": 120,
+      "F_low": 6,
+      "F_target": 16
+    },
+    "dedup_pressure": {
+      "D": 21,
+      "F_low": 1,
+      "F_target": 3
+    },
+    "fluidanimate": {
+      "D": 22,
+      "F_low": 1,
+      "F_target": 3
+    },
+    "streamcluster_pressure": {
+      "D": 22,
+      "F_low": 1,
+      "F_target": 3
+    },
+    "swaptions": {
+      "D": 8,
+      "F_low": 1,
+      "F_target": 2
+    }
+  }
+}
