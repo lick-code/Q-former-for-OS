@@ -2,7 +2,7 @@
 
 ## 1. 运行前检查
 
-从仓库根目录运行。必须保留 Stage8 r3 权威目录，不要重新运行或覆盖 Stage8。服务器需要 Python/PyTorch 项目环境、Linux `taskset` 与 `perf`。Stage9 默认绑定 CPU 0；先确认当前 shell 的 cpuset 包含 0：
+从仓库根目录运行。必须保留 Stage8 r5 双轨权威目录，不要重新运行或覆盖 Stage8。服务器需要 Python/PyTorch 项目环境、Linux `taskset` 与 `perf`。Stage9 默认绑定 CPU 0；先确认当前 shell 的 cpuset 包含 0：
 
 ```bash
 grep Cpus_allowed_list /proc/self/status
@@ -10,14 +10,15 @@ grep Cpus_allowed_list /proc/self/status
 
 若不包含 0，在任何正式 run 之前把 `configs/finals/capd_proactive_stage9.json` 的 `measurement.cpu_affinity` 改成一个允许的单独逻辑 CPU。脚本会从 JSON 读取该值并用于所有 `taskset`，不再需要同步修改多处命令。此修改必须发生在看任何 Stage9 结果之前；preflight 会冻结并记录新 config SHA。不要复用曾失败或运行中的 run ID。
 
-`stage9-overhead-r1` 已永久失败，且其 0.40 容量测量没有产生正式延迟样本；必须原样保留该目录，禁止续跑、覆盖或导入。修复后的第一次运行至少使用 `stage9-overhead-r2`。
+`stage9-overhead-r1` 已永久失败，且其旧 v1 矩阵没有产生正式延迟样本；必须原样保留该目录，禁止续跑、覆盖或导入。v2 合同必须使用全新 run ID，例如 `stage9-overhead-v2-r1`。
 
 ## 2. 一键正式运行
 
 ```bash
+set -Eeuo pipefail
 cd /path/to/Q-former-for-OS
 chmod +x scripts/validate_capd_proactive_stage9_server.sh
-RUN_ID="stage9-overhead-r2"
+RUN_ID="stage9-overhead-v2-r1"
 PYTHON_BIN=python3 bash scripts/validate_capd_proactive_stage9_server.sh "${RUN_ID}"
 ```
 
@@ -36,7 +37,7 @@ cd /path/to/Q-former-for-OS
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export PYTHONHASHSEED=0
-RUN_ID="stage9-overhead-r2"
+RUN_ID="stage9-overhead-v2-r1"
 RUN_ROOT="outputs/capd_proactive_stage9/${RUN_ID}"
 CPU_AFFINITY="$(python3 -c 'import json; print(json.load(open("configs/finals/capd_proactive_stage9.json"))["measurement"]["cpu_affinity"][0])')"
 
@@ -45,21 +46,39 @@ perf stat -h 2>&1 | grep -- '--control'
 perf stat -e cycles,instructions,task-clock -- \
   taskset -c "${CPU_AFFINITY}" /bin/true
 
+CURRENT_STEP="preflight"
+preserve_failure() {
+  local exit_code=$?
+  trap - ERR
+  set +e
+  python3 scripts/run_capd_proactive_stage9.py \
+    --project-root "$PWD" --run-id "${RUN_ID}" \
+    mark-not-verified --failure-step "${CURRENT_STEP}" \
+    --failure-reason "server_validation_exit_${exit_code}"
+  echo "[FAILED] Stage-9 stopped at ${CURRENT_STEP}; use a NEW run ID: ${RUN_ROOT}" >&2
+  exit "${exit_code}"
+}
+trap preserve_failure ERR
+
 taskset -c "${CPU_AFFINITY}" python3 scripts/run_capd_proactive_stage9.py \
   --project-root "$PWD" --run-id "${RUN_ID}" preflight
 
+CURRENT_STEP="static_compile"
 python3 -m py_compile \
   qmap/proactive_stage9.py \
   scripts/run_capd_proactive_stage9.py
 
 mkdir -p "${RUN_ROOT}/logs"
+CURRENT_STEP="stage1_stage9_regression"
 python3 -m unittest discover -s tests -p 'test*.py' -v \
   2>&1 | tee "${RUN_ROOT}/logs/stage1_stage9_regression.log"
 
+CURRENT_STEP="record_regression_receipt"
 taskset -c "${CPU_AFFINITY}" python3 scripts/run_capd_proactive_stage9.py \
   --project-root "$PWD" --run-id "${RUN_ID}" \
   record-tests --test-log "${RUN_ROOT}/logs/stage1_stage9_regression.log"
 
+CURRENT_STEP="latency_quality_memory"
 taskset -c "${CPU_AFFINITY}" python3 scripts/run_capd_proactive_stage9.py \
   --project-root "$PWD" --run-id "${RUN_ID}" measure
 
@@ -69,6 +88,7 @@ ACK_FIFO="${RUN_ROOT}/perf/ack.fifo"
 rm -f "${CONTROL_FIFO}" "${ACK_FIFO}"
 mkfifo "${CONTROL_FIFO}" "${ACK_FIFO}"
 
+CURRENT_STEP="perf_hardware_counters"
 perf stat \
   --delay=-1 \
   --control="fifo:${CONTROL_FIFO},${ACK_FIFO}" \
@@ -81,11 +101,14 @@ perf stat \
     --perf-ack-fifo "${ACK_FIFO}" \
   2> "${RUN_ROOT}/perf/perf-stderr.log"
 
+CURRENT_STEP="parse_perf"
 taskset -c "${CPU_AFFINITY}" python3 scripts/run_capd_proactive_stage9.py \
   --project-root "$PWD" --run-id "${RUN_ID}" parse-perf
 
+CURRENT_STEP="independent_verification"
 taskset -c "${CPU_AFFINITY}" python3 scripts/run_capd_proactive_stage9.py \
   --project-root "$PWD" --run-id "${RUN_ID}" verify
+trap - ERR
 ```
 
 ## 4. perf 权限失败
@@ -110,8 +133,11 @@ perf stat -e cycles,instructions,task-clock -- \
 - `run_state.json`：同一 verified 状态，无 failure。
 - `environment.json`：Linux、CPU 型号、逻辑/物理核、实际 affinity、线程、governor/turbo 可读值或明确 unavailable 原因。
 - `raw_latency_samples.csv` 与两个 summary：可由原始样本重算一致。
-- `quality_summary.json`：b_max 1/2/4 均有 18 个质量单元，其中 9 个有效 round、9 个零 round，并保留 weighted cost 与 Early-Reuse，purpose 为 analysis only。
-- `perf/perf-stat.raw`、`perf_parsed.json`、`perf_scope_counts.json`：9 个有效 snapshot、9 个零 round job，cycles 来自 1800 个受控 round 的硬件 counter 区间，cycles/instructions/task-clock 均为 `ok`。
+- `stage8_compatibility_receipt.json`：Stage8 v2 的 80/48/32 job、30 个 CAPD plan job、Stage8/Stage4 SHA 链均通过，`stage9_entry_gate=satisfied`；Stage8 原目录保持只读。
+- `quality_summary.json`：b_max 1/2/4 均有 30 个 `(track,workload,seed)` 质量 job，其中 27 个 active、3 个 standard fluidanimate 零 round，并分别提供 Standard、Pressure 和 10 个 track-workload 描述性汇总。
+- `instrumentation_audit.json`：30 个正式 `b_max=2` job 的 Top-b 与最终状态均为 identical。
+- `perf/perf-stat.raw`、`perf_parsed.json`、`perf_scope_counts.json`：27 个有效 snapshot、3 个零 round job，cycles 来自 5400 个受控 round 的硬件 counter 区间，cycles/instructions/task-clock 均为 `ok`。
+- `capacity_overhead.csv`：6 个唯一 workload 的冻结 D 容量行，重复轨道仅记录在 `tracks`。
 - `memory_breakdown.json`、`capacity_overhead.csv`、`artifacts/report_cn.md`。
 
-若脚本在任一步失败，trap 会写 `stage9_not_verified` 和失败步骤。不要删除、覆盖或续跑该目录；换成 `stage9-overhead-r2` 等全新 run ID。只有完整新 run 可以进入验证。
+若脚本在任一步失败，trap 会写 `stage9_not_verified` 和失败步骤。不要删除、覆盖或续跑该目录；将 `stage9-overhead-v2-r1` 递增为 `stage9-overhead-v2-r2` 等从未使用的新 ID。只有完整新 run 可以进入验证。

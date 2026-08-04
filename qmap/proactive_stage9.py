@@ -24,8 +24,10 @@ from qmap import proactive_replay
 from qmap import proactive_stage5_policies
 
 
-SCHEMA_VERSION = "capd_proactive_stage9_v1_0"
-CONTRACT_ID = "CAPD-PROACTIVE-STAGE9-1.0"
+SCHEMA_VERSION = "capd_proactive_stage9_v2_0"
+CONTRACT_ID = "CAPD-PROACTIVE-STAGE9-2.0"
+RESULT_SCHEMA_SHA256 = (
+    "20293f71287b3d711632b272b4c1871307c48420bf03a2b4c8768e5e6353d28e")
 IMPLEMENTED = "stage9_implemented_awaiting_server_measurement"
 RUNNING = "stage9_running"
 VERIFIED = "stage9_overhead_verified"
@@ -41,7 +43,7 @@ LATENCY_FIELDS = (
     "total_round_latency_ns", "unattributed_framework_overhead_ns")
 EXCLUSIVE_PHASE_FIELDS = LATENCY_FIELDS[:6]
 FROZEN_CONTROLS = {
-    "F_low": 8, "F_target": 16, "b_max": 4, "candidate_size_K": 8,
+    "b_max": 2, "candidate_size_K": 8,
     "candidate_source": "lru_tail", "selector": "disabled",
     "fallback_policy": "lru", "trigger_mode": "low_watermark"}
 FROZEN_CAPD = {
@@ -145,7 +147,8 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
   _require(value.get("stage_status") == IMPLEMENTED and
            value.get("output_root") == "outputs/capd_proactive_stage9" and
            value.get("result_schema") ==
-           "configs/finals/capd_proactive_stage9_result_schema.json",
+           "configs/finals/capd_proactive_stage9_result_schema.json" and
+           value.get("result_schema_sha256") == RESULT_SCHEMA_SHA256,
            "Stage-9 output/status binding changed.")
   _require(value.get("frozen_controls") == FROZEN_CONTROLS,
            "Stage-9 frozen Replay controls changed.")
@@ -181,7 +184,7 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
            "Stage-9 CPU measurement contract changed.")
   sensitivity = value.get("sensitivity", {})
   _require(tuple(sensitivity.get("b_max_values", ())) == SENSITIVITY_BMAX and
-           sensitivity.get("formal_b_max") == 4 and
+           sensitivity.get("formal_b_max") == 2 and
            sensitivity.get("purpose") == "analysis_only_not_selection" and
            sensitivity.get("quality_metrics") ==
            ["weighted_cost", "early_reuse"],
@@ -196,20 +199,23 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
       "oov_fix_allowed": False},
       "Stage-9 Test/freeze stop-loss policy changed.")
   matrix = value.get("measurement_matrix", {})
-  _require(matrix.get("capacity_ratios") == ["0.20"] and
-           matrix.get("workloads") == "all_stage8_locked_workloads" and
+  _require(matrix.get("source") ==
+           "stage8_v2_capd_job_manifests_plan_job" and
+           matrix.get("identity_fields") == ["track", "workload", "seed"] and
            matrix.get("seeds") == list(CAPD_SEEDS) and
-           matrix.get("job_count") == 54 and
-           matrix.get("selection_basis") ==
-           "stage7_prefrozen_main_default_capacity_not_stage8_test_selection" and
+           matrix.get("track_workload_cell_count") == 10 and
+           matrix.get("jobs_per_b_max") == 30 and
+           matrix.get("quality_job_count") == 90 and
+           matrix.get("formal_instrumentation_job_count") == 30 and
+           matrix.get("unique_workload_capacity_count") == 6 and
            matrix.get("latency_applicability") ==
            "active_proactive_round_cells_only_zero_round_cells_retained_in_quality" and
-           matrix.get("expected_active_round_jobs_per_b_max") == 9 and
-           matrix.get("expected_zero_round_jobs_per_b_max") == 9 and
-           matrix.get("expected_active_round_workloads") ==
-           ["canneal", "dedup_pressure", "blackscholes"] and
-           matrix.get("expected_zero_round_workloads") ==
-           ["streamcluster_pressure", "swaptions", "fluidanimate"],
+           matrix.get("expected_active_round_jobs_per_b_max") == 27 and
+           matrix.get("expected_zero_round_jobs_per_b_max") == 3 and
+           matrix.get("expected_zero_round_job_keys") == [
+               "standard|fluidanimate|3136859",
+               "standard|fluidanimate|42",
+               "standard|fluidanimate|2026"],
            "Stage-9 predeclared measurement matrix changed.")
   _require(value.get("fair_capacity", {}).get("formal_replay") == "deferred" and
            value.get("fair_capacity", {}).get("overwrite_stage8_allowed") is False,
@@ -219,19 +225,40 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
            perf.get("counter_source") == "linux_perf_hardware" and
            perf.get("control") == "perf_stat_fifo_enable_disable" and
            perf.get("repetitions_per_snapshot") == 200 and
-           perf.get("expected_snapshot_count") == 9 and
+           perf.get("expected_snapshot_count") == 27 and
            perf.get("wall_time_frequency_estimate_allowed") is False,
            "Stage-9 perf hardware-counter contract changed.")
+  required_stage8 = {
+      "verification", "run_identity", "resolved_config", "job_manifest",
+      "run_state", "config"}
+  required_stage4 = {
+      "final_stage4_freeze", "formal_checkpoint_manifest",
+      "stage8_model_contract"}
+  for label, bindings, required in (
+      ("Stage-8", value.get("stage8_authority", {}), required_stage8),
+      ("Stage-4", value.get("stage4_authority", {}), required_stage4)):
+    _require(set(bindings) == required,
+             "{} authority bindings changed.".format(label))
+    for name, row in bindings.items():
+      _require(isinstance(row, Mapping) and isinstance(row.get("path"), str) and
+               len(str(row.get("sha256", ""))) == 64,
+               "Invalid {} authority binding: {}.".format(label, name))
   return value
 
 
 def validate_stage8_verification(value: Mapping[str, Any]) -> None:
-  _require(value.get("status") == "stage8_sync_replay_verified" and
-           value.get("stage9_entry_gate") == "satisfied" and
-           value.get("formal_job_count") == 144 and
+  _require(value.get("contract_id") == "CAPD-PROACTIVE-STAGE8-2.0" and
+           value.get("status") == "stage8_sync_replay_verified" and
+           value.get("formal_job_count") == 80 and
+           value.get("standard_job_count") == 48 and
+           value.get("pressure_job_count") == 32 and
+           value.get("track_workload_cell_count") == 10 and
+           value.get("fairness") == "passed" and
+           value.get("job_results_verified") is True and
+           value.get("statistics_verified") is True and
            value.get("test_used_for_parameter_selection") is False and
            value.get("frozen_parameters_changed") is False,
-           "Stage-8 authority does not satisfy the Stage-9 entry gate.")
+           "Stage-8 v2 authority does not satisfy the Stage-9 entry gate.")
 
 
 def verify_file_binding(path: str, expected_sha256: str, label: str) -> str:
@@ -312,7 +339,7 @@ def write_run_state(run_root: str, status: str, completed: Sequence[str],
   _require(status in (IMPLEMENTED, RUNNING, VERIFIED, NOT_VERIFIED),
            "Unknown Stage-9 run status.")
   write_json_atomic(os.path.join(run_root, "run_state.json"), {
-      "schema_version": "capd_proactive_stage9_run_state_v1_0",
+      "schema_version": "capd_proactive_stage9_run_state_v2_0",
       "contract_id": CONTRACT_ID,
       "status": status,
       "stage10_entry_gate": (
@@ -356,7 +383,7 @@ def summarize_latency_samples(samples: Sequence[Mapping[str, Any]]) -> Dict[str,
   _require(len(measured) + len(warmup) == len(samples),
            "Latency samples contain an unknown sample_kind.")
   result = {
-      "schema_version": "capd_proactive_stage9_latency_summary_v1_0",
+      "schema_version": "capd_proactive_stage9_latency_summary_v2_0",
       "clock": "time.perf_counter_ns",
       "stage_timings": "exclusive",
       "total_boundary": "watermark_check_start_through_top_b_result",
@@ -399,7 +426,7 @@ def throughput_from_samples(samples: Sequence[Mapping[str, Any]]) -> Dict[str, A
     key = str(int(row["b_t"]))
     b_distribution[key] = b_distribution.get(key, 0) + 1
   return {
-      "schema_version": "capd_proactive_stage9_throughput_v1_0",
+      "schema_version": "capd_proactive_stage9_throughput_v2_0",
       "measured_rounds": len(measured),
       "measured_demoted_pages": pages,
       "measured_total_round_latency_ns": total_ns,
@@ -469,7 +496,7 @@ def parse_perf_stat(raw: str, delimiter: str = ";") -> Dict[str, Any]:
   unavailable = [event for event in required
                  if events[event]["status"] != "ok"]
   return {
-      "schema_version": "capd_proactive_stage9_perf_v1_0",
+      "schema_version": "capd_proactive_stage9_perf_v2_0",
       "delimiter": delimiter, "events": events,
       "cycles_verified": events["cycles"]["status"] == "ok",
       "required_events_verified": not unavailable,
@@ -543,7 +570,8 @@ def capacity_overhead_rows(
     effective = dram_pages - pages
     rows.append({
         "workload": capacity["workload"],
-        "capacity_ratio": str(capacity["ratio"]),
+        "tracks": "|".join(sorted(str(track)
+                                   for track in capacity.get("tracks", ()))),
         "baseline_dram_pages": dram_pages,
         "management_fixed_bytes": int(management_fixed_bytes),
         "metadata_bytes_per_page": int(metadata_bytes_per_page),

@@ -4,27 +4,29 @@
 
 Stage9 的唯一目标是测量冻结 CAPD 的用户态 Linux CPU 同步决策开销。它不改进 Stage8 效果，不训练模型，不扩展 page/PC vocabulary，不处理 OOV，不选择 best seed，不更改 `page_enter_dram`，不执行 promotion，也不声称完成 Linux 内核集成、真实页面迁移或前台端到端加速。
 
-权威入口固定为 `outputs/capd_proactive_stage8/stage8-sync-replay-r3/verification.json`。preflight 必须同时验证文件 SHA-256 以及以下字段：
+权威入口固定为 `outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/`。preflight 必须验证 Stage8 v2 的 verification、run identity、resolved config、root job manifest、run state、正式配置及 Stage4 冻结/checkpoint/model contract SHA 链，并交叉核对：
 
 - `status=stage8_sync_replay_verified`
-- `stage9_entry_gate=satisfied`
-- `formal_job_count=144`
+- `contract_id=CAPD-PROACTIVE-STAGE8-2.0`
+- `formal_job_count=80`、`standard_job_count=48`、`pressure_job_count=32`
+- `fairness=passed`
+- `job_results_verified=true`、`statistics_verified=true`
 - `test_used_for_parameter_selection=false`
 - `frozen_parameters_changed=false`
 
-Stage8 r3 目录全程只读。Stage9 只写 `outputs/capd_proactive_stage9/<run_id>/`。
+Stage8 r5 目录全程只读。Stage9 preflight 在自己的新 run 目录写 `stage8_compatibility_receipt.json` 并记录 `stage9_entry_gate=satisfied`，不得向 Stage8 证据补字段。Stage9 只写 `outputs/capd_proactive_stage9/<run_id>/`。
 
 ## 2. 冻结配置
 
-正式配置为 `F_low=8`、`F_target=16`、`b_max=4`、`K=8`、`H=20`、`L=256`、`lambda=(1,1,2)`、selector disabled、候选为当前 LRU tail、fallback 为 LRU、cost 为 `1:2:8:10`。三个冻结 checkpoint seed 全部参与：3136859、42、2026；禁止 best-seed 选择。
+正式配置为 `b_max=2`、`K=8`、`H=20`、`L=256`、`lambda=(1,1,2)`、selector disabled、候选为当前 LRU tail、fallback 为 LRU、cost 为 `1:2:8:10`。`D/F_low/F_target/trace/checkpoint` 不使用全局默认值，逐 job 直接取自 Stage8 r5 CAPD job manifest 的 `plan_job`。三个冻结 checkpoint seed 全部参与：3136859、42、2026；禁止 best-seed 选择。
 
 在线设备只能是 CPU；batch 是一个主动降级 round；模块必须 `eval()`，推理必须位于 `torch.no_grad()`。默认线程配置为 PyTorch intra-op 1、inter-op 1、`OMP_NUM_THREADS=1`、`MKL_NUM_THREADS=1`。默认 affinity 为 CPU 0，preflight 会调用并读取 `sched_setaffinity`，请求值与实际值不一致即失败。
 
 如果服务器 cpuset 不允许 CPU 0，只能在任何正式 run 开始前修改 Stage9 配置中的 affinity，并使用新 run ID 运行 preflight；preflight 记录修改后的配置 SHA。不得在观察测量结果后更换 affinity、线程、20 个预热 round 或 3 次正式重复。
 
-测量矩阵预声明为 6 个 Stage8 锁定 workload、Stage7 在查看 Test 前冻结的主默认容量 0.20、3 个冻结 seed、`b_max=1/2/4`，共 54 个质量单元。选择 0.20 的依据是 Stage7 `capacity_matrix.json` 中 `default_ratio=0.20` 且对应行 `is_main_default=true`，不是查看 Stage8 Test 后选择更容易触发 round 的容量点。1/2/4 是摊销敏感性，不是重新选择正式 `b_max`；正式值始终为 4。Test 不能用于参数、checkpoint、容量或正式 `b_max` 选择。
+测量矩阵来自 Stage8 r5 root job manifest 和 30 个 CAPD job manifest 的 `plan_job`。正式身份键为 `(track, workload, seed)`：Standard 18 个、Pressure 12 个。`b_max=1/2/4` 共 90 个质量 job；1/2/4 只用于预声明敏感性分析，正式值始终为 2。Test 不能用于参数、checkpoint 或正式 `b_max` 选择。
 
-Stage8 冻结轨迹表明，在 0.20 容量下，每个 b_max 的 18 个质量单元中，canneal、dedup_pressure、blackscholes 的 3 seed 共 9 个单元存在主动降级 round，streamcluster_pressure、swaptions、fluidanimate 的 3 seed 共 9 个单元为零 round。所有 18 个单元都保留 weighted cost 和 Early-Reuse 质量结果；延迟、摊销和吞吐只对 9 个有效 round 单元统计。零 round 单元不伪造延迟样本。有效/零 round 的数量和 workload 身份都是 fail-closed 契约，发生变化即停止。
+每个 b_max 必须为 27 个 active job 和 3 个零 round job。零 round 身份只能是 `standard|fluidanimate|3136859`、`standard|fluidanimate|42`、`standard|fluidanimate|2026`。全部 30 个 job 都保留 weighted cost 和 Early-Reuse 质量结果；延迟、摊销和吞吐只对 27 个 active job 统计。若任一 b_max 改变 27/3 或零 round 身份，整次 run fail-closed。
 
 ## 3. 延迟边界
 
@@ -41,7 +43,7 @@ Stage8 冻结轨迹表明，在 0.20 容量下，每个 b_max 的 18 个质量�
 
 前 20 个逻辑 round 标记为 `warmup`，不进入正式统计。其余每个逻辑 round 在同一状态上重复 3 次完整决策，候选顺序、ranking 和 Top-b 必须逐次相同，随后只执行一次状态迁移。原始样本保存在 `raw_latency_samples.csv`；每阶段报告 Mean/P50/P95/P99。验证器从原始 CSV 独立重算汇总。
 
-正式 `b_max=4` 还会在同一 Linux CPU 上逐 job 运行未插桩参考 Replay，并与插桩 Replay 对比 Top-b 序列和最终状态 SHA，任何差异均阻断验证。参考与被测路径使用相同的 Stage8 r3 权威 Trace、checkpoint 和冻结配置；不把 CUDA 与 CPU 的数值差异混入插桩审计。
+正式 `b_max=2` 会在同一 Linux CPU 上对 30 个 job 运行未插桩参考 Replay，并与插桩 Replay 对比 Top-b 序列和最终状态 SHA，任何差异均阻断验证。参考与被测路径使用相同的 Stage8 r5 `plan_job` Trace、checkpoint 和逐 workload 控制量；不把 CUDA 与 CPU 的数值差异混入插桩审计。
 
 ## 4. 摊销与吞吐
 
@@ -58,7 +60,7 @@ Stage8 冻结轨迹表明，在 0.20 容量下，每个 b_max 的 18 个质量�
 
 ## 5. CPU cycles
 
-cycles 只能来自 Linux `perf stat` 的硬件计数器。验证脚本使用 perf FIFO control：模型加载、Trace 定位和 20-round 预热时计数器关闭；对 9 个有效 workload/seed 捕获首个预热后 full-shape 决策状态，只在 200 次无状态改变的正式 `b_max=4` round 重复区间启用计数器。9 个 snapshot 的启用区间累加；另外 9 个零 round 单元的 job ID 单独记录，scope 数量写入 `perf_scope_counts.json`。
+cycles 只能来自 Linux `perf stat` 的硬件计数器。验证脚本使用 perf FIFO control：模型加载、Trace 定位和 20-round 预热时计数器关闭；对 27 个 active `(track,workload,seed)` job 捕获首个预热后 full-shape 决策状态，只在 200 次无状态改变的正式 `b_max=2` round 重复区间启用计数器。27 个 snapshot 的启用区间累加；另外 3 个零 round job ID 单独记录，scope 数量写入 `perf_scope_counts.json`。
 
 perf 受控区间执行同一 stateless round，但移除 `perf_counter_ns` 调用和样本字典构造，避免把延迟插桩本身计入 cycles；候选构造、feature、模型推理、确定性排序、ranking 验证和 Top-b 均保留。原始 `perf -x ';'` 输出原样保存为 `perf/perf-stat.raw`，解析 `cycles`、`instructions`、`task-clock`、context switches、CPU migrations 和 page faults。cycles/round、cycles/page 只除以受控区间的实际 round/page 数。
 
@@ -74,7 +76,7 @@ perf 受控区间执行同一 stateless round，但移除 `perf_counter_ns` 调�
 
 每页 metadata 采用预声明的 64 bytes/page 解析布局：residency/dirty 8、frequency 8、last access 8、DRAM entry 8、LRU links 16、alignment/reserve 16。它是目标实现的 packed 线性计费，不声称等于 Python dict 的浅层或完整大小。
 
-`management_fixed_bytes` 包含模型参数/buffer、history packed bytes、candidate tensor 以及已物化 feature/Transformer/score activation。容量表对 Stage7 的所有 workload/容量执行：
+`management_fixed_bytes` 包含模型参数/buffer、history packed bytes、candidate tensor 以及已物化 feature/Transformer/score activation。容量表只对 6 个唯一 workload 的冻结 D 执行；Standard/Pressure 重复 workload 仅通过 `tracks` 字段说明适用轨道，不重复计费：
 
 `management_memory = management_fixed + dram_pages × 64`
 

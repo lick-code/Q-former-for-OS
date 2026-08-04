@@ -43,7 +43,7 @@ if ! taskset -c "${CPU_AFFINITY}" /bin/true; then
 fi
 
 # Pre-run environment probe: do this before creating/burning RUN_ID and before
-# the expensive 54-cell Replay. A numeric paranoid value alone is not enough;
+# the expensive 90-job quality Replay. A numeric paranoid value alone is not enough;
 # capabilities may still allow perf, so the hardware events are exercised.
 command -v perf >/dev/null || {
   echo "[PRE-RUN FAILED] Linux perf is not installed; no Stage-9 run was started." >&2

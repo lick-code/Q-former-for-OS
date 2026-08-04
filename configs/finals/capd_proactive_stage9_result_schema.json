@@ -1,6 +1,6 @@
 {
-  "schema_version": "capd_proactive_stage9_result_schema_v1_0",
-  "contract_id": "CAPD-PROACTIVE-STAGE9-1.0",
+  "schema_version": "capd_proactive_stage9_result_schema_v2_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
   "run_statuses": [
     "stage9_implemented_awaiting_server_measurement",
     "stage9_running",
@@ -10,6 +10,7 @@
   "required_run_artifacts": [
     "run_identity.json",
     "resolved_config.json",
+    "stage8_compatibility_receipt.json",
     "preflight.json",
     "environment.json",
     "raw_latency_samples.csv",
@@ -23,6 +24,7 @@
     "memory_breakdown.json",
     "capacity_overhead.csv",
     "artifacts/report_cn.md",
+    "logs/stage1_stage9_regression.log",
     "server_test_receipt.json",
     "verification.json",
     "run_state.json"
@@ -30,10 +32,15 @@
   "raw_latency_required_fields": [
     "sample_kind",
     "repetition_index",
+    "track",
     "workload",
-    "capacity_ratio",
     "seed",
+    "D",
+    "F_low",
+    "F_target",
     "b_max",
+    "trace_sha256",
+    "checkpoint_sha256",
     "cycle_id",
     "cycle_round_index",
     "round_id",
@@ -106,9 +113,22 @@
     "early_reuse_rate_256_mean",
     "early_reuse_rate_1024_mean"
   ],
+  "quality_track_groups": ["standard", "pressure"],
+  "quality_track_workload_group_count": 10,
+  "quality_row_required_identity_fields": [
+    "track",
+    "workload",
+    "seed",
+    "D",
+    "F_low",
+    "F_target",
+    "b_max",
+    "trace_sha256",
+    "checkpoint_sha256"
+  ],
   "capacity_required_fields": [
     "workload",
-    "capacity_ratio",
+    "tracks",
     "baseline_dram_pages",
     "management_memory_bytes",
     "management_pages",
@@ -126,7 +146,9 @@
     "memory_verified": true,
     "raw_to_summary_verified": true,
     "instrumentation_semantics_verified": true,
+    "stage8_compatibility_receipt_verified": true,
     "test_used_for_parameter_selection": false,
+    "formal_b_max": 2,
     "fair_capacity_replay_status": "deferred"
   }
 }

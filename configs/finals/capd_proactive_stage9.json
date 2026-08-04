@@ -1,35 +1,52 @@
 {
-  "schema_version": "capd_proactive_stage9_v1_0",
-  "contract_id": "CAPD-PROACTIVE-STAGE9-1.0",
+  "schema_version": "capd_proactive_stage9_v2_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
   "stage_status": "stage9_implemented_awaiting_server_measurement",
   "output_root": "outputs/capd_proactive_stage9",
   "result_schema": "configs/finals/capd_proactive_stage9_result_schema.json",
+  "result_schema_sha256": "20293f71287b3d711632b272b4c1871307c48420bf03a2b4c8768e5e6353d28e",
   "stage8_authority": {
     "verification": {
-      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/verification.json",
-      "sha256": "74b01a13359d10019a11cc9bb1f5b0fd89b880b8aecf2a43ebbefc4d1e93b76e"
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/verification.json",
+      "sha256": "b531f7324af9a6edf7dc31adc1426782c2389be35fd4b6058aa1986764e8025b"
     },
     "run_identity": {
-      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/run_identity.json",
-      "sha256": "791862c357089eae5cec6d1811f88b83509f56a9f9e259c7868d5236b86523fb"
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/run_identity.json",
+      "sha256": "ad9b96f038fb3c0799483ffd6d1d1120122ca1935a01a0a6a551d3a93adc7a42"
     },
     "resolved_config": {
-      "path": "outputs/capd_proactive_stage8/stage8-sync-replay-r3/resolved_config.json",
-      "sha256": "9e5ee218cb110fcbcb67b2d8aed0303ba3bb386e66b66668cb91bbed0b03c314"
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/resolved_config.json",
+      "sha256": "c09cc43cdcb726c62e3d7757b4d820a5175e2f322c8016beccaf1421e6610f04"
+    },
+    "job_manifest": {
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/job_manifest.json",
+      "sha256": "015c8746b05c2dac27d4e05daf3cbbfc33e12ee54f97bf22fe8d3602636310b1"
+    },
+    "run_state": {
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/run_state.json",
+      "sha256": "639c4677a81fe74bb56aa221f6f39ac0150782d9a1d1a277f6b6f6ac56f6f6e5"
     },
     "config": {
       "path": "configs/finals/capd_proactive_stage8.json",
-      "sha256": "f8047c7ba712b30f4a7252ce89221388ec46860a9001ba08ee561410307e74d8"
+      "sha256": "52bb15a3872c99bf2a61af3a25914078be04c296e093af4cacf23dd741bf93d3"
+    }
+  },
+  "stage4_authority": {
+    "final_stage4_freeze": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/final_stage4_freeze.json",
+      "sha256": "cb70bce49bee1dba6e1009f327ba0237080f7c59ac76e049989c541b53ef525b"
     },
-    "result_schema": {
-      "path": "configs/finals/capd_proactive_stage8_result_schema.json",
-      "sha256": "ff4f81029fc4d6dc475c47de494fb0a2cba076db9f86ef121bd8f5a35fb502d6"
+    "formal_checkpoint_manifest": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/formal_checkpoint_manifest.json",
+      "sha256": "61d62d59414b65c0600f29b415246a419199d97a8fd001aa570b6f9012b72dda"
+    },
+    "stage8_model_contract": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/stage8_model_contract.json",
+      "sha256": "80bd84d4c627461f51ddf2ffafba225a8aca6dafa76104b15c43edb8e422d033"
     }
   },
   "frozen_controls": {
-    "F_low": 8,
-    "F_target": 16,
-    "b_max": 4,
+    "b_max": 2,
     "candidate_size_K": 8,
     "candidate_source": "lru_tail",
     "selector": "disabled",
@@ -85,28 +102,26 @@
     ]
   },
   "measurement_matrix": {
-    "workloads": "all_stage8_locked_workloads",
-    "capacity_ratios": ["0.20"],
+    "source": "stage8_v2_capd_job_manifests_plan_job",
+    "identity_fields": ["track", "workload", "seed"],
     "seeds": [3136859, 42, 2026],
-    "job_count": 54,
-    "selection_basis": "stage7_prefrozen_main_default_capacity_not_stage8_test_selection",
+    "track_workload_cell_count": 10,
+    "jobs_per_b_max": 30,
+    "quality_job_count": 90,
+    "formal_instrumentation_job_count": 30,
+    "unique_workload_capacity_count": 6,
     "latency_applicability": "active_proactive_round_cells_only_zero_round_cells_retained_in_quality",
-    "expected_active_round_jobs_per_b_max": 9,
-    "expected_zero_round_jobs_per_b_max": 9,
-    "expected_active_round_workloads": [
-      "canneal",
-      "dedup_pressure",
-      "blackscholes"
-    ],
-    "expected_zero_round_workloads": [
-      "streamcluster_pressure",
-      "swaptions",
-      "fluidanimate"
+    "expected_active_round_jobs_per_b_max": 27,
+    "expected_zero_round_jobs_per_b_max": 3,
+    "expected_zero_round_job_keys": [
+      "standard|fluidanimate|3136859",
+      "standard|fluidanimate|42",
+      "standard|fluidanimate|2026"
     ]
   },
   "sensitivity": {
     "b_max_values": [1, 2, 4],
-    "formal_b_max": 4,
+    "formal_b_max": 2,
     "purpose": "analysis_only_not_selection",
     "quality_metrics": ["weighted_cost", "early_reuse"]
   },
@@ -121,11 +136,11 @@
       "cpu-migrations",
       "page-faults"
     ],
-    "scope": "formal_b_max_4_stage7_main_default_active_round_cells_all_seeds_measured_region_only",
+    "scope": "formal_b_max_2_stage8_v2_active_round_track_workload_seed_jobs_only",
     "control": "perf_stat_fifo_enable_disable",
     "repetitions_per_snapshot": 200,
-    "expected_snapshot_count": 9,
-    "snapshot_rule": "first_decision_after_20_warmup_rounds_per_workload_seed",
+    "expected_snapshot_count": 27,
+    "snapshot_rule": "first_decision_after_20_warmup_rounds_per_track_workload_seed",
     "wall_time_frequency_estimate_allowed": false
   },
   "memory": {
