@@ -1,37 +1,47 @@
 {
-  "schema_version": "capd_proactive_stage8_v1_0",
-  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
+  "schema_version": "capd_proactive_stage8_v2_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-2.0",
   "stage_status": "stage8_implemented_awaiting_formal_replay",
   "output_root": "outputs/capd_proactive_stage8",
   "result_schema": "configs/finals/capd_proactive_stage8_result_schema.json",
-  "stage7_authority": {
-    "verification": {"path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/verification.json", "sha256": "29bb6b6c3d131a6535b2c326b9a6b502a894d2b42df4c82cf6cba72732b686b3"},
-    "execution_plan": {"path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/stage8_execution_plan.json", "sha256": "3e1b26ea9ba9e2d37f3f08d6b22694e23520228f5b8591ed26e92e34d76d14d6"},
+  "result_schema_sha256": "931cebc608559df679f44a4c5138750c499fee3c01df851863330bfb4db67362",
+  "authorities": {
+    "r4_final_freeze": {"path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/final_freeze.json", "sha256": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1"},
+    "r4_pressure_generation_contract": {"path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/pressure_generation_contract.json", "sha256": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761"},
+    "r4_run_state": {"path": "outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/run_state.json", "sha256": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63"},
+    "stage4_final_freeze": {"path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/final_stage4_freeze.json", "sha256": "cb70bce49bee1dba6e1009f327ba0237080f7c59ac76e049989c541b53ef525b"},
+    "stage4_model_contract": {"path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/stage8_model_contract.json", "sha256": "80bd84d4c627461f51ddf2ffafba225a8aca6dafa76104b15c43edb8e422d033"},
+    "stage4_checkpoint_manifest": {"path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/formal_checkpoint_manifest.json", "sha256": "61d62d59414b65c0600f29b415246a419199d97a8fd001aa570b6f9012b72dda"},
+    "stage4_run_state": {"path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/run_state.json", "sha256": "09663106a23445c6ffc7dcae2b9d1cc84cbb5dfbcb4b75380ab38ed77a76ee21"},
     "standard_test_lock": {"path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/standard_test_lock.json", "sha256": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb"},
-    "capacity_matrix": {"path": "outputs/capd_proactive_stage7/stage7-server-suite-r1/capacity_matrix.json", "sha256": "bc8e951a8f66ee2d8d049d3052960f718e9acd27819b54438039041e640fedb4"}
+    "pressure_test_lock": {"path": "outputs/capd_proactive_pressure_stage7/stage7-pressure-derive-r2/pressure_test_lock.json", "sha256": "929738382e1ac03263f9ea0b56e01cc0892ea3177229aa1604403a2aa3c39d5a"},
+    "pressure_bundle_manifest": {"path": "outputs/capd_proactive_pressure_stage7/stage7-pressure-derive-r2/local_pressure_bundle_manifest.json", "sha256": "898a6b2c85221a1dbd5eb483cc0ef6599ce43065c60dcd7779791cce7f50ad52"},
+    "cost_config": {"path": "configs/finals/capd_proactive_stage2_cost_profiles.json", "sha256": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0"}
   },
-  "entry_authority": {
-    "stage7_workload_config": {"path": "configs/finals/capd_proactive_stage7_workloads.json", "sha256": "0fcbf855802a214544b1720fb959217a53d72840d3ee7e96aa567f57caece56b"},
-    "stage5_config": {"path": "configs/finals/capd_proactive_stage5.json", "sha256": "81bfc754ad194f02a62405f5c716eb8dfc65232da5d39801f667dacac387e609"},
-    "stage5_verification": {"path": "outputs/capd_proactive_stage5/stage5-baseline-r4/verification.json", "sha256": "96aed31be275e53cd0930b8cb29b166a54767b2608311cd1825c8d819ea90354"},
-    "stage6_config": {"path": "configs/finals/capd_proactive_stage6_tpp.json", "sha256": "4c38ea0c21bc4d3a8914197a042e9143939b435d3b523ae3fd8e7f0fe07463b0"},
-    "stage6_verification": {"path": "outputs/capd_proactive_stage6/stage6-tpp-r1/verification.json", "sha256": "84321235521cff69b0a24cb5df53f5c6c9da99029cbd1f0d069e8805644adb6d"}
+  "tracks": {
+    "standard": {"workloads": ["canneal", "streamcluster_pressure", "dedup_pressure", "blackscholes", "swaptions", "fluidanimate"], "records_per_test": 600000, "source_lock": "standard_test_lock", "structural_zero_workloads": ["streamcluster_pressure", "fluidanimate"]},
+    "pressure": {"workloads": ["canneal", "dedup_pressure", "blackscholes", "swaptions"], "records_per_test": 500000, "source_lock": "pressure_test_lock", "derived_bundle": "pressure_bundle_manifest"}
   },
-  "formal_policies": ["reactive_lru", "proactive_lru", "proactive_clock", "tpp_inspired", "capd", "oracle"],
+  "formal_policies": ["reactive_lru", "proactive_lru", "proactive_clock", "tpp_inspired", "oracle", "capd"],
   "deterministic_policies": ["reactive_lru", "proactive_lru", "proactive_clock", "tpp_inspired", "oracle"],
   "capd_seeds": [3136859, 42, 2026],
-  "capacity_ratios": ["0.20", "0.40", "0.60"],
-  "comparison_A": ["proactive_lru", "proactive_clock", "tpp_inspired", "capd", "oracle"],
-  "comparison_B": ["reactive_lru", "proactive_lru"],
-  "frozen_controls": {"F_low": 8, "F_target": 16, "candidate_size_K": 8, "b_max": 4, "candidate_source": "lru_tail", "selector": "disabled", "fallback_policy": "lru", "trigger_mode": "low_watermark"},
+  "workload_controls": {
+    "canneal": {"D": 120, "F_low": 6, "F_target": 16},
+    "streamcluster_pressure": {"D": 22, "F_low": 1, "F_target": 3},
+    "dedup_pressure": {"D": 21, "F_low": 1, "F_target": 3},
+    "blackscholes": {"D": 8, "F_low": 1, "F_target": 2},
+    "swaptions": {"D": 8, "F_low": 1, "F_target": 2},
+    "fluidanimate": {"D": 22, "F_low": 1, "F_target": 3}
+  },
+  "frozen_controls": {"candidate_size_K": 8, "b_max": 2, "history_H": 20, "candidate_source": "lru_tail", "selector": "disabled", "fallback_policy": "lru", "trigger_mode": "low_watermark", "b_t_rule": "min(b_max,max(0,F_target-F_t),candidate_count)"},
   "capd": {"lookahead_L": 256, "label_weights": [1, 1, 2], "history_H": 20, "vocabulary_expansion_allowed": false, "unk_index": 0, "best_seed_selection_allowed": false},
   "tpp_inspired": {"epoch_length": 1024, "cold_threshold": 1, "dirty_tie_break": false, "promotion_allowed": false},
-  "cost_profile": {"name": "default", "weights": {"dram_hit": 1, "nvm_read": 2, "nvm_write": 8, "demotion": 10}},
-  "storage": {"page_size_bytes": 4096, "nvm_capacity_model": "unbounded_backing_tier", "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source", "initial_state": "empty_dram_all_test_pages_backed_by_nvm"},
+  "cost_profile": {"name": "default", "config_path": "configs/finals/capd_proactive_stage2_cost_profiles.json", "weights": {"dram_hit": 1, "nvm_read": 2, "nvm_write": 8, "demotion": 10}},
+  "storage": {"page_size_bytes": 4096, "nvm_capacity_model": "unbounded_backing_tier", "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source", "initial_state": "empty_dram_all_trace_pages_backed_by_nvm"},
   "early_reuse_windows": [64, 256, 1024],
-  "statistics": {"bootstrap_seed": 20260801, "bootstrap_resamples": 10000, "bootstrap_unit": "workload_capacity_cell", "confidence_level": 0.95, "std": "sample_ddof_1", "zero_denominator_rate": 0.0},
+  "statistics": {"bootstrap_seed": 20260801, "bootstrap_resamples": 10000, "bootstrap_unit": "track_workload_cell", "standard_cell_count": 6, "pressure_cell_count": 4, "confidence_level": 0.95, "std": "sample_ddof_1", "zero_denominator_rate": 0.0},
   "resume_contract": {"completed_identity_and_schema_and_sha_only": true, "failed_or_running_or_corrupt_requires_new_run_id": true, "automatic_retry": false, "atomic_json_writes": true},
-  "acceptance": {"minimum_stage1_through_stage8_regression_tests": 380, "formal_job_count": 144, "verified_status": "stage8_sync_replay_verified", "failure_status": "stage8_not_verified"},
+  "acceptance": {"minimum_stage1_through_stage8_regression_tests": 380, "standard_job_count": 48, "pressure_job_count": 32, "formal_job_count": 80, "cell_count": 10, "verified_status": "stage8_sync_replay_verified", "failure_status": "stage8_not_verified", "awaiting_status": "awaiting_formal_replay_confirmation"},
   "deterministic_runtime": {"cublas_workspace_config": ":4096:8", "pythonhashseed": "0", "torch_deterministic_algorithms": true, "cudnn_benchmark": false, "cudnn_deterministic": true, "cuda_smoke_all_capd_checkpoints_before_test_parse": true},
-  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency."
+  "interpretation_boundary": "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency, foreground latency, CPU overhead, or memory overhead."
 }

@@ -1,11 +1,14 @@
 {
-  "schema_version": "capd_proactive_stage8_result_schema_v1_0",
-  "contract_id": "CAPD-PROACTIVE-STAGE8-1.0",
-  "job_result_schema": "capd_proactive_stage8_job_result_v1_0",
+  "schema_version": "capd_proactive_stage8_result_schema_v2_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-2.0",
+  "job_result_schema": "capd_proactive_stage8_job_result_v2_0",
+  "aggregate_schema": "capd_proactive_stage8_aggregate_v2_0",
   "required_identity_fields": [
-    "job_id", "workload", "workload_role", "capacity_ratio", "dram_capacity_pages",
-    "policy", "seed", "test_identity", "trace_sha256", "trace_range",
-    "initial_state_sha256", "candidate_contract_sha256", "semantic_result_sha256"
+    "job_id", "track", "workload", "workload_role", "policy", "seed",
+    "test_identity", "trace_sha256", "source_interval", "evaluation_interval",
+    "D", "W_ref", "F_low", "F_target", "K", "b_max", "alpha", "beta",
+    "history_H", "checkpoint_sha256", "initial_state_sha256",
+    "cost_profile_sha256", "semantic_result_sha256"
   ],
   "required_metric_fields": [
     "dram_hits", "nvm_reads", "nvm_writes", "total_demotions",
@@ -16,22 +19,17 @@
     "free_frame_exhaustion_count", "emergency_fallback_count", "fallback_rate",
     "early_reuse", "decision_count"
   ],
-  "fallback_rate": {
-    "numerator": "emergency_fallback_count",
-    "denominator": "page_enter_dram_count",
-    "zero_denominator": 0.0
-  },
-  "early_reuse": {
-    "deltas_accesses": [64, 256, 1024],
-    "denominator": "proactive_demotion_events_each_selected_page_counts_once",
-    "zero_denominator": 0.0,
-    "wasted_demotion": "no_future_access_after_proactive_demotion"
-  },
-  "capd_oov_required": [
+  "required_oov_fields": [
     "page_access_oov_count", "page_access_oov_ratio", "page_unique_oov_count",
     "page_unique_oov_ratio", "pc_access_oov_count", "pc_access_oov_ratio",
     "pc_unique_oov_count", "pc_unique_oov_ratio",
     "vocabulary_expansion_allowed", "unk_index"
+  ],
+  "pressure_provenance_fields": [
+    "derived_csv_sha256", "source_standard_test_sha256", "source_raw_interval",
+    "evaluation_interval", "pressure_lock_sha256",
+    "pressure_bundle_manifest_sha256", "addendum_sha256",
+    "parent_r4_contract_sha256"
   ],
   "semantic_sha_excludes": [
     "runtime", "checkpoint.resolved_path", "round.feature_latency", "round.inference_latency",
@@ -41,6 +39,11 @@
     "metrics.p50_decision_time", "metrics.p95_decision_time",
     "metrics.p99_decision_time"
   ],
-  "aggregate_schema": "capd_proactive_stage8_aggregate_v1_0",
+  "bootstrap": {
+    "resampling_unit": "track_workload_cell",
+    "standard_cell_count": 6,
+    "pressure_cell_count": 4,
+    "tracks_are_not_seeds": true
+  },
   "zero_denominator_policy": "rate_is_exactly_0.0_and_raw_denominator_is_retained"
 }

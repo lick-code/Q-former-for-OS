@@ -11,8 +11,6 @@ from typing import Any, Dict, Mapping, Optional, Sequence
 
 from qmap import proactive_cost
 from qmap import proactive_replay
-from qmap import proactive_stage4
-from qmap import proactive_stage5_contract as stage5_contract
 from qmap import proactive_stage5_policies
 from qmap import proactive_stage5_replay
 from qmap import proactive_stage6_replay
@@ -112,24 +110,37 @@ def _oov_diagnostics(ranker: Any, trace: Sequence[Mapping[str, Any]]) -> Dict[st
       "mapping_behavior": "unseen_frozen_input_maps_to_unk_index_0"}
 
 
+def replay_parameters_for_job(policy: str,
+                              controls: Mapping[str, Any]
+                              ) -> proactive_replay.ReplayParameters:
+  required = ("D", "F_low", "F_target", "K", "b_max", "history_H")
+  if any(key not in controls for key in required):
+    raise contract.Stage8ContractError("Job replay controls are incomplete.")
+  if policy == "reactive_lru":
+    return proactive_replay.ReplayParameters(
+        policy_name=policy, dram_capacity_pages=int(controls["D"]),
+        history_window_size=int(controls["history_H"]), early_reuse_window=64)
+  return proactive_replay.ReplayParameters(
+      policy_name=policy, dram_capacity_pages=int(controls["D"]),
+      F_low=int(controls["F_low"]), F_target=int(controls["F_target"]),
+      b_max=int(controls["b_max"]), candidate_size_K=int(controls["K"]),
+      history_window_size=int(controls["history_H"]), early_reuse_window=64)
+
+
 def _ranker_and_parameters(stage0: Mapping[str, Any], policy: str,
                            trace: Sequence[Mapping[str, Any]],
-                           dram_pages: int,
+                           controls: Mapping[str, Any],
                            checkpoint: Optional[Mapping[str, Any]],
                            device: str):
+  parameters = replay_parameters_for_job(policy, controls)
   if policy == "tpp_inspired":
     policy_stage0 = proactive_stage6_replay._stage0_for_tpp(stage0)
-    parameters = proactive_replay.ReplayParameters(
-        policy_name=policy, dram_capacity_pages=int(dram_pages), F_low=8,
-        F_target=16, b_max=4, candidate_size_K=8,
-        history_window_size=20, early_reuse_window=64)
     ranker = proactive_stage6_tpp.TPPInspiredRanker(
         epoch_length=1024, cold_threshold=1, dirty_tie_break=False,
         early_reuse_window=64)
     return policy_stage0, parameters, ranker
   policy_stage0 = proactive_stage5_replay._stage0_for_policy(
       stage0, policy, checkpoint=checkpoint)
-  parameters = proactive_stage5_replay._parameters(policy, int(dram_pages))
   ranker = None if policy == "reactive_lru" else (
       proactive_stage5_policies.build_ranker(
           policy, trace=trace, checkpoint=checkpoint, device=device))
@@ -140,16 +151,25 @@ def run_formal_test_replay(
     stage0_config: Mapping[str, Any],
     cost_config: proactive_cost.CostConfiguration,
     trace: Sequence[Mapping[str, Any]], job: Mapping[str, Any],
-    lock_row: Mapping[str, Any], working_set_pages: int,
+    lock_row: Mapping[str, Any],
     checkpoint: Optional[Mapping[str, Any]] = None, device: str = "cpu",
     measure_latency: bool = True, retain_access_logs: bool = False,
     invariant_mode: str = "boundary") -> Dict[str, Any]:
   """The only policy entry allowed to consume a sealed Stage-7 Test trace."""
   policy = job["policy"]
-  if (job.get("formal_test") is not True or job.get("split") != "test" or
-      lock_row.get("policy_replay_allowed_stage") != 8 or
-      job.get("test_identity") != lock_row.get("fairness_identity") or
-      len(trace) != lock_row.get("accesses")):
+  track = job.get("track")
+  interval = job.get("evaluation_interval", {})
+  expected_accesses = interval.get("end_exclusive", 0) - interval.get(
+      "start_inclusive", 0)
+  locked_identity = (lock_row.get("fairness_identity") if track == "standard"
+                     else lock_row.get("candidate_content_sha256"))
+  track_authorized = (
+      lock_row.get("policy_replay_allowed_stage") == 8 if track == "standard"
+      else lock_row.get("pressure_eligible") is True)
+  if (job.get("formal_test") is not True or job.get("split_role") != "test" or
+      track not in contract.TRACKS or not track_authorized or
+      job.get("test_identity") != locked_identity or
+      len(trace) != expected_accesses):
     raise contract.Stage8ContractError("Formal Test authorization mismatch.")
   if policy == "capd":
     if checkpoint is None or int(checkpoint["seed"]) != int(job["seed"]):
@@ -157,7 +177,7 @@ def run_formal_test_replay(
   elif checkpoint is not None:
     raise contract.Stage8ContractError("Non-CAPD job received a checkpoint.")
   policy_stage0, parameters, ranker = _ranker_and_parameters(
-      stage0_config, policy, trace, int(job["dram_pages"]), checkpoint, device)
+      stage0_config, policy, trace, job["controls"], checkpoint, device)
   oov = _oov_diagnostics(ranker, trace) if policy == "capd" else None
   replay = proactive_replay.ProactiveReplay(
       policy_stage0, parameters, ranking_policy=ranker,
@@ -223,46 +243,56 @@ def run_formal_test_replay(
   initial_state = {
       "dram_resident": [],
       "nvm_backing_pages": sorted({int(access["page"]) for access in trace}),
-      "free_frames": int(job["dram_pages"]), "lru_order": [],
+      "free_frames": int(job["D"]), "lru_order": [],
       "dirty_pages": []}
-  candidate_contract = stage5_contract.candidate_contract_identity()
+  candidate_contract = {
+      "constructor": "lru_tail_current_state",
+      "controls": copy.deepcopy(job["controls"]),
+      "sha256": job["candidate_contract_sha256"]}
   result = {
       "schema_version": contract.RESULT_SCHEMA_VERSION,
       "contract_id": contract.CONTRACT_ID,
       "stage_status": contract.IMPLEMENTED,
-      "job_id": job["job_id"], "policy": policy,
+      "job_id": job["job_id"], "track": track, "policy": policy,
       "policy_display_name": DISPLAY_NAMES[policy], "seed": job.get("seed"),
       "workload": job["workload"], "workload_role": job["workload_role"],
-      "capacity_ratio": str(job["capacity_ratio"]),
-      "dram_capacity_pages": int(job["dram_pages"]),
-      "working_set_pages": int(working_set_pages), "split": "test",
+      "dram_capacity_pages": int(job["D"]), "split_role": "test",
       "formal_test": True, "test_used_for_selection": False,
       "test_identity": job["test_identity"],
-      "trace_sha256": lock_row["sha256"],
-      "trace_range": copy.deepcopy(lock_row["interval"]),
+      "trace_sha256": job["trace_sha256"],
+      "source_interval": copy.deepcopy(job["source_interval"]),
+      "evaluation_interval": copy.deepcopy(job["evaluation_interval"]),
+      "source_standard_test_sha256": job["source_standard_test_sha256"],
+      "derived_csv_sha256": job["derived_csv_sha256"],
+      "source_raw_interval": copy.deepcopy(job["source_raw_interval"]),
+      "pressure_lock_sha256": job["pressure_lock_sha256"],
+      "pressure_bundle_manifest_sha256": job[
+          "pressure_bundle_manifest_sha256"],
+      "addendum_sha256": job["addendum_sha256"],
+      "parent_r4_contract_sha256": job["parent_r4_contract_sha256"],
       "page_size_bytes": 4096,
       "nvm_capacity_model": "unbounded_backing_tier",
       "initial_state": initial_state,
-      "initial_state_sha256": proactive_stage4.fingerprint_value(initial_state),
-      "page_enter_dram_semantics":
-          "occupies_one_free_frame_regardless_of_source",
+      "initial_state_sha256": job["initial_state_sha256"],
+      "observed_initial_state_sha256": contract.fingerprint_value(initial_state),
+      "page_enter_dram_semantics": job["page_enter_dram_semantics"],
       "cost_profile": {"name": "default", "weights": dict(contract.FROZEN_COST)},
-      "F_low": None if policy == "reactive_lru" else 8,
-      "F_target": None if policy == "reactive_lru" else 16,
-      "candidate_size_K": None if policy == "reactive_lru" else 8,
-      "b_max": None if policy == "reactive_lru" else 4,
-      "b_t_rule": None if policy == "reactive_lru" else
-          "min(b_max,F_target-F_t,|C_t|)",
-      "candidate_source": None if policy == "reactive_lru" else "lru_tail",
-      "fallback_policy": None if policy == "reactive_lru" else "lru",
-      "trigger_mode": None if policy == "reactive_lru" else "low_watermark",
+      "cost_profile_sha256": job["cost_profile_sha256"],
+      "D": job["D"], "W_ref": job["W_ref"], "F_low": job["F_low"],
+      "F_target": job["F_target"], "K": job["K"], "b_max": job["b_max"],
+      "history_H": job["history_H"], "alpha": job["alpha"],
+      "beta": job["beta"], "b_t_rule": job["controls"]["b_t_rule"],
+      "candidate_source": job["controls"]["candidate_source"],
+      "fallback_policy": job["controls"]["fallback_policy"],
+      "trigger_mode": job["controls"]["trigger_mode"],
       "candidate_contract": candidate_contract,
-      "candidate_contract_sha256": candidate_contract["sha256"],
+      "candidate_contract_sha256": job["candidate_contract_sha256"],
       "selector_status": "disabled", "B": None,
+      "checkpoint_sha256": None if checkpoint is None else checkpoint["sha256"],
       "checkpoint": (None if checkpoint is None else {
           "seed": int(checkpoint["seed"]),
           "recorded_path": job["checkpoint"]["path"],
-          "resolved_path": checkpoint["path"],
+          "resolved_path": checkpoint.get("resolved_path", checkpoint.get("path")),
           "sha256": checkpoint["sha256"],
           "selection_criterion": checkpoint["selection_criterion"]}),
       "capd_generalization": oov,
@@ -270,7 +300,10 @@ def run_formal_test_replay(
           "epoch_length": 1024, "cold_threshold": 1,
           "dirty_tie_break": False, "promotion_performed": False,
           "future_information_accessed": False,
-          "fallback_to_lru_used": False} if policy == "tpp_inspired" else None),
+          "fallback_to_lru_used": False, "D": job["D"],
+          "F_low": job["F_low"], "F_target": job["F_target"],
+          "K": job["K"], "b_max": job["b_max"]}
+          if policy == "tpp_inspired" else None),
       "future_information": "candidate_scoped_oracle_only" if policy == "oracle" else "not_accessed",
       "metrics": metrics, "events": raw["events"], "rounds": raw["rounds"],
       "cycles": raw["cycles"],
@@ -283,7 +316,7 @@ def run_formal_test_replay(
       "old_finals_v3_stage_artifacts_used": False,
       "performance_selection_performed": False,
       "interpretation_boundary":
-          "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency or foreground latency."}
+          "Synchronous Replay measures page-ranking quality, NVM events, weighted cost, state trajectory, and synchronous decision overhead; it is not real background concurrency, foreground latency, CPU overhead, or memory overhead."}
   result["semantic_result_sha256"] = contract.fingerprint_value(
       contract.semantic_payload(result))
   contract.audit_job_result(result, job)

@@ -51,6 +51,31 @@ CURRENT_STEP="static_compile"
   qmap/proactive_stage8_replay.py \
   qmap/proactive_stage8_results.py \
   scripts/run_capd_proactive_stage8.py
+"${PYTHON_BIN}" - <<'PY'
+from pathlib import Path
+
+paths = (
+    "qmap/proactive_stage8_contract.py",
+    "qmap/proactive_stage8_replay.py",
+    "qmap/proactive_stage8_results.py",
+    "scripts/run_capd_proactive_stage8.py",
+    "configs/finals/capd_proactive_stage8.json",
+    "configs/finals/capd_proactive_stage8_result_schema.json",
+)
+forbidden = (
+    "working_set_pages", "capacity_ratio", "0.20", "0.40", "0.60",
+    "18-cell", "18_cell",
+)
+hits = [
+    "{}: {}".format(path, token)
+    for path in paths
+    for token in forbidden
+    if token in Path(path).read_text(encoding="utf-8")
+]
+if hits:
+  raise SystemExit("obsolete Stage-8 hardcode(s): " + ", ".join(hits))
+print("[OK] Stage-8 obsolete-hardcode scan")
+PY
 
 CURRENT_STEP="cuda_checkpoint_smoke"
 "${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
@@ -70,16 +95,5 @@ CURRENT_STEP="record_regression_receipt"
   --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" \
   record-tests --test-log "${TEST_LOG}"
 
-CURRENT_STEP="formal_144_job_execute"
-"${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
-  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" execute
-
-CURRENT_STEP="audited_aggregation"
-"${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
-  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" aggregate
-
-CURRENT_STEP="independent_verification"
-"${PYTHON_BIN}" scripts/run_capd_proactive_stage8.py \
-  --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" --device "${DEVICE}" verify
-
 trap - ERR
+echo "[STOP] awaiting_formal_replay_confirmation"
