@@ -1,0 +1,33 @@
+{
+  "checkpoint_receipts": {
+    "2026": {
+      "checkpoint_sha256": "7c124136eecc157cef1cef3c1f9d68ac57b0c60ac594ae49f473bb2f2a4d2d27",
+      "selection_criterion": "minimum_valid_loss_only",
+      "semantic_result_sha256": "efa43ebc70e707cd97dfb4f2963d7fff24b66eeefc5fc455464e1900ae1b9080"
+    },
+    "3136859": {
+      "checkpoint_sha256": "7093c5b188548a86baf1c6f6a46715f1ace01c230ae41635f636b1112e870438",
+      "selection_criterion": "minimum_valid_loss_only",
+      "semantic_result_sha256": "4f03e134295c7acb26cb91418fc7ed83a5b90568e61f39518c075c0dc3f59624"
+    },
+    "42": {
+      "checkpoint_sha256": "40d4f5c0413e36d3e9887d90d809195c6bf53db7dfdf397e654555b1d3fcae0a",
+      "selection_criterion": "minimum_valid_loss_only",
+      "semantic_result_sha256": "afe1c042272f07df394246f95c53ff497717b9a0c4ae58b48e5a87faf2d588e5"
+    }
+  },
+  "completed_at": "2026-08-04T09:59:34.974786Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-2.0",
+  "cuda_device_name": "NVIDIA GeForce RTX 3060 Ti",
+  "deterministic_runtime_environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "PYTHONHASHSEED": "0"
+  },
+  "device": "cuda:0",
+  "pressure_trace_opened": false,
+  "schema_version": "capd_proactive_stage8_runtime_smoke_v2_0",
+  "status": "passed",
+  "test_performance_inspected": false,
+  "test_trace_opened": false,
+  "torch_version": "1.13.1+cu117"
+}
