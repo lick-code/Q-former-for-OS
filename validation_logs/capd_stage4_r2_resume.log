@@ -1,0 +1,131 @@
+[STEP 1/5] verify frozen code, config, and partial-run evidence
+qmap/proactive_stage4_stage7.py: OK
+scripts/run_capd_proactive_stage4_stage7.py: OK
+qmap/qmap_train.py: OK
+configs/finals/capd_proactive_stage4_stage7_search_r2.json: OK
+outputs/capd_proactive_stage3/stage3-stage7-unified-contract-r4/final_freeze.json: OK
+outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/input_manifest.json: OK
+outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/sample_structure_report.json: OK
+outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/external_cache_reference.json: OK
+outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/search_contract_confirmation.json: OK
+outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/confirmed_search_contract.json: OK
+outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/search/semantic/phase_result.json: OK
+[STEP 2/5] compile and run the Stage4 regression suite
+test_formal_freeze_false_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_legacy_uniform_watermarks_do_not_enter (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_old_verification_is_not_read (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_r4_correct_sha_passes (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_r4_registered_sha_constants (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_r4_wrong_sha_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_stage4_entry_false_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_workload_specific_watermarks (tests.test_capd_proactive_stage4_stage7.Stage4Stage7AuthorityTest) ... ok
+test_duplicate_workload_split_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ManifestBoundaryTest) ... ok
+test_legitimate_pressure_named_workload_is_allowed (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ManifestBoundaryTest) ... ok
+test_missing_validation_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ManifestBoundaryTest) ... ok
+test_missing_workload_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ManifestBoundaryTest) ... ok
+test_pressure_derived_path_hard_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ManifestBoundaryTest) ... ok
+test_source_interval_length_mismatch_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ManifestBoundaryTest) ... ok
+test_test_role_hard_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ManifestBoundaryTest) ... ok
+test_active_or_structural_identity_change_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ProtocolRepairContractTest) ... ok
+test_r1_audit_sha_change_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ProtocolRepairContractTest) ... ok
+test_repair_rejects_test_pressure_checkpoint_or_performance_use (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ProtocolRepairContractTest) ... ok
+test_repaired_search_draft_is_valid_and_has_new_identity (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ProtocolRepairContractTest) ... ok
+test_reused_r1_trace_evidence_binds_all_current_entries (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ProtocolRepairContractTest) ... ok
+test_structural_zero_row_is_na_and_never_selection_eligible (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ProtocolRepairContractTest) ... ok
+test_training_six_selection_four_and_structural_two_are_exact (tests.test_capd_proactive_stage4_stage7.Stage4Stage7ProtocolRepairContractTest) ... ok
+test_all_command_does_not_call_freeze (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7.py:190: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage4_stage7.py' mode='r' encoding='utf-8'>
+  source = open(runner.__file__, "r", encoding="utf-8").read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_all_formal_seeds_are_explicit (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_b_max_is_fixed_to_two (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_candidate_count_and_training_count (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_freeze_without_flag_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_full_model_dimensions_are_validated (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_k_is_fixed_to_eight (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_phase_inheritance_keeps_complete_args (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_search_containing_capacity_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_search_containing_k_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_search_draft_is_valid (tests.test_capd_proactive_stage4_stage7.Stage4Stage7SearchContractTest) ... ok
+test_checkpoint_argument_mismatch_fails (tests.test_capd_proactive_stage4_stage7.Stage4Stage7TrainingContractTest) ... ok
+test_indexed_labels_equal_shared_reference (tests.test_capd_proactive_stage4_stage7.Stage4Stage7TrainingContractTest) ... ok
+test_qmap_train_applies_every_candidate_argument (tests.test_capd_proactive_stage4_stage7.Stage4Stage7TrainingContractTest) ... ok
+test_require_cuda_has_no_cpu_fallback (tests.test_capd_proactive_stage4_stage7.Stage4Stage7TrainingContractTest) ... ok
+test_resume_contract_change_fails_closed (tests.test_capd_proactive_stage4_stage7.Stage4Stage7TrainingContractTest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7.py:424: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage4_stage7.py' mode='r' encoding='utf-8'>
+  source = open(runner.__file__, "r", encoding="utf-8").read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_single_gpu_training_loop_is_serial (tests.test_capd_proactive_stage4_stage7.Stage4Stage7TrainingContractTest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7.py:436: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage4_stage7.py' mode='r' encoding='utf-8'>
+  source = open(runner.__file__, "r", encoding="utf-8").read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_vocabulary_declares_train_only_and_oov (tests.test_capd_proactive_stage4_stage7.Stage4Stage7TrainingContractTest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7.py:449: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpljpozeoh/train.jsonl' mode='w' encoding='utf-8'>
+  json.dumps(value) + "\n")
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7.py:449: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpljpozeoh/valid.jsonl' mode='w' encoding='utf-8'>
+  json.dumps(value) + "\n")
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_architecture_learning_rate_and_seed_reuse_same_sample_identity (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_candidate_and_freeze_are_distinct_commands (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_confirmation_does_not_start_training (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7_e2e.py:139: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage4_stage7.py' mode='r' encoding='utf-8'>
+  source = open(runner.__file__, "r", encoding="utf-8").read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_external_cache_index_accepts_cross_phase_semantic_aliases (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_external_cache_index_rejects_owner_or_semantic_mismatch (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_external_cache_registration_contains_no_copy_operation (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7_e2e.py:312: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage4_stage7.py' mode='r' encoding='utf-8'>
+  source = open(runner.__file__, "r", encoding="utf-8").read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_final_verification_binds_orchestration_repair_receipt (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7_e2e.py:343: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage4_stage7.py' mode='r' encoding='utf-8'>
+  source = open(runner.__file__, "r", encoding="utf-8").read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_full_search_refuses_missing_confirmation (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_preflight_creates_expected_gate_artifacts (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_protocol_repair_candidate_summary_rejects_nonzero_structural_row (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_protocol_repair_candidate_summary_uses_only_active_four (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_r2_preflight_reuses_pinned_r1_parse_evidence (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_r2_resume_script_audits_partial_run_before_resume (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_sample_gate_code_contains_no_training_or_selection_call (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... /home/likc/Q-former-for-OS/tests/test_capd_proactive_stage4_stage7_e2e.py:239: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage4_stage7.py' mode='r' encoding='utf-8'>
+  source = open(runner.__file__, "r", encoding="utf-8").read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_sample_gate_refuses_confirmation_flag_and_checkpoint (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_sample_generation_binds_r4_method_and_is_deterministic (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_sample_structure_report_detects_one_zero_workload_split (tests.test_capd_proactive_stage4_stage7_e2e.Stage4Stage7SyntheticE2ETest) ... ok
+test_authority_config_is_valid (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_k_less_than_or_equal_to_bmax_is_rejected (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_selector_cannot_be_enabled (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_stage3_values_cannot_change (tests.test_capd_proactive_stage4.ProactiveStage4ContractTest) ... ok
+test_all_six_weight_formulas_and_relabel (tests.test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_incomplete_and_empty_future_windows_are_explicit (tests.test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_variable_top_b_metrics_ties_and_short_candidates (tests.test_capd_proactive_stage4.ProactiveStage4LabelAndMetricTest) ... ok
+test_resolved_sha_and_distinct_content_are_enforced (tests.test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_test_and_overlapping_intervals_are_rejected (tests.test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_test_named_path_is_rejected (tests.test_capd_proactive_stage4.ProactiveStage4ManifestTest) ... ok
+test_selection_is_global_and_deterministic (tests.test_capd_proactive_stage4.ProactiveStage4SelectionTest) ... ok
+test_source_identity_excludes_runtime_output_and_deployment_paths (tests.test_capd_proactive_stage4.ProactiveStage4ServerWorkflowTest) ... ok
+test_validator_does_not_repeat_preflight_after_tests (tests.test_capd_proactive_stage4.ProactiveStage4ServerWorkflowTest) ... ok
+test_multi_round_samples_rebuild_after_state_updates (tests.test_capd_proactive_stage4.ProactiveStage4TrajectoryTest) ... ok
+test_train_resume_identity_and_closed_loop_metric_path (tests.test_capd_proactive_stage4_e2e.ProactiveStage4TrainingE2ETest) ... ok
+
+----------------------------------------------------------------------
+Ran 72 tests in 5.953s
+
+OK
+[OK] preflight passed: /tmp/tmpyh70oy4b/outputs/new-stage4/stage4-stage7-unified-r1
+[GATE] full search is locked until explicit contract confirmation
+[OK] preflight passed: /tmp/tmpvdid43ya/outputs/new-stage4/stage4-stage7-unified-r2
+[GATE] full search is locked until explicit contract confirmation
+[STEP 3/5] audit completed checkpoints and the known architecture failure
+[OK] verified completed training manifests: 21
+[OK] preserved semantic phase and four architecture failure records
+[STEP 4/5] record the authorized orchestration-only repair
+[OK] orchestration repair receipt: outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/orchestration_repair_resume_receipt.json
+[STEP 5/5] resume the confirmed search; completed checkpoints are reused
+[OK] candidate generated; formal freeze was NOT created
+[FINAL] STAGE4_R2_SEARCH_RESUMED_AND_CANDIDATE_READY
+[GATE] FORMAL_FREEZE_NOT_CREATED_AWAITING_REVIEW
+[DONE] resume exit=0

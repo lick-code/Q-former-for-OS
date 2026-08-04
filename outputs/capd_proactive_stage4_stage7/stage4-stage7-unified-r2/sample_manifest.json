@@ -1,59 +1,615 @@
 {
-  "cache_mode": "verified_external_read_only_reference",
-  "candidate_selected": false,
-  "checkpoint_created": false,
-  "external_cache_reference_sha256": "3c09724ae76a48cf07917ac66699d4968e382b34ae2a3344b73005ac50350619",
-  "formal_freeze": false,
-  "manifests": [
-    {
-      "candidate_id": "sem-reference",
-      "sample_generation_contract_sha256": "7c34fe9158bbbd4db513e3ca12a6dd44c5ef103d8c0d56869d6fbc7ff8deda7d",
-      "sample_manifest_sha256": "4b6cae574a75fddd16d154347a295628657a78aad5db8a1359e5fcb61cfb2eb3",
-      "semantic_key": "da0dab0afec1945a70ef"
-    },
-    {
-      "candidate_id": "sem-L128",
-      "sample_generation_contract_sha256": "fd2e5176fda137bbf4767b863d5a6e2cd2adfbc42780ccd9906503e3d0a64cb0",
-      "sample_manifest_sha256": "b88896463ac7f3be7cffadb1879475a34be5dfc5d830ec38c70017d8cfb1a81a",
-      "semantic_key": "f9d2e67f7e48ec7763f0"
-    },
-    {
-      "candidate_id": "sem-L512",
-      "sample_generation_contract_sha256": "898214ebd0146b8dfc86ef1f7c538586f66575f2684d31258c3e5941edf83d97",
-      "sample_manifest_sha256": "3f5948ba9d88b5ad88948771ea9fa936fd7c557321103f99da277c3b5fb5a76e",
-      "semantic_key": "a1d1833d041127173b9a"
-    },
-    {
-      "candidate_id": "sem-H10",
-      "sample_generation_contract_sha256": "ea574d6a7dfa4a314e0d07a3355ffa7843a5cbc2ad717e4e484c63ba4f19b018",
-      "sample_manifest_sha256": "865879e2ebc3ad9de951c1502c3595336fd23536c5c894d016a0d1dde31b76af",
-      "semantic_key": "4c085004fc9b77a5c87e"
-    },
-    {
-      "candidate_id": "sem-H40",
-      "sample_generation_contract_sha256": "1e883abbe09858590d8841b67b0d3d190d294df182814ee8779a6d5688e874ca",
+  "datasets": {
+    "00a4f3c66a508576c92b": {
+      "cache_mode": "verified_external_read_only_reference",
+      "sample_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/datasets/00a4f3c66a508576c92b/sample_manifest.json",
       "sample_manifest_sha256": "d48a79c034062b2cb77f6ca342d1d6e99d24b2b1eca16c3750eb5136a4fa5d8e",
-      "semantic_key": "00a4f3c66a508576c92b"
+      "vocabulary": {
+        "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+        "fit_scope": "six_train_only",
+        "manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/00a4f3c66a508576c92b/vocabulary_manifest.json",
+        "manifest_sha256": "4a81487873f73b7b65fcce9270ffea20591645fa2b9e91ff5a42feb93248b2d5",
+        "page_vocabulary_file_sha256": "5d8b1c455f05e7ae837b827cb811e6ee153f165ad88a04f0ea8ce8d75e36340c",
+        "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/00a4f3c66a508576c92b/page_input_to_index.json",
+        "page_vocabulary_sha256": "c48f37bca9483b318bac0cbb0f747e059a67fc63c68d2e99dd3f84ee4c14121b",
+        "page_vocabulary_size": 33456,
+        "pc_vocabulary_file_sha256": "cff51a7e1c1029931a4708f4a65001eb2506c85df857117e148f07f8b9ce9a0c",
+        "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/00a4f3c66a508576c92b/pc_input_to_index.json",
+        "pc_vocabulary_sha256": "84c4b6f8fc985529e415d2f52f35c1f520c2ee14e2613bb7bec5a949b01bdb69",
+        "pc_vocabulary_size": 16314,
+        "pressure_used_for_fit": false,
+        "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+        "test_used_for_fit": false,
+        "unk_index": 0,
+        "validation_oov_by_workload": {
+          "blackscholes": {
+            "page_oov_count": 6210,
+            "page_oov_rate": 0.011764572156042557,
+            "page_oov_unique": 2,
+            "page_total": 527856,
+            "pc_oov_count": 15,
+            "pc_oov_rate": 3.410020914794944e-05,
+            "pc_oov_unique": 15,
+            "pc_total": 439880
+          },
+          "canneal": {
+            "page_oov_count": 26640,
+            "page_oov_rate": 0.8333333333333334,
+            "page_oov_unique": 1271,
+            "page_total": 31968,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 26640
+          },
+          "dedup_pressure": {
+            "page_oov_count": 1534,
+            "page_oov_rate": 0.2708333333333333,
+            "page_oov_unique": 256,
+            "page_total": 5664,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 4720
+          },
+          "fluidanimate": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "streamcluster_pressure": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "swaptions": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 129024,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 107520
+          }
+        },
+        "validation_used_for_fit": false,
+        "vocabulary_sha256": "c7394f8253d0c897368177c3b1251bea5398453986eada77feac9ca52b293d9d"
+      }
     },
-    {
-      "candidate_id": "sem-lam111",
-      "sample_generation_contract_sha256": "36c10dacd1c158ecdbc7381a8c70083d0bbfc49c263ed64ac21f22e31ad7067c",
-      "sample_manifest_sha256": "fdd668481a294a74e8c6dcd84f0d88cd6b915a11512181c3691885a009bd3dc0",
-      "semantic_key": "c37dfff7fbbcc70b4c88"
+    "4c085004fc9b77a5c87e": {
+      "cache_mode": "verified_external_read_only_reference",
+      "sample_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/datasets/4c085004fc9b77a5c87e/sample_manifest.json",
+      "sample_manifest_sha256": "865879e2ebc3ad9de951c1502c3595336fd23536c5c894d016a0d1dde31b76af",
+      "vocabulary": {
+        "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+        "fit_scope": "six_train_only",
+        "manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/4c085004fc9b77a5c87e/vocabulary_manifest.json",
+        "manifest_sha256": "eb51f474c68e09a519f608ce2a506b0fbc1d40b63211c39021f52bfc2c81a151",
+        "page_vocabulary_file_sha256": "82c09a2bf95685a030cc5195af4e4f18f6bb64b8a04d11989f324cbd2962c866",
+        "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/4c085004fc9b77a5c87e/page_input_to_index.json",
+        "page_vocabulary_sha256": "a6cda9aa7bc45c126a6bed98592bce448a8e9258ecaf88b6dec109a1dfb88586",
+        "page_vocabulary_size": 33443,
+        "pc_vocabulary_file_sha256": "6851adcd96b901267d306e784c9444dd641a076e83d51cca633758ea9f496155",
+        "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/4c085004fc9b77a5c87e/pc_input_to_index.json",
+        "pc_vocabulary_sha256": "dbe2cfdd8a6ec72da820ec4816e90d9f8e3ca9b1a4977e3b0313410e05d03c42",
+        "pc_vocabulary_size": 7556,
+        "pressure_used_for_fit": false,
+        "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+        "test_used_for_fit": false,
+        "unk_index": 0,
+        "validation_oov_by_workload": {
+          "blackscholes": {
+            "page_oov_count": 4097,
+            "page_oov_rate": 0.02069756398209613,
+            "page_oov_unique": 2,
+            "page_total": 197946,
+            "pc_oov_count": 10,
+            "pc_oov_rate": 9.09338910611985e-05,
+            "pc_oov_unique": 10,
+            "pc_total": 109970
+          },
+          "canneal": {
+            "page_oov_count": 10656,
+            "page_oov_rate": 0.8888888888888888,
+            "page_oov_unique": 1271,
+            "page_total": 11988,
+            "pc_oov_count": 72,
+            "pc_oov_rate": 0.010810810810810811,
+            "pc_oov_unique": 1,
+            "pc_total": 6660
+          },
+          "dedup_pressure": {
+            "page_oov_count": 1062,
+            "page_oov_rate": 0.5,
+            "page_oov_unique": 252,
+            "page_total": 2124,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 1180
+          },
+          "fluidanimate": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "streamcluster_pressure": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "swaptions": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 48384,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 26880
+          }
+        },
+        "validation_used_for_fit": false,
+        "vocabulary_sha256": "1e94c2adf41ca04c40f35c2aeca39e1d92e57d997fce1426863ae0ecfc06c089"
+      }
     },
-    {
-      "candidate_id": "sem-lam114",
-      "sample_generation_contract_sha256": "b0cff749d28e689050886122c7636054dc80f407df350ae830247bac55a11cbb",
+    "9de7e2db50b4783bc14c": {
+      "cache_mode": "verified_external_read_only_reference",
+      "sample_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/datasets/9de7e2db50b4783bc14c/sample_manifest.json",
       "sample_manifest_sha256": "24676cbab29c1ff04c9a6c1eebcc6e3d12adfe5932331f9e616612116bb5d842",
-      "semantic_key": "9de7e2db50b4783bc14c"
+      "vocabulary": {
+        "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+        "fit_scope": "six_train_only",
+        "manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/9de7e2db50b4783bc14c/vocabulary_manifest.json",
+        "manifest_sha256": "dcd5ef5c89c58efb4cb6a932d32b5ec0da4719ed330a0c131e6c8001d76bee8d",
+        "page_vocabulary_file_sha256": "7b8b473356843a93159f33a76846ab6fbbdba8c95cde825510199fcf711af1aa",
+        "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/9de7e2db50b4783bc14c/page_input_to_index.json",
+        "page_vocabulary_sha256": "7f016369d4be300cff5650e50fbbb7f687683aeb800303fe8770e2f372cb9399",
+        "page_vocabulary_size": 33450,
+        "pc_vocabulary_file_sha256": "565c32a7e1d1b12c4c2552b431dab9fda96fc660ca11faa2cb28501cf0fa834d",
+        "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/9de7e2db50b4783bc14c/pc_input_to_index.json",
+        "pc_vocabulary_sha256": "9ba935c37a15c0d32117499e5990a18e352b39943ffc066f93f0bf1dcc8becd9",
+        "pc_vocabulary_size": 11760,
+        "pressure_used_for_fit": false,
+        "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+        "test_used_for_fit": false,
+        "unk_index": 0,
+        "validation_oov_by_workload": {
+          "blackscholes": {
+            "page_oov_count": 4118,
+            "page_oov_rate": 0.013373777263929123,
+            "page_oov_unique": 2,
+            "page_total": 307916,
+            "pc_oov_count": 12,
+            "pc_oov_rate": 5.4560334636719105e-05,
+            "pc_oov_unique": 12,
+            "pc_total": 219940
+          },
+          "canneal": {
+            "page_oov_count": 15984,
+            "page_oov_rate": 0.8571428571428571,
+            "page_oov_unique": 1271,
+            "page_total": 18648,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 13320
+          },
+          "dedup_pressure": {
+            "page_oov_count": 1180,
+            "page_oov_rate": 0.35714285714285715,
+            "page_oov_unique": 256,
+            "page_total": 3304,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 2360
+          },
+          "fluidanimate": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "streamcluster_pressure": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "swaptions": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 75264,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 53760
+          }
+        },
+        "validation_used_for_fit": false,
+        "vocabulary_sha256": "a163e8dd4527555a0ee3073a918b4d52f3a3fa53bd1f3b672637064c44d7c1af"
+      }
+    },
+    "a1d1833d041127173b9a": {
+      "cache_mode": "verified_external_read_only_reference",
+      "sample_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/datasets/a1d1833d041127173b9a/sample_manifest.json",
+      "sample_manifest_sha256": "3f5948ba9d88b5ad88948771ea9fa936fd7c557321103f99da277c3b5fb5a76e",
+      "vocabulary": {
+        "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+        "fit_scope": "six_train_only",
+        "manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/a1d1833d041127173b9a/vocabulary_manifest.json",
+        "manifest_sha256": "9ac3382716b5f179db164ca9a736582abe17e8a3de870beec9502ba444a9a4bf",
+        "page_vocabulary_file_sha256": "7b8b473356843a93159f33a76846ab6fbbdba8c95cde825510199fcf711af1aa",
+        "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/a1d1833d041127173b9a/page_input_to_index.json",
+        "page_vocabulary_sha256": "7f016369d4be300cff5650e50fbbb7f687683aeb800303fe8770e2f372cb9399",
+        "page_vocabulary_size": 33450,
+        "pc_vocabulary_file_sha256": "565c32a7e1d1b12c4c2552b431dab9fda96fc660ca11faa2cb28501cf0fa834d",
+        "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/a1d1833d041127173b9a/pc_input_to_index.json",
+        "pc_vocabulary_sha256": "9ba935c37a15c0d32117499e5990a18e352b39943ffc066f93f0bf1dcc8becd9",
+        "pc_vocabulary_size": 11760,
+        "pressure_used_for_fit": false,
+        "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+        "test_used_for_fit": false,
+        "unk_index": 0,
+        "validation_oov_by_workload": {
+          "blackscholes": {
+            "page_oov_count": 4115,
+            "page_oov_rate": 0.013373763373763373,
+            "page_oov_unique": 2,
+            "page_total": 307692,
+            "pc_oov_count": 12,
+            "pc_oov_rate": 5.46000546000546e-05,
+            "pc_oov_unique": 12,
+            "pc_total": 219780
+          },
+          "canneal": {
+            "page_oov_count": 15984,
+            "page_oov_rate": 0.8571428571428571,
+            "page_oov_unique": 1271,
+            "page_total": 18648,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 13320
+          },
+          "dedup_pressure": {
+            "page_oov_count": 1180,
+            "page_oov_rate": 0.35714285714285715,
+            "page_oov_unique": 256,
+            "page_total": 3304,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 2360
+          },
+          "fluidanimate": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "streamcluster_pressure": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "swaptions": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 75096,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 53640
+          }
+        },
+        "validation_used_for_fit": false,
+        "vocabulary_sha256": "a163e8dd4527555a0ee3073a918b4d52f3a3fa53bd1f3b672637064c44d7c1af"
+      }
+    },
+    "c37dfff7fbbcc70b4c88": {
+      "cache_mode": "verified_external_read_only_reference",
+      "sample_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/datasets/c37dfff7fbbcc70b4c88/sample_manifest.json",
+      "sample_manifest_sha256": "fdd668481a294a74e8c6dcd84f0d88cd6b915a11512181c3691885a009bd3dc0",
+      "vocabulary": {
+        "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+        "fit_scope": "six_train_only",
+        "manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/c37dfff7fbbcc70b4c88/vocabulary_manifest.json",
+        "manifest_sha256": "a952c827a2232076ebe65b51ef0a2c7680066db10386bfaed6df2e4d55f9ca38",
+        "page_vocabulary_file_sha256": "7b8b473356843a93159f33a76846ab6fbbdba8c95cde825510199fcf711af1aa",
+        "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/c37dfff7fbbcc70b4c88/page_input_to_index.json",
+        "page_vocabulary_sha256": "7f016369d4be300cff5650e50fbbb7f687683aeb800303fe8770e2f372cb9399",
+        "page_vocabulary_size": 33450,
+        "pc_vocabulary_file_sha256": "565c32a7e1d1b12c4c2552b431dab9fda96fc660ca11faa2cb28501cf0fa834d",
+        "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/c37dfff7fbbcc70b4c88/pc_input_to_index.json",
+        "pc_vocabulary_sha256": "9ba935c37a15c0d32117499e5990a18e352b39943ffc066f93f0bf1dcc8becd9",
+        "pc_vocabulary_size": 11760,
+        "pressure_used_for_fit": false,
+        "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+        "test_used_for_fit": false,
+        "unk_index": 0,
+        "validation_oov_by_workload": {
+          "blackscholes": {
+            "page_oov_count": 4118,
+            "page_oov_rate": 0.013373777263929123,
+            "page_oov_unique": 2,
+            "page_total": 307916,
+            "pc_oov_count": 12,
+            "pc_oov_rate": 5.4560334636719105e-05,
+            "pc_oov_unique": 12,
+            "pc_total": 219940
+          },
+          "canneal": {
+            "page_oov_count": 15984,
+            "page_oov_rate": 0.8571428571428571,
+            "page_oov_unique": 1271,
+            "page_total": 18648,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 13320
+          },
+          "dedup_pressure": {
+            "page_oov_count": 1180,
+            "page_oov_rate": 0.35714285714285715,
+            "page_oov_unique": 256,
+            "page_total": 3304,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 2360
+          },
+          "fluidanimate": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "streamcluster_pressure": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "swaptions": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 75264,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 53760
+          }
+        },
+        "validation_used_for_fit": false,
+        "vocabulary_sha256": "a163e8dd4527555a0ee3073a918b4d52f3a3fa53bd1f3b672637064c44d7c1af"
+      }
+    },
+    "da0dab0afec1945a70ef": {
+      "cache_mode": "verified_external_read_only_reference",
+      "sample_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/datasets/da0dab0afec1945a70ef/sample_manifest.json",
+      "sample_manifest_sha256": "4b6cae574a75fddd16d154347a295628657a78aad5db8a1359e5fcb61cfb2eb3",
+      "vocabulary": {
+        "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+        "fit_scope": "six_train_only",
+        "manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/da0dab0afec1945a70ef/vocabulary_manifest.json",
+        "manifest_sha256": "1c860dcac06f48e5893e48a3572edeedc8b817546d842cdb16e3005eb45ed666",
+        "page_vocabulary_file_sha256": "7b8b473356843a93159f33a76846ab6fbbdba8c95cde825510199fcf711af1aa",
+        "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/da0dab0afec1945a70ef/page_input_to_index.json",
+        "page_vocabulary_sha256": "7f016369d4be300cff5650e50fbbb7f687683aeb800303fe8770e2f372cb9399",
+        "page_vocabulary_size": 33450,
+        "pc_vocabulary_file_sha256": "565c32a7e1d1b12c4c2552b431dab9fda96fc660ca11faa2cb28501cf0fa834d",
+        "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/da0dab0afec1945a70ef/pc_input_to_index.json",
+        "pc_vocabulary_sha256": "9ba935c37a15c0d32117499e5990a18e352b39943ffc066f93f0bf1dcc8becd9",
+        "pc_vocabulary_size": 11760,
+        "pressure_used_for_fit": false,
+        "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+        "test_used_for_fit": false,
+        "unk_index": 0,
+        "validation_oov_by_workload": {
+          "blackscholes": {
+            "page_oov_count": 4118,
+            "page_oov_rate": 0.013373777263929123,
+            "page_oov_unique": 2,
+            "page_total": 307916,
+            "pc_oov_count": 12,
+            "pc_oov_rate": 5.4560334636719105e-05,
+            "pc_oov_unique": 12,
+            "pc_total": 219940
+          },
+          "canneal": {
+            "page_oov_count": 15984,
+            "page_oov_rate": 0.8571428571428571,
+            "page_oov_unique": 1271,
+            "page_total": 18648,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 13320
+          },
+          "dedup_pressure": {
+            "page_oov_count": 1180,
+            "page_oov_rate": 0.35714285714285715,
+            "page_oov_unique": 256,
+            "page_total": 3304,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 2360
+          },
+          "fluidanimate": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "streamcluster_pressure": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "swaptions": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 75264,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 53760
+          }
+        },
+        "validation_used_for_fit": false,
+        "vocabulary_sha256": "a163e8dd4527555a0ee3073a918b4d52f3a3fa53bd1f3b672637064c44d7c1af"
+      }
+    },
+    "f9d2e67f7e48ec7763f0": {
+      "cache_mode": "verified_external_read_only_reference",
+      "sample_manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/datasets/f9d2e67f7e48ec7763f0/sample_manifest.json",
+      "sample_manifest_sha256": "b88896463ac7f3be7cffadb1879475a34be5dfc5d830ec38c70017d8cfb1a81a",
+      "vocabulary": {
+        "contract_id": "CAPD-PROACTIVE-STAGE4-STAGE7-1.0",
+        "fit_scope": "six_train_only",
+        "manifest_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/f9d2e67f7e48ec7763f0/vocabulary_manifest.json",
+        "manifest_sha256": "52b7a23735180e401313f5dda6388deb959cebe98ab419741379c2ab218d3232",
+        "page_vocabulary_file_sha256": "7b8b473356843a93159f33a76846ab6fbbdba8c95cde825510199fcf711af1aa",
+        "page_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/f9d2e67f7e48ec7763f0/page_input_to_index.json",
+        "page_vocabulary_sha256": "7f016369d4be300cff5650e50fbbb7f687683aeb800303fe8770e2f372cb9399",
+        "page_vocabulary_size": 33450,
+        "pc_vocabulary_file_sha256": "565c32a7e1d1b12c4c2552b431dab9fda96fc660ca11faa2cb28501cf0fa834d",
+        "pc_vocabulary_path": "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r1/vocabulary/f9d2e67f7e48ec7763f0/pc_input_to_index.json",
+        "pc_vocabulary_sha256": "9ba935c37a15c0d32117499e5990a18e352b39943ffc066f93f0bf1dcc8becd9",
+        "pc_vocabulary_size": 11760,
+        "pressure_used_for_fit": false,
+        "schema_version": "capd_proactive_stage4_stage7_vocabulary_v1_0",
+        "test_used_for_fit": false,
+        "unk_index": 0,
+        "validation_oov_by_workload": {
+          "blackscholes": {
+            "page_oov_count": 4121,
+            "page_oov_rate": 0.013378653888607529,
+            "page_oov_unique": 2,
+            "page_total": 308028,
+            "pc_oov_count": 12,
+            "pc_oov_rate": 5.45404963185165e-05,
+            "pc_oov_unique": 12,
+            "pc_total": 220020
+          },
+          "canneal": {
+            "page_oov_count": 15984,
+            "page_oov_rate": 0.8571428571428571,
+            "page_oov_unique": 1271,
+            "page_total": 18648,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 13320
+          },
+          "dedup_pressure": {
+            "page_oov_count": 1180,
+            "page_oov_rate": 0.35714285714285715,
+            "page_oov_unique": 256,
+            "page_total": 3304,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 2360
+          },
+          "fluidanimate": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "streamcluster_pressure": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 0,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 0
+          },
+          "swaptions": {
+            "page_oov_count": 0,
+            "page_oov_rate": 0.0,
+            "page_oov_unique": 0,
+            "page_total": 75320,
+            "pc_oov_count": 0,
+            "pc_oov_rate": 0.0,
+            "pc_oov_unique": 0,
+            "pc_total": 53800
+          }
+        },
+        "validation_used_for_fit": false,
+        "vocabulary_sha256": "a163e8dd4527555a0ee3073a918b4d52f3a3fa53bd1f3b672637064c44d7c1af"
+      }
     }
-  ],
-  "pressure_trace_opened": false,
-  "run_id": "stage4-stage7-unified-r2",
-  "schema_version": "capd_proactive_stage4_stage7_sample_index_v1_1",
-  "search_contract_confirmed": false,
-  "search_started": false,
-  "status": "sample_structure_gate_passed_no_training_started",
-  "test_trace_opened": false,
-  "training_started": false
+  },
+  "formal_freeze": false,
+  "schema_version": "capd_proactive_stage4_stage7_sample_index_v1_0"
 }

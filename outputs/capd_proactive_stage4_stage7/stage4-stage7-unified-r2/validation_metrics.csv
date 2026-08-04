@@ -1,0 +1,16 @@
+phase,candidate_id,active_selection_workloads,primary_metric,worst_active_workload_metric,macro_ndcg_at_b_t,mean_best_validation_loss
+semantic,sem-reference,"canneal,dedup_pressure,blackscholes,swaptions",1.1611169444444445,1.4589705555555554,0.9740759628755129,-0.9332351157163503
+semantic,sem-lam111,"canneal,dedup_pressure,blackscholes,swaptions",1.1615741666666668,1.4614833333333335,0.9717264308208441,-0.9307773967627834
+semantic,sem-H40,"canneal,dedup_pressure,blackscholes,swaptions",1.1622577777777778,1.4630755555555555,0.9707914415081221,-0.9313400741926969
+semantic,sem-L512,"canneal,dedup_pressure,blackscholes,swaptions",1.1628008333333333,1.4655088888888887,0.9756062558368562,-0.930817527339346
+semantic,sem-L128,"canneal,dedup_pressure,blackscholes,swaptions",1.1645772222222224,1.4727405555555555,0.9708152908926957,-0.931111734697624
+semantic,sem-lam114,"canneal,dedup_pressure,blackscholes,swaptions",1.1653090277777778,1.4766633333333334,0.9750673824340518,-0.9347096398045158
+semantic,sem-H10,"canneal,dedup_pressure,blackscholes,swaptions",1.1656358333333332,1.4770483333333333,0.9702177554491099,-0.931178840931239
+architecture,arch-wide,"canneal,dedup_pressure,blackscholes,swaptions",1.1598477777777778,1.4530922222222222,0.9737296116714859,-0.9338092031375375
+architecture,arch-balanced,"canneal,dedup_pressure,blackscholes,swaptions",1.1611169444444445,1.4589705555555554,0.9740759628755129,-0.9332351157163503
+architecture,arch-compact,"canneal,dedup_pressure,blackscholes,swaptions",1.1618826388888888,1.4638849999999999,0.9745992487323746,-0.9329616601981162
+architecture,arch-deep,"canneal,dedup_pressure,blackscholes,swaptions",1.1626430555555556,1.4651155555555555,0.9742127932764656,-0.9312626610484694
+optimization,opt-balanced,"canneal,dedup_pressure,blackscholes,swaptions",1.1598477777777778,1.4530922222222222,0.9737296116714859,-0.9338092031375375
+optimization,opt-steady,"canneal,dedup_pressure,blackscholes,swaptions",1.1618515277777777,1.4622894444444445,0.9721712887970563,-0.9316789605014021
+optimization,opt-regularized,"canneal,dedup_pressure,blackscholes,swaptions",1.1629843055555555,1.4678705555555556,0.9755934835485365,-0.9348337850737528
+optimization,opt-fast,"canneal,dedup_pressure,blackscholes,swaptions",1.1643493055555556,1.4718605555555555,0.9734462551451277,-0.9354187148608125

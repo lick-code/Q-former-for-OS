@@ -1,0 +1,65 @@
+{
+  "candidate": {
+    "candidate_id": "opt-balanced",
+    "candidate_sha256": "7a93ea88988c8fce539b841d4eeac2be86841d53d5df7e6c7060018649d302bb",
+    "execution": {
+      "device": "cuda",
+      "replay_workers": 6,
+      "require_cuda": true,
+      "sample_workers": 6,
+      "single_gpu_training_process": true,
+      "train_workers": 4
+    },
+    "history_H": 20,
+    "label_weights": [
+      1.0,
+      1.0,
+      2.0
+    ],
+    "lookahead_L": 256,
+    "model": {
+      "ablation": "cross_attention",
+      "address_embed_dim": 24,
+      "address_vocab_size": 100000,
+      "context_mode": "cross_attention",
+      "dropout": 0.1,
+      "feedforward_dim": 96,
+      "hidden_dim": 48,
+      "num_heads": 4,
+      "num_layers": 2,
+      "num_queries": 4,
+      "page_dim": 21,
+      "page_embed_dim": 24,
+      "page_state_dim": 4,
+      "page_vocab_size": 100000,
+      "pc_embed_dim": 22,
+      "pc_vocab_size": 50000,
+      "position_encoding": "sinusoidal",
+      "rw_embed_dim": 2,
+      "shared_page_embedding": true,
+      "use_page_id_embedding": true
+    },
+    "phase": "optimization",
+    "training": {
+      "approx_ndcg_alpha": 10.0,
+      "batch_size": 32,
+      "checkpoint_tie_break": "earliest_epoch",
+      "deterministic_algorithms": true,
+      "epochs": 8,
+      "learning_rate": 0.0001,
+      "num_workers": 4,
+      "precision": "fp32",
+      "weight_decay": 0.0001
+    }
+  },
+  "formal_freeze": false,
+  "formal_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "run_id": "stage4-stage7-unified-r2",
+  "schema_version": "capd_proactive_stage4_stage7_candidate_v1_0",
+  "selection_report_sha256": "92a6e998abedb603674ff8b54b8c7807400de0e4c2833e4d107625c9ff90acce",
+  "status": "candidate_awaiting_explicit_formal_freeze"
+}
