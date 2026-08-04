@@ -47,6 +47,8 @@ CURRENT_STEP="preflight"
 
 CURRENT_STEP="static_compile"
 "${PYTHON_BIN}" -m py_compile \
+  qmap/proactive_stage4_stage7.py \
+  qmap/proactive_stage5_policies.py \
   qmap/proactive_stage8_contract.py \
   qmap/proactive_stage8_replay.py \
   qmap/proactive_stage8_results.py \

@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from qmap import finals_config
 from qmap import proactive_replay
 from qmap import proactive_stage4
+from qmap import proactive_stage4_stage7
 from qmap import proactive_stage5_contract as contract
 
 
@@ -231,7 +232,9 @@ class CAPDRanker(proactive_replay.CandidateRankingPolicy):
       torch.backends.cudnn.deterministic = True
     checkpoint = torch.load(
         checkpoint_path, map_location=torch.device("cpu"))
-    if checkpoint.get("contract_id") != proactive_stage4.CONTRACT_ID:
+    if checkpoint.get("contract_id") not in (
+        proactive_stage4_stage7.CONTRACT_ID,
+        proactive_stage4_stage7.PROTOCOL_REPAIR_CONTRACT_ID):
       raise contract.Stage5ContractError(
           "CAPD rejected a historical/non-proactive checkpoint.")
     training_contract = checkpoint.get("stage4_training_contract")
@@ -242,7 +245,9 @@ class CAPDRanker(proactive_replay.CandidateRankingPolicy):
         proactive_stage4.fingerprint_value(training_contract)):
       raise contract.Stage5ContractError(
           "CAPD checkpoint training-contract fingerprint mismatch.")
-    if checkpoint.get("experiment_id") != "L256_lam1-1-2_K8_H20":
+    if (not isinstance(training_contract.get("experiment_id"), str) or
+        checkpoint.get("experiment_id") != training_contract.get(
+            "experiment_id")):
       raise contract.Stage5ContractError(
           "CAPD checkpoint experiment identity mismatch.")
     if training_contract.get("expected_shape") != {

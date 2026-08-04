@@ -4,9 +4,13 @@ import copy
 import inspect
 import os
 import tempfile
+import types
 import unittest
+from unittest import mock
 
+from qmap import finals_config
 from qmap import proactive_stage4
+from qmap import proactive_stage4_stage7
 from qmap import proactive_stage5_contract as contract
 from qmap import proactive_stage5_policies as policies
 
@@ -20,6 +24,56 @@ class ProactiveStage5ContractTest(unittest.TestCase):
 
   def setUp(self):
     self.config = contract.load_config(CONFIG_PATH)
+
+  def _build_capd_ranker(self, checkpoint_contract_id,
+                         checkpoint_experiment_id=None):
+    frozen_experiment_id = "7c34fe9158bbbd4db513e3ca"
+    training_contract = {
+        "experiment_id": frozen_experiment_id,
+        "expected_shape": {"H": 20, "K": 8, "page_state_dim": 4},
+        "labels": {"lambda_1": 1.0, "lambda_2": 1.0, "lambda_3": 2.0},
+        "seed": 3136859}
+    vocab_contract = {
+        "page_frozen": True, "pc_frozen": True,
+        "page_vocab_fingerprint": finals_config.fingerprint_value({}),
+        "pc_vocab_fingerprint": finals_config.fingerprint_value({})}
+    checkpoint = {
+        "contract_id": checkpoint_contract_id,
+        "stage4_training_contract": training_contract,
+        "stage4_training_contract_fingerprint":
+            proactive_stage4.fingerprint_value(training_contract),
+        "experiment_id": (frozen_experiment_id
+                          if checkpoint_experiment_id is None else
+                          checkpoint_experiment_id),
+        "test_trace_opened": False, "selector_status": "disabled",
+        "vocab_contract": vocab_contract, "seed": 3136859}
+
+    class FakeVocab:
+      frozen = True
+      input_to_index = {}
+
+    predictor = types.SimpleNamespace(
+        _feature_embedder=types.SimpleNamespace(
+            page_embedder=FakeVocab(), pc_embedder=FakeVocab()))
+    fake_torch = types.SimpleNamespace(
+        use_deterministic_algorithms=lambda enabled: None,
+        backends=types.SimpleNamespace(cudnn=types.SimpleNamespace(
+            benchmark=False, deterministic=False)),
+        device=lambda value: value,
+        load=lambda path, map_location: checkpoint)
+
+    from qmap import qmap_eval
+    with tempfile.TemporaryDirectory() as directory:
+      path = os.path.join(directory, "qmap_best.pth")
+      with open(path, "wb") as handle:
+        handle.write(b"fixture")
+      with mock.patch.dict("sys.modules", {"torch": fake_torch}), \
+           mock.patch.object(qmap_eval, "QMAPPolicy",
+                             return_value=predictor), \
+           mock.patch.object(proactive_stage4, "fingerprint_file",
+                             return_value="a" * 64):
+        return policies.CAPDRanker(
+            path, "a" * 64, 3136859, device="cuda:0")
 
   def test_frozen_parameters_and_formal_policy_table(self):
     self.assertEqual("stage5_implemented", self.config["stage_status"])
@@ -114,6 +168,26 @@ class ProactiveStage5ContractTest(unittest.TestCase):
     signature = inspect.signature(policies.CAPDRanker.__init__)
     self.assertNotIn("trace", signature.parameters)
     self.assertNotIn("labels", signature.parameters)
+
+  def test_capd_adapter_accepts_stage4_stage7_checkpoint_contracts(self):
+    for contract_id in (
+        proactive_stage4_stage7.CONTRACT_ID,
+        proactive_stage4_stage7.PROTOCOL_REPAIR_CONTRACT_ID):
+      with self.subTest(contract_id=contract_id):
+        ranker = self._build_capd_ranker(contract_id)
+        self.assertEqual(3136859, ranker.seed)
+
+  def test_capd_adapter_rejects_historical_stage4_checkpoint_contract(self):
+    with self.assertRaisesRegex(
+        contract.Stage5ContractError, "historical/non-proactive"):
+      self._build_capd_ranker(proactive_stage4.CONTRACT_ID)
+
+  def test_capd_adapter_rejects_checkpoint_training_experiment_mismatch(self):
+    with self.assertRaisesRegex(
+        contract.Stage5ContractError, "experiment identity mismatch"):
+      self._build_capd_ranker(
+          proactive_stage4_stage7.PROTOCOL_REPAIR_CONTRACT_ID,
+          checkpoint_experiment_id="wrong-experiment")
 
   def test_test_and_historical_policy_are_hard_rejected(self):
     for policy in ("random", "lfu", "reactive_capd", "old_capd"):

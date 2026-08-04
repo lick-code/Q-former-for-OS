@@ -31,6 +31,7 @@ from qmap import proactive_stage8_results
 
 CODE_FILES = (
     "qmap/finals_config.py", "qmap/proactive_stage4.py",
+    "qmap/proactive_stage4_stage7.py",
     "qmap/proactive_replay.py", "qmap/proactive_cost.py",
     "qmap/proactive_stage5_contract.py", "qmap/proactive_stage5_policies.py",
     "qmap/proactive_stage5_replay.py", "qmap/proactive_stage6_contract.py",
