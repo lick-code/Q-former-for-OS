@@ -6,6 +6,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import subprocess
 import tempfile
 import types
 import unittest
@@ -280,6 +281,43 @@ class Stage8ContractTest(unittest.TestCase):
           "status": contract.NOT_VERIFIED})
       with self.assertRaises(contract.Stage8ContractError):
         module._reject_failed_run(directory)
+
+  def test_git_state_excludes_stage8_runtime_output(self):
+    import importlib.util
+    script = os.path.join(ROOT, "scripts", "run_capd_proactive_stage8.py")
+    spec = importlib.util.spec_from_file_location("stage8_git_script", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    with tempfile.TemporaryDirectory() as directory:
+      def git(*args):
+        return subprocess.run(
+            ["git"] + list(args), cwd=directory, check=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+      git("init", "-q")
+      git("config", "user.email", "stage8-test@example.invalid")
+      git("config", "user.name", "Stage8 Test")
+      with open(os.path.join(directory, "tracked.txt"), "w",
+                encoding="utf-8") as handle:
+        handle.write("baseline\n")
+      git("add", "tracked.txt")
+      git("commit", "-qm", "initial")
+
+      output_root = os.path.join(
+          directory, "outputs", "capd_proactive_stage8")
+      os.makedirs(os.path.join(output_root, "new-run"))
+      with open(os.path.join(output_root, "new-run", "preflight.json"),
+                "w", encoding="utf-8") as handle:
+        handle.write("{}\n")
+      self.assertFalse(module._git_state(
+          directory, output_root)["dirty_worktree"])
+      self.assertFalse(module._git_state(directory)["dirty_worktree"])
+
+      with open(os.path.join(directory, "unrelated.txt"), "w",
+                encoding="utf-8") as handle:
+        handle.write("unrelated\n")
+      self.assertTrue(module._git_state(
+          directory, output_root)["dirty_worktree"])
 
   def test_cuda_runtime_environment_is_fail_closed_and_exact(self):
     import importlib.util

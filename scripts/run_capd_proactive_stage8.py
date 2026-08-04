@@ -87,12 +87,26 @@ def _runtime_environment(config: Mapping[str, Any], device: str) -> Dict[str, An
   return actual
 
 
-def _git_state(project_root: str) -> Dict[str, Any]:
+def _git_state(project_root: str,
+               runtime_output_root: Optional[str] = None) -> Dict[str, Any]:
   try:
     commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=project_root).decode().strip()
+    status_command = ["git", "status", "--porcelain", "--untracked-files=all"]
+    if runtime_output_root is None:
+      runtime_output_root = os.path.join(
+          project_root, "outputs", "capd_proactive_stage8")
+    project_path = os.path.realpath(project_root)
+    output_path = os.path.realpath(runtime_output_root)
+    relative_output = os.path.relpath(output_path, project_path)
+    outside_project = (relative_output == os.pardir or
+                       relative_output.startswith(os.pardir + os.sep))
+    if relative_output not in (".", "") and not outside_project:
+      relative_output = relative_output.replace(os.sep, "/").rstrip("/")
+      status_command.extend([
+          "--", ".", ":(exclude){}/**".format(relative_output)])
     status = subprocess.check_output(
-        ["git", "status", "--porcelain"], cwd=project_root).decode().strip()
+        status_command, cwd=project_root).decode().strip()
     return {"commit": commit, "dirty_worktree": bool(status)}
   except (OSError, subprocess.CalledProcessError):
     return {"commit": "unknown", "dirty_worktree": None}
@@ -160,7 +174,9 @@ def _identity(args, config, authority, runtime_environment):
       "job_count": 80, "standard_job_count": 48, "pressure_job_count": 32,
       "cell_count": 10, "code_artifacts": _code_fingerprints(args.project_root),
       "deterministic_runtime_environment": runtime_environment,
-      "device": args.device, "git": _git_state(args.project_root)}
+      "device": args.device, "git": _git_state(
+          args.project_root,
+          os.path.join(args.project_root, config["output_root"]))}
 
 
 def preflight(args) -> str:
