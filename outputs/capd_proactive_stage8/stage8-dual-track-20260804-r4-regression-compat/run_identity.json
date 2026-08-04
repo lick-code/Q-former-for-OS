@@ -1,0 +1,75 @@
+{
+  "authority_sha256": {
+    "cost_config": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0",
+    "pressure_bundle_manifest": "898a6b2c85221a1dbd5eb483cc0ef6599ce43065c60dcd7779791cce7f50ad52",
+    "pressure_test_lock": "929738382e1ac03263f9ea0b56e01cc0892ea3177229aa1604403a2aa3c39d5a",
+    "r4_final_freeze": "02904916ad26273e1c01cda540bbae121e2f0a0e3b6914cfa6e2904068e7f0c1",
+    "r4_pressure_generation_contract": "1c4582c20098425f9e8a155e832aad737e35160e8d254808a09706ca45394761",
+    "r4_run_state": "71da1d6386d7f1f7e62ef4965d3d41abc7c5b775350760cb249dabbece8a0f63",
+    "stage4_checkpoint_manifest": "61d62d59414b65c0600f29b415246a419199d97a8fd001aa570b6f9012b72dda",
+    "stage4_final_freeze": "cb70bce49bee1dba6e1009f327ba0237080f7c59ac76e049989c541b53ef525b",
+    "stage4_model_contract": "80bd84d4c627461f51ddf2ffafba225a8aca6dafa76104b15c43edb8e422d033",
+    "stage4_run_state": "09663106a23445c6ffc7dcae2b9d1cc84cbb5dfbcb4b75380ab38ed77a76ee21",
+    "standard_test_lock": "d47eed1a58b650892d741ac939ec6ea709c78fc22936b08105886433251ee6cb"
+  },
+  "cell_count": 10,
+  "checkpoint_sha256": {
+    "2026": "7c124136eecc157cef1cef3c1f9d68ac57b0c60ac594ae49f473bb2f2a4d2d27",
+    "3136859": "7093c5b188548a86baf1c6f6a46715f1ace01c230ae41635f636b1112e870438",
+    "42": "40d4f5c0413e36d3e9887d90d809195c6bf53db7dfdf397e654555b1d3fcae0a"
+  },
+  "code_artifacts": {
+    "policy_learning/cache_model/embed.py": "0700a90a6ba51958b5682a86fa51ff65cbdd1fb458dcd806e1747e93ce197485",
+    "policy_learning/cache_model/model.py": "597ef45be66affbcc6081fc60c4ef6b1b317a6cfd81118678cfed71066b8f854",
+    "qmap/finals_config.py": "4b2b39cdce43762b6541215517642d5cec183a3154957a24dceab71a863d8de6",
+    "qmap/proactive_cost.py": "acedf1d88f49a87d2bb60e61754328c04083443c58b7c95a847e41f58266e4a7",
+    "qmap/proactive_replay.py": "36bec97e6bf6546384c36583be8b63c4b5a6d95fe1ec29b89a846096b82b71cd",
+    "qmap/proactive_stage4.py": "345a4be034841dd236e4bf31a8dd879463fceb28790c920df596e9232ea71157",
+    "qmap/proactive_stage4_stage7.py": "3ac2078a1ecf521f42b9fe67dc93885ee43d45efd4bfbe69bbf230adb277f6de",
+    "qmap/proactive_stage5_contract.py": "a0b5b9775afb5ebf2be2125d57d415fadaf4bd445fcd165418de3754a5bd38e0",
+    "qmap/proactive_stage5_policies.py": "0ae74d7f4a3dc18be901e5e707327fdbb5813ecb75d5ad1f8f0f440788a68181",
+    "qmap/proactive_stage5_replay.py": "d792dbff116b9650a65ed0ae3b73cc2e8c245c0191b2a5d0a698002567d80aec",
+    "qmap/proactive_stage6_contract.py": "d25445d17e4606622a3bc7a0ecedd6a1fa23ae0ce05a461181ddf8f09309e8dd",
+    "qmap/proactive_stage6_replay.py": "2e8d4ee3965ed4d9acc787342878fca778abf3abde600674925f3608302616a4",
+    "qmap/proactive_stage6_tpp.py": "2bd2bf9d5ef59e9c42d45f1db29f4aa5416e8dfb80f34156793ebc0754de21fe",
+    "qmap/proactive_stage8_contract.py": "46be823f75b7d82f479370240a9815863b878b3d026655474bcb502626e0b9da",
+    "qmap/proactive_stage8_replay.py": "561bdc2e112c87e4d5d88242ce179ede3867b3d94d5acd0137d63d413e522c32",
+    "qmap/proactive_stage8_results.py": "bd00752046d3a11f2513f026af0da17ba6bc1e0da9473738fb453b5142c992ec",
+    "qmap/qmap_eval.py": "6583d53e63d1043c763539fe4447d8f167c0c0b0d07c44c11e93fe15674df177",
+    "scripts/run_capd_proactive_stage8.py": "dd1dd9121b590124c845b765eb5f21273df20f3a5feac027e1f7570b380aad1d",
+    "scripts/validate_capd_proactive_stage8_server.sh": "07641f5d47ec6b9d4636f6af47b0512219ba98decd1f753a4014e8fc9cb89512"
+  },
+  "config_sha256": "52bb15a3872c99bf2a61af3a25914078be04c296e093af4cacf23dd741bf93d3",
+  "contract_id": "CAPD-PROACTIVE-STAGE8-2.0",
+  "cost_config_sha256": "85822b6ba4502a146052d856e82b529723067b85a515b02c9f95212f20180fa0",
+  "deterministic_runtime_environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "PYTHONHASHSEED": "0"
+  },
+  "device": "cuda:0",
+  "git": {
+    "commit": "b5c329aac632e5269762dfe99969fac745539a0c",
+    "dirty_worktree": false
+  },
+  "job_count": 80,
+  "job_manifest_sha256": "c5fa8d21c7d38a1ade1d2cd763ac47404ccdd6cd0a642a39cf153de50fd175ba",
+  "pressure_job_count": 32,
+  "pressure_payload_sha256": {
+    "blackscholes": "ce19130b47a4459e05ca6b85e4045d001abfacf4c3d5333c002efd5cef683683",
+    "canneal": "14319d0b7c4f4581bdad36e087c08c8e793d68f9505f954645ee847dbc71a3ee",
+    "dedup_pressure": "14ed12e17979e7bc793beddc9dd1931c7cefb5d708eac7c7c1bdb38f8cd0eb9b",
+    "swaptions": "601bce48c37d1734598cbe6b13906fbdf2b1d510e1753b9bcb60938c5ae9c6fa"
+  },
+  "result_schema_sha256": "931cebc608559df679f44a4c5138750c499fee3c01df851863330bfb4db67362",
+  "run_identity_sha256": "5a33d4e01f3f59c0496d04cd10655d6ff0d51237b9880c9c1764f4a870a0886f",
+  "stage0_sha256": "2226bf05a401f90d093d6fbd5255011cab4af506714b790775908d4a373835c0",
+  "standard_job_count": 48,
+  "standard_payload_sha256": {
+    "blackscholes": "27f4f7107f15ea52ec2052efdcffab3e2cb6cb605f4ac6cd79c6aa49a23d2a3f",
+    "canneal": "dbf4707925d63710ef36eb37dcc7d10b7aced2ad41890a0de590f863c9ca5d48",
+    "dedup_pressure": "7910bdc116b3ff0414feaca3dfeb553dd84b2ef1955c4d4807f92fc643cb2155",
+    "fluidanimate": "598d8dffb4be589ab8bd035f707141a58894db8347051b9beba9358e046df88d",
+    "streamcluster_pressure": "9433aea84e9cd54146ae5852ca41f02e653ef9f6bb7c66721995fb5687e6e12e",
+    "swaptions": "59afbf2923aea4ac6b1375fb3abc602c192b3e789a829b1a0415f50725ce0ef8"
+  }
+}
