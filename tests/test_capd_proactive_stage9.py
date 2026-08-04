@@ -100,6 +100,18 @@ class Stage9ContractTest(unittest.TestCase):
     with self.assertRaises(stage9.Stage9ContractError):
       runner._audit_main_default_capacity(_config(), authority)
 
+  def test_stage7_capacity_rows_are_stage9_owned_and_fail_closed(self):
+    runner = Stage9LatencyAndCycleTest._runner_module()
+    rows = [{"workload": "fixture", "ratio": "0.20"}]
+    self.assertEqual(rows, runner._stage7_capacity_rows({"rows": rows}))
+    self.assertEqual(rows, runner._stage7_capacity_rows(rows))
+    for invalid in ({}, {"rows": None}, None):
+      with self.subTest(invalid=invalid):
+        with self.assertRaises(stage9.Stage9ContractError):
+          runner._stage7_capacity_rows(invalid)
+    with open(runner.__file__, "r", encoding="utf-8") as handle:
+      self.assertNotIn("stage8_contract._capacity_rows", handle.read())
+
   def test_stage8_entry_gate_rejects_every_invalid_authority_field(self):
     valid = {
         "status": "stage8_sync_replay_verified",

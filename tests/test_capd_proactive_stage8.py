@@ -223,11 +223,14 @@ class Stage8ContractTest(unittest.TestCase):
     with self.assertRaises(contract.Stage8ContractError):
       contract._pressure_rows(ROOT, lock, bundle, "a" * 64, "b" * 64, False)
 
-  def test_standard_server_payload_path_is_fail_closed(self):
+  def test_standard_missing_server_payload_path_is_fail_closed(self):
     config = _config()
     lock = contract.load_json(os.path.join(
         ROOT, config["authorities"]["standard_test_lock"]["path"]))
     self.assertIn("stage7-server-suite-r1", lock["workloads"][0]["path"])
+    lock["workloads"][0]["path"] = (
+        "outputs/capd_proactive_stage7/stage7-server-suite-r1/"
+        "missing-fail-closed-fixture/test.csv")
     with self.assertRaises((contract.Stage8ContractError,
                             stage7.Stage7ContractError)):
       contract._standard_rows(ROOT, lock, True)

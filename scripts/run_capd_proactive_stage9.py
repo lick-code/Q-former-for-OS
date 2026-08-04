@@ -312,10 +312,17 @@ def _trace(path):
            "pc": row["pc"]} for row in stage7.iter_trace(path, 12)]
 
 
+def _stage7_capacity_rows(capacity):
+  rows = capacity.get("rows") if isinstance(capacity, Mapping) else capacity
+  if not isinstance(rows, list):
+    raise stage9.Stage9ContractError("Stage-7 capacity matrix rows are missing.")
+  return rows
+
+
 def _audit_main_default_capacity(config, authority):
   expected_ratio = config["measurement_matrix"]["capacity_ratios"][0]
   capacity = authority["capacity"]
-  rows = stage8_contract._capacity_rows(capacity)
+  rows = _stage7_capacity_rows(capacity)
   locked_workloads = {row["workload"]
                       for row in authority["lock"]["workloads"]}
   main_rows = [row for row in rows if row.get("is_main_default") is True]
@@ -647,7 +654,7 @@ def measure(args):
   lock_map = {row["workload"]: row for row in authority["lock"]["workloads"]}
   capacity_map = {
       (row["workload"], str(row["ratio"])): row
-      for row in stage8_contract._capacity_rows(authority["capacity"])}
+      for row in _stage7_capacity_rows(authority["capacity"])}
   directory = os.path.dirname(raw_path)
   fd, temporary = tempfile.mkstemp(
       prefix=".stage9-latency-", suffix=".tmp", dir=directory)
@@ -796,7 +803,7 @@ def measure(args):
       os.path.join(run_root, "memory_breakdown.json"), memory_breakdown)
   capacity_rows = stage9.capacity_overhead_rows(
       management_fixed, config["memory"]["metadata_bytes_per_page"],
-      stage8_contract._capacity_rows(authority["capacity"]), 4096)
+      _stage7_capacity_rows(authority["capacity"]), 4096)
   stage9.write_csv_atomic(
       os.path.join(run_root, "capacity_overhead.csv"), capacity_rows)
   _write_report(run_root, latency_summary, throughput_summary,
