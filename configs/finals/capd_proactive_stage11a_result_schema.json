@@ -1,0 +1,29 @@
+{
+  "schema_version": "capd_proactive_stage11a_result_schema_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE11A-1.0",
+  "null_numeric_representation": "null",
+  "report_missing_numeric_representation": "N/A",
+  "evidence_statuses": ["implemented", "candidate-ready", "formally_verified", "BLOCKED", "NOT_VERIFIABLE"],
+  "run_statuses": ["stage11a_implemented", "stage11a_candidate_ready", "stage11a_blocked", "stage11a_not_verifiable"],
+  "forbidden_generated_run_status": "stage11a_formally_verified",
+  "required_row_fields": [
+    "run_id", "row_id", "source_job_id", "source_result_sha256", "source_semantic_result_sha256",
+    "lane", "evidence_status", "evidence_mode", "parameter_family", "grid_cell_id", "frozen_grid_sha256",
+    "track", "workload", "seed", "policy_or_ablation", "D", "F_low", "F_target", "F_target_minus_F_low",
+    "capacity_working_set_fraction", "b_max", "label_weights", "cost_profile", "dram_hits", "nvm_reads",
+    "nvm_writes", "proactive_demotions", "reactive_demotions", "emergency_demotions", "total_demotions",
+    "raw_access_count", "weighted_cost", "weighted_cost_per_access", "input_artifact_path",
+    "input_artifact_sha256", "config_sha256", "code_version", "blocking_reason"
+  ],
+  "numeric_nullable_fields": [
+    "seed", "D", "F_low", "F_target", "F_target_minus_F_low", "capacity_working_set_fraction", "b_max",
+    "dram_hits", "nvm_reads", "nvm_writes", "proactive_demotions", "reactive_demotions", "emergency_demotions",
+    "total_demotions", "raw_access_count", "weighted_cost", "weighted_cost_per_access"
+  ],
+  "run_artifacts": [
+    "stage11a_config.json", "stage11a_manifest.json", "stage11a_results.csv", "stage11a_results.json",
+    "stage11a_report.md", "verification.json", "SHA256SUMS", "run_state.json"
+  ],
+  "manifest_excludes": ["stage11a_manifest.json", "SHA256SUMS"],
+  "sha256sums_excludes": ["SHA256SUMS"]
+}

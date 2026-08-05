@@ -1,0 +1,52 @@
+{
+  "schema_version": "capd_proactive_stage11a_config_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE11A-1.0",
+  "stage8_authority_path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit",
+  "main_control": {
+    "b_max": 2,
+    "label_weights": [1, 1, 2]
+  },
+  "cost_profiles": {
+    "read_light": {
+      "weights": {"dram_hit": 1, "nvm_read": 2, "nvm_write": 4, "demotion": 8},
+      "semantics": {"nvm_write": "NVM write access cost", "demotion": "DRAM to NVM migration cost"}
+    },
+    "default": {
+      "weights": {"dram_hit": 1, "nvm_read": 2, "nvm_write": 8, "demotion": 10},
+      "semantics": {"nvm_write": "NVM write access cost", "demotion": "DRAM to NVM migration cost"}
+    },
+    "write_expensive": {
+      "weights": {"dram_hit": 1, "nvm_read": 2, "nvm_write": 12, "demotion": 10},
+      "semantics": {"nvm_write": "NVM write access cost", "demotion": "DRAM to NVM migration cost"}
+    },
+    "migration_expensive": {
+      "weights": {"dram_hit": 1, "nvm_read": 2, "nvm_write": 8, "demotion": 20},
+      "semantics": {"nvm_write": "NVM write access cost", "demotion": "DRAM to NVM migration cost"}
+    }
+  },
+  "sensitivity_grid": {
+    "b_max": [1, 2, 4],
+    "capacity_working_set_fraction": [0.2, 0.4, 0.6],
+    "watermark_candidates": [],
+    "label_weight_candidates": [],
+    "analysis_only": true,
+    "grid_frozen": false,
+    "execution_authorized": false
+  },
+  "input_ablation": {
+    "status": "BLOCKED",
+    "variants": ["CAPD-Full", "CAPD-NoVPN", "CAPD-NoContext", "CAPD-NoPageState"],
+    "checkpoint_selection": "future_separately_approved_validation_only"
+  },
+  "batch_ablation": {
+    "variants": ["Proactive-CAPD-Top-1", "Proactive-CAPD-Top-b"],
+    "only_changed_parameter": "selection_count"
+  },
+  "external_gates": {
+    "stage9_run_root": null,
+    "stage10_run_root": null,
+    "stage10_contract_version": "stage10a_fixture_only"
+  },
+  "test_used_for_parameter_selection": false,
+  "execution_authorized": false
+}

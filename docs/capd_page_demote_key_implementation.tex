@@ -1,0 +1,141 @@
+% CAPD page-demotion implementation section.
+% Figure filenames are screenshot targets for the technical document.
+
+\subsection{\heiti CAPD 页面降级排序关键实现}
+
+CAPD 将页面降级建模为受 DRAM 空间约束驱动的候选页排序问题。Trace Replay 按时间顺序回放页面级访存记录，维护页面驻留层级、DRAM 中的 LRU 顺序、页面进入 DRAM 的时间、访问频率和脏页状态。当可用 DRAM 页框低于设定的低水位时，系统启动主动降级周期；在每一轮中，从当前 DRAM 页面构造候选集合，利用访问历史和候选页状态计算排序分数，并按照当前空间缺口批量选择降级页面。页面完成迁移后，系统更新驻留状态并重新构造候选集合，直至空闲页框恢复到目标水位。
+
+\subsubsection{\heiti 主动降级 Replay 状态与统一页面进入路径}
+
+Trace Replay 使用 \texttt{dram\_resident}、\texttt{nvm\_resident} 和 \texttt{residency\_state} 记录页面所在的存储层级，使用 \texttt{dram\_lru} 维护 DRAM 页面从最近访问到最久未访问的顺序。\texttt{dirty\_state}、\texttt{frequency\_state}、\texttt{last\_access\_index} 和 \texttt{dram\_entry\_index} 分别记录页面修改状态、访问次数、最近访问位置和进入 DRAM 的时间；\texttt{history\_window} 保存近期访存上下文。这些状态由所有页面策略共享，保证不同策略在相同驻留状态和容量约束下运行。
+
+页面离开 DRAM 时统一调用 \texttt{\_page\_demote\_from\_dram}。该函数从 DRAM 集合和 LRU 链表中移除页面，将页面加入 NVM 集合，更新驻留状态，清除写回后的脏状态，并记录降级事件、空闲页框变化及主动/被动/紧急降级计数。页面进入 DRAM 时统一调用 \texttt{\_page\_enter\_dram}；该函数要求调用前存在空闲页框，将页面插入 DRAM 的 MRU 端，记录进入时间，并检查页面状态不变量。
+
+一次访存请求首先根据 \texttt{residency\_state} 判断 DRAM 命中或 NVM 访问。未命中且 $F_t=0$ 时，Replay 先使用 LRU 页面完成紧急降级，再调用 \texttt{\_page\_enter\_dram} 处理当前访问页面。页面进入 DRAM 后，主动降级控制器依据水位条件决定是否启动主动降级周期。该处理顺序将访问引起的页面进入和空间压力引起的页面降级分开记录，也为后续统计和策略比较提供统一事件语义。
+
+图~\ref{fig:capd-trace-replay-state} 展示了页面降级函数的状态更新和事件记录过程：左侧代码完成 DRAM/NVM 驻留集合、LRU 链表和脏页状态的更新，右侧代码根据降级类型更新计数器并记录降级事件。页面进入 DRAM 和访问入口在同一 Replay 状态机中调用该统一降级路径。
+
+\begin{figure}[htbp]
+\centering
+\fbox{\includegraphics[width=0.96\textwidth]{figures/code/capd_trace_replay_state.png}}
+\caption{CAPD Replay 页面降级状态更新与事件记录}
+\label{fig:capd-trace-replay-state}
+\end{figure}
+
+% 截图对应：qmap/proactive_replay.py:594--644。
+
+\subsubsection{\heiti 工作负载水位参数与有界主动降级循环}
+
+主动降级的触发条件由当前空闲页框数 $F_t$、低水位 $F_{\mathrm{low}}$ 和目标水位 $F_{\mathrm{target}}$ 共同确定：
+
+\begin{equation}
+\begin{cases}
+F_t\geq F_{\mathrm{low}}：&\text{不启动主动降级；}\\
+0<F_t<F_{\mathrm{low}}：&\text{启动主动降级周期，直至 }F_t\geq F_{\mathrm{target}}；\\
+F_t=0：&\text{先执行 LRU 紧急降级，再继续恢复到 }F_{\mathrm{target}}。
+\end{cases}
+\end{equation}
+
+水位参数由 DRAM 容量和工作负载控制参数动态计算。实现首先根据 $\alpha$ 计算目标预留页框数，再通过 $\beta$ 得到低水位，并约束 $1\leq F_{\mathrm{low}}<F_{\mathrm{target}}<D$ 以及目标预留比例上限。当前正式配置采用 $\alpha=0.15$、$\beta=0.4$，使不同容量和工作负载的水位参数按照同一规则派生。
+
+为限制单轮迁移规模，系统根据当前恢复缺口和候选页数量计算批量上限：
+
+\begin{equation}
+b_t=\min\left(b_{\max},\;F_{\mathrm{target}}-F_t,\;|C_t|\right),
+\end{equation}
+
+其中 $C_t$ 为本轮候选页集合，$b_{\max}$ 为全局批量上限，正式配置为 $b_{\max}=2$。主动降级周期在每轮完成后重新读取 $F_t$，并在候选集合为空、$b_t=0$、达到目标水位或状态不再前进时终止。页面被降级后，下一轮重新构造候选集合，避免使用已经失效的页面状态。
+
+图~\ref{fig:capd-watermark-cycle} 展示了水位参数和批量上限的计算过程：左侧代码由容量、$\alpha$ 和 $\beta$ 派生 $F_{\mathrm{low}}$ 与 $F_{\mathrm{target}}$，右侧代码根据当前空闲页框数和候选页数量计算 $b_t$，从而为主动降级循环提供本轮的迁移规模约束。
+
+\begin{figure}[htbp]
+\centering
+\fbox{\includegraphics[width=0.96\textwidth]{figures/code/capd_watermark_cycle.png}}
+\caption{CAPD 动态水位与主动降级批量上限计算}
+\label{fig:capd-watermark-cycle}
+\end{figure}
+
+% 截图对应：qmap/proactive_stage3_stage7.py:641--659、qmap/proactive_stage3_stage7.py:666--677。
+
+\subsubsection{\heiti 候选页重建与在线状态特征}
+
+在主动降级周期的每一轮，系统从当前 DRAM 的 LRU 尾部构造候选集合。候选集合最多包含 $K$ 个页面，正式配置为 $K=8$；不可降级页面和当前正在进入 DRAM 的页面不参与本轮选择。候选集合由 Replay 根据当前实际驻留状态生成，模型只负责对已确定的候选页进行排序。
+
+候选页状态特征由当前可观测信息构成，包括近期历史窗口中的归一化访问频率、页面是否为脏页、页面在 DRAM 中的归一化驻留时间，以及页面在 LRU 候选集合中的相对位置。页面编号本身由模型的页面嵌入器编码。候选页少于 $K$ 个时使用零值 padding 补齐，并通过 \texttt{candidate\_mask} 标记有效位置；padding 项在模型评分和排序损失中均被屏蔽。
+
+页面降级会改变 DRAM 驻留集合、LRU 顺序和剩余空间，因此每轮迁移完成后都重新计算候选页和候选页特征。该“排序、迁移、重建”的循环是主动降级与一次性 victim 选择之间的主要执行差异。
+
+图~\ref{fig:capd-candidate-features} 展示了候选页集合构造及候选页访问统计接口：左侧代码从当前 DRAM 的 LRU 尾部筛出实际候选页，右侧代码在离线处理阶段统计候选页的下一次访问距离、未来访问次数和未来写次数。在线状态特征在此候选集合基础上进一步构造，并通过 mask 区分真实候选页和 padding 项。
+
+\begin{figure}[htbp]
+\centering
+\fbox{\includegraphics[width=0.96\textwidth]{figures/code/capd_candidate_features.png}}
+\caption{CAPD LRU 尾部候选集合与候选页访问统计}
+\label{fig:capd-candidate-features}
+\end{figure}
+
+% 截图对应：qmap/proactive_replay.py:666--679、qmap/qmap_generator.py:201--213。
+
+\subsubsection{\heiti 离线训练样本与未来排序标签}
+
+训练样本在每个主动降级决策点记录长度为 $H$ 的近期访存窗口、候选页集合、候选页状态、水位信息和候选页掩码。正式配置中 $H=20$。对于候选页 $p$，训练阶段在决策点之后的 lookahead 窗口内统计下一次访问距离、未来访问次数和未来写次数，得到未来不活跃程度 $\hat d_p$、未来冷度 $\hat q_p$ 和未来写入强度 $\hat w_p$。lookahead 长度为 $L=256$。
+
+参考排序目标由三个未来标签加权得到：
+
+\begin{equation}
+y_p=\lambda_1\hat d_p+\lambda_2\hat q_p-\lambda_3\hat w_p,
+\qquad (\lambda_1,\lambda_2,\lambda_3)=(1,1,2).
+\end{equation}
+
+$y_p$ 越大，表示页面在未来窗口中越不活跃、再次访问越少且写入风险越低。标签构造只发生在离线训练样本生成阶段；在线策略适配器不接收 trace 或未来标签对象。对于 trace 尾部无法取得完整 lookahead 的样本，代码显式记录有效窗口长度和完整性状态，避免将不完整未来窗口当作完整监督信号。
+
+图~\ref{fig:capd-training-sample} 展示了离线标签计算和训练样本生成入口：左侧代码从 lookahead 窗口提取候选页的未来访问统计，右侧代码根据 workload、窗口和候选页配置启动样本生成流程。样本字段的具体写入由该入口继续调用后续构造逻辑完成。
+
+\begin{figure}[htbp]
+\centering
+\fbox{\includegraphics[width=0.96\textwidth]{figures/code/capd_training_sample.png}}
+\caption{CAPD 未来标签计算与训练样本生成入口}
+\label{fig:capd-training-sample}
+\end{figure}
+
+% 截图对应：qmap/proactive_stage4.py:497--519、qmap/proactive_stage4_stage7.py:800--823。
+
+\subsubsection{\heiti 上下文编码、候选页评分与排序损失}
+
+模型首先将页面编号、PC 和读写类型转换为嵌入表示，并对长度为 $H$ 的历史序列加入正弦位置编码。因果 Transformer 对历史访存进行上下文编码，padding 位置通过历史掩码排除。候选页的页面嵌入与四维页面状态特征拼接后形成候选页查询表示。
+
+候选页查询通过 cross-attention 读取访问历史上下文，并与自身表示进行残差融合和归一化；随后由 MLP 输出每个候选页的降级分数。正式模型合同采用隐藏维度 48、2 层 Transformer、前馈层维度 96、4 个注意力头/查询、正弦位置编码和 0.1 dropout。候选页掩码会将 padding 位置的分数置为无效值，保证排序只作用于真实候选页。
+
+训练时使用列表级可微 ApproxNDCG 损失。损失函数先依据未来不活跃程度、未来冷度、写入敏感度和迁移代价计算候选页 relevance，再结合候选页掩码计算整个列表的近似 NDCG。这样模型优化的是候选页的相对顺序，而不是只拟合单一的 top-1 页面。
+
+图~\ref{fig:capd-context-score-loss} 展示了模型前向编码接口和排序损失配置：左侧代码接收历史访问特征和历史掩码，为后续 Transformer 上下文编码提供输入；右侧代码定义候选列表排序损失的参数接口。候选页交叉注意力和分数输出在同一模型模块的后续代码中完成。
+
+\begin{figure}[htbp]
+\centering
+\fbox{\includegraphics[width=0.96\textwidth]{figures/code/capd_context_score_loss.png}}
+\caption{CAPD 历史上下文编码入口与排序损失配置}
+\label{fig:capd-context-score-loss}
+\end{figure}
+
+% 截图对应：policy_learning/cache_model/model.py:213--222、policy_learning/cache_model/qmap_loss.py:22--31。
+
+\subsubsection{\heiti 冻结模型加载与在线 Top-$b_t$ 降级决策}
+
+在线阶段使用已冻结的 CAPD checkpoint。策略适配器加载模型前校验 checkpoint 路径对应的 SHA-256、训练合同、实验标识、随机种子、$H=20$、$K=8$、$L=256$、标签权重和模型输入形状，同时检查 Test trace 未被打开、候选页选择器处于关闭状态，以及页面和 PC 词表已经冻结。任一校验失败都会拒绝加载，避免将不符合合同的模型带入 Replay。
+
+每轮决策时，适配器只向模型提供当前候选页、最近访存历史、当前访问位置、页面进入 DRAM 的时间和当前脏页状态。\texttt{qmap\_eval} 将这些信息转换为固定形状的张量，使用候选页掩码屏蔽 padding 后执行前向计算。得到分数后，策略按分数降序排列候选页，取前 $b_t$ 个页面作为本轮降级集合，并调用统一的页面降级函数完成迁移。迁移结束后 Replay 更新 $F_t$、LRU 顺序和页面状态，再进入下一轮候选页重建。
+
+因此，CAPD 的在线推理边界可以概括为“当前候选页 + 历史访存 + 当前页面状态”。未来 lookahead 只用于离线标签生成，在线路径不访问未来 trace，也不重新训练或选择 checkpoint。
+
+图~\ref{fig:capd-online-top-b} 展示了在线候选页评分输入和批量选择过程：左侧代码检查显式候选页、构造候选页状态特征并准备历史窗口输入，右侧代码根据 $F_t$、$F_{\mathrm{target}}$、$b_{\max}$ 和候选页数量计算本轮 $b_t$。冻结 checkpoint 的合同校验在策略适配器加载阶段完成。
+
+\begin{figure}[htbp]
+\centering
+\fbox{\includegraphics[width=0.96\textwidth]{figures/code/capd_online_top_b.png}}
+\caption{CAPD 在线候选页评分输入与 Top-$b_t$ 批量选择}
+\label{fig:capd-online-top-b}
+\end{figure}
+
+% 截图对应：qmap/qmap_eval.py:922--948、qmap/proactive_replay.py:829--853。
+
+上述实现形成一条完整的主动降级决策链：Replay 维护统一页面状态，水位机制判断是否启动主动降级，候选页构造限定排序范围，模型结合历史上下文产生页面分数，最后按照 $b_t$ 批量完成页面迁移。不同基线策略也在同一 Replay 状态模型和容量约束下运行，从而保证页面命中、NVM 访问、降级次数和状态一致性等指标具有统一的统计口径。
