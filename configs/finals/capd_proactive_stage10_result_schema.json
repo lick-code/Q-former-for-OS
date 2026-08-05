@@ -1,0 +1,54 @@
+{
+  "schema_version": "capd_proactive_stage10_result_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE10-1.0",
+  "required": ["scenario_id", "mode", "observed", "derived", "interpretation"],
+  "properties": {
+    "scenario_id": {"type": "string"},
+    "mode": {"enum": ["fixture"]},
+    "observed": {
+      "type": "object",
+      "required": [
+        "emergency_fallback_count", "fallback_rate",
+        "foreground_blocking_time_total", "foreground_blocking_time_mean",
+        "foreground_blocking_time_p95", "blocking_sample_count",
+        "minimum_free_frames", "free_frame_exhaustion_duration",
+        "background_queue_length_mean", "background_queue_length_max",
+        "background_queue_length_p95", "background_utilization",
+        "page_enter_dram_count", "demotion_finish_count",
+        "effective_demotion_rate", "unfinished_blocked_request_count"
+      ],
+      "properties": {
+        "emergency_fallback_count": {"type": "integer"},
+        "fallback_rate": {"type": ["null", "number"]},
+        "foreground_blocking_time_total": {"type": "integer"},
+        "foreground_blocking_time_mean": {"type": ["null", "integer"]},
+        "foreground_blocking_time_p95": {"type": ["null", "integer"]},
+        "blocking_sample_count": {"type": "integer"},
+        "minimum_free_frames": {"type": "integer"},
+        "free_frame_exhaustion_duration": {"type": "integer"},
+        "background_queue_length_mean": {"type": "number"},
+        "background_queue_length_max": {"type": "integer"},
+        "background_queue_length_p95": {"type": "integer"},
+        "background_utilization": {"type": "number"},
+        "page_enter_dram_count": {"type": "integer"},
+        "demotion_finish_count": {"type": "integer"},
+        "effective_demotion_rate": {"type": "number"},
+        "unfinished_blocked_request_count": {"type": "integer"}
+      }
+    },
+    "derived": {
+      "type": "object",
+      "required": [
+        "simulation_horizon_ns", "seed", "T_inference_ns", "T_migration_ns",
+        "b_max", "b_t_reference", "mu_demote",
+        "mu_demote_pages_per_ns_numerator",
+        "mu_demote_pages_per_ns_denominator", "actual_b_t_values",
+        "actual_b_t_distribution", "arrival_model"
+      ]
+    },
+    "interpretation": {
+      "type": "object",
+      "required": ["scope", "real_linux_measurement_claimed", "kernel_behavior_claimed"]
+    }
+  }
+}

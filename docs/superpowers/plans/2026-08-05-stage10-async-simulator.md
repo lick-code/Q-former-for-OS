@@ -1,6 +1,6 @@
 # CAPD Stage10A Async Simulator Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (\`- [ ]\`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build and locally verify a deterministic pure-Python Stage10A discrete-event simulator whose fixture results are candidate-ready while formal Stage10 remains fail-closed until verified Stage9 v2 evidence exists.
 
@@ -121,8 +121,18 @@ class Stage10ConfigContractTest(unittest.TestCase):
     stage10.validate_config(config)
     self.assertEqual("CAPD-PROACTIVE-STAGE10-1.0",
                      config["contract_id"])
+    self.assertEqual(
+        stage10.sha256_file(SCHEMA_PATH),
+        config["result_schema_sha256"])
+    self.assertRegex(config["result_schema_sha256"], r"^[0-9a-f]{64}$")
     self.assertEqual("fixture", config["mode"])
     self.assertEqual("lru_tail", config["candidate_source"])
+    self.assertEqual(["-m", "unittest"],
+                     config["test_evidence"]["required_command_tokens"])
+    self.assertEqual("tests.test_capd_proactive_stage10",
+                     config["test_evidence"]["required_module"])
+    self.assertGreaterEqual(config["test_evidence"]["minimum_test_count"],
+                            10)
     self.assertEqual(["0.5", "0.8", "1.0", "1.2"],
                      [row["load_ratio"]
                       for row in config["uniform_scenarios"]])
@@ -130,7 +140,7 @@ class Stage10ConfigContractTest(unittest.TestCase):
                      schema["schema_version"])
     self.assertEqual(["null", "integer"],
                      schema["properties"]["observed"]["properties"]
-                     ["foreground_blocking_time_mean_ns"]["type"])
+                     ["foreground_blocking_time_mean"]["type"])
 
   def test_invalid_timing_capacity_and_arrival_kind_fail_closed(self):
     base = load_json(CONFIG_PATH)
@@ -181,6 +191,11 @@ Create a JSON document with these exact contract values:
     "enabled": false,
     "status": "future_input_option_requires_reliable_timestamps"
   },
+  "test_evidence": {
+    "required_command_tokens": ["-m", "unittest"],
+    "required_module": "tests.test_capd_proactive_stage10",
+    "minimum_test_count": 10
+  },
   "fixture_parameters": {
     "T_inference_ns": 2000,
     "T_migration_ns": 1000,
@@ -214,10 +229,52 @@ Create a JSON document with these exact contract values:
     "required_stage9_contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
     "required_stage9_status": "stage9_overhead_verified",
     "rejected_run_ids": ["stage9-overhead-r1"],
+    "stage9_run_root_argument": "--stage9-run-root",
+    "stage9_required_files": [
+      "run_identity.json",
+      "resolved_config.json",
+      "stage8_compatibility_receipt.json",
+      "preflight.json",
+      "environment.json",
+      "raw_latency_samples.csv",
+      "latency_summary.json",
+      "throughput_summary.json",
+      "quality_summary.json",
+      "instrumentation_audit.json",
+      "perf/perf-stat.raw",
+      "perf/perf_parsed.json",
+      "perf/perf_scope_counts.json",
+      "memory_breakdown.json",
+      "capacity_overhead.csv",
+      "artifacts/report_cn.md",
+      "logs/stage1_stage9_regression.log",
+      "server_test_receipt.json",
+      "verification.json",
+      "run_state.json"
+    ],
+    "stage9_verification_required": {
+      "schema_version": "capd_proactive_stage9_verification_v2_0",
+      "status": "stage9_overhead_verified",
+      "stage10_entry_gate": "satisfied",
+      "stage8_entry_gate": "satisfied",
+      "device": "cpu",
+      "linux_measurement": true,
+      "perf_cycles_verified": true,
+      "memory_verified": true,
+      "raw_to_summary_verified": true,
+      "instrumentation_semantics_verified": true,
+      "stage8_compatibility_receipt_verified": true,
+      "test_used_for_parameter_selection": false,
+      "formal_b_max": 2,
+      "b_max_sensitivity_purpose": "analysis_only_not_selection",
+      "stage8_artifacts_overwritten": false,
+      "fair_capacity_replay_status": "deferred"
+    },
     "historical_failed_run_state": {
       "path": "outputs/capd_proactive_stage9/stage9-overhead-r1/run_state.json",
       "sha256": "662a5e44f488a7951ddc2e9a75a39d49bd5024b6e9fde718a8553dd362711d15"
     },
+    "stage8_r5_verification_sha256": "b531f7324af9a6edf7dc31adc1426782c2389be35fd4b6058aa1986764e8025b",
     "stage8_r5_tree_sha256": "554eba14afa57eab2e02aaa156f32181d29d4c66929a5fd2ca934e87c5cf49db"
   }
 }
@@ -242,12 +299,12 @@ The schema must require top-level `scenario_id`, `mode`, `observed`, `derived`, 
       "required": [
         "emergency_fallback_count",
         "fallback_rate",
-        "foreground_blocking_time_total_ns",
-        "foreground_blocking_time_mean_ns",
-        "foreground_blocking_time_p95_ns",
+        "foreground_blocking_time_total",
+        "foreground_blocking_time_mean",
+        "foreground_blocking_time_p95",
         "blocking_sample_count",
         "minimum_free_frames",
-        "free_frame_exhaustion_duration_ns",
+        "free_frame_exhaustion_duration",
         "background_queue_length_mean",
         "background_queue_length_max",
         "background_queue_length_p95",
@@ -260,12 +317,12 @@ The schema must require top-level `scenario_id`, `mode`, `observed`, `derived`, 
       "properties": {
         "emergency_fallback_count": {"type": "integer"},
         "fallback_rate": {"type": ["null", "number"]},
-        "foreground_blocking_time_total_ns": {"type": "integer"},
-        "foreground_blocking_time_mean_ns": {"type": ["null", "integer"]},
-        "foreground_blocking_time_p95_ns": {"type": ["null", "integer"]},
+        "foreground_blocking_time_total": {"type": "integer"},
+        "foreground_blocking_time_mean": {"type": ["null", "integer"]},
+        "foreground_blocking_time_p95": {"type": ["null", "integer"]},
         "blocking_sample_count": {"type": "integer"},
         "minimum_free_frames": {"type": "integer"},
-        "free_frame_exhaustion_duration_ns": {"type": "integer"},
+        "free_frame_exhaustion_duration": {"type": "integer"},
         "background_queue_length_mean": {"type": "number"},
         "background_queue_length_max": {"type": "integer"},
         "background_queue_length_p95": {"type": "integer"},
@@ -281,6 +338,7 @@ The schema must require top-level `scenario_id`, `mode`, `observed`, `derived`, 
       "required": [
         "simulation_horizon_ns", "seed", "T_inference_ns",
         "T_migration_ns", "b_max", "b_t_reference",
+        "mu_demote",
         "mu_demote_pages_per_ns_numerator",
         "mu_demote_pages_per_ns_denominator",
         "actual_b_t_values", "actual_b_t_distribution", "arrival_model"
@@ -325,10 +383,16 @@ def _require(condition: Any, message: str) -> None:
 
 
 def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
+  _require(isinstance(value, Mapping), "Stage10 config must be an object.")
   _require(value.get("schema_version") == SCHEMA_VERSION,
            "Stage10 schema mismatch.")
   _require(value.get("contract_id") == CONTRACT_ID,
            "Stage10 contract mismatch.")
+  _require(value.get("result_schema") ==
+           "configs/finals/capd_proactive_stage10_result_schema.json" and
+           isinstance(value.get("result_schema_sha256"), str) and
+           len(value["result_schema_sha256"]) == 64,
+           "Stage10 result-schema binding is missing.")
   _require(value.get("mode") == FIXTURE, "Repository config must be fixture.")
   _require(value.get("candidate_source") == "lru_tail",
            "Stage10 candidate source changed.")
@@ -338,6 +402,14 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
       "enabled": False,
       "status": "future_input_option_requires_reliable_timestamps"},
       "Trace replay must remain disabled.")
+  test_evidence = value.get("test_evidence", {})
+  _require(test_evidence.get("required_command_tokens") ==
+           ["-m", "unittest"] and
+           test_evidence.get("required_module") ==
+           "tests.test_capd_proactive_stage10" and
+           isinstance(test_evidence.get("minimum_test_count"), int) and
+           test_evidence["minimum_test_count"] >= 10,
+           "Test evidence identity/count contract is missing.")
   params = value.get("fixture_parameters", {})
   positive = ("T_inference_ns", "T_migration_ns", "b_max",
               "b_t_reference", "dram_capacity_frames", "F_low",
@@ -359,6 +431,21 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
            "Uniform load matrix changed.")
   return value
 ~~~
+
+After writing the schema and module, compute the final config binding without
+hand-editing a digest:
+
+~~~powershell
+$schemaPath = (Resolve-Path 'configs/finals/capd_proactive_stage10_result_schema.json').Path
+$configPath = (Resolve-Path 'configs/finals/capd_proactive_stage10.json').Path
+$config = Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
+$config.result_schema_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $schemaPath).Hash.ToLower()
+$config | ConvertTo-Json -Depth 20 | Set-Content -Encoding utf8 -LiteralPath $configPath
+~~~
+
+The committed config must contain the computed 64-character SHA256 value; the
+initial JSON shape above intentionally omits this derived binding until the
+schema bytes exist.
 
 - [ ] **Step 7: Run the contract tests**
 
@@ -583,6 +670,15 @@ class SimulatorConfig:
   seed: int = 0
 
   def __post_init__(self) -> None:
+    integer_fields = (
+        "T_inference_ns", "T_migration_ns", "b_max", "b_t_reference",
+        "dram_capacity_frames", "initial_free_frames", "F_low",
+        "F_target", "K", "simulation_horizon_ns", "seed")
+    _require(all(isinstance(getattr(self, name), int) and
+                 not isinstance(getattr(self, name), bool)
+                 for name in integer_fields),
+             "Simulator parameters must be integers.")
+    _require(self.seed >= 0, "Seed must be non-negative.")
     _require(self.T_inference_ns > 0 and self.T_migration_ns > 0,
              "Service durations must be positive.")
     _require(self.dram_capacity_frames > 0 and
@@ -678,6 +774,8 @@ class SimulatorState:
     self.assert_invariants()
 
   def start_migration(self, kind: str, page_id: int) -> None:
+    _require(kind in ("normal", "emergency"),
+             "Unknown migration job kind.")
     source = (self.pending_emergency_migration_page_ids
               if kind == "emergency"
               else self.pending_normal_migration_page_ids)
@@ -695,6 +793,8 @@ class SimulatorState:
   def select_candidates(self, limit: int) -> List[int]:
     candidates = [page for page in reversed(self.lru_mru_to_lru)
                   if page not in self.reserved_page_ids]
+    # The scan is oldest-to-newest; page_id is the deterministic secondary key
+    # if a future state representation gives two pages the same tail rank.
     return candidates[:limit]
 
   def _insert_mru(self, page_id: int) -> None:
@@ -748,7 +848,7 @@ Run:
 python -m unittest tests.test_capd_proactive_stage10.Stage10StateContractTest -v
 ~~~
 
-Expected: 4 tests PASS. The implementation must not append admitted pages to the LRU tail; both immediate and post-blocking admissions use `_insert_mru`.
+Expected: 4 tests PASS. Candidate order is (lru_tail_rank, page_id) with the current unique LRU rank; the implementation must not append admitted pages to the LRU tail; both immediate and post-blocking admissions use the _insert_mru helper.
 
 - [ ] **Step 5: Add low-watermark batch sizing tests and implementation**
 
@@ -823,7 +923,7 @@ class Stage10ArrivalTest(unittest.TestCase):
     self.assertEqual(expected_period,
                      arrivals[1].timestamp_ns - arrivals[0].timestamp_ns)
 
-  def test_burst_intervals_are_non_overlapping_and_reproducible(self):
+  def test_burst_model_keeps_base_flow_before_inside_and_after_bursts(self):
     config = load_json(CONFIG_PATH)
     params = stage10.SimulatorConfig.from_mapping(config["fixture_parameters"])
     bursts = config["burst_scenarios"][0]["bursts"]
@@ -835,11 +935,24 @@ class Stage10ArrivalTest(unittest.TestCase):
         horizon_ns=params.simulation_horizon_ns)
     self.assertEqual(first, second)
     self.assertEqual(first, sorted(first, key=lambda item: item.timestamp_ns))
-    for item in first:
-      self.assertTrue(
-          any(burst["start_ns"] <= item.timestamp_ns <
-              burst["start_ns"] + burst["duration_ns"]
-              for burst in bursts))
+    self.assertTrue(any(item.timestamp_ns < bursts[0]["start_ns"]
+                        for item in first))
+    self.assertTrue(any(
+        bursts[0]["start_ns"] <= item.timestamp_ns <
+        bursts[0]["start_ns"] + bursts[0]["duration_ns"]
+        for item in first))
+    self.assertTrue(any(
+        bursts[1]["start_ns"] <= item.timestamp_ns <
+        bursts[1]["start_ns"] + bursts[1]["duration_ns"]
+        for item in first))
+    self.assertTrue(any(item.timestamp_ns >=
+                        bursts[-1]["start_ns"] + bursts[-1]["duration_ns"]
+                        for item in first))
+    self.assertEqual(
+        list(range(params.dram_capacity_frames - params.initial_free_frames,
+                   params.dram_capacity_frames - params.initial_free_frames +
+                   len(first))),
+        [item.page_id for item in first])
 
   def test_trace_replay_is_rejected_until_a_future_timestamp_contract_exists(self):
     params = stage10.SimulatorConfig.from_mapping(
@@ -913,30 +1026,49 @@ def generate_uniform_arrivals(params: SimulatorConfig, load_ratio: str,
 def generate_burst_arrivals(params: SimulatorConfig, bursts: List[Mapping[str, Any]],
                             base_load_ratio: str,
                             horizon_ns: int) -> List[Arrival]:
-  result = []
-  next_page_id = params.dram_capacity_frames - params.initial_free_frames
   ordered = sorted(bursts, key=lambda row: row["start_ns"])
   for previous, current in zip(ordered, ordered[1:]):
     _require(previous["start_ns"] + previous["duration_ns"] <=
              current["start_ns"], "Burst intervals must not overlap.")
   for burst in ordered:
     start = burst["start_ns"]
-    end = start + burst["duration_ns"]
-    _require(start >= 0 and end <= horizon_ns,
+    duration = burst["duration_ns"]
+    _require(isinstance(start, int) and isinstance(duration, int) and
+             start >= 0 and duration > 0 and start + duration <= horizon_ns,
              "Burst interval must be within the simulation horizon.")
-    ratio = Fraction(str(base_load_ratio)) * Fraction(str(burst["multiplier"]))
+    _require(Fraction(str(burst["multiplier"])) > 0,
+             "Burst multiplier must be positive.")
+
+  base = Fraction(str(base_load_ratio))
+  _require(base > 0, "Base arrival rate must be positive.")
+  segments = []
+  cursor = 0
+  for index, burst in enumerate(ordered):
+    start = burst["start_ns"]
+    end = start + burst["duration_ns"]
+    if cursor < start:
+      segments.append((cursor, start, base, index * 2))
+    segments.append((start, end,
+                     base * Fraction(str(burst["multiplier"])), index * 2 + 1))
+    cursor = end
+  if cursor < horizon_ns:
+    segments.append((cursor, horizon_ns, base, len(ordered) * 2))
+
+  timestamps = []
+  for start, end, ratio, segment_index in segments:
     period = _period_ns(params, str(ratio))
-    period_ceiling = (period.numerator + period.denominator - 1) // period.denominator
-    phase = (params.seed ^ start ^ end) % max(1, period_ceiling)
+    period_ceiling = ((period.numerator + period.denominator - 1) //
+                      period.denominator)
+    phase = ((params.seed ^ start ^ end ^ segment_index) %
+             max(1, period_ceiling))
     index = 0
-    while True:
-      timestamp = start + phase + int(period * index)
-      if timestamp >= end:
-        break
-      result.append(Arrival(timestamp, next_page_id))
-      next_page_id += 1
+    while start + phase + int(period * index) < end:
+      timestamps.append(start + phase + int(period * index))
       index += 1
-  return sorted(result, key=lambda item: (item.timestamp_ns, item.page_id))
+
+  first_page_id = params.dram_capacity_frames - params.initial_free_frames
+  return [Arrival(timestamp, first_page_id + index)
+          for index, timestamp in enumerate(sorted(timestamps))]
 
 
 def generate_arrivals(params: SimulatorConfig,
@@ -953,7 +1085,7 @@ def generate_arrivals(params: SimulatorConfig,
       "Stage10A supports uniform and burst arrivals only.")
 ~~~
 
-The uniform generator is the default Stage10A arrival model. A reliable trace replay input can be added only as a later contract extension with timestamp units, monotonicity, and provenance fields; this plan does not implement it.
+The uniform generator is the default Stage10A arrival model. Burst generation covers the complete horizon as contiguous segments: base_load_ratio outside each interval and base_load_ratio multiplied by the interval multiplier inside it; merged timestamps are sorted before continuous page IDs are assigned. A reliable trace replay input can be added only as a later contract extension with timestamp units, monotonicity, and provenance fields; this plan does not implement it.
 
 - [ ] **Step 4: Run arrival tests and verify all four load ratios**
 
@@ -963,7 +1095,7 @@ Run:
 python -m unittest tests.test_capd_proactive_stage10.Stage10ArrivalTest -v
 ~~~
 
-Expected: 5 tests PASS. Also run a one-line smoke check that `mu_demote` uses `b_t_reference`, not `b_max`:
+Expected: 5 tests PASS. The burst test must observe base-rate events before the first interval, multiplied-rate events inside both intervals, and base-rate events after the last interval. Also run a one-line smoke check that mu_demote uses b_t_reference, not b_max:
 
 ~~~powershell
 python -c "from fractions import Fraction; from qmap.proactive_stage10 import SimulatorConfig,mu_demote; p=SimulatorConfig(2000,1000,4,2,64,16,16,24,8,200000,1); assert mu_demote(p)==Fraction(2,4000)"
@@ -1018,16 +1150,16 @@ class Stage10SimulationTest(unittest.TestCase):
     result = stage10.run_simulation(
         params, [stage10.Arrival(0, 2)])
     self.assertEqual(1, result.metrics["blocking_sample_count"])
-    self.assertGreater(result.metrics["foreground_blocking_time_total_ns"], 0)
+    self.assertGreater(result.metrics["foreground_blocking_time_total"], 0)
     self.assertEqual(0, result.metrics["unfinished_blocked_request_count"])
 
   def test_empty_blocking_samples_are_null_and_exhaustion_is_time_integral(self):
     params = self._params(initial_free_frames=0, simulation_horizon_ns=10000)
     result = stage10.run_simulation(params, [])
-    self.assertIsNone(result.metrics["foreground_blocking_time_mean_ns"])
-    self.assertIsNone(result.metrics["foreground_blocking_time_p95_ns"])
+    self.assertIsNone(result.metrics["foreground_blocking_time_mean"])
+    self.assertIsNone(result.metrics["foreground_blocking_time_p95"])
     self.assertEqual(0, result.metrics["blocking_sample_count"])
-    self.assertEqual(10000, result.metrics["free_frame_exhaustion_duration_ns"])
+    self.assertEqual(10000, result.metrics["free_frame_exhaustion_duration"])
     self.assertEqual(0, result.metrics["emergency_fallback_count"])
 
   def test_runtime_batch_values_are_bounded_and_high_load_queue_is_explainable(self):
@@ -1133,12 +1265,12 @@ class _MetricAccumulator:
         queue_p95 = queue_length
         break
     return {
-        "foreground_blocking_time_total_ns": self.blocking_total_ns,
-        "foreground_blocking_time_mean_ns": mean,
-        "foreground_blocking_time_p95_ns":
+        "foreground_blocking_time_total": self.blocking_total_ns,
+        "foreground_blocking_time_mean": mean,
+        "foreground_blocking_time_p95":
             _percentile(self.blocking_durations, 95),
         "blocking_sample_count": count,
-        "free_frame_exhaustion_duration_ns": self.exhaustion_ns,
+        "free_frame_exhaustion_duration": self.exhaustion_ns,
         "background_queue_length_mean":
             (self.queue_area_ns / self.horizon_ns
              if self.horizon_ns else None),
@@ -1151,7 +1283,7 @@ class _MetricAccumulator:
     }
 ~~~
 
-The accumulator must observe the final interval through `simulation_horizon_ns`; `free_frame_exhaustion_duration_ns` is exactly the integral of `F_t=0` on `[0, simulation_horizon_ns]`, including an initially exhausted state and the terminal interval after the last event. Queue mean/P95 are time-weighted over the same full window. Queue length means not-yet-started normal plus emergency migration jobs; it excludes the active inference or migration, whose interval is recorded separately by `background_utilization`.
+The accumulator must observe the final interval through `simulation_horizon_ns`; `free_frame_exhaustion_duration` is exactly the integral of `F_t=0` on `[0, simulation_horizon_ns]`, with nanoseconds as its unit, including an initially exhausted state and the terminal interval after the last event. Queue mean/P95 are time-weighted over the same full window. Queue length means not-yet-started normal plus emergency migration jobs; it excludes the active inference or migration, whose interval is recorded separately by `background_utilization`.
 
 - [ ] **Step 4: Implement event handlers with reservation transitions**
 
@@ -1164,7 +1296,13 @@ def run_simulation(params: SimulatorConfig,
   queue = EventQueue()
   metrics = _MetricAccumulator(params.simulation_horizon_ns)
   events = []
-  for arrival in arrivals:
+  ordered_arrivals = sorted(
+      arrivals, key=lambda item: (item.timestamp_ns, item.page_id))
+  first_page_id = state.initial_resident_count
+  _require([item.page_id for item in ordered_arrivals] ==
+           list(range(first_page_id, first_page_id + len(ordered_arrivals))),
+           "Arrival page IDs must be contiguous and unique.")
+  for arrival in ordered_arrivals:
     if 0 <= arrival.timestamp_ns <= params.simulation_horizon_ns:
       queue.schedule(arrival.timestamp_ns, "page_enter_dram",
                      {"page_id": arrival.page_id})
@@ -1174,6 +1312,7 @@ def run_simulation(params: SimulatorConfig,
   fallback_count = 0
   arrival_attempt_count = 0
   demotion_count = 0
+  next_batch_id = 1
 
   def start_next_migration(now_ns: int) -> None:
     nonlocal active_service
@@ -1203,6 +1342,8 @@ def run_simulation(params: SimulatorConfig,
         queue.schedule(event.timestamp_ns, "emergency_fallback",
                        {"page_id": page_id})
     elif event.kind == "capd_round_start":
+      current_batch_id = next_batch_id
+      next_batch_id += 1
       if active_service is None and 0 < state.free_frames < params.F_low:
         candidates = state.select_candidates(params.K)
         batch = state.batch_size(state.free_frames, len(candidates))
@@ -1212,7 +1353,8 @@ def run_simulation(params: SimulatorConfig,
           state.reserve_inference(selected)
           active_service = ("inference", selected)
           queue.schedule(event.timestamp_ns + params.T_inference_ns,
-                         "capd_inference_finish", {"page_ids": selected})
+                         "capd_inference_finish",
+                         {"page_ids": selected, "batch_id": current_batch_id})
     elif event.kind == "capd_inference_finish":
       selected = list(event.payload["page_ids"])
       _require(active_service == ("inference", selected),
@@ -1253,9 +1395,19 @@ def run_simulation(params: SimulatorConfig,
       raise Stage10ContractError("Unhandled event: " + event.kind)
     state.assert_invariants()
     metrics.observe_point(len(pending_jobs), state.free_frames)
+    event_payload = dict(event.payload)
+    if event.kind == "capd_round_start":
+      event_payload["batch_id"] = current_batch_id
+    if event.kind == "emergency_fallback":
+      blocked_at = next(
+          start for start, page in state.blocked_requests
+          if page == event.payload["page_id"])
+      event_payload.update({
+          "free_frames": state.free_frames,
+          "background_queue_length": len(pending_jobs),
+          "blocked_start_ns": blocked_at})
     events.append({"timestamp_ns": event.timestamp_ns, "kind": event.kind,
-                   "event_id": event.event_id,
-                   "payload": dict(event.payload)})
+                   "event_id": event.event_id, "payload": event_payload})
   metrics.observe_interval(
       params.simulation_horizon_ns, len(pending_jobs), state.free_frames,
       background_active=active_service is not None)
@@ -1283,6 +1435,7 @@ def run_simulation(params: SimulatorConfig,
                    mu_demote(params).numerator,
                "mu_demote_pages_per_ns_denominator":
                    mu_demote(params).denominator,
+               "mu_demote": str(mu_demote(params)),
                "simulation_horizon_ns": params.simulation_horizon_ns,
                "T_inference_ns": params.T_inference_ns,
                "T_migration_ns": params.T_migration_ns,
@@ -1332,57 +1485,99 @@ Append:
 ~~~python
 class Stage10FormalGateTest(unittest.TestCase):
 
-  def test_stage9_r1_and_unverified_receipts_are_rejected(self):
-    for receipt in (
-        {"status": "stage9_not_verified", "run_id": "stage9-overhead-r1"},
-        {"status": "stage9_overhead_verified", "run_id": "stage9-overhead-r1"},
-        {"status": "stage9_implemented_awaiting_server_measurement",
-         "run_id": "stage9-overhead-r2"},
-    ):
-      with self.subTest(receipt=receipt):
-        result = stage10.check_formal_stage9_gate(receipt, {})
-        self.assertEqual("stage10_formal_blocked_by_stage9", result["status"])
-        self.assertFalse(result["formal_authorized"])
+  def _gate_config(self):
+    return load_json(CONFIG_PATH)["formal_gate"]
 
-  def test_verified_receipt_requires_all_bindings(self):
-    receipt = {
-        "status": "stage9_overhead_verified",
-        "run_id": "stage9-overhead-r2",
-        "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
-        "verification": {"cpu": True, "perf": True, "rss": True},
-        "manifest_sha256": "a" * 64,
-        "artifacts": {"manifest": {"sha256": "a" * 64}},
-        "sha_chain_verified": True,
-        "artifact_bindings_verified": True,
-        "stage8_r5_tree_sha256":
-            "554eba14afa57eab2e02aaa156f32181d29d4c66929a5fd2ca934e87c5cf49db"
+  def _write_verified_run(self, run_root):
+    gate = self._gate_config()
+    for relative in gate["stage9_required_files"]:
+      path = os.path.join(run_root, relative)
+      os.makedirs(os.path.dirname(path), exist_ok=True)
+      with open(path, "w", encoding="utf-8") as handle:
+        handle.write("{}" + chr(10))
+    compatibility = {
+        "stage9_entry_gate": "satisfied",
+        "formal_job_count": 80,
+        "standard_job_count": 48,
+        "pressure_job_count": 32,
+        "capd_job_count": 30,
+        "track_workload_cell_count": 10,
+        "fairness": "passed",
+        "job_results_verified": True,
+        "statistics_verified": True,
+        "test_used_for_parameter_selection": False,
+        "stage4_sha_chain_verified": True,
+        "stage8_run_state_verified": True,
+        "stage8_artifacts_read_only": True,
     }
-    result = stage10.check_formal_stage9_gate(receipt, {
-        "stage8_r5_tree_sha256": receipt["stage8_r5_tree_sha256"]})
-    self.assertTrue(result["formal_authorized"])
-    receipt["artifact_bindings_verified"] = False
-    self.assertFalse(stage10.check_formal_stage9_gate(
-        receipt, {"stage8_r5_tree_sha256":
-                  receipt["stage8_r5_tree_sha256"]})["formal_authorized"])
+    with open(os.path.join(run_root, "stage8_compatibility_receipt.json"),
+              "w", encoding="utf-8") as handle:
+      json.dump(compatibility, handle, sort_keys=True)
+    state = {
+        "schema_version": "capd_proactive_stage9_run_state_v2_0",
+        "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
+        "status": "stage9_overhead_verified",
+        "stage10_entry_gate": "satisfied",
+        "completed": ["perf_cycles", "independent_verification"],
+        "failure": None,
+    }
+    with open(os.path.join(run_root, "run_state.json"),
+              "w", encoding="utf-8") as handle:
+      json.dump(state, handle, sort_keys=True)
+    artifact_sha256 = {
+        relative: stage10.sha256_file(os.path.join(run_root, relative))
+        for relative in gate["stage9_required_files"]
+        if relative not in ("verification.json", "run_state.json")
+    }
+    verification = dict(gate["stage9_verification_required"])
+    verification.update({
+        "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
+        "stage8_verification_sha256": "b531f7324af9a6edf7dc31adc1426782c2389be35fd4b6058aa1986764e8025b",
+        "artifact_sha256": artifact_sha256,
+    })
+    with open(os.path.join(run_root, "verification.json"),
+              "w", encoding="utf-8") as handle:
+      json.dump(verification, handle, sort_keys=True)
 
-  def test_stage9_artifact_paths_and_hashes_are_verified(self):
+  def test_historical_r1_run_directory_is_rejected(self):
+    result = stage10.audit_stage9_run(
+        ROOT,
+        os.path.join(ROOT, "outputs", "capd_proactive_stage9",
+                     "stage9-overhead-r1"),
+        self._gate_config())
+    self.assertEqual("stage10_formal_blocked_by_stage9", result["status"])
+    self.assertFalse(result["formal_authorized"])
+    self.assertIn("stage9_overhead_verified", " ".join(result["reasons"]))
+
+  def test_verified_run_directory_generates_stage10_owned_receipt(self):
     with tempfile.TemporaryDirectory(dir=ROOT) as directory:
-      artifacts = {}
-      for name in ("run_state", "verification", "manifest", "sha256sums"):
-        path = os.path.join(directory, name + ".json")
-        with open(path, "w", encoding="utf-8") as handle:
-          json.dump({"name": name}, handle)
-        artifacts[name] = {
-            "path": os.path.relpath(path, ROOT),
-            "sha256": stage10.sha256_file(path)}
-      receipt = {"artifacts": artifacts}
-      verified = stage10.verify_stage9_artifact_bindings(ROOT, receipt)
-      self.assertTrue(verified["artifact_bindings_verified"])
-      with open(os.path.join(directory, "manifest.json"),
+      run_root = os.path.join(directory, "stage9-overhead-r2")
+      os.makedirs(run_root)
+      self._write_verified_run(run_root)
+      receipt = stage10.audit_stage9_run(
+          ROOT, run_root, self._gate_config())
+      self.assertEqual("stage9_compatibility_verified", receipt["status"])
+      self.assertTrue(receipt["formal_authorized"])
+      self.assertNotIn("sha_chain_verified", receipt)
+      self.assertEqual("stage9-overhead-r2", receipt["source_run_id"])
+      self.assertIn("verification.json", receipt["source_artifact_sha256"])
+      gated = stage10.check_formal_stage9_gate(receipt, self._gate_config())
+      self.assertEqual("stage10_formal_authorized", gated["status"])
+
+  def test_missing_or_tampered_artifact_is_rejected_before_gate(self):
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+      run_root = os.path.join(directory, "stage9-overhead-r2")
+      os.makedirs(run_root)
+      self._write_verified_run(run_root)
+      with open(os.path.join(run_root, "memory_breakdown.json"),
                 "a", encoding="utf-8") as handle:
         handle.write("tamper")
-      with self.assertRaises(stage10.Stage10ContractError):
-        stage10.verify_stage9_artifact_bindings(ROOT, receipt)
+      result = stage10.audit_stage9_run(
+          ROOT, run_root, self._gate_config())
+      self.assertEqual("stage10_formal_blocked_by_stage9", result["status"])
+      self.assertFalse(result["formal_authorized"])
+      self.assertTrue(any("artifact SHA mismatch" in reason
+                          for reason in result["reasons"]))
 ~~~
 
 - [ ] **Step 2: Run and confirm the gate helper is absent**
@@ -1401,41 +1596,8 @@ Add:
 
 ~~~python
 import hashlib
+import json
 import os
-
-
-def check_formal_stage9_gate(receipt: Mapping[str, Any],
-                             expected: Mapping[str, Any]) -> Mapping[str, Any]:
-  reasons = []
-  if receipt.get("status") != "stage9_overhead_verified":
-    reasons.append("stage9 status is not verified")
-  if receipt.get("run_id") == "stage9-overhead-r1":
-    reasons.append("historical stage9-overhead-r1 is immutable failed evidence")
-  if receipt.get("contract_id") != "CAPD-PROACTIVE-STAGE9-2.0":
-    reasons.append("Stage9 v2 contract missing")
-  verification = receipt.get("verification", {})
-  for key in ("cpu", "perf", "rss"):
-    if verification.get(key) is not True:
-      reasons.append("missing verified " + key + " evidence")
-  if (not isinstance(receipt.get("manifest_sha256"), str) or
-      len(receipt["manifest_sha256"]) != 64):
-    reasons.append("manifest SHA missing")
-  elif (receipt.get("artifacts", {}).get("manifest", {}).get("sha256") !=
-        receipt.get("manifest_sha256")):
-    reasons.append("manifest receipt binding mismatch")
-  if receipt.get("sha_chain_verified") is not True:
-    reasons.append("SHA chain not verified")
-  if receipt.get("artifact_bindings_verified") is not True:
-    reasons.append("Stage9 artifact bindings not independently verified")
-  if (receipt.get("stage8_r5_tree_sha256") !=
-      expected.get("stage8_r5_tree_sha256")):
-    reasons.append("Stage8 r5 authority binding mismatch")
-  return {
-      "status": ("stage10_formal_authorized" if not reasons
-                 else "stage10_formal_blocked_by_stage9"),
-      "formal_authorized": not reasons,
-      "reasons": reasons,
-  }
 
 
 def sha256_file(path: str) -> str:
@@ -1446,33 +1608,156 @@ def sha256_file(path: str) -> str:
   return digest.hexdigest()
 
 
-def verify_stage9_artifact_bindings(
-    project_root: str,
-    receipt: Mapping[str, Any]) -> Mapping[str, Any]:
-  required = {"run_state", "verification", "manifest", "sha256sums"}
-  bindings = receipt.get("artifacts", {})
-  _require(set(bindings) == required,
-           "Stage9 receipt artifact set is incomplete.")
-  root = os.path.realpath(project_root)
-  for name in sorted(required):
-    row = bindings[name]
-    _require(isinstance(row, Mapping) and
-             isinstance(row.get("path"), str) and
-             isinstance(row.get("sha256"), str) and
-             len(row["sha256"]) == 64,
-             "Invalid Stage9 artifact binding: " + name)
-    resolved = os.path.realpath(os.path.join(root, row["path"]))
-    _require(os.path.commonpath((root, resolved)) == root,
-             "Stage9 artifact escapes the repository: " + name)
-    _require(os.path.isfile(resolved), "Missing Stage9 artifact: " + name)
-    _require(sha256_file(resolved) == row["sha256"],
-             "Stage9 artifact SHA mismatch: " + name)
-  verified = dict(receipt)
-  verified["artifact_bindings_verified"] = True
-  return verified
+def _read_json_if_present(path: str):
+  if not os.path.isfile(path):
+    return None
+  with open(path, "r", encoding="utf-8") as handle:
+    return json.load(handle)
+
+
+def audit_stage9_run(project_root: str, stage9_run_root: str,
+                     gate: Mapping[str, Any]) -> Mapping[str, Any]:
+  reasons = []
+  project_root = os.path.realpath(project_root)
+  run_root = os.path.realpath(stage9_run_root)
+  try:
+    inside = os.path.commonpath((project_root, run_root)) == project_root
+  except ValueError:
+    inside = False
+  if not inside or not os.path.isdir(run_root):
+    reasons.append("Stage9 run directory is outside the repository or missing")
+  run_id = os.path.basename(run_root)
+  if run_id in gate.get("rejected_run_ids", ()):
+    reasons.append("historical stage9-overhead-r1 is immutable failed evidence")
+
+  required = tuple(gate["stage9_required_files"])
+  paths = {relative: os.path.join(run_root, relative)
+           for relative in required}
+  missing = [relative for relative, path in paths.items()
+             if not os.path.isfile(path)]
+  if missing:
+    reasons.append("Stage9 required files missing: " + ",".join(missing))
+
+  state = _read_json_if_present(paths["run_state.json"])
+  if not isinstance(state, Mapping):
+    reasons.append("Stage9 run_state.json is unavailable")
+  else:
+    if state.get("schema_version") != "capd_proactive_stage9_run_state_v2_0":
+      reasons.append("Stage9 run_state schema is not v2")
+    if state.get("contract_id") != gate["required_stage9_contract_id"]:
+      reasons.append("Stage9 run_state contract is not v2")
+    if state.get("status") != gate["required_stage9_status"]:
+      reasons.append("Stage9 run_state status is not verified")
+    if state.get("stage10_entry_gate") != "satisfied":
+      reasons.append("Stage9 run_state Stage10 gate is not satisfied")
+    if state.get("failure") is not None:
+      reasons.append("Stage9 run_state contains a failure record")
+    completed = set(state.get("completed", ()))
+    if not {"perf_cycles", "independent_verification"} <= completed:
+      reasons.append("Stage9 run_state lacks completed verification steps")
+
+  verification = _read_json_if_present(paths["verification.json"])
+  expected_verification = gate["stage9_verification_required"]
+  if not isinstance(verification, Mapping):
+    reasons.append("Stage9 verification.json is unavailable")
+  else:
+    if verification.get("contract_id") != gate["required_stage9_contract_id"]:
+      reasons.append("Stage9 verification contract is not v2")
+    for key, expected in expected_verification.items():
+      if verification.get(key) != expected:
+        reasons.append("Stage9 verification field mismatch: " + key)
+    if (verification.get("stage8_verification_sha256") !=
+        gate["stage8_r5_verification_sha256"]):
+      reasons.append("Stage8 r5 verification binding mismatch")
+
+  compatibility = _read_json_if_present(
+      paths["stage8_compatibility_receipt.json"])
+  compatibility_requirements = {
+      "stage9_entry_gate": "satisfied",
+      "formal_job_count": 80,
+      "standard_job_count": 48,
+      "pressure_job_count": 32,
+      "capd_job_count": 30,
+      "track_workload_cell_count": 10,
+      "fairness": "passed",
+      "job_results_verified": True,
+      "statistics_verified": True,
+      "test_used_for_parameter_selection": False,
+      "stage4_sha_chain_verified": True,
+      "stage8_run_state_verified": True,
+      "stage8_artifacts_read_only": True,
+  }
+  if not isinstance(compatibility, Mapping):
+    reasons.append("Stage8 compatibility receipt is unavailable")
+  else:
+    for key, expected in compatibility_requirements.items():
+      if compatibility.get(key) != expected:
+        reasons.append("Stage8 compatibility field mismatch: " + key)
+
+  observed_hashes = {}
+  expected_hashes = (verification.get("artifact_sha256", {})
+                     if isinstance(verification, Mapping) else {})
+  expected_hashed = set(required) - {"verification.json", "run_state.json"}
+  if not isinstance(expected_hashes, Mapping):
+    reasons.append("Stage9 artifact_sha256 is not an object")
+    expected_hashes = {}
+  if set(expected_hashes) != expected_hashed:
+    reasons.append("Stage9 artifact_sha256 key set is incomplete")
+  for relative, path in paths.items():
+    if os.path.isfile(path):
+      digest = sha256_file(path)
+      observed_hashes[relative] = digest
+      if relative in expected_hashed and expected_hashes.get(relative) != digest:
+        reasons.append("Stage9 artifact SHA mismatch: " + relative)
+
+  state_values = state if isinstance(state, Mapping) else {}
+  receipt = {
+      "schema_version": "capd_proactive_stage10_stage9_compatibility_v1_0",
+      "status": ("stage9_compatibility_verified" if not reasons
+                 else "stage10_formal_blocked_by_stage9"),
+      "formal_authorized": not reasons,
+      "source_run_id": run_id,
+      "source_run_root": os.path.relpath(run_root, project_root),
+      "source_stage9_contract_id": state_values.get("contract_id"),
+      "source_stage9_status": state_values.get("status"),
+      "source_artifact_sha256": observed_hashes,
+      "stage9_verification_sha256": (
+          sha256_file(paths["verification.json"])
+          if os.path.isfile(paths["verification.json"]) else None),
+      "stage9_run_state_sha256": (
+          sha256_file(paths["run_state.json"])
+          if os.path.isfile(paths["run_state.json"]) else None),
+      "stage8_compatibility_receipt_sha256": (
+          sha256_file(paths["stage8_compatibility_receipt.json"])
+          if os.path.isfile(paths["stage8_compatibility_receipt.json"])
+          else None),
+      "stage8_r5_verification_sha256":
+          gate["stage8_r5_verification_sha256"],
+      "stage8_r5_tree_sha256": gate["stage8_r5_tree_sha256"],
+      "reasons": reasons,
+  }
+  return receipt
+
+
+def check_formal_stage9_gate(receipt: Mapping[str, Any],
+                             gate: Mapping[str, Any]) -> Mapping[str, Any]:
+  result = dict(receipt)
+  reasons = list(receipt.get("reasons", ()))
+  if receipt.get("status") != "stage9_compatibility_verified":
+    reasons.append("Stage10-owned Stage9 compatibility receipt is blocked")
+  if receipt.get("source_run_id") in gate.get("rejected_run_ids", ()):
+    reasons.append("Stage9 r1 cannot authorize Stage10")
+  if receipt.get("stage8_r5_tree_sha256") != gate["stage8_r5_tree_sha256"]:
+    reasons.append("Stage8 r5 tree binding mismatch")
+  result["reasons"] = sorted(set(reasons))
+  result["formal_authorized"] = not result["reasons"]
+  result["status"] = ("stage10_formal_authorized"
+                      if result["formal_authorized"]
+                      else "stage10_formal_blocked_by_stage9")
+  return result
 ~~~
 
-Formal mode first calls `verify_stage9_artifact_bindings`, then checks the receipt fields. The runner must fail with a non-zero exit code before creating a run directory when `formal_authorized` is false. Fixture mode remains runnable and records the historical r1 rejection as evidence.
+Formal mode receives a Stage9 run-directory path, audits the real files and the Stage9 verification artifact_sha256 map, then creates this Stage10-owned compatibility receipt. It does not read or trust an external receipt field such as sha_chain_verified. The runner must fail with a non-zero exit code before creating a run directory when the audited receipt is blocked. Fixture mode audits the immutable r1 directory, records the structured failure, and remains runnable.
 
 - [ ] **Step 4: Run formal-gate tests**
 
@@ -1506,36 +1791,70 @@ Append:
 ~~~python
 class Stage10RunnerTest(unittest.TestCase):
 
-  def _run_fixture(self, output):
+  _TEST_CLASSES = [
+      "tests.test_capd_proactive_stage10.Stage10ConfigContractTest",
+      "tests.test_capd_proactive_stage10.Stage10EventHeapTest",
+      "tests.test_capd_proactive_stage10.Stage10StateContractTest",
+      "tests.test_capd_proactive_stage10.Stage10ArrivalTest",
+      "tests.test_capd_proactive_stage10.Stage10SimulationTest",
+      "tests.test_capd_proactive_stage10.Stage10FormalGateTest",
+  ]
+
+  def _write_real_test_log(self, output):
     test_log = os.path.join(output, "source-test.log")
+    command_args = ([sys.executable, "-m", "unittest"] +
+                    self._TEST_CLASSES + ["-v"])
+    completed = subprocess.run(
+        command_args, cwd=ROOT, stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT, text=True, check=False)
+    self.assertEqual(0, completed.returncode, completed.stdout)
+    command = "python -m unittest " + " ".join(self._TEST_CLASSES) + " -v"
     with open(test_log, "w", encoding="utf-8") as handle:
-      handle.write("synthetic integration test log\n")
+      handle.write("COMMAND: " + command + chr(10))
+      handle.write(completed.stdout)
+    return test_log
+
+  def _invoke_fixture(self, output, test_log, expected_sha=None):
     runner = os.path.join(ROOT, "scripts", "run_capd_proactive_stage10.py")
     return subprocess.run(
         [sys.executable, runner, "--config", CONFIG_PATH,
          "--mode", "fixture", "--output-root", output,
-         "--run-id", "fixture-test", "--test-log-input", test_log],
+         "--run-id", "fixture-test", "--test-log-input", test_log,
+         "--test-log-sha256", expected_sha or stage10.sha256_file(test_log)],
         cwd=ROOT, capture_output=True, text=True, check=False)
 
   def test_fixture_runner_writes_candidate_ready_artifacts(self):
     with tempfile.TemporaryDirectory() as output:
-      completed = self._run_fixture(output)
+      test_log = self._write_real_test_log(output)
+      completed = self._invoke_fixture(output, test_log)
       self.assertEqual(0, completed.returncode, completed.stderr)
       run_root = os.path.join(output, "fixture-test")
       for name in ("config.json", "event_model.md", "parameters.md",
                    "fixture_results.jsonl", "test_log.txt", "formal_gate.json",
+                   "stage9_compatibility_receipt.json", "test_evidence.json",
                    "verification.json", "run_state.json", "manifest.json",
                    "SHA256SUMS", "README.md"):
         self.assertTrue(os.path.isfile(os.path.join(run_root, name)), name)
       run_state = load_json(os.path.join(run_root, "run_state.json"))
       self.assertEqual("stage10_simulator_tests_passed",
                        run_state["status"])
+      self.assertTrue(run_state["stage10_simulator_implemented"])
+      self.assertTrue(run_state["stage10_simulator_tests_passed"])
+      self.assertTrue(run_state["stage10_formal_blocked_by_stage9"])
+      self.assertFalse(run_state["stage10_formally_verified"])
+      evidence = load_json(os.path.join(run_root, "test_evidence.json"))
+      self.assertGreaterEqual(evidence["test_count"], 10)
+      self.assertEqual(evidence["test_count"], evidence["result_line_count"])
+      self.assertEqual("OK", evidence["final_status"])
+      self.assertIn("tests.test_capd_proactive_stage10",
+                    evidence["command"])
       gate = load_json(os.path.join(run_root, "formal_gate.json"))
       self.assertEqual("stage10_formal_blocked_by_stage9", gate["status"])
 
   def test_manifest_and_sha256sums_recompute_independently(self):
     with tempfile.TemporaryDirectory() as output:
-      completed = self._run_fixture(output)
+      test_log = self._write_real_test_log(output)
+      completed = self._invoke_fixture(output, test_log)
       self.assertEqual(0, completed.returncode, completed.stderr)
       root = os.path.join(output, "fixture-test")
       manifest = load_json(os.path.join(root, "manifest.json"))
@@ -1556,11 +1875,51 @@ class Stage10RunnerTest(unittest.TestCase):
 
   def test_n_a_is_used_only_for_empty_blocking_samples(self):
     report = stage10.render_report({
-        "foreground_blocking_time_mean_ns": None,
-        "foreground_blocking_time_p95_ns": None,
+        "foreground_blocking_time_mean": None,
+        "foreground_blocking_time_p95": None,
         "blocking_sample_count": 0})
     self.assertIn("N/A", report)
     self.assertNotIn("mean=0", report)
+
+  def test_empty_failed_wrong_module_or_tampered_logs_are_rejected(self):
+    invalid_logs = {
+        "empty": "",
+        "failed": ("COMMAND: python -m unittest "
+                   "tests.test_capd_proactive_stage10 -v\n"
+                   "Ran 27 tests in 0.01s\n"
+                   "FAILED (failures=1)\n"),
+        "wrong-module": ("COMMAND: python -m unittest tests.other -v\n"
+                          "Ran 27 tests in 0.01s\nOK\n"),
+    }
+    for name, content in invalid_logs.items():
+      with self.subTest(name=name), tempfile.TemporaryDirectory() as output:
+        test_log = os.path.join(output, "invalid.log")
+        with open(test_log, "w", encoding="utf-8") as handle:
+          handle.write(content)
+        completed = self._invoke_fixture(output, test_log)
+        self.assertNotEqual(0, completed.returncode)
+        self.assertFalse(os.path.exists(os.path.join(output, "fixture-test")))
+
+    with tempfile.TemporaryDirectory() as output:
+      test_log = self._write_real_test_log(output)
+      expected_sha = stage10.sha256_file(test_log)
+      with open(test_log, "a", encoding="utf-8") as handle:
+        handle.write("tampered\n")
+      completed = self._invoke_fixture(output, test_log, expected_sha)
+      self.assertNotEqual(0, completed.returncode)
+      self.assertFalse(os.path.exists(os.path.join(output, "fixture-test")))
+
+  def test_formal_mode_without_a_verified_receipt_writes_no_run(self):
+    runner = os.path.join(ROOT, "scripts", "run_capd_proactive_stage10.py")
+    with tempfile.TemporaryDirectory() as output:
+      completed = subprocess.run(
+          [sys.executable, runner, "--config", CONFIG_PATH,
+           "--mode", "formal", "--output-root", output,
+           "--run-id", "must-not-be-created"],
+          cwd=ROOT, capture_output=True, text=True, check=False)
+      self.assertNotEqual(0, completed.returncode)
+      self.assertFalse(os.path.exists(
+          os.path.join(output, "must-not-be-created")))
 ~~~
 
 - [ ] **Step 2: Run runner tests and confirm the script is absent**
@@ -1577,13 +1936,14 @@ Expected: FAIL because the runner script and report/hash helpers do not exist.
 
 The runner must:
 
-1. Resolve the repository root from `__file__`, load and validate the config, and accept `--mode fixture|formal`, `--config`, `--output-root`, `--run-id`, `--test-log-input`, `--stage9-receipt`, and `--verify`.
-2. Create a fresh run directory and reject an existing run ID rather than resume or overwrite.
+1. Resolve the repository root from `__file__`, load and validate the config, and accept `--mode fixture|formal`, `--config`, `--output-root`, `--run-id`, `--test-log-input`, `--test-log-sha256`, `--stage9-run-root`, and `--verify`.
+2. Resolve and validate all preconditions, including the config/result-schema SHA, Stage9 gate result, and supplied test-log evidence, before calling `os.makedirs` for the candidate run. Create a fresh run directory only after those checks pass, and reject an existing run ID rather than resume or overwrite.
 3. Expand the four uniform scenarios and the multi-burst scenario, generate arrivals, call `run_simulation`, and write one canonical JSON object per line to `fixture_results.jsonl`.
+   For each line, copy `SimulationResult.metrics` to `observed`, copy `SimulationResult.derived` and add `arrival_model`, `load_ratio`, and any burst parameters to `derived`, copy `SimulationResult.interpretation`, and add the `scenario_id` and `mode=fixture` fields.
 4. Write `event_model.md` and `parameters.md` with integer units, the event priority table, `b_t` versus `b_t_reference`, MRU admission semantics, and the exhaustion integral definition.
 5. Render human reports with `N/A` for null blocking mean/P95.
-6. In fixture mode, read and hash-check the configured historical Stage9 r1 `run_state.json`, then write the rejection to `formal_gate.json`. In formal mode, require `--stage9-receipt` and validate that new receipt before creating a run directory.
-7. Copy the supplied unit-test log to `test_log.txt`; write `run_state.json` with `stage10_simulator_tests_passed`, and set explicit booleans `stage10_simulator_implemented=true`, `stage10_simulator_tests_passed=true`, `stage10_formal_blocked_by_stage9=true`, `stage10_formally_verified=false`.
+6. In fixture mode, audit the configured historical Stage9 r1 run directory and write the Stage10-owned blocked receipt to both `stage9_compatibility_receipt.json` and `formal_gate.json`. In formal mode, require `--stage9-run-root`, audit the real Stage9 run directory, and create no Stage10 run directory unless the audit passes.
+7. Require `--test-log-input` and `--test-log-sha256`; copy the log only after validating its SHA, exactly one `COMMAND:` line containing `-m`, `unittest`, and the configured module identity, exactly one `Ran N tests` summary with `N >= minimum_test_count`, exactly `N` verbose `test_... ... ok` result lines, no `FAILED`/`ERROR` terminal status, and the final non-empty line exactly `OK`. Write the validated evidence to `test_log.txt` and `test_evidence.json`; only then write `run_state.json` with `stage10_simulator_tests_passed` and set explicit booleans `stage10_simulator_implemented=true`, `stage10_simulator_tests_passed=true`, `stage10_formal_blocked_by_stage9=true`, `stage10_formally_verified=false`. Empty, malformed, failed, wrong-module, and SHA-mismatched logs must fail before the candidate run directory is created.
 8. Write `verification.json` after independently recomputing selected metric fields and event counts.
 9. Hash all payload files except `manifest.json` and `SHA256SUMS` into `manifest.json`; then hash every file except `SHA256SUMS` into `SHA256SUMS`. Recompute both lists before returning success.
 
@@ -1608,14 +1968,71 @@ def render_report(observed):
     return "N/A" if item is None else str(item)
   return "\n".join([
       "blocking_sample_count=" + value("blocking_sample_count"),
-      "foreground_blocking_time_mean_ns=" +
-          value("foreground_blocking_time_mean_ns"),
-      "foreground_blocking_time_p95_ns=" +
-          value("foreground_blocking_time_p95_ns"),
+      "foreground_blocking_time_mean=" +
+          value("foreground_blocking_time_mean"),
+      "foreground_blocking_time_p95=" +
+          value("foreground_blocking_time_p95"),
   ]) + "\n"
 ~~~
 
-Place `render_report` in `qmap/proactive_stage10.py` beside the Task 6 `sha256_file` helper so tests and the runner share pure implementations. The CLI must return non-zero for `--mode formal` when the Stage9 gate is blocked and must not create a formal result or run directory. It must never read Test data to choose parameters.
+Add the shared test-log validator beside `sha256_file` and `render_report`; it
+must return evidence only after every structural check succeeds:
+
+~~~python
+import re
+
+
+def validate_test_log(path, expected_sha256, evidence_contract):
+  if not os.path.isfile(path):
+    raise Stage10ContractError("Test log is missing.")
+  if not isinstance(expected_sha256, str) or not re.fullmatch(
+      r"[0-9a-fA-F]{64}", expected_sha256):
+    raise Stage10ContractError("Test-log SHA256 argument is invalid.")
+  actual_sha256 = sha256_file(path)
+  if actual_sha256 != expected_sha256.lower():
+    raise Stage10ContractError("Test-log SHA256 mismatch.")
+  with open(path, "r", encoding="utf-8") as handle:
+    text = handle.read().lstrip("\ufeff")
+  lines = [line.rstrip("\r") for line in text.splitlines()]
+  command_lines = [line[len("COMMAND:"):].strip()
+                   for line in lines if line.startswith("COMMAND:")]
+  if len(command_lines) != 1:
+    raise Stage10ContractError("Test log must contain one COMMAND line.")
+  command = command_lines[0]
+  if any(token not in command
+         for token in evidence_contract["required_command_tokens"]):
+    raise Stage10ContractError("Test command identity is invalid.")
+  if evidence_contract["required_module"] not in command:
+    raise Stage10ContractError("Test module identity is invalid.")
+  matches = re.findall(r"(?m)^Ran\s+(\d+)\s+tests?\b", text)
+  if len(matches) != 1:
+    raise Stage10ContractError("Test log must contain one Ran N tests line.")
+  test_count = int(matches[0])
+  if test_count < evidence_contract["minimum_test_count"]:
+    raise Stage10ContractError("Test count is below the configured minimum.")
+  result_lines = [line.strip() for line in lines
+                  if re.match(r"^test_\S.*\.\.\.\s+ok$",
+                              line.strip())]
+  if len(result_lines) != test_count:
+    raise Stage10ContractError("Verbose test result count does not match.")
+  nonempty = [line.strip() for line in lines if line.strip()]
+  if not nonempty or nonempty[-1] != "OK":
+    raise Stage10ContractError("Test log does not end in OK.")
+  if any(line in ("FAILED", "ERROR") or line.startswith("FAILED (") or
+         line.startswith("ERROR (")
+         for line in nonempty):
+    raise Stage10ContractError("Test log contains a failure status.")
+  return {
+      "sha256": actual_sha256,
+      "command": command,
+      "module": evidence_contract["required_module"],
+      "test_count": test_count,
+      "result_line_count": len(result_lines),
+      "final_status": "OK",
+  }
+~~~
+
+Place `validate_test_log` and `render_report` in `qmap/proactive_stage10.py` beside the Task 6 `sha256_file` helper so tests and the runner share pure implementations. The CLI must return non-zero for `--mode formal` when the Stage9 gate is blocked and must not create a formal result or run directory. It must never read Test data to choose parameters. The runner must call `validate_test_log` before creating `test_log.txt`, `test_evidence.json`, `run_state.json`, `manifest.json`, or any candidate status; a hash match alone is insufficient without the command, count, and terminal-status checks.
 
 - [ ] **Step 4: Run the complete Stage10 test module and the fixture runner**
 
@@ -1623,9 +2040,15 @@ Run:
 
 ~~~powershell
 $testLog = 'tmp/stage10-unit-tests.log'
-python -m unittest tests.test_capd_proactive_stage10 -v 2>&1 | Tee-Object -FilePath $testLog
+$testCommand = 'python -m unittest tests.test_capd_proactive_stage10 -v'
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText(
+  $testLog, "COMMAND: $testCommand`n", $utf8NoBom)
+python -m unittest tests.test_capd_proactive_stage10 -v 2>&1 |
+  Tee-Object -FilePath $testLog -Append
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-python scripts/run_capd_proactive_stage10.py --config configs/finals/capd_proactive_stage10.json --mode fixture --test-log-input $testLog --output-root outputs/capd_proactive_stage10 --run-id stage10-async-simulator-r1
+$testLogSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $testLog).Hash.ToLower()
+python scripts/run_capd_proactive_stage10.py --config configs/finals/capd_proactive_stage10.json --mode fixture --test-log-input $testLog --test-log-sha256 $testLogSha256 --output-root outputs/capd_proactive_stage10 --run-id stage10-async-simulator-r1
 ~~~
 
 Expected: all Stage10 tests PASS; runner exits 0; run state is `stage10_simulator_tests_passed`; formal gate is `stage10_formal_blocked_by_stage9`; no formal result file exists.
@@ -1696,7 +2119,8 @@ class Stage10DocumentationTest(unittest.TestCase):
     self.assertIn("stage10_formal_blocked_by_stage9", status)
     self.assertIn("stage9_overhead_verified", server)
     self.assertIn("stage9-overhead-r1", server)
-    self.assertNotIn("STAGE10_FORMALLY_VERIFIED", status)
+    self.assertIn("stage10_formally_verified=false", status)
+    self.assertNotIn("stage10_formally_verified=true", status)
 ~~~
 
 - [ ] **Step 2: Write the Chinese protocol document**
@@ -1723,6 +2147,8 @@ State exactly:
 - simulator implemented and local tests passed;
 - fixture output is candidate-ready, not formal;
 - formal Stage10 is blocked by absent verified Stage9 v2 evidence;
+- the status text contains the literal `stage10_formally_verified=false` and
+  never contains `stage10_formally_verified=true`;
 - Stage8 r5 and Stage9 r1 are immutable;
 - no Stage9 rerun, CPU/perf/RSS estimate, or Test tuning was performed;
 - the next gate is a Stage9-owned receipt with status `stage9_overhead_verified`, complete Linux CPU/perf/RSS evidence, manifest/verification/SHA chain, and Stage8 r5 bindings.
@@ -1733,13 +2159,21 @@ Include commands for a future Linux host:
 
 ~~~bash
 set -o pipefail
-export STAGE9_RECEIPT
-test -n "$STAGE9_RECEIPT"
+export STAGE9_RUN_ROOT
+test -d "$STAGE9_RUN_ROOT"
 mkdir -p logs
+TEST_LOG=logs/stage10-unit-tests.log
+TEST_COMMAND='python3 -m unittest tests.test_capd_proactive_stage10 -v'
+printf 'COMMAND: %s\n' "$TEST_COMMAND" > "$TEST_LOG"
+python3 -m unittest tests.test_capd_proactive_stage10 -v 2>&1 |
+  tee -a "$TEST_LOG"
+TEST_LOG_SHA256=$(sha256sum "$TEST_LOG" | awk '{print $1}')
 python3 scripts/run_capd_proactive_stage10.py \
   --config configs/finals/capd_proactive_stage10.json \
   --mode formal \
-  --stage9-receipt "$STAGE9_RECEIPT" \
+  --stage9-run-root "$STAGE9_RUN_ROOT" \
+  --test-log-input "$TEST_LOG" \
+  --test-log-sha256 "$TEST_LOG_SHA256" \
   --output-root outputs/capd_proactive_stage10 \
   --run-id stage10-async-simulator-r1-linux \
   2>&1 | tee logs/stage10-async-simulator-r1-linux.log
@@ -1747,7 +2181,7 @@ python3 scripts/run_capd_proactive_stage10.py \
   --verify outputs/capd_proactive_stage10/stage10-async-simulator-r1-linux
 ~~~
 
-Define `STAGE9_RECEIPT` as a required environment input pointing to a new verified Stage9 v2 receipt. State that these commands have not run and that the current repository's Stage9 r1 path must be rejected.
+Define `STAGE9_RUN_ROOT` as a required environment input pointing to the complete new verified Stage9 v2 run directory. Stage10 reads and independently hashes that directory's `run_state.json`, `verification.json`, `artifact_sha256` map, and `stage8_compatibility_receipt.json`, then creates its own compatibility receipt; it does not accept a caller-supplied receipt or trust a self-reported `sha_chain_verified` flag. State that these commands have not run and that the current repository's Stage9 r1 path must be rejected.
 
 - [ ] **Step 5: Run documentation and full verification commands**
 
@@ -1762,7 +2196,7 @@ Get-Content -LiteralPath 'docs/superpowers/plans/2026-08-05-stage10-async-simula
 Get-Content -LiteralPath 'docs/superpowers/plans/2026-08-05-stage10-async-simulator.md' | Select-String -Pattern ('^\s*' + 'pass' + '\s*$')
 ~~~
 
-Expected: all Stage10 tests PASS; independent verification exits 0; `git diff --check` is clean for tracked edits; the forbidden-term scan returns no lines. Because the plan is untracked at this point, additionally run a direct whitespace check:
+Expected: all Stage10 tests PASS; independent verification exits 0; `git diff --check` is clean for tracked edits; the forbidden-term scan returns no lines. Also run the direct whitespace check so the plan file is checked independently of Git's diff view:
 
 ~~~powershell
 $planPath = (Resolve-Path 'docs/superpowers/plans/2026-08-05-stage10-async-simulator.md').Path
@@ -1790,13 +2224,8 @@ The implementation is accepted only when all of the following are true:
 1. `python -m unittest tests.test_capd_proactive_stage10 -v` passes.
 2. The fixture runner produces the complete candidate directory and independent manifest/SHA/metric verification passes.
 3. Same-time ordering, reservation disjointness, capacity invariants, deterministic LRU-tail selection, MRU insertion, uniform/burst reproducibility, null/N/A blocking semantics, and full-window exhaustion integration are covered by tests.
-4. Formal mode rejects absent/unverified Stage9 receipts, explicitly rejects `stage9-overhead-r1`, and writes no formal result.
+4. Formal mode rejects an absent/unverified Stage9 run directory, independently audits its `run_state.json`, `verification.json`, `artifact_sha256`, and `stage8_compatibility_receipt.json`, explicitly rejects `stage9-overhead-r1`, and writes no formal result.
 5. Stage8 r5 and Stage9 r1 tree hashes remain unchanged.
 6. The resulting status is `candidate-ready`, with `stage10_formal_blocked_by_stage9=true` and `stage10_formally_verified=false`.
 
-Plan complete and saved to `docs/superpowers/plans/2026-08-05-stage10-async-simulator.md`. Two execution options:
-
-1. Subagent-Driven (recommended): dispatch a fresh subagent per task with review checkpoints.
-2. Inline Execution: execute tasks in this session using the executing-plans skill with checkpoints.
-
-The user must approve the plan and choose one execution option before implementation begins.
+Plan complete and saved to `docs/superpowers/plans/2026-08-05-stage10-async-simulator.md`. The selected execution style is Inline Execution using the executing-plans skill with checkpoints. The user must explicitly approve this revised plan before implementation begins; no implementation authorization is inferred from the earlier design approval.

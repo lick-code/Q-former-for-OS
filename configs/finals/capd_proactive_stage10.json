@@ -1,0 +1,97 @@
+{
+  "schema_version": "capd_proactive_stage10_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE10-1.0",
+  "mode": "fixture",
+  "stage_status": "stage10_simulator_implementation_candidate",
+  "output_root": "outputs/capd_proactive_stage10",
+  "candidate_run_id": "stage10-async-simulator-r1",
+  "result_schema": "configs/finals/capd_proactive_stage10_result_schema.json",
+  "result_schema_sha256": "dda783f592b9320fb83710a258e4598314d62425290ad6e8b30d6fc41b200043",
+  "candidate_source": "lru_tail",
+  "arrival_models": ["uniform", "burst"],
+  "trace_replay": {
+    "enabled": false,
+    "status": "future_input_option_requires_reliable_timestamps"
+  },
+  "test_evidence": {
+    "required_command_tokens": ["-m", "unittest"],
+    "required_module": "tests.test_capd_proactive_stage10",
+    "expected_command": "python -m unittest tests.test_capd_proactive_stage10 -v",
+    "expected_commands": [
+      "python -m unittest tests.test_capd_proactive_stage10 -v",
+      "python -m unittest tests.test_capd_proactive_stage10.Stage10ConfigContractTest tests.test_capd_proactive_stage10.Stage10EventHeapTest tests.test_capd_proactive_stage10.Stage10StateContractTest tests.test_capd_proactive_stage10.Stage10ArrivalTest tests.test_capd_proactive_stage10.Stage10SimulationTest tests.test_capd_proactive_stage10.Stage10FormalGateTest -v"
+    ],
+    "minimum_test_count": 10
+  },
+  "fixture_parameters": {
+    "T_inference_ns": 2000,
+    "T_migration_ns": 1000,
+    "b_max": 2,
+    "b_t_reference": 2,
+    "dram_capacity_frames": 64,
+    "initial_free_frames": 16,
+    "F_low": 16,
+    "F_target": 24,
+    "K": 8,
+    "simulation_horizon_ns": 200000,
+    "seed": 3136859
+  },
+  "uniform_scenarios": [
+    {"scenario_id": "uniform-0p5", "load_ratio": "0.5"},
+    {"scenario_id": "uniform-0p8", "load_ratio": "0.8"},
+    {"scenario_id": "uniform-1p0", "load_ratio": "1.0"},
+    {"scenario_id": "uniform-1p2", "load_ratio": "1.2"}
+  ],
+  "burst_scenarios": [
+    {
+      "scenario_id": "burst-multi-r1",
+      "base_load_ratio": "0.5",
+      "bursts": [
+        {"start_ns": 50000, "duration_ns": 30000, "multiplier": "2.0"},
+        {"start_ns": 120000, "duration_ns": 20000, "multiplier": "1.6"}
+      ]
+    }
+  ],
+  "formal_gate": {
+    "required_stage9_contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
+    "required_stage9_status": "stage9_overhead_verified",
+    "stage9_config_path": "configs/finals/capd_proactive_stage9.json",
+    "stage9_config_sha256": "4fbbe7fe17f3ef10a9f04c83960901837f0dcda513d843c27b9d8e888ce2c1a7",
+    "stage9_output_root": "outputs/capd_proactive_stage9",
+    "rejected_run_ids": ["stage9-overhead-r1"],
+    "stage9_run_root_argument": "--stage9-run-root",
+    "stage9_required_files": [
+      "run_identity.json", "resolved_config.json", "stage8_compatibility_receipt.json",
+      "preflight.json", "environment.json", "raw_latency_samples.csv",
+      "latency_summary.json", "throughput_summary.json", "quality_summary.json",
+      "instrumentation_audit.json", "perf/perf-stat.raw", "perf/perf_parsed.json",
+      "perf/perf_scope_counts.json", "memory_breakdown.json", "capacity_overhead.csv",
+      "artifacts/report_cn.md", "logs/stage1_stage9_regression.log",
+      "server_test_receipt.json", "verification.json", "run_state.json"
+    ],
+    "stage9_verification_required": {
+      "schema_version": "capd_proactive_stage9_verification_v2_0",
+      "status": "stage9_overhead_verified",
+      "stage10_entry_gate": "satisfied",
+      "stage8_entry_gate": "satisfied",
+      "device": "cpu",
+      "linux_measurement": true,
+      "perf_cycles_verified": true,
+      "memory_verified": true,
+      "raw_to_summary_verified": true,
+      "instrumentation_semantics_verified": true,
+      "stage8_compatibility_receipt_verified": true,
+      "test_used_for_parameter_selection": false,
+      "formal_b_max": 2,
+      "b_max_sensitivity_purpose": "analysis_only_not_selection",
+      "stage8_artifacts_overwritten": false,
+      "fair_capacity_replay_status": "deferred"
+    },
+    "historical_failed_run_state": {
+      "path": "outputs/capd_proactive_stage9/stage9-overhead-r1/run_state.json",
+      "sha256": "662a5e44f488a7951ddc2e9a75a39d49bd5024b6e9fde718a8553dd362711d15"
+    },
+    "stage8_r5_verification_sha256": "b531f7324af9a6edf7dc31adc1426782c2389be35fd4b6058aa1986764e8025b",
+    "stage8_r5_tree_sha256": "554eba14afa57eab2e02aaa156f32181d29d4c66929a5fd2ca934e87c5cf49db"
+  }
+}

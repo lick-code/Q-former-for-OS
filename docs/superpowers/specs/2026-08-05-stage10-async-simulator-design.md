@@ -1,6 +1,6 @@
 # CAPD Stage10A Async Simulator Design
 
-**Status:** design review pending; implementation not authorized.
+**Status:** design approved; Stage10A implementation authorized.
 
 **Goal:** Build a deterministic, reproducible, single-threaded discrete-event simulator for CAPD asynchronous page admission, background demotion, queue pressure, free-frame exhaustion, emergency fallback, and foreground blocking, without claiming Stage10B or real Linux behavior.
 
