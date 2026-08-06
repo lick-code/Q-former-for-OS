@@ -3,9 +3,11 @@
 
 from __future__ import annotations
 
-import importlib.util
 import copy
+import importlib.util
+import math
 import os
+import re
 import sys
 
 
@@ -84,6 +86,74 @@ def verify_recovery_identity(runner, expected, actual):
             "; ".join(differences)))
 
 
+def verify_regression_receipt(runner, run_root, project_root, receipt, minimum):
+  """Reproduce the unittest summary even when buffered test stdout follows it."""
+  recorded = receipt.get("log_path")
+  if not isinstance(recorded, str) or os.path.isabs(recorded):
+    raise runner.stage9.Stage9ContractError("Regression log path is invalid.")
+  log_path = os.path.realpath(os.path.join(
+      project_root, recorded.replace("/", os.sep).replace("\\", os.sep)))
+  resolved_run_root = os.path.realpath(run_root)
+  try:
+    confined = os.path.commonpath((resolved_run_root, log_path)) == resolved_run_root
+  except ValueError:
+    confined = False
+  if not confined or not os.path.isfile(log_path):
+    raise runner.stage9.Stage9ContractError(
+        "Regression log must be an artifact inside this Stage-9 run.")
+  runner.stage9.verify_file_binding(
+      log_path, receipt.get("log_sha256"), "Stage-9 regression log")
+  with open(log_path, "r", encoding="utf-8", errors="replace") as handle:
+    text = handle.read()
+  summaries = re.findall(
+      r"(?m)^Ran\s+(\d+)\s+tests?[^\r\n]*\r?\n\s*"
+      r"(OK(?:\s+\([^\r\n]*\))?|FAILED(?:\s+\([^\r\n]*\))?)\s*$",
+      text)
+  count = int(summaries[-1][0]) if summaries else 0
+  final_ok = bool(summaries and summaries[-1][1].startswith("OK"))
+  checks = {
+      "schema_version": receipt.get("schema_version") ==
+          "capd_proactive_stage9_server_test_receipt_v2_0",
+      "contract_id": receipt.get("contract_id") == runner.stage9.CONTRACT_ID,
+      "status": receipt.get("status") == "passed",
+      "test_count": receipt.get("test_count") == count,
+      "minimum_required": receipt.get("minimum_required") == minimum,
+      "minimum_satisfied": count >= minimum,
+      "unittest_summary": final_ok,
+  }
+  failed = sorted(name for name, passed in checks.items() if not passed)
+  if failed:
+    raise runner.stage9.Stage9ContractError(
+        "Server regression receipt failed: {}".format(", ".join(failed)))
+
+
+def verify_quality_aggregate_equivalent(stored, computed, path="quality"):
+  """Require exact structure and tolerate only JSON round-trip float ULPs."""
+  if isinstance(stored, dict) and isinstance(computed, dict):
+    if set(stored) != set(computed):
+      raise ValueError("{} keys changed".format(path))
+    for key in stored:
+      verify_quality_aggregate_equivalent(
+          stored[key], computed[key], "{}.{}".format(path, key))
+    return
+  if isinstance(stored, list) and isinstance(computed, list):
+    if len(stored) != len(computed):
+      raise ValueError("{} length changed".format(path))
+    for index, (left, right) in enumerate(zip(stored, computed)):
+      verify_quality_aggregate_equivalent(
+          left, right, "{}[{}]".format(path, index))
+    return
+  if isinstance(stored, float) and isinstance(computed, float):
+    if (not math.isfinite(stored) or not math.isfinite(computed) or
+        abs(stored - computed) > 1e-12):
+      raise ValueError(
+          "{} float changed: {!r} != {!r}".format(path, stored, computed))
+    return
+  if stored != computed:
+    raise ValueError("{} changed: {!r} != {!r}".format(
+        path, stored, computed))
+
+
 def load_recovery_run(runner, args):
   """Load failed r3 while retaining every identity check except Git metadata."""
   config, stage0, cost = runner._load(args)
@@ -124,6 +194,26 @@ def main():
   runner._PerfControl.command = command
   runner._verify_measurement_checkpoint = lambda path, raw_path, config, jobs: (
       verify_measurement_checkpoint(runner, path, raw_path, config, jobs))
+  runner._verify_regression_receipt = (
+      lambda run_root, project_root, receipt, minimum:
+      verify_regression_receipt(
+          runner, run_root, project_root, receipt, minimum))
+  original_aggregate_quality = runner._aggregate_quality
+  quality_path = os.path.join(RUN_ROOT, "quality_summary.json")
+  stored_quality = runner.stage9.load_json(quality_path)
+
+  def aggregate_quality(rows):
+    computed = original_aggregate_quality(rows)
+    if rows == stored_quality.get("rows"):
+      try:
+        verify_quality_aggregate_equivalent(
+            stored_quality.get("by_b_max"), computed.get("by_b_max"))
+      except ValueError as error:
+        raise runner.stage9.Stage9ContractError(str(error))
+      computed["by_b_max"] = copy.deepcopy(stored_quality["by_b_max"])
+    return computed
+
+  runner._aggregate_quality = aggregate_quality
   runner._loaded_run = lambda args: load_recovery_run(runner, args)
   runner.main(sys.argv[1:])
 

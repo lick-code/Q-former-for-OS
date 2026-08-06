@@ -2019,18 +2019,7 @@ Proactive-CAPD Top-b
 
 两者均使用当前主动水位，只改变单轮选择数量，用于证明批量执行的作用。
 
----
 
-## 15.8 筛选器负向探索
-
-只使用既有实验结果，不重新训练。
-
-简短报告：
-
-- oracle headroom 为 0；
-- weighted cost 无改善；
-- 延迟增加；
-- 最终未采用。
 
 ---
 
@@ -2256,17 +2245,6 @@ blocking time
 
 ---
 
-## P4：时间允许后完成
-
-- [ ] Proactive-Kleio-lite 扩展结果；
-- [ ] Proactive-PatternS-lite 扩展结果；
-- [ ] NoContext/NoPageState；
-- [ ] 额外 Cost profile；
-- [ ] 额外标签权重；
-- [ ] Pressure Test；
-- [ ] 公平扣除模型内存实验。
-
----
 
 # 18. 配置冻结与止损规则
 
