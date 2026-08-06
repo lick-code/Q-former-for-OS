@@ -1,0 +1,13 @@
+Events disabled
+Events enabled
+Events disabled
+Traceback (most recent call last):
+  File "scripts/run_capd_proactive_stage9.py", line 1882, in <module>
+    main()
+  File "scripts/run_capd_proactive_stage9.py", line 1878, in main
+    commands[args.command](args)
+  File "scripts/run_capd_proactive_stage9.py", line 1410, in perf_workload
+    control.command("disable")
+  File "scripts/run_capd_proactive_stage9.py", line 1344, in command
+    "perf control did not acknowledge {}: {!r}".format(value, response))
+qmap.proactive_stage9.Stage9ContractError: perf control did not acknowledge disable: '\x00ack'

@@ -1,0 +1,7 @@
+workload,tracks,baseline_dram_pages,management_fixed_bytes,metadata_bytes_per_page,management_memory_bytes,management_memory_mib,management_pages,capd_effective_dram_pages,capacity_feasible,management_exceeds_capacity_pages,capacity_overhead_percent,page_size_bytes,fair_capacity_replay_status
+blackscholes,pressure|standard,8,14249396,64,14249908,13.589771270751953,3479,-3471,False,3471,43487.5,4096,deferred
+canneal,pressure|standard,120,14249396,64,14257076,13.596607208251953,3481,-3361,False,3361,2900.8333333333335,4096,deferred
+dedup_pressure,pressure|standard,21,14249396,64,14250740,13.590564727783203,3480,-3459,False,3459,16571.428571428572,4096,deferred
+fluidanimate,standard,22,14249396,64,14250804,13.590625762939453,3480,-3458,False,3458,15818.181818181818,4096,deferred
+streamcluster_pressure,standard,22,14249396,64,14250804,13.590625762939453,3480,-3458,False,3458,15818.181818181818,4096,deferred
+swaptions,pressure|standard,8,14249396,64,14249908,13.589771270751953,3479,-3471,False,3471,43487.5,4096,deferred

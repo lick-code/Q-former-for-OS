@@ -1,0 +1,146 @@
+{
+  "candidate_tensor": {
+    "bytes": 224,
+    "method": "exact_materialized_tensor_bytes",
+    "python_candidate_state_estimate_bytes": 4857
+  },
+  "history_buffer": {
+    "logical_packed_bytes": 480,
+    "python_estimate_limit": "sys.getsizeof recursion is not native RSS",
+    "python_recursive_estimate_bytes": 6743
+  },
+  "management_fixed_bytes": 14249396,
+  "management_fixed_mib": 13.589282989501953,
+  "metadata_bytes_per_page": 64,
+  "metadata_method": "analytical_packed_target_layout_not_python_dict_size",
+  "model_buffers": {
+    "bytes": 3840,
+    "measurement_method": "exact_tensor_numel_times_element_size",
+    "mib": 0.003662109375
+  },
+  "model_by_seed": {
+    "2026": {
+      "model_buffers": {
+        "bytes": 3840,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "mib": 0.003662109375
+      },
+      "model_parameters": {
+        "all_model_parameters_bytes": 14237140,
+        "all_model_parameters_mib": 13.577594757080078,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "other_parameter_bytes": 85460,
+        "page_embedding_parameter_bytes": 9600000,
+        "pc_embedding_parameter_bytes": 4400000,
+        "transformer_parameter_bytes": 151680
+      },
+      "runtime_tensors": {
+        "activation_limit": "Observed materialized inputs/outputs; internal ATen workspace and allocator fragmentation are represented only by OS RSS peaks.",
+        "candidate_tensor_bytes": 224,
+        "feature_activation_bytes": 3840,
+        "history_tensor_bytes": 560,
+        "input_tensor_bytes": 784,
+        "measurement_method": "exact_materialized_tensor_bytes_and_output_activation_lower_bound",
+        "score_tensor_bytes": 32,
+        "transformer_activation_bytes": 3840
+      }
+    },
+    "3136859": {
+      "model_buffers": {
+        "bytes": 3840,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "mib": 0.003662109375
+      },
+      "model_parameters": {
+        "all_model_parameters_bytes": 14237140,
+        "all_model_parameters_mib": 13.577594757080078,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "other_parameter_bytes": 85460,
+        "page_embedding_parameter_bytes": 9600000,
+        "pc_embedding_parameter_bytes": 4400000,
+        "transformer_parameter_bytes": 151680
+      },
+      "runtime_tensors": {
+        "activation_limit": "Observed materialized inputs/outputs; internal ATen workspace and allocator fragmentation are represented only by OS RSS peaks.",
+        "candidate_tensor_bytes": 224,
+        "feature_activation_bytes": 3840,
+        "history_tensor_bytes": 560,
+        "input_tensor_bytes": 784,
+        "measurement_method": "exact_materialized_tensor_bytes_and_output_activation_lower_bound",
+        "score_tensor_bytes": 32,
+        "transformer_activation_bytes": 3840
+      }
+    },
+    "42": {
+      "model_buffers": {
+        "bytes": 3840,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "mib": 0.003662109375
+      },
+      "model_parameters": {
+        "all_model_parameters_bytes": 14237140,
+        "all_model_parameters_mib": 13.577594757080078,
+        "measurement_method": "exact_tensor_numel_times_element_size",
+        "other_parameter_bytes": 85460,
+        "page_embedding_parameter_bytes": 9600000,
+        "pc_embedding_parameter_bytes": 4400000,
+        "transformer_parameter_bytes": 151680
+      },
+      "runtime_tensors": {
+        "activation_limit": "Observed materialized inputs/outputs; internal ATen workspace and allocator fragmentation are represented only by OS RSS peaks.",
+        "candidate_tensor_bytes": 224,
+        "feature_activation_bytes": 3840,
+        "history_tensor_bytes": 560,
+        "input_tensor_bytes": 784,
+        "measurement_method": "exact_materialized_tensor_bytes_and_output_activation_lower_bound",
+        "score_tensor_bytes": 32,
+        "transformer_activation_bytes": 3840
+      }
+    }
+  },
+  "model_parameters": {
+    "all_model_parameters_bytes": 14237140,
+    "all_model_parameters_mib": 13.577594757080078,
+    "measurement_method": "exact_tensor_numel_times_element_size",
+    "other_parameter_bytes": 85460,
+    "page_embedding_parameter_bytes": 9600000,
+    "pc_embedding_parameter_bytes": 4400000,
+    "transformer_parameter_bytes": 151680
+  },
+  "page_embedding": {
+    "bytes": 9600000,
+    "method": "exact_tensor_numel_times_element_size"
+  },
+  "pc_embedding": {
+    "bytes": 4400000,
+    "method": "exact_tensor_numel_times_element_size"
+  },
+  "rss": {
+    "measurement_method": "os_observed_rss",
+    "process_baseline_rss_bytes": 351367168,
+    "process_baseline_rss_mib": 335.08984375,
+    "stage9_incremental_peak_rss_bytes": 716087296,
+    "stage9_incremental_peak_rss_mib": 682.9140625,
+    "total_peak_rss_bytes": 1067454464,
+    "total_peak_rss_mib": 1018.00390625
+  },
+  "runtime_tensor_maxima": {
+    "candidate_tensor_bytes": 224,
+    "feature_activation_bytes": 3840,
+    "history_tensor_bytes": 560,
+    "input_tensor_bytes": 784,
+    "score_tensor_bytes": 32,
+    "transformer_activation_bytes": 3840
+  },
+  "schema_version": "capd_proactive_stage9_memory_v2_0",
+  "tracemalloc_complete_for_torch_native": false,
+  "transformer_activation": {
+    "bytes": 3840,
+    "limitation": "Internal ATen workspaces are covered only by RSS peak.",
+    "method": "materialized_output_tensor_lower_bound"
+  },
+  "transformer_parameters": {
+    "bytes": 151680,
+    "method": "exact_tensor_numel_times_element_size"
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "applicability": "active_proactive_round_cells_only_zero_round_cells_retained_in_quality",
+  "by_b_max": {
+    "1": {
+      "clock": "time.perf_counter_ns",
+      "excluded_from_total": [
+        "page_migration",
+        "replay_state_update",
+        "invariant_checks",
+        "quality_metrics",
+        "artifact_serialization"
+      ],
+      "measured_sample_count": 364071,
+      "schema_version": "capd_proactive_stage9_latency_summary_v2_0",
+      "stage_timings": "exclusive",
+      "stages": {
+        "candidate_construction_ns": {
+          "count": 364071,
+          "maximum": 141161,
+          "mean": 9550.974238541383,
+          "minimum": 5818,
+          "p50": 7840,
+          "p95": 28514.5,
+          "p99": 32467.899999999965
+        },
+        "candidate_scoring_ns": {
+          "count": 364071,
+          "maximum": 1284345,
+          "mean": 584683.4722924924,
+          "minimum": 503756,
+          "p50": 565265,
+          "p95": 672372.5,
+          "p99": 1005363.3
+        },
+        "feature_construction_ns": {
+          "count": 364071,
+          "maximum": 2155405,
+          "mean": 446709.8818829294,
+          "minimum": 350900,
+          "p50": 405981,
+          "p95": 819623.0,
+          "p99": 928901.5
+        },
+        "top_b_selection_ns": {
+          "count": 364071,
+          "maximum": 71868,
+          "mean": 4448.215977103368,
+          "minimum": 3421,
+          "p50": 4230,
+          "p95": 5100.0,
+          "p99": 11007.79999999993
+        },
+        "total_round_latency_ns": {
+          "count": 364071,
+          "maximum": 80478545,
+          "mean": 2275205.65520187,
+          "minimum": 1954243,
+          "p50": 2183486,
+          "p95": 2676836.5,
+          "p99": 3777083.1999999997
+        },
+        "transformer_encoding_ns": {
+          "count": 364071,
+          "maximum": 79307624,
+          "mean": 1150946.1246762308,
+          "minimum": 1002709,
+          "p50": 1113080,
+          "p95": 1311236.0,
+          "p99": 1940392.9
+        },
+        "unattributed_framework_overhead_ns": {
+          "count": 364071,
+          "maximum": 300142,
+          "mean": 77895.99457248724,
+          "minimum": 64924,
+          "p50": 73776,
+          "p95": 102052.5,
+          "p99": 123059.0
+        },
+        "watermark_check_ns": {
+          "count": 364071,
+          "maximum": 40420,
+          "mean": 970.9915620854174,
+          "minimum": 427,
+          "p50": 1051,
+          "p95": 1226.0,
+          "p99": 1713.0
+        }
+      },
+      "total_boundary": "watermark_check_start_through_top_b_result",
+      "warmup_sample_count": 486
+    },
+    "2": {
+      "clock": "time.perf_counter_ns",
+      "excluded_from_total": [
+        "page_migration",
+        "replay_state_update",
+        "invariant_checks",
+        "quality_metrics",
+        "artifact_serialization"
+      ],
+      "measured_sample_count": 182394,
+      "schema_version": "capd_proactive_stage9_latency_summary_v2_0",
+      "stage_timings": "exclusive",
+      "stages": {
+        "candidate_construction_ns": {
+          "count": 182394,
+          "maximum": 84833,
+          "mean": 9516.317154073051,
+          "minimum": 5844,
+          "p50": 7964.0,
+          "p95": 28872.0,
+          "p99": 32592.0
+        },
+        "candidate_scoring_ns": {
+          "count": 182394,
+          "maximum": 1259866,
+          "mean": 576973.3669199644,
+          "minimum": 505432,
+          "p50": 567983.0,
+          "p95": 644231.35,
+          "p99": 714714.7000000001
+        },
+        "feature_construction_ns": {
+          "count": 182394,
+          "maximum": 2134401,
+          "mean": 446367.63149007095,
+          "minimum": 357971,
+          "p50": 411297.0,
+          "p95": 830977.4500000001,
+          "p99": 931572.6300000001
+        },
+        "top_b_selection_ns": {
+          "count": 182394,
+          "maximum": 96880,
+          "mean": 4679.620618002785,
+          "minimum": 3687,
+          "p50": 4491.0,
+          "p95": 5091.0,
+          "p99": 12170.0
+        },
+        "total_round_latency_ns": {
+          "count": 182394,
+          "maximum": 59322522,
+          "mean": 2252304.4582606885,
+          "minimum": 1970315,
+          "p50": 2192418.0,
+          "p95": 2625519.0,
+          "p99": 2938056.360000004
+        },
+        "transformer_encoding_ns": {
+          "count": 182394,
+          "maximum": 58121476,
+          "mean": 1136645.887545643,
+          "minimum": 1002963,
+          "p50": 1116180.0,
+          "p95": 1260576.85,
+          "p99": 1405631.5200000003
+        },
+        "unattributed_framework_overhead_ns": {
+          "count": 182394,
+          "maximum": 336085,
+          "mean": 77165.42003026415,
+          "minimum": 65090,
+          "p50": 74153.0,
+          "p95": 96485.0,
+          "p99": 114235.63000000006
+        },
+        "watermark_check_ns": {
+          "count": 182394,
+          "maximum": 28184,
+          "mean": 956.214502670044,
+          "minimum": 426,
+          "p50": 1053.0,
+          "p95": 1194.0,
+          "p99": 1345.0
+        }
+      },
+      "total_boundary": "watermark_check_start_through_top_b_result",
+      "warmup_sample_count": 483
+    },
+    "4": {
+      "clock": "time.perf_counter_ns",
+      "excluded_from_total": [
+        "page_migration",
+        "replay_state_update",
+        "invariant_checks",
+        "quality_metrics",
+        "artifact_serialization"
+      ],
+      "measured_sample_count": 175446,
+      "schema_version": "capd_proactive_stage9_latency_summary_v2_0",
+      "stage_timings": "exclusive",
+      "stages": {
+        "candidate_construction_ns": {
+          "count": 175446,
+          "maximum": 97512,
+          "mean": 8766.680152297573,
+          "minimum": 5900,
+          "p50": 7936.0,
+          "p95": 14642.5,
+          "p99": 31967.54999999999
+        },
+        "candidate_scoring_ns": {
+          "count": 175446,
+          "maximum": 1610344,
+          "mean": 574621.3316861029,
+          "minimum": 503641,
+          "p50": 566856.5,
+          "p95": 638396.25,
+          "p99": 699333.2499999998
+        },
+        "feature_construction_ns": {
+          "count": 175446,
+          "maximum": 2187971,
+          "mean": 428611.8537042737,
+          "minimum": 357779,
+          "p50": 407322.0,
+          "p95": 495388.0,
+          "p99": 914326.0499999996
+        },
+        "top_b_selection_ns": {
+          "count": 175446,
+          "maximum": 67348,
+          "mean": 4622.934253274512,
+          "minimum": 3678,
+          "p50": 4451.0,
+          "p95": 5013.0,
+          "p99": 11724.649999999965
+        },
+        "total_round_latency_ns": {
+          "count": 175446,
+          "maximum": 63423989,
+          "mean": 2225967.997275515,
+          "minimum": 1959080,
+          "p50": 2185321.0,
+          "p95": 2549244.5,
+          "p99": 2781632.9999999977
+        },
+        "transformer_encoding_ns": {
+          "count": 175446,
+          "maximum": 62094328,
+          "mean": 1131533.121849458,
+          "minimum": 1003061,
+          "p50": 1114682.0,
+          "p95": 1251041.0,
+          "p99": 1362399.5
+        },
+        "unattributed_framework_overhead_ns": {
+          "count": 175446,
+          "maximum": 327608,
+          "mean": 76857.2572700432,
+          "minimum": 65916,
+          "p50": 74051.0,
+          "p95": 96130.25,
+          "p99": 111883.04999999987
+        },
+        "watermark_check_ns": {
+          "count": 175446,
+          "maximum": 42007,
+          "mean": 954.8183600652053,
+          "minimum": 425,
+          "p50": 1054.0,
+          "p95": 1192.0,
+          "p99": 1322.0
+        }
+      },
+      "total_boundary": "watermark_check_start_through_top_b_result",
+      "warmup_sample_count": 480
+    }
+  },
+  "formal_b_max": 2,
+  "schema_version": "capd_proactive_stage9_latency_suite_v2_0",
+  "sensitivity_purpose": "analysis_only_not_selection"
+}

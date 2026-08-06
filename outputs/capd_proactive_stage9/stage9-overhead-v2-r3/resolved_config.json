@@ -1,0 +1,217 @@
+{
+  "acceptance": {
+    "failure_status": "stage9_not_verified",
+    "minimum_stage1_through_stage9_regression_tests": 450,
+    "required_status": "stage9_overhead_verified",
+    "stage10_entry_gate": "satisfied",
+    "success_marker": "[FINAL] STAGE9_OVERHEAD_VERIFIED"
+  },
+  "capd": {
+    "best_seed_selection_allowed": false,
+    "history_H": 20,
+    "label_weights": [
+      1,
+      1,
+      2
+    ],
+    "lookahead_L": 256,
+    "unk_index": 0,
+    "vocabulary_expansion_allowed": false
+  },
+  "capd_seeds": [
+    3136859,
+    42,
+    2026
+  ],
+  "config_sha256": "642641d56fe52e3772bdaa0772d5c9fd250cc17976918ce99acd36d18a035922",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
+  "cost_profile": {
+    "name": "default",
+    "weights": {
+      "demotion": 10,
+      "dram_hit": 1,
+      "nvm_read": 2,
+      "nvm_write": 8
+    }
+  },
+  "fair_capacity": {
+    "formal_replay": "deferred",
+    "formula": "baseline_dram_pages-ceil(capd_management_memory_bytes/4096)",
+    "overwrite_stage8_allowed": false
+  },
+  "frozen_controls": {
+    "b_max": 2,
+    "candidate_size_K": 8,
+    "candidate_source": "lru_tail",
+    "fallback_policy": "lru",
+    "selector": "disabled",
+    "trigger_mode": "low_watermark"
+  },
+  "interpretation_boundary": "Stage9 measures user-space Linux CPU synchronous CAPD decision-round overhead. It is not kernel integration, page-migration latency, foreground end-to-end latency, promotion, or Stage10 asynchronous replay.",
+  "measurement": {
+    "batch_size_rounds": 1,
+    "clock": "time.perf_counter_ns",
+    "cpu_affinity": [
+      0
+    ],
+    "cpu_threads": 1,
+    "device": "cpu",
+    "excluded_from_total": [
+      "page_migration",
+      "replay_state_update",
+      "invariant_checks",
+      "quality_metrics",
+      "artifact_serialization"
+    ],
+    "formal_repetitions": 3,
+    "mkl_num_threads": 1,
+    "model_eval": true,
+    "omp_num_threads": 1,
+    "stage_timings": "exclusive",
+    "torch_inter_op_threads": 1,
+    "torch_intra_op_threads": 1,
+    "torch_no_grad": true,
+    "total_boundary": "watermark_check_start_through_top_b_result",
+    "warmup_rounds": 20
+  },
+  "measurement_matrix": {
+    "expected_active_round_jobs_per_b_max": 27,
+    "expected_zero_round_job_keys": [
+      "standard|fluidanimate|3136859",
+      "standard|fluidanimate|42",
+      "standard|fluidanimate|2026"
+    ],
+    "expected_zero_round_jobs_per_b_max": 3,
+    "formal_instrumentation_job_count": 30,
+    "identity_fields": [
+      "track",
+      "workload",
+      "seed"
+    ],
+    "jobs_per_b_max": 30,
+    "latency_applicability": "active_proactive_round_cells_only_zero_round_cells_retained_in_quality",
+    "quality_job_count": 90,
+    "seeds": [
+      3136859,
+      42,
+      2026
+    ],
+    "source": "stage8_v2_capd_job_manifests_plan_job",
+    "track_workload_cell_count": 10,
+    "unique_workload_capacity_count": 6
+  },
+  "memory": {
+    "metadata_bytes_per_page": 64,
+    "metadata_layout": {
+      "allocator_alignment_reserve_bytes": 16,
+      "dram_entry_index_bytes": 8,
+      "frequency_counter_bytes": 8,
+      "last_access_index_bytes": 8,
+      "lru_links_bytes": 16,
+      "residency_and_dirty_flags_bytes": 8
+    },
+    "native_process_measurement": "proc_status_and_getrusage_peak_rss",
+    "python_object_measurement": "recursive_sys_getsizeof_estimate_only",
+    "tracemalloc_complete_for_torch_native": false
+  },
+  "output_root": "outputs/capd_proactive_stage9",
+  "perf": {
+    "control": "perf_stat_fifo_enable_disable",
+    "counter_source": "linux_perf_hardware",
+    "events": [
+      "cycles",
+      "instructions",
+      "task-clock",
+      "context-switches",
+      "cpu-migrations",
+      "page-faults"
+    ],
+    "expected_snapshot_count": 27,
+    "repetitions_per_snapshot": 200,
+    "required": true,
+    "scope": "formal_b_max_2_stage8_v2_active_round_track_workload_seed_jobs_only",
+    "snapshot_rule": "first_decision_after_effective_per_job_warmup_derived_from_stage8_bmax2",
+    "wall_time_frequency_estimate_allowed": false
+  },
+  "result_schema": "configs/finals/capd_proactive_stage9_result_schema.json",
+  "result_schema_sha256": "a07c1f4b192f76eff45d33fcbe6e37b325aec1a8648c5542538ead1b6ecda893",
+  "resume_contract": {
+    "atomic_writes": true,
+    "automatic_retry": false,
+    "completed_identity_schema_sha_only": true,
+    "failed_running_or_corrupt_requires_new_run_id": true,
+    "measurement_checkpoint_granularity": "track_workload_seed_bmax",
+    "partial_measurement_preserved": true
+  },
+  "run_id": "stage9-overhead-v2-r3",
+  "run_identity_sha256": "cc662852fa7ee43209d721b5acaae062fb02d790f82e5245ec0511c443987454",
+  "schema_version": "capd_proactive_stage9_v2_0",
+  "sensitivity": {
+    "b_max_values": [
+      1,
+      2,
+      4
+    ],
+    "formal_b_max": 2,
+    "purpose": "analysis_only_not_selection",
+    "quality_metrics": [
+      "weighted_cost",
+      "early_reuse"
+    ]
+  },
+  "stage4_authority": {
+    "final_stage4_freeze": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/final_stage4_freeze.json",
+      "sha256": "cb70bce49bee1dba6e1009f327ba0237080f7c59ac76e049989c541b53ef525b"
+    },
+    "formal_checkpoint_manifest": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/formal_checkpoint_manifest.json",
+      "sha256": "61d62d59414b65c0600f29b415246a419199d97a8fd001aa570b6f9012b72dda"
+    },
+    "stage8_model_contract": {
+      "path": "outputs/capd_proactive_stage4_stage7/stage4-stage7-unified-r2/stage8_model_contract.json",
+      "sha256": "80bd84d4c627461f51ddf2ffafba225a8aca6dafa76104b15c43edb8e422d033"
+    }
+  },
+  "stage8_authority": {
+    "config": {
+      "path": "configs/finals/capd_proactive_stage8.json",
+      "sha256": "52bb15a3872c99bf2a61af3a25914078be04c296e093af4cacf23dd741bf93d3"
+    },
+    "job_manifest": {
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/job_manifest.json",
+      "sha256": "015c8746b05c2dac27d4e05daf3cbbfc33e12ee54f97bf22fe8d3602636310b1"
+    },
+    "resolved_config": {
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/resolved_config.json",
+      "sha256": "c09cc43cdcb726c62e3d7757b4d820a5175e2f322c8016beccaf1421e6610f04"
+    },
+    "run_identity": {
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/run_identity.json",
+      "sha256": "ad9b96f038fb3c0799483ffd6d1d1120122ca1935a01a0a6a551d3a93adc7a42"
+    },
+    "run_state": {
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/run_state.json",
+      "sha256": "639c4677a81fe74bb56aa221f6f39ac0150782d9a1d1a277f6b6f6ac56f6f6e5"
+    },
+    "verification": {
+      "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/verification.json",
+      "sha256": "b531f7324af9a6edf7dc31adc1426782c2389be35fd4b6058aa1986764e8025b"
+    }
+  },
+  "stage_status": "stage9_implemented_awaiting_server_measurement",
+  "storage": {
+    "nvm_capacity_model": "unbounded_backing_tier",
+    "page_enter_dram_semantics": "occupies_one_free_frame_regardless_of_source",
+    "page_size_bytes": 4096,
+    "promotion_allowed": false
+  },
+  "test_policy": {
+    "checkpoint_selection_allowed": false,
+    "formal_b_max_selection_allowed": false,
+    "oov_fix_allowed": false,
+    "retraining_allowed": false,
+    "used_for_parameter_selection": false,
+    "vocabulary_expansion_allowed": false
+  }
+}

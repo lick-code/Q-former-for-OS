@@ -1,0 +1,80 @@
+{
+  "applicability": "active_proactive_round_cells_only_zero_round_cells_retained_in_quality",
+  "by_b_max": {
+    "1": {
+      "amortized_latency_ns_per_page": {
+        "count": 364071,
+        "maximum": 80478545.0,
+        "mean": 2275205.65520187,
+        "minimum": 1954243.0,
+        "p50": 2183486.0,
+        "p95": 2676836.5,
+        "p99": 3777083.1999999997
+      },
+      "amortized_sample_count": 364071,
+      "b_t_distribution": {
+        "1": 364071
+      },
+      "b_t_zero_count": 0,
+      "b_t_zero_policy": "counted_separately_excluded_from_division",
+      "demoted_pages_per_second": 439.52070781543216,
+      "measured_demoted_pages": 364071,
+      "measured_rounds": 364071,
+      "measured_total_round_latency_ns": 828336398095,
+      "rounds_per_second": 439.52070781543216,
+      "schema_version": "capd_proactive_stage9_throughput_v2_0"
+    },
+    "2": {
+      "amortized_latency_ns_per_page": {
+        "count": 182394,
+        "maximum": 29661261.0,
+        "mean": 1145418.9495679683,
+        "minimum": 985157.5,
+        "p50": 1096354.0,
+        "p95": 1322622.7000000002,
+        "p99": 2520587.220000004
+      },
+      "amortized_sample_count": 182394,
+      "b_t_distribution": {
+        "1": 2781,
+        "2": 179613
+      },
+      "b_t_zero_count": 0,
+      "b_t_zero_policy": "counted_separately_excluded_from_division",
+      "demoted_pages_per_second": 881.2098118623597,
+      "measured_demoted_pages": 362007,
+      "measured_rounds": 182394,
+      "measured_total_round_latency_ns": 410806819360,
+      "rounds_per_second": 443.98970855487113,
+      "schema_version": "capd_proactive_stage9_throughput_v2_0"
+    },
+    "4": {
+      "amortized_latency_ns_per_page": {
+        "count": 175446,
+        "maximum": 31711994.5,
+        "mean": 1092547.4207030463,
+        "minimum": 623484.5,
+        "p50": 1090499.0,
+        "p95": 1214577.25,
+        "p99": 1309023.325
+      },
+      "amortized_sample_count": 175446,
+      "b_t_distribution": {
+        "2": 169209,
+        "3": 2547,
+        "4": 3690
+      },
+      "b_t_zero_count": 0,
+      "b_t_zero_policy": "counted_separately_excluded_from_division",
+      "demoted_pages_per_second": 923.9043484800079,
+      "measured_demoted_pages": 360819,
+      "measured_rounds": 175446,
+      "measured_total_round_latency_ns": 390537181250,
+      "rounds_per_second": 449.24275695964866,
+      "schema_version": "capd_proactive_stage9_throughput_v2_0"
+    }
+  },
+  "formal_b_max": 2,
+  "schema_version": "capd_proactive_stage9_throughput_suite_v2_0",
+  "sensitivity_purpose": "analysis_only_not_selection"
+}
