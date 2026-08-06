@@ -1,0 +1,25 @@
+{
+  "expensive_measurement_rerun": false,
+  "git_worktree_change_tolerated_only_after_all_bound_sha_checks": true,
+  "measurement_checkpoint_sha256": "8ec44db66348aef3c65459ea48a3b87fc417d862102c85b4fe6bda958bf915d3",
+  "original_run_state_sha256": "c6ff94c0d105506f690e9caedb58e850b3533107a44b51a2cf982f7eb6b8ea79",
+  "raw_latency_samples_bytes": 194210443,
+  "raw_latency_samples_sha256": "1a8a144cfca9519ca4a8bb9ae46417aadd45b38d056100752c1b82d866465528",
+  "reason": "perf_fifo_ack_was_nul_prefixed",
+  "recorded_git_identity": {
+    "commit": "4ab58ccf18055588db95890d331c141631126733",
+    "dirty_worktree": false
+  },
+  "recovery_driver_sha256": "21941b15659564233d09c9ce364c8bf48b32c34af1eba7d27264f79d59ba2730",
+  "recovery_script_sha256": "334a6be17cf4ebf8fc73fe236f61d20b9dca96821da836fffdca67ee2fafe69e",
+  "recovery_time_git_identity": {
+    "commit": "d806b7323aed65822cd3dea44634c8ac2e29abc5",
+    "dirty_worktree": false
+  },
+  "run_id": "stage9-overhead-v2-r3",
+  "run_identity_sha256": "3241d3df3b1ff701dcc0a571d05f0eacab8412becf1fc960e22df97ef433c2b2",
+  "schema_version": "capd_proactive_stage9_perf_recovery_v1_0",
+  "scope": "reuse_completed_latency_quality_memory_and_rerun_perf_only",
+  "semantic_change": "strip_leading_nul_bytes_from_perf_fifo_ack_only",
+  "status": "authorized"
+}

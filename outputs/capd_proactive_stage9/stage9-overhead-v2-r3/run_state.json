@@ -10,13 +10,13 @@
   ],
   "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
   "failure": {
-    "failed_at": "2026-08-06T08:21:05.677645Z",
+    "failed_at": "2026-08-06T09:07:41.280819Z",
     "perf_failure_evidence": {
-      "perf-stat.raw": "# started on Thu Aug  6 16:20:05 2026\n\n2204497261;;cycles;763622605;100.00;;\n1076090644;;instructions;763622605;100.00;;\n763.62;msec;task-clock;763622605;100.00;;\n2;;context-switches;763622605;100.00;;\n0;;cpu-migrations;763622605;100.00;;\n4;;page-faults;763622605;100.00;;\n",
-      "perf-stderr.log": "Events disabled\nEvents enabled\nEvents disabled\nTraceback (most recent call last):\n  File \"scripts/run_capd_proactive_stage9.py\", line 1882, in <module>\n    main()\n  File \"scripts/run_capd_proactive_stage9.py\", line 1878, in main\n    commands[args.command](args)\n  File \"scripts/run_capd_proactive_stage9.py\", line 1410, in perf_workload\n    control.command(\"disable\")\n  File \"scripts/run_capd_proactive_stage9.py\", line 1344, in command\n    \"perf control did not acknowledge {}: {!r}\".format(value, response))\nqmap.proactive_stage9.Stage9ContractError: perf control did not acknowledge disable: '\\x00ack'\n"
+      "perf-stat.raw": "# started on Thu Aug  6 17:07:12 2026\n\n<not counted>;;cycles;0;100.00;;\n<not counted>;;instructions;0;100.00;;\n<not counted>;msec;task-clock;0;100.00;;\n<not counted>;;context-switches;0;100.00;;\n<not counted>;;cpu-migrations;0;100.00;;\n<not counted>;;page-faults;0;100.00;;\n",
+      "perf-stderr.log": "Events disabled\nTraceback (most recent call last):\n  File \"/home/likc/Q-former-for-OS/outputs/capd_proactive_stage9/stage9-overhead-v2-r3/perf_recovery_driver.py\", line 94, in <module>\n    main()\n  File \"/home/likc/Q-former-for-OS/outputs/capd_proactive_stage9/stage9-overhead-v2-r3/perf_recovery_driver.py\", line 90, in main\n    runner.main(sys.argv[1:])\n  File \"/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage9.py\", line 1878, in main\n    commands[args.command](args)\n  File \"/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage9.py\", line 1352, in perf_workload\n    run_root, config, stage0, _, entry, _, _ = _loaded_run(args)\n  File \"/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage9.py\", line 484, in _loaded_run\n    \"Differences: {}\".format(\"; \".join(differences)))\nqmap.proactive_stage9.Stage9ContractError: Stage-9 identity changed after preflight; use a new run ID. Differences: git.commit: '4ab58ccf18055588db95890d331c141631126733' -> 'd806b7323aed65822cd3dea44634c8ac2e29abc5'; run_identity_sha256: 'cc662852fa7ee43209d721b5acaae062fb02d790f82e5245ec0511c443987454' -> 'fcfbaa555135f5b0b9920e497a660b549f7af532371049395cfb64bb4bef1af8'\n"
     },
     "permission_guidance": "Check /proc/sys/kernel/perf_event_paranoid and hardware-counter availability; obtain authorized access and rerun with a NEW run ID. Do not estimate cycles from wall time and CPU frequency.",
-    "reason": "server_validation_exit_1",
+    "reason": "perf_recovery_exit_1",
     "requires_new_run_id": true,
     "step": "perf_hardware_counters"
   },
