@@ -75,8 +75,20 @@ for relative, expected in identity["code_artifacts"].items():
   if actual != expected:
     raise stage9.Stage9ContractError(
         "Frozen r3 code changed before recovery: {}".format(relative))
-if runner._git_state(project_root) != identity["git"]:
-  raise stage9.Stage9ContractError("Frozen r3 Git identity changed before recovery.")
+bound_files = {
+    "config_sha256": config_path,
+    "result_schema_sha256": os.path.join(project_root, config["result_schema"]),
+    "stage0_sha256": os.path.join(
+        project_root, "configs", "finals", "capd_proactive_stage0.json"),
+    "cost_config_sha256": os.path.join(
+        project_root, "configs", "finals",
+        "capd_proactive_stage2_cost_profiles.json"),
+}
+for identity_key, path in bound_files.items():
+  if stage9.fingerprint_file(path) != identity[identity_key]:
+    raise stage9.Stage9ContractError(
+        "Frozen r3 input changed before recovery: {}".format(identity_key))
+actual_git = runner._git_state(project_root)
 
 state_path = os.path.join(run_root, "run_state.json")
 state = stage9.load_json(state_path)
@@ -110,6 +122,9 @@ receipt = {
     "scope": "reuse_completed_latency_quality_memory_and_rerun_perf_only",
     "original_run_state_sha256": stage9.fingerprint_file(original_state),
     "run_identity_sha256": stage9.fingerprint_file(identity_path),
+    "recorded_git_identity": identity["git"],
+    "recovery_time_git_identity": actual_git,
+    "git_worktree_change_tolerated_only_after_all_bound_sha_checks": True,
     "measurement_checkpoint_sha256": stage9.fingerprint_file(checkpoint_path),
     "raw_latency_samples_sha256": stage9.fingerprint_file(raw_path),
     "raw_latency_samples_bytes": os.path.getsize(raw_path),
