@@ -1,0 +1,49 @@
+{
+  "captured_at": "2026-08-06T02:37:04.460913Z",
+  "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
+  "cpu": {
+    "governor_by_requested_cpu": {
+      "0": {
+        "path": "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+        "status": "read",
+        "value": "schedutil"
+      }
+    },
+    "logical_cpu_count": 20,
+    "model": "Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz",
+    "physical_core_count": 10,
+    "physical_core_count_status": "read",
+    "turbo_or_boost_control": {
+      "enabled": true,
+      "path": "/sys/devices/system/cpu/intel_pstate/no_turbo",
+      "semantic": "one_means_disabled_zero_means_enabled",
+      "status": "read",
+      "value": "0"
+    }
+  },
+  "device": "cpu",
+  "governor_read_failure_is_explicit": true,
+  "linux_kernel": "7.0.0-28-generic",
+  "platform": "Linux-7.0.0-28-generic-x86_64-with-debian-trixie-sid",
+  "python_implementation": "CPython",
+  "python_version": "3.7.16",
+  "pytorch_version": "1.13.1+cu117",
+  "runtime_binding": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "actual_affinity": [
+      0
+    ],
+    "cpu_threads": 1,
+    "formal_repetitions": 3,
+    "requested_affinity": [
+      0
+    ],
+    "torch_inter_op_threads": 1,
+    "torch_intra_op_threads": 1,
+    "warmup_rounds": 20
+  },
+  "schema_version": "capd_proactive_stage9_environment_v2_0",
+  "system": "Linux",
+  "turbo_read_failure_is_explicit": true
+}
