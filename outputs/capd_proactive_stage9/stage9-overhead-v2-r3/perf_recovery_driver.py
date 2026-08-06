@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib.util
+import copy
 import os
 import sys
 
@@ -69,6 +70,42 @@ def verify_measurement_checkpoint(runner, path, raw_path, config, jobs):
   return value
 
 
+def verify_recovery_identity(runner, expected, actual):
+  """Allow only Git metadata drift after all recorded artifact SHA checks."""
+  expected_bound = copy.deepcopy(expected)
+  actual_bound = copy.deepcopy(actual)
+  for value in (expected_bound, actual_bound):
+    value.pop("git", None)
+    value.pop("run_identity_sha256", None)
+  differences = runner._identity_differences(expected_bound, actual_bound)
+  if differences:
+    raise runner.stage9.Stage9ContractError(
+        "Stage-9 bound identity changed during perf recovery: {}".format(
+            "; ".join(differences)))
+
+
+def load_recovery_run(runner, args):
+  """Load failed r3 while retaining every identity check except Git metadata."""
+  config, stage0, cost = runner._load(args)
+  run_root = runner._run_root(args, config)
+  state_path = os.path.join(run_root, "run_state.json")
+  if not os.path.isfile(state_path):
+    raise runner.stage9.Stage9ContractError(
+        "Recovery run has no Stage-9 run state.")
+  state = runner.stage9.load_json(state_path)
+  if state.get("status") != runner.stage9.RUNNING:
+    raise runner.stage9.Stage9ContractError(
+        "Perf recovery requires the audited running state.")
+  binding, torch = runner._configure_cpu_runtime(config)
+  stage8_entry = runner._audit_stage8_entry(config, args.project_root)
+  actual = runner._identity(args, config, stage8_entry, binding)
+  expected = runner.stage9.load_json(
+      os.path.join(run_root, "run_identity.json"))
+  actual["run_identity_sha256"] = runner.stage9.fingerprint_value(actual)
+  verify_recovery_identity(runner, expected, actual)
+  return run_root, config, stage0, cost, stage8_entry, expected, torch
+
+
 def main():
   spec = importlib.util.spec_from_file_location(
       "stage9_frozen_runner_perf_recovery", RUNNER_PATH)
@@ -87,6 +124,7 @@ def main():
   runner._PerfControl.command = command
   runner._verify_measurement_checkpoint = lambda path, raw_path, config, jobs: (
       verify_measurement_checkpoint(runner, path, raw_path, config, jobs))
+  runner._loaded_run = lambda args: load_recovery_run(runner, args)
   runner.main(sys.argv[1:])
 
 
