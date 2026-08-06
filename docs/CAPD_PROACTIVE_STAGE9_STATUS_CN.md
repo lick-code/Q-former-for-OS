@@ -2,7 +2,7 @@
 
 ## 当前结论
 
-状态：`stage9_implemented_awaiting_server_measurement`（旧 v1/r1 失败证据已保留，等待全新 v2 run）
+状态：`stage9_implemented_awaiting_server_measurement`（旧 v1/r1 与 v2-r2 失败证据均保留，等待全新 v2-r3 run）
 
 Stage8 r5 双轨入口已在开发时重新计算外层 SHA 并检查机器证据，权威文件显示：
 
@@ -16,7 +16,7 @@ Stage9 已迁移为 `CAPD-PROACTIVE-STAGE9-2.0`。开发未重新运行、覆盖
 
 旧 `stage9-overhead-r1` 的直接失败证据是 `kernel.perf_event_paranoid=4`，`perf-stderr.log` 报告 “No supported events found”；旧矩阵也没有正式延迟样本。该目录是 v1 历史失败证据，不能续跑、覆盖、导入或改写。
 
-v2 脚本在创建 run 目录前实际探测 CPU affinity、perf FIFO 能力和 cycles/instructions/task-clock 权限。preflight 从 Stage8 r5 root/job manifests 取得 30 个 CAPD `plan_job`，Stage9 自有兼容性收据记录 80/48/32、30 个 CAPD job 及 Stage4 SHA 链。每个 b_max 强制 27 active/3 zero-round，零 round 只能是 standard fluidanimate 的三个 seed；零 round 只保留质量，不进入延迟、吞吐或 cycles 除法。
+v2 脚本在创建 run 目录前实际探测 CPU affinity、perf FIFO 能力和 cycles/instructions/task-clock 权限。preflight 从 Stage8 r5 root/job manifests 取得 30 个 CAPD `plan_job`，Stage9 自有兼容性收据记录 80/48/32、30 个 CAPD job 及 Stage4 SHA 链。每个 b_max 强制 27 active/3 zero-round，零 round 只能是 standard fluidanimate 的三个 seed；零 round 只保留质量，不进入延迟、吞吐或 cycles 除法。每个 job 的 warmup 由 Stage8 b_max=2 round/主动驱逐证据推导，短轨迹不会被固定 20 轮 warmup 吃空。
 
 ## 已具备能力
 
@@ -28,7 +28,7 @@ v2 脚本在创建 run 目录前实际探测 CPU affinity、perf FIFO 能力和 
 - 运行前真实 perf 权限探针；perf FIFO 控制的真实 hardware cycles、instructions、task-clock 原始/解析产物及 cycles/round/page。
 - 参数/embedding/Transformer/history/candidate/metadata/RSS 分层内存口径。
 - 6 个唯一 workload 冻结 D 的 4KB 向上取整和有效 DRAM 页扣减表；重复轨道不重复计费。
-- 原子写入、失败现场、新 run ID 隔离和独立 verification。
+- 原子写入、逐 `(track,workload,seed,b_max)` checkpoint、失败现场、新 run ID 隔离和独立 verification。
 
 ## 尚未完成
 
@@ -44,7 +44,7 @@ v2 脚本在创建 run 目录前实际探测 CPU affinity、perf FIFO 能力和 
 
 ## 本地验证边界（2026-08-04）
 
-- `python -m unittest tests.test_capd_proactive_stage8 tests.test_capd_proactive_stage9`：76 tests，全部通过。
+- `python -m unittest tests.test_capd_proactive_stage8 tests.test_capd_proactive_stage9`：80 tests，全部通过。
 - Stage9 定向测试可在 Windows 导入 runner；正式测量入口仍会拒绝非 Linux。
 - Python AST、两个 JSON 配置、`git diff --check` 通过；Stage3/4/7/8 正式证据和旧 `stage9-overhead-r1` 无 diff。
 - 全仓库 discover 在 10 分钟内未完成；fail-fast 首个错误是既有 bridge 测试无法写 `tmp/capd_bridge_plan_tests/execution_plan.json.tmp.*`（Windows `PermissionError`），不是 Stage9 断言失败。

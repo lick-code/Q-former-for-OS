@@ -4,7 +4,7 @@
   "stage_status": "stage9_implemented_awaiting_server_measurement",
   "output_root": "outputs/capd_proactive_stage9",
   "result_schema": "configs/finals/capd_proactive_stage9_result_schema.json",
-  "result_schema_sha256": "20293f71287b3d711632b272b4c1871307c48420bf03a2b4c8768e5e6353d28e",
+  "result_schema_sha256": "a07c1f4b192f76eff45d33fcbe6e37b325aec1a8648c5542538ead1b6ecda893",
   "stage8_authority": {
     "verification": {
       "path": "outputs/capd_proactive_stage8/stage8-dual-track-20260804-r5-post-evidence-commit/verification.json",
@@ -140,7 +140,7 @@
     "control": "perf_stat_fifo_enable_disable",
     "repetitions_per_snapshot": 200,
     "expected_snapshot_count": 27,
-    "snapshot_rule": "first_decision_after_20_warmup_rounds_per_track_workload_seed",
+    "snapshot_rule": "first_decision_after_effective_per_job_warmup_derived_from_stage8_bmax2",
     "wall_time_frequency_estimate_allowed": false
   },
   "memory": {
@@ -174,7 +174,9 @@
     "atomic_writes": true,
     "completed_identity_schema_sha_only": true,
     "failed_running_or_corrupt_requires_new_run_id": true,
-    "automatic_retry": false
+    "automatic_retry": false,
+    "partial_measurement_preserved": true,
+    "measurement_checkpoint_granularity": "track_workload_seed_bmax"
   },
   "acceptance": {
     "minimum_stage1_through_stage9_regression_tests": 450,

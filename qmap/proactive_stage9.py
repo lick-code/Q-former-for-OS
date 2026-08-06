@@ -27,7 +27,7 @@ from qmap import proactive_stage5_policies
 SCHEMA_VERSION = "capd_proactive_stage9_v2_0"
 CONTRACT_ID = "CAPD-PROACTIVE-STAGE9-2.0"
 RESULT_SCHEMA_SHA256 = (
-    "20293f71287b3d711632b272b4c1871307c48420bf03a2b4c8768e5e6353d28e")
+    "a07c1f4b192f76eff45d33fcbe6e37b325aec1a8648c5542538ead1b6ecda893")
 IMPLEMENTED = "stage9_implemented_awaiting_server_measurement"
 RUNNING = "stage9_running"
 VERIFIED = "stage9_overhead_verified"
@@ -226,8 +226,18 @@ def validate_config(value: Mapping[str, Any]) -> Mapping[str, Any]:
            perf.get("control") == "perf_stat_fifo_enable_disable" and
            perf.get("repetitions_per_snapshot") == 200 and
            perf.get("expected_snapshot_count") == 27 and
+           perf.get("snapshot_rule") ==
+           "first_decision_after_effective_per_job_warmup_derived_from_stage8_bmax2" and
            perf.get("wall_time_frequency_estimate_allowed") is False,
            "Stage-9 perf hardware-counter contract changed.")
+  _require(value.get("resume_contract") == {
+      "atomic_writes": True,
+      "completed_identity_schema_sha_only": True,
+      "failed_running_or_corrupt_requires_new_run_id": True,
+      "automatic_retry": False,
+      "partial_measurement_preserved": True,
+      "measurement_checkpoint_granularity": "track_workload_seed_bmax"},
+      "Stage-9 measurement checkpoint/immutability contract changed.")
   required_stage8 = {
       "verification", "run_identity", "resolved_config", "job_manifest",
       "run_state", "config"}

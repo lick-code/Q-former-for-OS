@@ -36,7 +36,22 @@ F_t=0：&\text{先执行 LRU 紧急降级，再继续恢复到 }F_{\mathrm{targe
 \end{cases}
 \end{equation}
 
-水位参数由 DRAM 容量和工作负载控制参数动态计算。实现首先根据 $\alpha$ 计算目标预留页框数，再通过 $\beta$ 得到低水位，并约束 $1\leq F_{\mathrm{low}}<F_{\mathrm{target}}<D$ 以及目标预留比例上限。当前正式配置采用 $\alpha=0.15$、$\beta=0.4$，使不同容量和工作负载的水位参数按照同一规则派生。
+水位参数由 DRAM 容量 $D$ 和工作负载控制参数 $\alpha$、$\beta$ 动态计算。代码使用十进制定点的 half-up 舍入，而不是直接使用向上取整。对于非负数 $x$，记
+\(\operatorname{rhu}(x)=\lfloor x+1/2\rfloor\) 为 half-up 舍入函数，则水位计算过程为：
+
+\begin{equation}
+\begin{aligned}
+F_{\mathrm{target}}&=\max\left(2,\min\left(16,\operatorname{rhu}(\alpha D)\right)\right),\\
+F_{\mathrm{low}}^{(0)}&=\max\left(1,\operatorname{rhu}(\beta F_{\mathrm{target}})\right),\\
+F_{\mathrm{low}}&=
+\begin{cases}
+F_{\mathrm{target}}-1,&F_{\mathrm{low}}^{(0)}\geq F_{\mathrm{target}},\\
+F_{\mathrm{low}}^{(0)},&F_{\mathrm{low}}^{(0)}<F_{\mathrm{target}}.
+\end{cases}
+\end{aligned}
+\end{equation}
+
+其中，第一行先将 $\alpha D$ 舍入为整数，再将目标水位限制在 $[2,16]$；第二行根据目标水位计算低水位，并保证其至少为 $1$；第三行处理低水位不小于目标水位的边界情况，将其修正为 $F_{\mathrm{target}}-1$。最终参数必须满足 $1\leq F_{\mathrm{low}}<F_{\mathrm{target}}<D$，且 $F_{\mathrm{target}}/D\leq 0.25$。代码允许的参数集合为 $\alpha\in\{0.05,0.10,0.15,0.20\}$、$\beta\in\{0.4,0.5,0.6\}$，当前配置采用 $\alpha=0.15$、$\beta=0.4$。
 
 为限制单轮迁移规模，系统根据当前恢复缺口和候选页数量计算批量上限：
 

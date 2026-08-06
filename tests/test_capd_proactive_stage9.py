@@ -80,6 +80,16 @@ class Stage9ContractTest(unittest.TestCase):
     self.assertIn("tracks", schema["capacity_required_fields"])
     self.assertNotIn("capacity_ratio", schema["capacity_required_fields"])
     self.assertEqual(2, schema["verification_required"]["formal_b_max"])
+    warmup_fields = {
+        "frozen_warmup_rounds", "effective_warmup_rounds",
+        "warmup_basis_stage8_rounds",
+        "warmup_basis_stage8_proactive_demotions"}
+    self.assertTrue(warmup_fields <= set(schema["raw_latency_required_fields"]))
+    self.assertTrue(warmup_fields <= set(
+        schema["quality_row_required_identity_fields"]))
+    self.assertIn("measurement_checkpoint.json", schema["required_run_artifacts"])
+    self.assertTrue({"status", "completed_cells", "raw_sha256"} <= set(
+        schema["measurement_checkpoint_required_fields"]))
 
   def test_result_schema_sha_is_pinned_and_tamper_is_rejected(self):
     config = _config()
@@ -319,6 +329,29 @@ class Stage9ContractTest(unittest.TestCase):
       second = stage9.prepare_new_run(directory, "run-b")
       self.assertNotEqual(first, second)
 
+  def test_completed_measurement_checkpoint_binds_all_cells_and_raw_sha(self):
+    runner = Stage9LatencyAndCycleTest._runner_module()
+    config = _config()
+    jobs = _capd_jobs()
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+      raw = os.path.join(directory, "raw_latency_samples.csv")
+      checkpoint = os.path.join(directory, "measurement_checkpoint.json")
+      with open(raw, "w", encoding="utf-8") as handle:
+        handle.write("fixture\n")
+      cells = [{
+          "track": job["track"], "workload": job["workload"],
+          "seed": job["seed"], "b_max": b_max,
+          "effective_warmup_rounds": 0}
+          for job in jobs for b_max in stage9.SENSITIVITY_BMAX]
+      runner._write_measurement_checkpoint(
+          checkpoint, "completed", cells, [{}] * 90, [{}] * 30,
+          {seed: {} for seed in config["capd_seeds"]}, {}, raw_partial_path=raw)
+      runner._verify_measurement_checkpoint(checkpoint, raw, config, jobs)
+      with open(raw, "a", encoding="utf-8") as handle:
+        handle.write("tampered\n")
+      with self.assertRaises(stage9.Stage9ContractError):
+        runner._verify_measurement_checkpoint(checkpoint, raw, config, jobs)
+
   def test_git_identity_ignores_stage9_outputs_but_detects_source_changes(self):
     runner = Stage9LatencyAndCycleTest._runner_module()
     with tempfile.TemporaryDirectory() as directory:
@@ -454,23 +487,53 @@ class Stage9LatencyAndCycleTest(unittest.TestCase):
     }
     identities = [(job["track"], job["workload"], job["seed"])
                   for job in _capd_jobs()]
+    basis_by_identity = {
+        (job["track"], job["workload"], job["seed"]): {
+            "stage8_rounds": 2 if job["workload"] == "streamcluster_pressure"
+            else 30,
+            "stage8_proactive_demotions": 3 if
+            job["workload"] == "streamcluster_pressure" else 60}
+        for job in _capd_jobs()}
     for b_max in (1, 2, 4):
-      quality.extend({
-          "b_max": b_max, "track": track, "workload": workload,
-          "seed": seed,
-          "number_of_proactive_rounds": (
-              0 if (track, workload, seed) in zero_keys else 30)}
-          for track, workload, seed in identities)
+      rows = []
+      for track, workload, seed in identities:
+        identity = (track, workload, seed)
+        natural_rounds = (0 if identity in zero_keys else
+                          (3 - (seed % 3) if workload ==
+                           "streamcluster_pressure" else 30))
+        basis = basis_by_identity[identity]
+        warmup = runner._warmup_policy(_config(), basis, b_max)
+        if natural_rounds == 0:
+          warmup["effective_warmup_rounds"] = 0
+        else:
+          warmup["effective_warmup_rounds"] = min(
+              warmup["effective_warmup_rounds"], natural_rounds - 1)
+        rows.append(dict(
+            b_max=b_max, track=track, workload=workload, seed=seed,
+            number_of_proactive_rounds=natural_rounds, **warmup))
+      quality.extend(rows)
       value = runner._LatencyAccumulator()
-      value.warmup = 27 * 20
-      value.measured = 27 * (30 - 20) * 3
+      active = [row for row in rows if row["number_of_proactive_rounds"] > 0]
+      value.warmup = sum(row["effective_warmup_rounds"] for row in active)
+      value.measured = sum(
+          (row["number_of_proactive_rounds"] -
+           row["effective_warmup_rounds"]) * 3 for row in active)
       value.pages = value.measured
       for track, workload, seed in identities:
-        if (track, workload, seed) not in zero_keys:
+        row = next(item for item in rows if
+                   (item["track"], item["workload"], item["seed"]) ==
+                   (track, workload, seed))
+        if row["number_of_proactive_rounds"] > 0:
+          effective = row["effective_warmup_rounds"]
           value.sample_counts_by_cell[(
-              track, workload, seed, "warmup")] = 20
+              track, workload, seed, "warmup")] = effective
           value.sample_counts_by_cell[(
-              track, workload, seed, "measured")] = 30
+              track, workload, seed, "measured")] = (
+                  row["number_of_proactive_rounds"] - effective) * 3
+          value.warmup_by_cell[(track, workload, seed)] = (
+              row["frozen_warmup_rounds"], effective,
+              row["warmup_basis_stage8_rounds"],
+              row["warmup_basis_stage8_proactive_demotions"])
       accumulators[str(b_max)] = value
     runner._audit_measurement_completeness(
         accumulators, quality, _config())
@@ -478,6 +541,22 @@ class Stage9LatencyAndCycleTest(unittest.TestCase):
     with self.assertRaises(stage9.Stage9ContractError):
       runner._audit_measurement_completeness(
           accumulators, quality, _config())
+
+  def test_warmup_policy_preserves_a_measured_round_for_short_stage8_jobs(self):
+    runner = self._runner_module()
+    config = _config()
+    basis = {"stage8_rounds": 2, "stage8_proactive_demotions": 3}
+    self.assertEqual(2, runner._warmup_policy(config, basis, 1)[
+        "effective_warmup_rounds"])
+    self.assertEqual(1, runner._warmup_policy(config, basis, 2)[
+        "effective_warmup_rounds"])
+    self.assertEqual(1, runner._warmup_policy(config, basis, 4)[
+        "effective_warmup_rounds"])
+    for b_max in (1, 2, 4):
+      policy = runner._warmup_policy(config, basis, b_max)
+      natural_rounds = 2
+      effective = min(policy["effective_warmup_rounds"], natural_rounds - 1)
+      self.assertLess(effective, natural_rounds)
 
   def test_perf_scope_requires_exact_active_and_zero_cells(self):
     runner = self._runner_module()

@@ -52,7 +52,9 @@ RAW_FIELDS = (
     "sample_kind", "repetition_index", "track", "workload", "seed",
     "D", "F_low", "F_target", "b_max", "trace_sha256",
     "checkpoint_sha256", "cycle_id", "cycle_round_index", "round_id",
-    "access_index", "F_before", "candidate_count", "b_t") + tuple(
+    "access_index", "F_before", "candidate_count", "b_t",
+    "frozen_warmup_rounds", "effective_warmup_rounds",
+    "warmup_basis_stage8_rounds", "warmup_basis_stage8_proactive_demotions") + tuple(
         stage9.LATENCY_FIELDS)
 
 
@@ -173,6 +175,7 @@ def _audit_stage8_entry(config, project_root, verify_payloads=True):
     raise stage9.Stage9ContractError(
         "Stage-8 v2 must expose 30 track/workload/seed CAPD jobs.")
   job_manifests = {}
+  capd_warmup_basis = {}
   stage8_run_root = os.path.dirname(paths["job_manifest"])
   for job in capd_jobs:
     job_path = os.path.join(
@@ -192,6 +195,24 @@ def _audit_stage8_entry(config, project_root, verify_payloads=True):
         checkpoint.get("sha256")):
       raise stage9.Stage9ContractError(
           "Stage-8 CAPD job manifest binding changed: " + job["job_id"])
+    result_path = os.path.join(
+        stage8_run_root, "jobs", job["job_id"], "result.json")
+    stage9.verify_file_binding(
+        result_path, item.get("result_sha256", ""),
+        "Stage-8 CAPD result " + job["job_id"])
+    result = stage9.load_json(result_path)
+    stage8_contract.audit_job_result(result, job)
+    rounds = len(result.get("rounds", ()))
+    proactive_demotions = int(result.get("metrics", {}).get(
+        "proactive_demotions", 0))
+    if rounds < 0 or proactive_demotions < 0:
+      raise stage9.Stage9ContractError(
+          "Stage-8 CAPD result has invalid round provenance: " + job["job_id"])
+    capd_warmup_basis[job["job_id"]] = {
+        "stage8_b_max": int(job["b_max"]),
+        "stage8_rounds": rounds,
+        "stage8_proactive_demotions": proactive_demotions,
+        "result_sha256": item["result_sha256"]}
     job_manifests[job["job_id"]] = item
   receipt = {
       "schema_version": "capd_proactive_stage9_stage8_compatibility_v2_0",
@@ -220,6 +241,7 @@ def _audit_stage8_entry(config, project_root, verify_payloads=True):
           "config": stage8_config, "resolved_config": resolved_config,
           "manifest": manifest, "capd_jobs": capd_jobs,
           "capd_job_manifests": job_manifests,
+          "capd_warmup_basis": capd_warmup_basis,
           "compatibility_receipt": receipt}
 
 
@@ -547,6 +569,32 @@ def _job_context(job, b_max):
       "checkpoint_sha256": job["checkpoint"]["sha256"]}
 
 
+def _warmup_policy(config, basis, b_max):
+  """Choose a per-job warmup that cannot consume the whole short replay.
+
+  Stage-8 b_max=2 results provide frozen evidence of the job's proactive
+  demotion volume.  Scaling that volume by the requested sensitivity gives a
+  conservative lower-bound estimate for the number of decision rounds.  The
+  final replay audit still checks the observed round count and can retry a
+  short cell with one less warmup round.
+  """
+  frozen = int(config["measurement"]["warmup_rounds"])
+  stage8_rounds = int(basis["stage8_rounds"])
+  stage8_demotions = int(basis["stage8_proactive_demotions"])
+  estimated_rounds = max(
+      stage8_rounds,
+      (stage8_demotions + int(b_max) - 1) // int(b_max))
+  return {
+      "frozen_warmup_rounds": frozen,
+      "effective_warmup_rounds": min(frozen, max(0, estimated_rounds - 1)),
+      "warmup_basis_stage8_rounds": stage8_rounds,
+      "warmup_basis_stage8_proactive_demotions": stage8_demotions}
+
+
+def _measurement_context(job, b_max, warmup):
+  return dict(_job_context(job, b_max), **dict(warmup))
+
+
 def _expected_job_map(jobs):
   expected = {(job["track"], job["workload"], int(job["seed"])): job
               for job in jobs}
@@ -587,7 +635,8 @@ def _capacity_workload_rows(jobs):
           for _, row in sorted(by_workload.items())]
 
 
-def _build_profiled_replay(stage0, job, checkpoint, b_max, config):
+def _build_profiled_replay(stage0, job, checkpoint, b_max, config,
+                           warmup=None):
   policy_stage0 = proactive_stage5_replay._stage0_for_policy(
       stage0, "capd", checkpoint=checkpoint)
   parameters = _replay_parameters(job, b_max)
@@ -599,10 +648,16 @@ def _build_profiled_replay(stage0, job, checkpoint, b_max, config):
       weights=(1.0, 1.0, 2.0))
   replay = stage9.InstrumentedProactiveReplay(
       policy_stage0, parameters, ranker,
-      warmup_rounds=config["measurement"]["warmup_rounds"],
+      warmup_rounds=(config["measurement"]["warmup_rounds"] if
+                     warmup is None else warmup["effective_warmup_rounds"]),
       formal_repetitions=config["measurement"]["formal_repetitions"],
       invariant_mode="boundary", exclude_current_entering_page=True,
-      sample_context=_job_context(job, b_max))
+      sample_context=_measurement_context(
+          job, b_max, warmup or {
+              "frozen_warmup_rounds": config["measurement"]["warmup_rounds"],
+              "effective_warmup_rounds": config["measurement"]["warmup_rounds"],
+              "warmup_basis_stage8_rounds": -1,
+              "warmup_basis_stage8_proactive_demotions": -1}))
   return replay, ranker
 
 
@@ -615,10 +670,21 @@ class _LatencyAccumulator(object):
     self.b_t = {}
     self.amortized = array.array("d")
     self.sample_counts_by_cell = {}
+    self.warmup_by_cell = {}
 
   def add(self, sample):
     cell = (sample["track"], sample["workload"], int(sample["seed"]),
             sample["sample_kind"])
+    identity = cell[:3]
+    warmup = (int(sample["frozen_warmup_rounds"]),
+              int(sample["effective_warmup_rounds"]),
+              int(sample["warmup_basis_stage8_rounds"]),
+              int(sample["warmup_basis_stage8_proactive_demotions"]))
+    previous = self.warmup_by_cell.setdefault(identity, warmup)
+    if previous != warmup:
+      raise stage9.Stage9ContractError(
+          "Stage-9 raw samples disagree on per-job warmup policy: {}".format(
+              identity))
     self.sample_counts_by_cell[cell] = (
         self.sample_counts_by_cell.get(cell, 0) + 1)
     if sample["sample_kind"] == "warmup":
@@ -662,12 +728,12 @@ class _LatencyAccumulator(object):
         "b_t_zero_policy": "counted_separately_excluded_from_division"}
 
 
-def _quality_row(trace, raw, job, b_max, cost_config):
+def _quality_row(trace, raw, job, b_max, cost_config, warmup):
   summary = raw["summary"]
   weighted = proactive_cost.compute_weighted_cost(
       summary, cost_config.profiles["default"])
   early = proactive_stage8_replay.early_reuse_metrics(trace, raw["events"])
-  return dict(_job_context(job, b_max), **{
+  return dict(_measurement_context(job, b_max, warmup), **{
       "weighted_cost": weighted.weighted_cost,
       "weighted_cost_per_access": weighted.weighted_cost / float(len(trace)),
       "early_reuse_rate_64": early["windows"]["64"]["rate"],
@@ -729,7 +795,7 @@ def _audit_measurement_completeness(
   if expected_jobs is not None:
     _audit_record_identities(
         quality_rows, expected_jobs, stage9.SENSITIVITY_BMAX)
-  warmup_rounds = config["measurement"]["warmup_rounds"]
+  frozen_warmup_rounds = int(config["measurement"]["warmup_rounds"])
   repetitions = config["measurement"]["formal_repetitions"]
   expected_active = matrix["expected_active_round_jobs_per_b_max"]
   expected_zero = matrix["expected_zero_round_jobs_per_b_max"]
@@ -761,25 +827,51 @@ def _audit_measurement_completeness(
         active_cells != all_cells - expected_zero_cells):
       raise stage9.Stage9ContractError(
           "b_max={} active/zero workload identities changed.".format(b_max))
-    insufficient = [row for row in active
-                    if row["number_of_proactive_rounds"] <= warmup_rounds]
-    if insufficient:
+    for row in rows:
+      if (int(row.get("frozen_warmup_rounds", -1)) !=
+          frozen_warmup_rounds or
+          int(row.get("effective_warmup_rounds", -1)) < 0 or
+          int(row.get("warmup_basis_stage8_rounds", -1)) < 0 or
+          int(row.get("warmup_basis_stage8_proactive_demotions", -1)) < 0):
+        raise stage9.Stage9ContractError(
+            "Missing or invalid per-job warmup provenance for {}|{} seed {}.".format(
+                row["track"], row["workload"], row["seed"]))
+    if any(int(row["effective_warmup_rounds"]) != 0 for row in zero):
       raise stage9.Stage9ContractError(
-          "Active cells do not exceed frozen warmup rounds: {}".format(
-              [row["workload"] for row in insufficient]))
-    expected_warmup = len(active) * warmup_rounds
+          "Zero-round jobs must use zero effective warmup rounds.")
+    for row in active:
+      effective = int(row.get("effective_warmup_rounds", -1))
+      if (int(row.get("frozen_warmup_rounds", -1)) != frozen_warmup_rounds or
+          effective < 0 or effective > frozen_warmup_rounds or
+          effective >= int(row["number_of_proactive_rounds"])):
+        raise stage9.Stage9ContractError(
+            "Invalid per-job warmup policy for {}|{} seed {}.".format(
+                row["track"], row["workload"], row["seed"]))
+    expected_warmup = sum(
+        int(row["effective_warmup_rounds"]) for row in active)
     expected_measured = sum(
-        (row["number_of_proactive_rounds"] - warmup_rounds) * repetitions
+        (row["number_of_proactive_rounds"] -
+         int(row["effective_warmup_rounds"])) * repetitions
         for row in active)
     observed = accumulators[str(b_max)]
     for row in active:
       cell = (row["track"], row["workload"], int(row["seed"]))
       if (observed.sample_counts_by_cell.get(cell + ("warmup",), 0) !=
-          warmup_rounds or
+          int(row["effective_warmup_rounds"]) or
           observed.sample_counts_by_cell.get(cell + ("measured",), 0) !=
-          (row["number_of_proactive_rounds"] - warmup_rounds) * repetitions):
+          (row["number_of_proactive_rounds"] -
+           int(row["effective_warmup_rounds"])) * repetitions):
         raise stage9.Stage9ContractError(
             "b_max={} raw sample count changed for workload/seed {}.".format(
+                b_max, cell))
+      expected_policy = (
+          int(row["frozen_warmup_rounds"]),
+          int(row["effective_warmup_rounds"]),
+          int(row["warmup_basis_stage8_rounds"]),
+          int(row["warmup_basis_stage8_proactive_demotions"]))
+      if observed.warmup_by_cell.get(cell) != expected_policy:
+        raise stage9.Stage9ContractError(
+            "b_max={} raw warmup policy changed for workload/seed {}.".format(
                 b_max, cell))
     unexpected_cells = {
         cell[:3] for cell in observed.sample_counts_by_cell
@@ -876,12 +968,78 @@ def _merge_model_memory_observation(model_memory_by_seed, seed, observation):
       runtime.setdefault(name, value)
 
 
+def _write_measurement_checkpoint(path, status, completed_cells,
+                                  quality_rows, instrumentation_audit,
+                                  model_memory_by_seed, max_runtime,
+                                  raw_partial_path=None, failure=None):
+  value = {
+      "schema_version": "capd_proactive_stage9_measurement_checkpoint_v2_0",
+      "status": status,
+      "completed_cells": list(completed_cells),
+      "quality_row_count": len(quality_rows),
+      "instrumentation_audit_count": len(instrumentation_audit),
+      "model_memory_seeds": sorted(model_memory_by_seed),
+      "runtime_tensor_maxima": dict(max_runtime),
+      "raw_partial_path": (None if raw_partial_path is None else
+                            os.path.basename(raw_partial_path)),
+      "raw_partial_bytes": (None if raw_partial_path is None or
+                             not os.path.isfile(raw_partial_path) else
+                            os.path.getsize(raw_partial_path)),
+      "raw_sha256": (stage9.fingerprint_file(raw_partial_path)
+                      if status == "completed" and raw_partial_path is not None
+                      and os.path.isfile(raw_partial_path) else None),
+      "failure": None if failure is None else dict(failure),
+      "updated_at": _utc_now()}
+  stage9.write_json_atomic(path, value)
+
+
+def _verify_measurement_checkpoint(path, raw_path, config, jobs):
+  value = stage9.load_json(path)
+  expected_cells = {
+      (job["track"], job["workload"], int(job["seed"]), int(b_max))
+      for job in jobs for b_max in stage9.SENSITIVITY_BMAX}
+  rows = value.get("completed_cells", [])
+  try:
+    observed_cells = {
+        (row["track"], row["workload"], int(row["seed"]), int(row["b_max"]))
+        for row in rows}
+    effective = [int(row["effective_warmup_rounds"]) for row in rows]
+  except (KeyError, TypeError, ValueError):
+    raise stage9.Stage9ContractError(
+        "Measurement checkpoint has malformed completed cells.")
+  expected_seeds = sorted(int(seed) for seed in config["capd_seeds"])
+  raw_bytes = os.path.getsize(raw_path)
+  raw_sha256 = stage9.fingerprint_file(raw_path)
+  if (value.get("schema_version") !=
+      "capd_proactive_stage9_measurement_checkpoint_v2_0" or
+      value.get("status") != "completed" or value.get("failure") is not None or
+      len(rows) != len(expected_cells) or observed_cells != expected_cells or
+      any(item < 0 or item > config["measurement"]["warmup_rounds"]
+          for item in effective) or
+      value.get("quality_row_count") !=
+      config["measurement_matrix"]["quality_job_count"] or
+      value.get("instrumentation_audit_count") !=
+      config["measurement_matrix"]["formal_instrumentation_job_count"] or
+      value.get("model_memory_seeds") != expected_seeds or
+      value.get("raw_partial_path") != os.path.basename(raw_path) or
+      value.get("raw_partial_bytes") != raw_bytes or
+      value.get("raw_sha256") != raw_sha256):
+    raise stage9.Stage9ContractError(
+        "Completed measurement checkpoint does not bind the full raw suite.")
+  return value
+
+
 def measure(args):
   run_root, config, stage0, cost, entry, identity, _ = _loaded_run(args)
   raw_path = os.path.join(run_root, "raw_latency_samples.csv")
-  if os.path.exists(raw_path):
+  partial_path = os.path.join(run_root, "raw_latency_samples.partial.csv")
+  checkpoint_path = os.path.join(run_root, "measurement_checkpoint.json")
+  existing = [path for path in (raw_path, partial_path, checkpoint_path)
+              if os.path.exists(path)]
+  if existing:
     raise stage9.Stage9ContractError(
-        "Measurement artifact already exists; use a new run ID.")
+        "Measurement artifacts already exist ({}); use a new run ID.".format(
+            ", ".join(os.path.basename(path) for path in existing)))
   baseline_rss = _current_rss_bytes()
   if baseline_rss <= 0:
     raise stage9.Stage9ContractError(
@@ -894,6 +1052,7 @@ def measure(args):
   max_runtime = {}
   max_history_python = 0
   max_candidate_python = 0
+  completed_cells = []
   authority = entry["authority"]
   jobs = _measurement_jobs(config, entry)
   jobs_by_cell = {}
@@ -915,18 +1074,31 @@ def measure(args):
         for job in cell_jobs:
           checkpoint = _checkpoint(entry, job)
           for b_max in stage9.SENSITIVITY_BMAX:
-            replay, ranker = _build_profiled_replay(
-                stage0, job, checkpoint, b_max, config)
-            replay.register_backing_pages(item["page"] for item in trace)
-            for access in trace:
-              replay.process_access(access)
-              replay.access_logs[:] = []
-            raw = replay.result()
-            replay.validate_log_accounting()
+            basis = entry["capd_warmup_basis"][job["job_id"]]
+            warmup = _warmup_policy(config, basis, b_max)
+            for attempt in range(2):
+              replay, ranker = _build_profiled_replay(
+                  stage0, job, checkpoint, b_max, config, warmup=warmup)
+              replay.register_backing_pages(item["page"] for item in trace)
+              for access in trace:
+                replay.process_access(access)
+                replay.access_logs[:] = []
+              raw = replay.result()
+              replay.validate_log_accounting()
+              natural_rounds = int(raw["summary"]["number_of_proactive_rounds"])
+              if (attempt == 0 and natural_rounds > 0 and
+                  natural_rounds <= warmup["effective_warmup_rounds"]):
+                del raw, replay, ranker
+                gc.collect()
+                warmup = dict(
+                    warmup, effective_warmup_rounds=natural_rounds - 1)
+                continue
+              break
             for sample in replay.stage9_latency_samples:
               writer.writerow({key: sample.get(key) for key in RAW_FIELDS})
               accumulators[str(b_max)].add(sample)
-            quality_rows.append(_quality_row(trace, raw, job, b_max, cost))
+            quality_rows.append(
+                _quality_row(trace, raw, job, b_max, cost, warmup))
             if b_max == config["sensitivity"]["formal_b_max"]:
               cpu_reference = proactive_stage8_replay.run_formal_test_replay(
                   stage0, cost, trace, job, lock_row,
@@ -949,6 +1121,18 @@ def measure(args):
                 max_candidate_python, stage9.deep_sizeof(candidate_snapshot))
             del raw, replay, ranker
             gc.collect()
+            completed_cells.append({
+                "track": track, "workload": workload,
+                "seed": int(job["seed"]), "b_max": int(b_max),
+                "effective_warmup_rounds": int(
+                    warmup["effective_warmup_rounds"])})
+            handle.flush()
+            os.fsync(handle.fileno())
+            _write_measurement_checkpoint(
+                checkpoint_path,
+                "running", completed_cells, quality_rows,
+                instrumentation_audit, model_memory_by_seed, max_runtime,
+                raw_partial_path=temporary)
           print("[OK] Stage-9 latency/quality {}|{} seed {}".format(
               track, workload, job["seed"]), flush=True)
         del trace
@@ -958,7 +1142,23 @@ def measure(args):
     _audit_measurement_completeness(
         accumulators, quality_rows, config, expected_jobs=jobs)
     os.replace(temporary, raw_path)
-  except Exception:
+    _write_measurement_checkpoint(
+        checkpoint_path,
+        "completed", completed_cells, quality_rows,
+        instrumentation_audit, model_memory_by_seed, max_runtime,
+        raw_partial_path=raw_path)
+  except Exception as error:
+    try:
+      if os.path.isfile(temporary):
+        os.replace(temporary, partial_path)
+      _write_measurement_checkpoint(
+          checkpoint_path,
+          "interrupted", completed_cells, quality_rows,
+          instrumentation_audit, model_memory_by_seed, max_runtime,
+          raw_partial_path=partial_path,
+          failure={"type": type(error).__name__, "message": str(error)})
+    except Exception:
+      pass
     try:
       os.unlink(temporary)
     except OSError:
@@ -1167,9 +1367,12 @@ def perf_workload(args):
       trace = _job_trace(args.project_root, cell_jobs[0])
       for job in cell_jobs:
         checkpoint = _checkpoint(entry, job)
+        warmup = _warmup_policy(
+            config, entry["capd_warmup_basis"][job["job_id"]],
+            config["sensitivity"]["formal_b_max"])
         replay, ranker = _build_profiled_replay(
             stage0, job, checkpoint,
-            config["sensitivity"]["formal_b_max"], config)
+            config["sensitivity"]["formal_b_max"], config, warmup=warmup)
         replay.__class__ = _SnapshotReplay
         replay.register_backing_pages(item["page"] for item in trace)
         snapshot = None
@@ -1182,14 +1385,14 @@ def perf_workload(args):
           logical_rounds = replay._stage9_logical_rounds
           if logical_rounds == 0:
             zero_round_jobs.append(job["job_id"])
-            zero_round_cells.append(_job_context(
-                job, config["sensitivity"]["formal_b_max"]))
+            zero_round_cells.append(_measurement_context(
+                job, config["sensitivity"]["formal_b_max"], warmup))
             del replay, ranker
             gc.collect()
             continue
           raise stage9.Stage9ContractError(
-              "Perf cell has {} rounds, insufficient for {} warmup rounds: {}".format(
-                  logical_rounds, config["measurement"]["warmup_rounds"],
+              "Perf cell has {} rounds, insufficient for {} effective warmup rounds: {}".format(
+                  logical_rounds, warmup["effective_warmup_rounds"],
                   job["job_id"]))
         expected = snapshot.decision[:4]
         control.command("enable")
@@ -1207,8 +1410,8 @@ def perf_workload(args):
           control.command("disable")
         snapshot_count += 1
         measured_job_ids.append(job["job_id"])
-        measured_cells.append(_job_context(
-            job, config["sensitivity"]["formal_b_max"]))
+        measured_cells.append(_measurement_context(
+            job, config["sensitivity"]["formal_b_max"], warmup))
         del replay, ranker
         gc.collect()
       del trace
@@ -1477,6 +1680,10 @@ def verify(args):
   if missing:
     raise stage9.Stage9ContractError(
         "Stage-9 required artifacts missing: {}".format(missing))
+  jobs = _measurement_jobs(config, entry)
+  _verify_measurement_checkpoint(
+      os.path.join(run_root, "measurement_checkpoint.json"),
+      os.path.join(run_root, "raw_latency_samples.csv"), config, jobs)
   environment = stage9.load_json(os.path.join(run_root, "environment.json"))
   stage9.validate_runtime_binding(environment["runtime_binding"])
   if environment.get("system") != "Linux" or environment.get("device") != "cpu":
@@ -1486,7 +1693,6 @@ def verify(args):
       run_root, args.project_root, receipt,
       config["acceptance"]["minimum_stage1_through_stage9_regression_tests"])
   perf = stage9.load_json(os.path.join(run_root, "perf", "perf_parsed.json"))
-  jobs = _measurement_jobs(config, entry)
   perf_scope = stage9.load_json(os.path.join(
       run_root, "perf", "perf_scope_counts.json"))
   with open(os.path.join(run_root, "perf", "perf-stat.raw"), "r",

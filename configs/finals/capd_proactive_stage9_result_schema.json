@@ -13,6 +13,7 @@
     "stage8_compatibility_receipt.json",
     "preflight.json",
     "environment.json",
+    "measurement_checkpoint.json",
     "raw_latency_samples.csv",
     "latency_summary.json",
     "throughput_summary.json",
@@ -48,6 +49,10 @@
     "F_before",
     "candidate_count",
     "b_t",
+    "frozen_warmup_rounds",
+    "effective_warmup_rounds",
+    "warmup_basis_stage8_rounds",
+    "warmup_basis_stage8_proactive_demotions",
     "watermark_check_ns",
     "candidate_construction_ns",
     "feature_construction_ns",
@@ -56,6 +61,20 @@
     "top_b_selection_ns",
     "total_round_latency_ns",
     "unattributed_framework_overhead_ns"
+  ],
+  "measurement_checkpoint_required_fields": [
+    "schema_version",
+    "status",
+    "completed_cells",
+    "quality_row_count",
+    "instrumentation_audit_count",
+    "model_memory_seeds",
+    "runtime_tensor_maxima",
+    "raw_partial_path",
+    "raw_partial_bytes",
+    "raw_sha256",
+    "failure",
+    "updated_at"
   ],
   "latency_statistics": ["mean", "p50", "p95", "p99"],
   "latency_units": "nanoseconds",
@@ -124,7 +143,11 @@
     "F_target",
     "b_max",
     "trace_sha256",
-    "checkpoint_sha256"
+    "checkpoint_sha256",
+    "frozen_warmup_rounds",
+    "effective_warmup_rounds",
+    "warmup_basis_stage8_rounds",
+    "warmup_basis_stage8_proactive_demotions"
   ],
   "capacity_required_fields": [
     "workload",
