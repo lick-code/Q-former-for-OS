@@ -1,13 +1,55 @@
 Events disabled
-Traceback (most recent call last):
-  File "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage9/stage9-overhead-v2-r3/perf_recovery_driver.py", line 94, in <module>
-    main()
-  File "/home/likc/Q-former-for-OS/outputs/capd_proactive_stage9/stage9-overhead-v2-r3/perf_recovery_driver.py", line 90, in main
-    runner.main(sys.argv[1:])
-  File "/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage9.py", line 1878, in main
-    commands[args.command](args)
-  File "/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage9.py", line 1352, in perf_workload
-    run_root, config, stage0, _, entry, _, _ = _loaded_run(args)
-  File "/home/likc/Q-former-for-OS/scripts/run_capd_proactive_stage9.py", line 484, in _loaded_run
-    "Differences: {}".format("; ".join(differences)))
-qmap.proactive_stage9.Stage9ContractError: Stage-9 identity changed after preflight; use a new run ID. Differences: git.commit: '4ab58ccf18055588db95890d331c141631126733' -> 'd806b7323aed65822cd3dea44634c8ac2e29abc5'; run_identity_sha256: 'cc662852fa7ee43209d721b5acaae062fb02d790f82e5245ec0511c443987454' -> 'fcfbaa555135f5b0b9920e497a660b549f7af532371049395cfb64bb4bef1af8'
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled
+Events enabled
+Events disabled

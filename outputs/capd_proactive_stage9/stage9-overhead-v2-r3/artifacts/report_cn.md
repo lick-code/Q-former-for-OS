@@ -35,3 +35,14 @@ b_t=0 单独计数并从单页摊销除法中排除。b_max=1/2/4 仅为预声�
 ## 边界
 
 capacity_overhead.csv 已按 ceil(management_memory_bytes/4096) 给出 6 个唯一 workload 冻结 D 的有效 DRAM 页数；tracks 列仅说明适用轨道，不重复计费。公平容量 Replay 复算本阶段标记为 deferred，且不会覆盖 Stage8 正式结果。perf cycles 见 perf/perf_parsed.json；本报告不声称内核集成、真实迁移耗时、前台端到端延迟或异步结果。
+
+## Linux perf 硬件计数
+
+计数窗口由 perf FIFO enable/disable 控制，排除模型加载和预热；原始输出未改写地保存在 `perf/perf-stat.raw`。
+
+- cycles：32547223233
+- instructions：26896194900
+- task-clock：11305.64
+- cycles/round：6027263.5616666665
+- cycles/demoted page：3190904.2385294116
+
