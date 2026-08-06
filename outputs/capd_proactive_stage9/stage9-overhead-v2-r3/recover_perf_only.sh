@@ -64,6 +64,10 @@ runner_path = os.path.join(project_root, "scripts", "run_capd_proactive_stage9.p
 spec = importlib.util.spec_from_file_location("stage9_recovery_audit", runner_path)
 runner = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runner)
+driver_spec = importlib.util.spec_from_file_location(
+    "stage9_recovery_driver", os.environ["DRIVER"])
+driver = importlib.util.module_from_spec(driver_spec)
+driver_spec.loader.exec_module(driver)
 
 config_path = os.path.join(project_root, "configs", "finals", "capd_proactive_stage9.json")
 config = stage9.load_json(config_path)
@@ -110,7 +114,8 @@ entry = runner._audit_stage8_entry(config, project_root)
 jobs = runner._measurement_jobs(config, entry)
 raw_path = os.path.join(run_root, "raw_latency_samples.csv")
 checkpoint_path = os.path.join(run_root, "measurement_checkpoint.json")
-runner._verify_measurement_checkpoint(checkpoint_path, raw_path, config, jobs)
+driver.verify_measurement_checkpoint(
+    runner, checkpoint_path, raw_path, config, jobs)
 
 if not os.path.exists(original_state):
   shutil.copy2(state_path, original_state)
@@ -171,9 +176,9 @@ perf stat \
     --perf-ack-fifo "${ACK_FIFO}" \
   2> "${PERF_DIR}/perf-stderr.log"
 
-taskset -c "${CPU_AFFINITY}" "${PYTHON_BIN}" scripts/run_capd_proactive_stage9.py \
+taskset -c "${CPU_AFFINITY}" "${PYTHON_BIN}" "${DRIVER}" \
   --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" parse-perf
-taskset -c "${CPU_AFFINITY}" "${PYTHON_BIN}" scripts/run_capd_proactive_stage9.py \
+taskset -c "${CPU_AFFINITY}" "${PYTHON_BIN}" "${DRIVER}" \
   --project-root "${PROJECT_ROOT}" --run-id "${RUN_ID}" verify
 
 trap - ERR
