@@ -7,6 +7,7 @@ import copy
 import importlib.util
 import json
 import os
+import subprocess
 import tempfile
 import unittest
 
@@ -317,6 +318,42 @@ class Stage9ContractTest(unittest.TestCase):
         stage9.prepare_new_run(directory, "run-a")
       second = stage9.prepare_new_run(directory, "run-b")
       self.assertNotEqual(first, second)
+
+  def test_git_identity_ignores_stage9_outputs_but_detects_source_changes(self):
+    runner = Stage9LatencyAndCycleTest._runner_module()
+    with tempfile.TemporaryDirectory() as directory:
+      subprocess.check_call(
+          ["git", "init", "-q"], cwd=directory)
+      source = os.path.join(directory, "source.py")
+      with open(source, "w", encoding="utf-8") as handle:
+        handle.write("VALUE = 1\n")
+      subprocess.check_call(["git", "add", "source.py"], cwd=directory)
+      subprocess.check_call(
+          ["git", "-c", "user.name=Stage9 Test", "-c",
+           "user.email=stage9-test@example.invalid", "commit", "-q", "-m",
+           "baseline"], cwd=directory)
+
+      clean = runner._git_state(directory)
+      self.assertFalse(clean["dirty_worktree"])
+      run_root = os.path.join(
+          directory, "outputs", "capd_proactive_stage9", "run-r1")
+      os.makedirs(run_root)
+      with open(os.path.join(run_root, "run_state.json"), "w",
+                encoding="utf-8") as handle:
+        json.dump({"status": "running"}, handle)
+      self.assertEqual(clean, runner._git_state(directory))
+
+      with open(source, "w", encoding="utf-8") as handle:
+        handle.write("VALUE = 2\n")
+      self.assertTrue(runner._git_state(directory)["dirty_worktree"])
+
+  def test_identity_difference_reports_the_exact_json_path(self):
+    runner = Stage9LatencyAndCycleTest._runner_module()
+    differences = runner._identity_differences(
+        {"git": {"commit": "abc", "dirty_worktree": False}},
+        {"git": {"commit": "abc", "dirty_worktree": True}})
+    self.assertEqual(
+        ["git.dirty_worktree: False -> True"], differences)
 
   def test_server_checks_perf_permission_before_starting_expensive_run(self):
     path = os.path.join(

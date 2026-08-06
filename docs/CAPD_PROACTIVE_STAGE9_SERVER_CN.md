@@ -10,7 +10,7 @@ grep Cpus_allowed_list /proc/self/status
 
 若不包含 0，在任何正式 run 之前把 `configs/finals/capd_proactive_stage9.json` 的 `measurement.cpu_affinity` 改成一个允许的单独逻辑 CPU。脚本会从 JSON 读取该值并用于所有 `taskset`，不再需要同步修改多处命令。此修改必须发生在看任何 Stage9 结果之前；preflight 会冻结并记录新 config SHA。不要复用曾失败或运行中的 run ID。
 
-`stage9-overhead-r1` 已永久失败，且其旧 v1 矩阵没有产生正式延迟样本；必须原样保留该目录，禁止续跑、覆盖或导入。v2 合同必须使用全新 run ID，例如 `stage9-overhead-v2-r1`。
+`stage9-overhead-r1` 已永久失败，且其旧 v1 矩阵没有产生正式延迟样本；必须原样保留该目录，禁止续跑、覆盖或导入。此前的 `stage9-overhead-v2-r1` 也已失败并保持不变；本次修复后的 v2 合同必须使用全新 run ID，例如 `stage9-overhead-v2-r2`。
 
 ## 2. 一键正式运行
 
@@ -18,7 +18,7 @@ grep Cpus_allowed_list /proc/self/status
 set -Eeuo pipefail
 cd /path/to/Q-former-for-OS
 chmod +x scripts/validate_capd_proactive_stage9_server.sh
-RUN_ID="stage9-overhead-v2-r1"
+RUN_ID="stage9-overhead-v2-r2"
 PYTHON_BIN=python3 bash scripts/validate_capd_proactive_stage9_server.sh "${RUN_ID}"
 ```
 
@@ -37,7 +37,7 @@ cd /path/to/Q-former-for-OS
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export PYTHONHASHSEED=0
-RUN_ID="stage9-overhead-v2-r1"
+RUN_ID="stage9-overhead-v2-r2"
 RUN_ROOT="outputs/capd_proactive_stage9/${RUN_ID}"
 CPU_AFFINITY="$(python3 -c 'import json; print(json.load(open("configs/finals/capd_proactive_stage9.json"))["measurement"]["cpu_affinity"][0])')"
 
@@ -140,4 +140,4 @@ perf stat -e cycles,instructions,task-clock -- \
 - `capacity_overhead.csv`：6 个唯一 workload 的冻结 D 容量行，重复轨道仅记录在 `tracks`。
 - `memory_breakdown.json`、`capacity_overhead.csv`、`artifacts/report_cn.md`。
 
-若脚本在任一步失败，trap 会写 `stage9_not_verified` 和失败步骤。不要删除、覆盖或续跑该目录；将 `stage9-overhead-v2-r1` 递增为 `stage9-overhead-v2-r2` 等从未使用的新 ID。只有完整新 run 可以进入验证。
+若脚本在任一步失败，trap 会写 `stage9_not_verified` 和失败步骤。不要删除、覆盖或续跑失败目录；递增为从未使用的新 ID。只有完整新 run 可以进入验证。

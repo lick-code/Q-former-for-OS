@@ -228,15 +228,47 @@ def _code_fingerprints(project_root):
           for path in CODE_FILES}
 
 
-def _git_state(project_root):
+def _git_state(project_root, runtime_output_root=None):
   try:
     commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=project_root).decode().strip()
+    status_command = [
+        "git", "status", "--porcelain", "--untracked-files=all"]
+    if runtime_output_root is None:
+      runtime_output_root = os.path.join(
+          project_root, "outputs", "capd_proactive_stage9")
+    project_path = os.path.realpath(project_root)
+    output_path = os.path.realpath(runtime_output_root)
+    relative_output = os.path.relpath(output_path, project_path)
+    outside_project = (relative_output == os.pardir or
+                       relative_output.startswith(os.pardir + os.sep))
+    if relative_output not in (".", "") and not outside_project:
+      relative_output = relative_output.replace(os.sep, "/").rstrip("/")
+      status_command.extend([
+          "--", ".", ":(exclude){}/**".format(relative_output)])
     status = subprocess.check_output(
-        ["git", "status", "--porcelain"], cwd=project_root).decode().strip()
+        status_command, cwd=project_root).decode().strip()
     return {"commit": commit, "dirty_worktree": bool(status)}
   except (OSError, subprocess.CalledProcessError):
     return {"commit": "unknown", "dirty_worktree": None}
+
+
+def _identity_differences(expected, actual, path=""):
+  if isinstance(expected, dict) and isinstance(actual, dict):
+    differences = []
+    for key in sorted(set(expected) | set(actual)):
+      child = "{}.{}".format(path, key) if path else str(key)
+      if key not in expected:
+        differences.append("{}: missing -> {!r}".format(child, actual[key]))
+      elif key not in actual:
+        differences.append("{}: {!r} -> missing".format(child, expected[key]))
+      else:
+        differences.extend(
+            _identity_differences(expected[key], actual[key], child))
+    return differences
+  if expected != actual:
+    return ["{}: {!r} -> {!r}".format(path, expected, actual)]
+  return []
 
 
 def _read_text(path):
@@ -342,6 +374,9 @@ def _environment(config, binding, torch):
 
 
 def _identity(args, config, stage8_entry, binding):
+  output_root = config["output_root"]
+  if not os.path.isabs(output_root):
+    output_root = os.path.join(args.project_root, output_root)
   return {
       "schema_version": "capd_proactive_stage9_run_identity_v2_0",
       "contract_id": stage9.CONTRACT_ID, "run_id": args.run_id,
@@ -365,7 +400,7 @@ def _identity(args, config, stage8_entry, binding):
       "device": "cpu", "runtime_binding": binding,
       "formal_b_max": 2, "sensitivity_b_max": [1, 2, 4],
       "test_used_for_parameter_selection": False,
-      "git": _git_state(args.project_root),
+      "git": _git_state(args.project_root, output_root),
       "code_artifacts": _code_fingerprints(args.project_root)}
 
 
@@ -421,8 +456,10 @@ def _loaded_run(args):
   expected = stage9.load_json(os.path.join(run_root, "run_identity.json"))
   actual["run_identity_sha256"] = stage9.fingerprint_value(actual)
   if actual != expected:
+    differences = _identity_differences(expected, actual)
     raise stage9.Stage9ContractError(
-        "Stage-9 identity changed after preflight; use a new run ID.")
+        "Stage-9 identity changed after preflight; use a new run ID. "
+        "Differences: {}".format("; ".join(differences)))
   return run_root, config, stage0, cost, stage8_entry, expected, torch
 
 
