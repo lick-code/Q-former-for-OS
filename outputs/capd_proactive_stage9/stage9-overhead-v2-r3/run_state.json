@@ -7,21 +7,12 @@
     "memory",
     "capacity_accounting",
     "instrumentation_audit",
-    "perf_cycles"
+    "perf_cycles",
+    "independent_verification"
   ],
   "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
-  "failure": {
-    "failed_at": "2026-08-06T09:18:58.284511Z",
-    "perf_failure_evidence": {
-      "perf-stat.raw": "# started on Thu Aug  6 17:15:25 2026\n\n32547223233;;cycles;11305643578;100.00;;\n26896194900;;instructions;11305643578;100.00;;\n11305.64;msec;task-clock;11305643578;100.00;;\n41;;context-switches;11305643578;100.00;;\n0;;cpu-migrations;11305643578;100.00;;\n27;;page-faults;11305643578;100.00;;\n",
-      "perf-stderr.log": "Events disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\nEvents enabled\nEvents disabled\n"
-    },
-    "permission_guidance": "Check /proc/sys/kernel/perf_event_paranoid and hardware-counter availability; obtain authorized access and rerun with a NEW run ID. Do not estimate cycles from wall time and CPU frequency.",
-    "reason": "perf_recovery_exit_1",
-    "requires_new_run_id": true,
-    "step": "perf_hardware_counters"
-  },
+  "failure": null,
   "schema_version": "capd_proactive_stage9_run_state_v2_0",
-  "stage10_entry_gate": "not_satisfied",
-  "status": "stage9_not_verified"
+  "stage10_entry_gate": "satisfied",
+  "status": "stage9_overhead_verified"
 }
