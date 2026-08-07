@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required": [
+    "schema_version",
+    "source_set_id",
+    "approved_design",
+    "approved_plan",
+    "config",
+    "source_manifest",
+    "schemas",
+    "commands",
+    "controlled_execution",
+    "environment_contract",
+    "stage9_binding",
+    "authorization_state"
+  ],
+  "schema_version": "capd_proactive_stage10_generation_freeze_receipt_v1_0",
+  "type": "object"
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "capd_proactive_stage10_result_v2_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required_top_level": [
+    "scenario_id",
+    "contract_id",
+    "evidence_mode",
+    "observed",
+    "derived",
+    "interpretation"
+  ],
+  "evidence_mode": [
+    "deterministic_async_simulation"
+  ],
+  "required_observed": [
+    "emergency_fallback_count",
+    "fallback_rate",
+    "foreground_blocking_time_total",
+    "foreground_blocking_time_mean",
+    "foreground_blocking_time_p95",
+    "blocking_sample_count",
+    "minimum_free_frames",
+    "free_frame_exhaustion_duration",
+    "background_queue_length_mean",
+    "background_queue_length_max",
+    "background_queue_length_p95",
+    "background_utilization",
+    "page_enter_dram_count",
+    "demotion_finish_count",
+    "effective_demotion_rate",
+    "unfinished_blocked_request_count"
+  ],
+  "required_derived": [
+    "comparison_channel",
+    "timing_profile_id",
+    "arrival_profile_id",
+    "arrival_binding",
+    "T_inference_ns",
+    "T_migration_ns",
+    "b_max",
+    "b_t_reference",
+    "actual_b_t_values"
+  ],
+  "comparison_channels": [
+    "fixed_arrival",
+    "capacity_normalized"
+  ],
+  "required_arrival_binding": [
+    "arrival_rate_basis",
+    "arrival_reference_profile",
+    "arrival_stream_sha256",
+    "absolute_arrival_rate",
+    "normalized_load_ratio",
+    "cross_profile_comparison_allowed",
+    "cross_profile_comparison_scope"
+  ],
+  "arrival_rate_basis": [
+    "reference_profile_fixed",
+    "per_profile_mu_demote"
+  ],
+  "arrival_rate_unit": "pages_per_ns",
+  "required_interpretation": [
+    "deterministic_async_simulation_verified",
+    "real_nvm_measurement_verified",
+    "kernel_behavior_verified",
+    "real_concurrency_verified",
+    "real_foreground_end_to_end_latency_verified",
+    "real_system_async_performance_verified",
+    "timing_sensitivity_interpretation_allowed",
+    "capacity_normalized_timing_causal_interpretation_allowed"
+  ],
+  "null_semantics": {
+    "foreground_blocking_time_mean": "null_when_blocking_sample_count_is_zero",
+    "foreground_blocking_time_p95": "null_when_blocking_sample_count_is_zero",
+    "report_rendering": "N/A"
+  }
+}

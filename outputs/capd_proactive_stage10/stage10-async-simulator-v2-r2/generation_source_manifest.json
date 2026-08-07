@@ -1,0 +1,116 @@
+{
+  "entries": [
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_event_engine",
+      "path": "qmap/proactive_stage10.py",
+      "role": "runtime",
+      "sha256": "e54403280177942bb63143c43b4ebce5ff93c113ee003057fbdc6d6e4f08a441"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_semantics",
+      "path": "qmap/proactive_stage10_v2.py",
+      "role": "runtime",
+      "sha256": "270ae04db6ee92008e47c286ef969c1811e1a082f724de54d83a16d1422b5b84"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_r2_contract",
+      "path": "qmap/proactive_stage10_v2_r2.py",
+      "role": "runtime",
+      "sha256": "5899ccffa2859afb7953cb0d45ee6ef348b472b7e3d91df54f85a8b0f3cb1af9"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_dispatcher",
+      "path": "scripts/run_capd_proactive_stage10.py",
+      "role": "runner",
+      "sha256": "eda2bf6cbdc675fd6f2082c0906eff3e8c216784f3b0fcec70b0e4f920eb6cb3"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_r1_runner",
+      "path": "scripts/run_capd_proactive_stage10_v2.py",
+      "role": "runner",
+      "sha256": "b9dcd5b258ddcdf7711c263a7f908bd6980708572de3fb1d0b2b9e3042bc1b79"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_r2_runner",
+      "path": "scripts/run_capd_proactive_stage10_v2_r2.py",
+      "role": "runner",
+      "sha256": "a3a42e9c29497504687a3e601906b8637452b7004b6ba377daaec1d596b406f8"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_r2_test_support",
+      "path": "tests/stage10_v2_r2_test_support.py",
+      "role": "support",
+      "sha256": "c961878e6f84757a1a3b27835364e6967f9037ab9ba66fe18f1352668d6c0039"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_test_support",
+      "path": "tests/stage10_v2_test_support.py",
+      "role": "support",
+      "sha256": "eecd0df263bf2e4c8af181b97774fd5ad41476f08fd0b71329495ec50831ae00"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10a_generation_tests",
+      "path": "tests/test_capd_proactive_stage10.py",
+      "role": "test",
+      "sha256": "c036baf7137f0d3105243be29da260ac23b24dee0d10a4feabc7114ad456edd2"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_generation_tests",
+      "path": "tests/test_capd_proactive_stage10_v2.py",
+      "role": "test",
+      "sha256": "02f12f01b3dd8d6c87afd40a477fe85e543f1a8155934cfba22f1a67870a82e0"
+    },
+    {
+      "generation_identity": true,
+      "generation_test_groups": [
+        "generation_core"
+      ],
+      "logical_name": "stage10_v2_r2_generation_tests",
+      "path": "tests/test_capd_proactive_stage10_v2_r2.py",
+      "role": "test",
+      "sha256": "0bfeea71f9f84d6e83f1a74430ad0545df2df577f41545127cb91884aa347ef7"
+    }
+  ],
+  "schema_version": "capd_proactive_stage10_generation_source_manifest_v1_0",
+  "source_set_id": "stage10-v2-r2-generation-core-v1"
+}

@@ -1,0 +1,126 @@
+{
+  "argv": [
+    "D:\\python3.13\\python.exe",
+    "-m",
+    "tests.test_capd_proactive_stage10_v2_release",
+    "--stage11-negative-audit-worker",
+    "--stage10a-run-root",
+    "outputs/capd_proactive_stage10/stage10-async-simulator-r1",
+    "--stage10-r2-run-root",
+    "outputs/capd_proactive_stage10/stage10-async-simulator-v2-r2",
+    "--approved-freeze-receipt-sha256",
+    "3f4ce4ff71006777e18ded8d6b2e453c679b4a3d3ba2723d5892d7e310ac61f2"
+  ],
+  "environment": {
+    "architecture": "64bit",
+    "dependency_policy": "stdlib_only",
+    "machine": "AMD64",
+    "os_name": "nt",
+    "platform_release": "11",
+    "platform_system": "Windows",
+    "platform_version": "10.0.26200",
+    "python_cache_tag": "cpython-313",
+    "python_executable": "D:\\python3.13\\python.exe",
+    "python_implementation": "CPython",
+    "python_version": "3.13.6",
+    "required_dependency_versions": {}
+  },
+  "exit_code": 0,
+  "log_sha256": "9bd5c4f8760831b787cb086636e143a2c74af408c9faa72458772c94de1611ad",
+  "post_dependency_snapshot": {
+    "file_count": 8,
+    "files": [
+      {
+        "length": 50793,
+        "path": "qmap/proactive_stage10.py",
+        "sha256": "e54403280177942bb63143c43b4ebce5ff93c113ee003057fbdc6d6e4f08a441"
+      },
+      {
+        "length": 48697,
+        "path": "qmap/proactive_stage10_v2.py",
+        "sha256": "270ae04db6ee92008e47c286ef969c1811e1a082f724de54d83a16d1422b5b84"
+      },
+      {
+        "length": 26320,
+        "path": "qmap/proactive_stage10_v2_r2.py",
+        "sha256": "5899ccffa2859afb7953cb0d45ee6ef348b472b7e3d91df54f85a8b0f3cb1af9"
+      },
+      {
+        "length": 26699,
+        "path": "qmap/proactive_stage11.py",
+        "sha256": "04869e08b59e8f661d9dc3ca8c2eeae769480b94e79f6bf3c7e059ec633572bc"
+      },
+      {
+        "length": 17761,
+        "path": "scripts/run_capd_proactive_stage10.py",
+        "sha256": "eda2bf6cbdc675fd6f2082c0906eff3e8c216784f3b0fcec70b0e4f920eb6cb3"
+      },
+      {
+        "length": 26116,
+        "path": "scripts/run_capd_proactive_stage10_v2.py",
+        "sha256": "b9dcd5b258ddcdf7711c263a7f908bd6980708572de3fb1d0b2b9e3042bc1b79"
+      },
+      {
+        "length": 81957,
+        "path": "scripts/run_capd_proactive_stage10_v2_r2.py",
+        "sha256": "a3a42e9c29497504687a3e601906b8637452b7004b6ba377daaec1d596b406f8"
+      },
+      {
+        "length": 4661,
+        "path": "tests/test_capd_proactive_stage10_v2_release.py",
+        "sha256": "4cb5f3d84609fe36ce2186f3c20c5848cceaf18204904d50e83ddcf9127b53b6"
+      }
+    ],
+    "fingerprint_sha256": "b656682a9b5f829ab01324774e6bb059043ede2abd0d0a6e86b365f2b4a473a2"
+  },
+  "pre_dependency_snapshot": {
+    "file_count": 8,
+    "files": [
+      {
+        "length": 50793,
+        "path": "qmap/proactive_stage10.py",
+        "sha256": "e54403280177942bb63143c43b4ebce5ff93c113ee003057fbdc6d6e4f08a441"
+      },
+      {
+        "length": 48697,
+        "path": "qmap/proactive_stage10_v2.py",
+        "sha256": "270ae04db6ee92008e47c286ef969c1811e1a082f724de54d83a16d1422b5b84"
+      },
+      {
+        "length": 26320,
+        "path": "qmap/proactive_stage10_v2_r2.py",
+        "sha256": "5899ccffa2859afb7953cb0d45ee6ef348b472b7e3d91df54f85a8b0f3cb1af9"
+      },
+      {
+        "length": 26699,
+        "path": "qmap/proactive_stage11.py",
+        "sha256": "04869e08b59e8f661d9dc3ca8c2eeae769480b94e79f6bf3c7e059ec633572bc"
+      },
+      {
+        "length": 17761,
+        "path": "scripts/run_capd_proactive_stage10.py",
+        "sha256": "eda2bf6cbdc675fd6f2082c0906eff3e8c216784f3b0fcec70b0e4f920eb6cb3"
+      },
+      {
+        "length": 26116,
+        "path": "scripts/run_capd_proactive_stage10_v2.py",
+        "sha256": "b9dcd5b258ddcdf7711c263a7f908bd6980708572de3fb1d0b2b9e3042bc1b79"
+      },
+      {
+        "length": 81957,
+        "path": "scripts/run_capd_proactive_stage10_v2_r2.py",
+        "sha256": "a3a42e9c29497504687a3e601906b8637452b7004b6ba377daaec1d596b406f8"
+      },
+      {
+        "length": 4661,
+        "path": "tests/test_capd_proactive_stage10_v2_release.py",
+        "sha256": "4cb5f3d84609fe36ce2186f3c20c5848cceaf18204904d50e83ddcf9127b53b6"
+      }
+    ],
+    "fingerprint_sha256": "b656682a9b5f829ab01324774e6bb059043ede2abd0d0a6e86b365f2b4a473a2"
+  },
+  "result_sha256": "663d313fa497cd3705b6d43a375b9b7d8b5840bf958a814293287ce0190b7704",
+  "schema_version": "capd_proactive_stage10_stage11_negative_audit_evidence_v1_0",
+  "timed_out": false,
+  "timeout_seconds": 600
+}

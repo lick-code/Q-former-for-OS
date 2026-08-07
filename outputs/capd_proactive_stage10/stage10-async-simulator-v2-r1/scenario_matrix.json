@@ -1,0 +1,2397 @@
+{
+  "comparison_channels": [
+    "fixed_arrival",
+    "capacity_normalized"
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "reference_arrival_stream_sha256": {
+    "burst-reference": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+    "uniform-0p5": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+    "uniform-0p8": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+    "uniform-1p0": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+    "uniform-1p2": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6"
+  },
+  "reference_timing_profile": "inference-mean__migration-ratio-0p10",
+  "scenario_count": 60,
+  "scenario_ids": [
+    "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-0p5",
+    "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-0p8",
+    "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-1p0",
+    "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-1p2",
+    "fixed_arrival__inference-mean__migration-ratio-0p10__burst-reference",
+    "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-0p5",
+    "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-0p8",
+    "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-1p0",
+    "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-1p2",
+    "fixed_arrival__inference-p50__migration-ratio-0p10__burst-reference",
+    "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-0p5",
+    "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-0p8",
+    "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-1p0",
+    "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-1p2",
+    "fixed_arrival__inference-p95__migration-ratio-0p10__burst-reference",
+    "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-0p5",
+    "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-0p8",
+    "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-1p0",
+    "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-1p2",
+    "fixed_arrival__inference-p99__migration-ratio-0p10__burst-reference",
+    "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-0p5",
+    "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-0p8",
+    "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-1p0",
+    "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-1p2",
+    "fixed_arrival__inference-mean__migration-ratio-0p01__burst-reference",
+    "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-0p5",
+    "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-0p8",
+    "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-1p0",
+    "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-1p2",
+    "fixed_arrival__inference-mean__migration-ratio-1p00__burst-reference",
+    "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-0p5",
+    "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-0p8",
+    "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-1p0",
+    "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-1p2",
+    "capacity_normalized__inference-mean__migration-ratio-0p10__burst-reference",
+    "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-0p5",
+    "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-0p8",
+    "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-1p0",
+    "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-1p2",
+    "capacity_normalized__inference-p50__migration-ratio-0p10__burst-reference",
+    "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-0p5",
+    "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-0p8",
+    "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-1p0",
+    "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-1p2",
+    "capacity_normalized__inference-p95__migration-ratio-0p10__burst-reference",
+    "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-0p5",
+    "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-0p8",
+    "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-1p0",
+    "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-1p2",
+    "capacity_normalized__inference-p99__migration-ratio-0p10__burst-reference",
+    "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-0p5",
+    "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-0p8",
+    "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-1p0",
+    "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-1p2",
+    "capacity_normalized__inference-mean__migration-ratio-0p01__burst-reference",
+    "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-0p5",
+    "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-0p8",
+    "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-1p0",
+    "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-1p2",
+    "capacity_normalized__inference-mean__migration-ratio-1p00__burst-reference"
+  ],
+  "scenarios": [
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 4
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1351382,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 6
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1351382,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 3378455,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1,
+                "numerator": 1
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 5,
+                "numerator": 4
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2702764,
+            "numerator": 1321439
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 3378455,
+            "numerator": 2642878
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1351382,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1351382,
+            "numerator": 1321439
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 3378455,
+            "numerator": 3964317
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p50__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1351382,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 3378455,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2702764,
+            "numerator": 1321439
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1351382,
+                "numerator": 1321439
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 3378455,
+                "numerator": 2642878
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p50__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5405528,
+            "numerator": 3075979
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 3378455,
+            "numerator": 3075979
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1351382,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2702764,
+            "numerator": 3075979
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 6756910,
+            "numerator": 9227937
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p95__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1351382,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 3378455,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 5405528,
+            "numerator": 3075979
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 2702764,
+                "numerator": 3075979
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 3378455,
+                "numerator": 3075979
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p95__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1351382,
+            "numerator": 847129
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 3378455,
+            "numerator": 3388516
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1351382,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 675691,
+            "numerator": 847129
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 3378455,
+            "numerator": 5082774
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p99__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1351382,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 3378455,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 1351382,
+            "numerator": 847129
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 675691,
+                "numerator": 847129
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 3378455,
+                "numerator": 3388516
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-p99__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2702764,
+            "numerator": 1148675
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-0p5",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 675691,
+            "numerator": 459470
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-0p8",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1351382,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1351382,
+            "numerator": 1148675
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-1p0",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 675691,
+            "numerator": 689205
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p01__uniform-1p2",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1351382,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 3378455,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2702764,
+            "numerator": 1148675
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1351382,
+                "numerator": 1148675
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 675691,
+                "numerator": 459470
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-0p01__burst-reference",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 675691,
+            "numerator": 844614
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-0p5",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 3378455,
+            "numerator": 6756912
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-0p8",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1351382,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 675691,
+            "numerator": 1689228
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-1p0",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 3378455,
+            "numerator": 10135368
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-1p00__uniform-1p2",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1351382,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 3378455,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "reference_profile_fixed",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+        "cross_profile_comparison_allowed": true,
+        "cross_profile_comparison_scope": "timing_sensitivity_within_simulator",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 675691,
+            "numerator": 844614
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 675691,
+                "numerator": 1689228
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 3378455,
+                "numerator": 6756912
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "fixed_arrival",
+      "scenario_id": "fixed_arrival__inference-mean__migration-ratio-1p00__burst-reference",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "56320a472364afa125add6d244ab740599a7d52d222260e6136b5a26615bdc2d",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "c44787554c7a4c6297a52b9c35ef5fd29c7aab33cbd3b0536ac74adda885254b",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 4
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1351382,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "6ae0b01e6e250b37f60e6cc1e96df6bc55ec17f931378245d84c4f2bb02cddad",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378455,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "f502ed0bde7cca0f994b651404893821e7d11ba2dc7476a0ecf0a3ab43f971f6",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 6
+          },
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2702764,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1351382,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 3378455,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p10",
+        "arrival_stream_sha256": "8c58b00ec9d80017a394641219e0651da5e17cb39b755b3ac2f5a34099b49ca6",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1,
+                "numerator": 1
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 5,
+                "numerator": 4
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-mean__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-mean__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2642878,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p50__migration-ratio-0p10",
+        "arrival_stream_sha256": "50ca9c197882dcf11e32e3779431351062a49deb5714569da3eaa2939cd4727a",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 6607195,
+            "numerator": 4,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p50__migration-ratio-0p10",
+        "arrival_stream_sha256": "7d29fe5f71336b8e9e1368eed3f1b723c0a878654a71151a5df6b66b29e40ea0",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 4
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1321439,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p50__migration-ratio-0p10",
+        "arrival_stream_sha256": "eac4aef81a65d3edb0f00da50dd4d39ee0b01db61acda64b03ea1da012982588",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 6607195,
+            "numerator": 6,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p50__migration-ratio-0p10",
+        "arrival_stream_sha256": "1df618d718fd3c1b4d511ced937f36fab0a594967f0f499f394fcc903bd77397",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 6
+          },
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p50__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2192418,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2642878,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1321439,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 6607195,
+                "numerator": 4,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p50__migration-ratio-0p10",
+        "arrival_stream_sha256": "13e5991ac7633c4406aac7f33da87fad9c6f46be0e8a1465aa9695c85af848e9",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1,
+                "numerator": 1
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 5,
+                "numerator": 4
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-p50__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p50__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-p50__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3075979,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p95__migration-ratio-0p10",
+        "arrival_stream_sha256": "8f1eb0dd2e036dd4e2bce49c8d442e03d0cc6ec7bdd4d3927f5e6e16e25373fd",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 15379895,
+            "numerator": 8,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p95__migration-ratio-0p10",
+        "arrival_stream_sha256": "fbfb400aeeb7d76bcb605e06792e675bcd147f6e59d028c46ebe58c262681314",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 4
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3075979,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p95__migration-ratio-0p10",
+        "arrival_stream_sha256": "2e3db31a79becbdf98787e709caada264d9319e3da6de5099ab70b672364155a",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 15379895,
+            "numerator": 12,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p95__migration-ratio-0p10",
+        "arrival_stream_sha256": "a697ccd3429bf577b427754b49fdbe28918512b9367276400386e5c2e64a053e",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 6
+          },
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p95__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2625519,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 3075979,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 3075979,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 15379895,
+                "numerator": 8,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p95__migration-ratio-0p10",
+        "arrival_stream_sha256": "1808b9cd0800697a3316a72c20a42fd79a95957251903377d48f1ca6a42a3a5c",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1,
+                "numerator": 1
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 5,
+                "numerator": 4
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-p95__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p95__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-p95__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3388516,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p99__migration-ratio-0p10",
+        "arrival_stream_sha256": "61c91f6a7ff4761e9101a3615eeeb11ba63c77d833245edf06780d193e087d8e",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-0p5",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 4235645,
+            "numerator": 2,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p99__migration-ratio-0p10",
+        "arrival_stream_sha256": "c283271d23fef3e4728bc19e5dd17dcf5239278b586187caafe60ce850e72786",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 4
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-0p8",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1694258,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p99__migration-ratio-0p10",
+        "arrival_stream_sha256": "b5aca04802293bea4e9af6baee1c1b15d515914dc3b0ab7e59211cf0b9f149d8",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-1p0",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 4235645,
+            "numerator": 3,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p99__migration-ratio-0p10",
+        "arrival_stream_sha256": "003e92a3010b49e9fc712a183aab3417335c59272d1142f9872f62e175b3abd3",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 6
+          },
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p99__migration-ratio-0p10__uniform-1p2",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2938056,
+      "T_migration_ns": 225230,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 3388516,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1694258,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 4235645,
+                "numerator": 2,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-p99__migration-ratio-0p10",
+        "arrival_stream_sha256": "b77733efe302e0d7efaf164c3d7d74545cfe9899088a4179fb04731e4cb6a414",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1,
+                "numerator": 1
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 5,
+                "numerator": 4
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-p99__migration-ratio-0p10"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-p99__migration-ratio-0p10__burst-reference",
+      "timing_profile_id": "inference-p99__migration-ratio-0p10"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2297350,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p01",
+        "arrival_stream_sha256": "b8498398bebeb1028dde846c2698a0fa4c095db10b03abb2b2ee71186304c762",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-0p5",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 5743375,
+            "numerator": 4,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p01",
+        "arrival_stream_sha256": "8da8bef758505461250f7bd90edf65c456d3561a19cb81d88d4c6f5c1fb71096",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 4
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-0p8",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 1148675,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p01",
+        "arrival_stream_sha256": "cadb3a529796b4b743724e2e06410bc5b3f2e86948ad387be976ccc4d5518276",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-1p0",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 5743375,
+            "numerator": 6,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p01",
+        "arrival_stream_sha256": "5fb6ce6503fd4fd58be7b4d85ba131d00f29922f81b98bbffd3b50c109d68a3d",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 6
+          },
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p01__uniform-1p2",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 22523,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 2297350,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 1148675,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 5743375,
+                "numerator": 4,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-0p01",
+        "arrival_stream_sha256": "67bd1320892f2494c69c8fd04fcb92c275a98366847893e93e4520bd2ddb54d5",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1,
+                "numerator": 1
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 5,
+                "numerator": 4
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-mean__migration-ratio-0p01"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-0p01__burst-reference",
+      "timing_profile_id": "inference-mean__migration-ratio-0p01"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 6756912,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-1p00",
+        "arrival_stream_sha256": "d133110e0d3ff8acf2c7df2297f14d2b736f1affde83ed3479ac946c8e24e5ee",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-0p5",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-0p5",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 4223070,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-1p00",
+        "arrival_stream_sha256": "7c572fb3738f9467576f27eb4815b64c0058f08dd7f1204cd7168a5a0a3c1f0f",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 4
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-0p8",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-0p8",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 3378456,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-1p00",
+        "arrival_stream_sha256": "7adb08f82aeb9940e3f58657efbb10acca832666f9f1f6b5eeded3acea982bd3",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-1p0",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-1p0",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "kind": "uniform",
+          "rate": {
+            "denominator": 2815380,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          }
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-1p00",
+        "arrival_stream_sha256": "1c9dab5c405d8e2508a76627eba921e86e990204c93cfeca5402d52e5a46802e",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "kind": "uniform",
+          "ratio": {
+            "denominator": 5,
+            "numerator": 6
+          },
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "uniform-1p2",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-1p00__uniform-1p2",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    },
+    {
+      "T_inference_ns": 2252304,
+      "T_migration_ns": 2252304,
+      "arrival_binding": {
+        "absolute_arrival_rate": {
+          "base_rate": {
+            "denominator": 6756912,
+            "numerator": 1,
+            "unit": "pages_per_ns"
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "rate": {
+                "denominator": 3378456,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "rate": {
+                "denominator": 4223070,
+                "numerator": 1,
+                "unit": "pages_per_ns"
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise"
+        },
+        "arrival_rate_basis": "per_profile_mu_demote",
+        "arrival_reference_profile": "inference-mean__migration-ratio-1p00",
+        "arrival_stream_sha256": "7528e9d00687177898f96ef2d472143650eae31f373264221fc9ed039122970d",
+        "cross_profile_comparison_allowed": false,
+        "cross_profile_comparison_scope": "relative_capacity_pressure_only",
+        "normalized_load_ratio": {
+          "base_ratio": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "intervals": [
+            {
+              "end_ns": 3000000000,
+              "ratio": {
+                "denominator": 1,
+                "numerator": 1
+              },
+              "start_ns": 2000000000
+            },
+            {
+              "end_ns": 7000000000,
+              "ratio": {
+                "denominator": 5,
+                "numerator": 4
+              },
+              "start_ns": 6000000000
+            }
+          ],
+          "kind": "piecewise",
+          "reference": "inference-mean__migration-ratio-1p00"
+        }
+      },
+      "arrival_profile_id": "burst-reference",
+      "comparison_channel": "capacity_normalized",
+      "scenario_id": "capacity_normalized__inference-mean__migration-ratio-1p00__burst-reference",
+      "timing_profile_id": "inference-mean__migration-ratio-1p00"
+    }
+  ],
+  "schema_version": "capd_proactive_stage10_scenario_matrix_v2_0"
+}

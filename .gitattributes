@@ -9,3 +9,7 @@
 *.sh text eol=lf
 *.yaml text eol=lf
 *.yml text eol=lf
+
+# Preserve byte-exact Stage9 r3 evidence whose verification hashes include EOLs.
+/outputs/capd_proactive_stage9/stage9-overhead-v2-r3/capacity_overhead.csv binary !eol
+/outputs/capd_proactive_stage9/stage9-overhead-v2-r3/perf/perf-stat.raw binary !eol

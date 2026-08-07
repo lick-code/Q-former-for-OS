@@ -1,0 +1,18 @@
+{
+  "additionalProperties": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required": [
+    "schema_version",
+    "argv",
+    "timeout_seconds",
+    "pre_dependency_snapshot",
+    "post_dependency_snapshot",
+    "result_sha256",
+    "log_sha256",
+    "exit_code",
+    "timed_out",
+    "environment"
+  ],
+  "schema_version": "capd_proactive_stage10_stage11_negative_audit_evidence_v1_0",
+  "type": "object"
+}

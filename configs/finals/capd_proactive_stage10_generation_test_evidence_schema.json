@@ -1,0 +1,23 @@
+{
+  "additionalProperties": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required": [
+    "schema_version",
+    "approved_freeze_receipt_sha256",
+    "source_manifest_sha256",
+    "argv",
+    "cwd",
+    "timeout_seconds",
+    "pre_source_snapshot",
+    "post_source_snapshot",
+    "test_count",
+    "ordered_verbose_test_ids",
+    "final_status",
+    "exit_code",
+    "timed_out",
+    "environment",
+    "log_sha256"
+  ],
+  "schema_version": "capd_proactive_stage10_generation_test_evidence_v1_0",
+  "type": "object"
+}

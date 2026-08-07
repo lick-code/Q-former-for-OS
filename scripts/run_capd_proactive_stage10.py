@@ -118,7 +118,7 @@ def _verify_metric_line(line):
         raise stage10.Stage10ContractError("Fixture claims kernel behavior.")
 
 
-def verify_run(run_root: str):
+def verify_v1_fixture_run(run_root: str):
     root = Path(run_root).resolve()
     if not root.is_dir():
         raise stage10.Stage10ContractError("Stage10 run directory is missing.")
@@ -220,6 +220,41 @@ def verify_run(run_root: str):
             "manifest_files": len(manifest["files"])}
 
 
+def verify_run(run_root: str, *, approved_freeze_receipt_sha256: str | None = None):
+    """Dispatch verification by the complete persisted version identity."""
+    root = Path(run_root).resolve()
+    if not root.is_dir() or not (root / "config.json").is_file():
+        raise stage10.Stage10ContractError("Stage10 run directory is missing.")
+    config = load_json(root / "config.json")
+    contract_id = config.get("contract_id")
+    if contract_id == stage10.CONTRACT_ID:
+        return verify_v1_fixture_run(str(root))
+    if contract_id == "CAPD-PROACTIVE-STAGE10-2.0":
+        if not (root / "run_identity.json").is_file():
+            raise stage10.Stage10ContractError("Stage10 version identity is missing.")
+        identity = load_json(root / "run_identity.json")
+        version_tuple = (
+            config.get("schema_version"), config.get("run_id"),
+            identity.get("schema_version"), identity.get("run_id"),
+        )
+        if version_tuple == (
+                "capd_proactive_stage10_v2_0", "stage10-async-simulator-v2-r1",
+                "capd_proactive_stage10_run_identity_v2_0",
+                "stage10-async-simulator-v2-r1"):
+            from scripts import run_capd_proactive_stage10_v2 as stage10_v2_runner
+            return stage10_v2_runner.verify_v2_run(root, project_root=ROOT)
+        if version_tuple == (
+                "capd_proactive_stage10_v2_1", "stage10-async-simulator-v2-r2",
+                "capd_proactive_stage10_run_identity_v2_1",
+                "stage10-async-simulator-v2-r2"):
+            from scripts import run_capd_proactive_stage10_v2_r2 as r2_runner
+            return r2_runner.verify_r2_run(
+                root, project_root=ROOT,
+                approved_freeze_receipt_sha256=approved_freeze_receipt_sha256)
+        raise stage10.Stage10ContractError("Mixed or unknown Stage10 v2 identity.")
+    raise stage10.Stage10ContractError("Unknown Stage10 contract id.")
+
+
 def _build_run(config, mode, output_root, run_id, test_log_input,
                test_log_sha256, stage9_run_root):
     config_path = Path(config).resolve()
@@ -313,10 +348,14 @@ def main(argv=None):
     parser.add_argument("--test-log-sha256")
     parser.add_argument("--stage9-run-root")
     parser.add_argument("--verify")
+    parser.add_argument("--approved-freeze-receipt-sha256")
     args = parser.parse_args(argv)
     try:
         if args.verify:
-            result = verify_run(args.verify)
+            result = verify_run(
+                args.verify,
+                approved_freeze_receipt_sha256=
+                    args.approved_freeze_receipt_sha256)
             print(json.dumps(result, sort_keys=True))
             return 0
         missing = [name for name in ("config", "mode", "output_root", "run_id")

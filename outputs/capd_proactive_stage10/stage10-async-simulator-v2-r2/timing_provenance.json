@@ -1,0 +1,33 @@
+{
+  "conversion_rule": "Decimal ROUND_HALF_UP to integral nanoseconds",
+  "field": "by_b_max[\"2\"].stages.total_round_latency_ns.mean",
+  "formal_b_max": 2,
+  "inference_ns": {
+    "mean": 2252304,
+    "p50": 2192418,
+    "p95": 2625519,
+    "p99": 2938056
+  },
+  "latency_summary_sha256": "a4e28f6627b278258202d7ab71db72474f29f9e569ca432ebfc40e36baf12a09",
+  "measurement_checkpoint_sha256": "8ec44db66348aef3c65459ea48a3b87fc417d862102c85b4fe6bda958bf915d3",
+  "migration_ns": {
+    "migration-ratio-0p01": 22523,
+    "migration-ratio-0p10": 225230,
+    "migration-ratio-1p00": 2252304
+  },
+  "migration_source": "predeclared_simulator_scenario_ratio_not_hardware_measurement",
+  "original_decimal": {
+    "mean": "2252304.4582606885",
+    "p50": "2192418.0",
+    "p95": "2625519.0",
+    "p99": "2938056.360000004"
+  },
+  "run_identity_file_sha256": "3241d3df3b1ff701dcc0a571d05f0eacab8412becf1fc960e22df97ef433c2b2",
+  "run_identity_sha256": "cc662852fa7ee43209d721b5acaae062fb02d790f82e5245ec0511c443987454",
+  "sample_count": 182394,
+  "schema_version": "capd_proactive_stage10_timing_provenance_v2_0",
+  "source_artifact": "latency_summary.json",
+  "source_run_id": "stage9-overhead-v2-r3",
+  "stage9_config_sha256": "642641d56fe52e3772bdaa0772d5c9fd250cc17976918ce99acd36d18a035922",
+  "stage9_verification_sha256": "bc5dc7fc46247da5d2085dd302150361232ff0cd27cd9b911cb559072ef8635f"
+}

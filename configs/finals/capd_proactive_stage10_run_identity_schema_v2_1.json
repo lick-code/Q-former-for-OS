@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "run_id",
+    "evidence_mode",
+    "config_sha256",
+    "approved_freeze_receipt_sha256",
+    "generation_source_manifest_sha256",
+    "generation_source_set_fingerprint_sha256",
+    "generation_source_entry_count",
+    "generation_test_evidence_sha256",
+    "execution_environment_sha256",
+    "run_identity_sha256"
+  ],
+  "schema_version": "capd_proactive_stage10_run_identity_v2_1",
+  "type": "object"
+}

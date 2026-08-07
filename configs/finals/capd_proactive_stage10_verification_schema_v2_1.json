@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "evidence_mode",
+    "status",
+    "stage9_input_gate",
+    "simulation_executed",
+    "artifacts_independently_recomputed",
+    "current_generation_sources_recomputed",
+    "generation_tests_verified",
+    "result_count",
+    "scenario_ids",
+    "real_system_async_performance_verified"
+  ],
+  "schema_version": "capd_proactive_stage10_verification_v2_1",
+  "type": "object"
+}

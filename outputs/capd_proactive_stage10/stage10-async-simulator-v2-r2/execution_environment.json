@@ -1,0 +1,103 @@
+{
+  "formal_simulation_worker": {
+    "argv": [
+      "D:\\python3.13\\python.exe",
+      "scripts/run_capd_proactive_stage10_v2_r2.py",
+      "--formal-simulation-worker",
+      "--config",
+      "configs/finals/capd_proactive_stage10_v2_r2.json",
+      "--stage9-run-root",
+      "outputs/capd_proactive_stage9/stage9-overhead-v2-r3",
+      "--approved-freeze-receipt-sha256",
+      "3f4ce4ff71006777e18ded8d6b2e453c679b4a3d3ba2723d5892d7e310ac61f2"
+    ],
+    "attempt_count": 1,
+    "automatic_retry_performed": false,
+    "cwd": "D:\\计算机系统大赛\\功能赛道\\cache_replacement",
+    "ended_at_utc": "2026-08-07T01:57:25.084229Z",
+    "environment": {
+      "architecture": "64bit",
+      "dependency_policy": "stdlib_only",
+      "machine": "AMD64",
+      "os_name": "nt",
+      "platform_release": "11",
+      "platform_system": "Windows",
+      "platform_version": "10.0.26200",
+      "python_cache_tag": "cpython-313",
+      "python_executable": "D:\\python3.13\\python.exe",
+      "python_implementation": "CPython",
+      "python_version": "3.13.6",
+      "required_dependency_versions": {}
+    },
+    "exit_code": 0,
+    "monitor_interval_seconds": 30,
+    "monitor_observations": [
+      {
+        "elapsed_seconds": 30.014301,
+        "process_alive": true
+      },
+      {
+        "elapsed_seconds": 33.916996,
+        "process_alive": false
+      }
+    ],
+    "process_tree_collected": true,
+    "started_at_utc": "2026-08-07T01:56:51.166246Z",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "44d463a4079fc1c7d0d8135234190bb8bd117562270402e46aea380461ddd25c",
+    "termination_grace_seconds": 10,
+    "termination_method": null,
+    "termination_requested": false,
+    "timed_out": false,
+    "timeout_seconds": 1800,
+    "wall_clock_duration_seconds": 33.916996
+  },
+  "generation_test": {
+    "argv": [
+      "D:\\python3.13\\python.exe",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_capd_proactive_stage10",
+      "tests.test_capd_proactive_stage10_v2",
+      "tests.test_capd_proactive_stage10_v2_r2"
+    ],
+    "attempt_count": 1,
+    "automatic_retry_performed": false,
+    "cwd": "D:\\计算机系统大赛\\功能赛道\\cache_replacement",
+    "ended_at_utc": "2026-08-07T01:56:51.049458Z",
+    "environment": {
+      "architecture": "64bit",
+      "dependency_policy": "stdlib_only",
+      "machine": "AMD64",
+      "os_name": "nt",
+      "platform_release": "11",
+      "platform_system": "Windows",
+      "platform_version": "10.0.26200",
+      "python_cache_tag": "cpython-313",
+      "python_executable": "D:\\python3.13\\python.exe",
+      "python_implementation": "CPython",
+      "python_version": "3.13.6",
+      "required_dependency_versions": {}
+    },
+    "exit_code": 0,
+    "monitor_interval_seconds": 30,
+    "monitor_observations": [
+      {
+        "elapsed_seconds": 16.178975,
+        "process_alive": false
+      }
+    ],
+    "process_tree_collected": true,
+    "started_at_utc": "2026-08-07T01:56:34.870005Z",
+    "stderr_sha256": "2bebcbb19525469b2d6eef6f311ba8e8b1f4f29766ba1f1acf51a3a3715c4f4d",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "termination_grace_seconds": 10,
+    "termination_method": null,
+    "termination_requested": false,
+    "timed_out": false,
+    "timeout_seconds": 1800,
+    "wall_clock_duration_seconds": 16.178975
+  },
+  "schema_version": "capd_proactive_stage10_execution_environment_v1_0"
+}

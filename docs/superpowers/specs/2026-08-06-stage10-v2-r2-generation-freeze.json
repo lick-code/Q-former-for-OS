@@ -1,0 +1,310 @@
+{
+  "approved_design": {
+    "path": "docs/superpowers/specs/2026-08-06-stage10-v2-r2-source-identity-migration-design.md",
+    "sha256": "e967307c7cc9c3548424c646ca2c442c01ef738da0995fbda9037044567f3cc2",
+    "status": "design_approved"
+  },
+  "approved_plan": {
+    "path": "docs/superpowers/plans/2026-08-06-stage10-v2-r2-source-identity-migration.md",
+    "sha256": "3ed8f1760c1a9f93f06c1d6c9897485b2169be88844f63b0183bdca2351bee23",
+    "status": "implementation_plan_approved_tasks_0_9"
+  },
+  "authorization_state": {
+    "formal_run_authorized_at_receipt_creation": false,
+    "release_authorized_at_receipt_creation": false,
+    "stage11_positive_migration_authorized_at_receipt_creation": false
+  },
+  "commands": {
+    "formal_simulation_worker": {
+      "argv_suffix": [
+        "scripts/run_capd_proactive_stage10_v2_r2.py",
+        "--formal-simulation-worker",
+        "--config",
+        "configs/finals/capd_proactive_stage10_v2_r2.json",
+        "--stage9-run-root",
+        "outputs/capd_proactive_stage9/stage9-overhead-v2-r3",
+        "--approved-freeze-receipt-sha256",
+        "<external-approved-freeze-receipt-sha256>"
+      ],
+      "interpreter_policy": "current_runner_sys_executable"
+    },
+    "generation_tests": {
+      "argv_suffix": [
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_capd_proactive_stage10",
+        "tests.test_capd_proactive_stage10_v2",
+        "tests.test_capd_proactive_stage10_v2_r2"
+      ],
+      "expected_test_count": 71,
+      "interpreter_policy": "current_runner_sys_executable",
+      "ordered_verbose_test_ids": [
+        "tests.test_capd_proactive_stage10.Stage10ArrivalTest.test_burst_model_keeps_base_flow_before_inside_and_after_bursts",
+        "tests.test_capd_proactive_stage10.Stage10ArrivalTest.test_overlapping_bursts_are_rejected",
+        "tests.test_capd_proactive_stage10.Stage10ArrivalTest.test_trace_replay_is_rejected_until_a_future_timestamp_contract_exists",
+        "tests.test_capd_proactive_stage10.Stage10ArrivalTest.test_uniform_generator_is_reproducible_and_integer_ns",
+        "tests.test_capd_proactive_stage10.Stage10ArrivalTest.test_uniform_period_uses_reference_batch_and_model_capacity",
+        "tests.test_capd_proactive_stage10.Stage10ConfigContractTest.test_invalid_timing_capacity_and_arrival_kind_fail_closed",
+        "tests.test_capd_proactive_stage10.Stage10ConfigContractTest.test_repository_config_and_schema_are_valid",
+        "tests.test_capd_proactive_stage10.Stage10DocumentationTest.test_docs_state_candidate_ready_and_formal_blocked",
+        "tests.test_capd_proactive_stage10.Stage10EventHeapTest.test_event_ids_are_strictly_monotonic",
+        "tests.test_capd_proactive_stage10.Stage10EventHeapTest.test_same_time_events_follow_frozen_priority_then_event_id",
+        "tests.test_capd_proactive_stage10.Stage10FormalGateTest.test_forged_run_directory_is_rejected_before_stage10_gate",
+        "tests.test_capd_proactive_stage10.Stage10FormalGateTest.test_historical_r1_run_directory_is_rejected",
+        "tests.test_capd_proactive_stage10.Stage10FormalGateTest.test_missing_or_tampered_artifact_is_rejected_before_gate",
+        "tests.test_capd_proactive_stage10.Stage10RunnerTest.test_empty_failed_wrong_module_or_tampered_logs_are_rejected",
+        "tests.test_capd_proactive_stage10.Stage10RunnerTest.test_fixture_runner_writes_candidate_ready_artifacts",
+        "tests.test_capd_proactive_stage10.Stage10RunnerTest.test_formal_mode_without_a_verified_receipt_writes_no_run",
+        "tests.test_capd_proactive_stage10.Stage10RunnerTest.test_independent_verifier_rejects_rehashed_tamper_and_extra_file",
+        "tests.test_capd_proactive_stage10.Stage10RunnerTest.test_manifest_and_sha256sums_recompute_independently",
+        "tests.test_capd_proactive_stage10.Stage10RunnerTest.test_n_a_is_used_only_for_empty_blocking_samples",
+        "tests.test_capd_proactive_stage10.Stage10SimulationTest.test_arrival_consumes_frame_and_demotion_releases_it",
+        "tests.test_capd_proactive_stage10.Stage10SimulationTest.test_arrivals_outside_horizon_are_rejected",
+        "tests.test_capd_proactive_stage10.Stage10SimulationTest.test_empty_blocking_samples_are_null_and_exhaustion_is_time_integral",
+        "tests.test_capd_proactive_stage10.Stage10SimulationTest.test_full_arrival_is_blocked_then_admitted_after_demotion",
+        "tests.test_capd_proactive_stage10.Stage10SimulationTest.test_identical_seed_and_arrivals_produce_identical_events_and_metrics",
+        "tests.test_capd_proactive_stage10.Stage10SimulationTest.test_runtime_batch_values_are_bounded_and_high_load_queue_is_explainable",
+        "tests.test_capd_proactive_stage10.Stage10StateContractTest.test_batch_size_is_bounded_by_target_gap_and_candidates",
+        "tests.test_capd_proactive_stage10.Stage10StateContractTest.test_capacity_and_frame_invariants_hold_after_admission_and_release",
+        "tests.test_capd_proactive_stage10.Stage10StateContractTest.test_initial_resident_ids_and_lru_order_are_deterministic",
+        "tests.test_capd_proactive_stage10.Stage10StateContractTest.test_new_and_unblocked_pages_enter_mru_head",
+        "tests.test_capd_proactive_stage10.Stage10StateContractTest.test_reserved_components_are_disjoint_and_duplicate_is_rejected",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2ArrivalMatrixTest.test_channel_rate_basis_and_comparison_scope_are_paired",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2ArrivalMatrixTest.test_sixty_rows_and_fixed_arrival_identity",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2ConfigContractTest.test_fixture_or_weakened_config_is_rejected",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2ConfigContractTest.test_repository_config_and_schema_bind_approved_contract",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2MeasurementCheckpointTest.test_checkpoint_identity_sets_and_raw_binding_are_verified",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2MeasurementCheckpointTest.test_rehashed_checkpoint_tamper_still_fails_pinned_sha",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2RunnerLifecycleTest.test_empty_or_forged_test_log_is_rejected",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2RunnerLifecycleTest.test_preflight_failure_creates_no_output",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2RunnerLifecycleTest.test_rehashed_metadata_tampering_fails_full_object_verification",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2RunnerLifecycleTest.test_synthetic_entrypoint_cannot_target_production_output",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2RunnerLifecycleTest.test_temporary_compact_run_writes_and_verifies_exact_artifacts",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2SimulationContractTest.test_capacity_normalized_cannot_claim_timing_causality",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2SimulationContractTest.test_v2_wrapper_is_deterministic_and_never_claims_real_system",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2Stage9GateTest.test_historical_run_and_self_declared_receipt_are_rejected",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2Stage9GateTest.test_no_root_manifest_is_required_but_hash_tamper_fails",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2Stage9GateTest.test_perf_newline_change_fails_byte_exact_gate",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2Stage9GateTest.test_real_stage9_r3_passes_complete_read_only_gate",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2TimingProvenanceTest.test_decimal_round_half_up_derivation_is_exact",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2VerifierDispatchTest.test_unknown_contract_is_rejected",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2VerifierDispatchTest.test_v1_and_v2_verifiers_are_bidirectionally_incompatible",
+        "tests.test_capd_proactive_stage10_v2.Stage10V2VerifierDispatchTest.test_v1_dispatch_still_verifies_historical_fixture",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ConfigSchemaTest.test_complete_r2_config_structure_passes",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ConfigSchemaTest.test_identity_semantics_and_execution_tamper_fail",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ControlledGenerationTestTest.test_controlled_process_records_environment_and_single_execution",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ControlledGenerationTestTest.test_external_approved_sha_is_required_and_recomputed",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ControlledGenerationTestTest.test_hard_timeout_fails_closed_without_retry",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ControlledGenerationTestTest.test_verbose_unittest_log_returns_canonical_test_identity",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2DispatchTest.test_mixed_r1_r2_identity_is_rejected",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2DispatchTest.test_r2_dispatch_requires_and_forwards_external_sha",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2FinalStatusTest.test_final_status_requires_verified_readiness_and_has_eight_files",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2FreezeReceiptTest.test_repository_receipt_is_completely_reconstructed",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2GenerationIsolationTest.test_generation_runtime_has_not_loaded_stage11",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2MetadataContractTest.test_complete_expected_objects_are_stable",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2MetadataContractTest.test_rehashed_metadata_tamper_still_fails_full_comparison",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ReleaseReadinessTest.test_exact_stage11_triples_and_twelve_file_readiness",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2ReleaseReadinessTest.test_stage11_tamper_fails_before_release_creation",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2RunnerLifecycleTest.test_compact_temporary_run_has_exact_artifacts_and_recomputes",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2RunnerLifecycleTest.test_preflight_failure_creates_no_output",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2SourceManifestTest.test_exact_manifest_and_current_snapshot_pass",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2SourceManifestTest.test_path_sort_sha_and_stage11_leakage_fail_closed",
+        "tests.test_capd_proactive_stage10_v2_r2.Stage10V2R2SourceManifestTest.test_static_stage11_import_and_dependency_omission_fail"
+      ]
+    },
+    "protocol": {
+      "path": "docs/CAPD_PROACTIVE_STAGE10_V2_R2_PROTOCOL_CN.md",
+      "sha256": "2c4cfb7e4cbac35810c1ad3ec89344b3b9874bbcb2c2277b3dbd1f96cfb34310"
+    },
+    "release_contract": {
+      "final_status_test_argv_suffix": [
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_capd_proactive_stage10_v2_release.Stage10V2R2FinalStatusDocumentationTest"
+      ],
+      "post_seal_stage11_drift": "informational_only",
+      "readiness_test_argv_suffix": [
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_capd_proactive_stage10_v2_release.Stage10V2R2ReadinessDocumentationTest"
+      ],
+      "release_test_module": {
+        "path": "tests/test_capd_proactive_stage10_v2_release.py",
+        "sha256": "4cb5f3d84609fe36ce2186f3c20c5848cceaf18204904d50e83ddcf9127b53b6"
+      },
+      "stage11_audit_argv_suffix": [
+        "-m",
+        "tests.test_capd_proactive_stage10_v2_release",
+        "--stage11-negative-audit-worker",
+        "--stage10a-run-root",
+        "outputs/capd_proactive_stage10/stage10-async-simulator-r1",
+        "--stage10-r2-run-root",
+        "outputs/capd_proactive_stage10/stage10-async-simulator-v2-r2",
+        "--approved-freeze-receipt-sha256",
+        "<external-approved-freeze-receipt-sha256>"
+      ],
+      "stage11_audit_read_only": true,
+      "stage11_expected": {
+        "stage10_r2": {
+          "formal_authorized": false,
+          "reason_code": "invalid_stage10a_fixture",
+          "status": "NOT_VERIFIABLE"
+        },
+        "stage10a": {
+          "formal_authorized": false,
+          "reason_code": "stage10a_fixture_only",
+          "status": "BLOCKED"
+        },
+        "stage11_positive_migration_authorized": false
+      },
+      "stage11_output_creation_allowed": false
+    }
+  },
+  "config": {
+    "canonical_sha256": "11c40dfc8038d7b008e68e5eba76216c8897b972f4579621d6698d4d8864182f",
+    "path": "configs/finals/capd_proactive_stage10_v2_r2.json",
+    "sha256": "bdeebdd2ff3e5e7416171832058074b068ebfa6c851dd9ced7653d36755c376f"
+  },
+  "controlled_execution": {
+    "automatic_retry_allowed": false,
+    "final_status_test_timeout_seconds": 600,
+    "formal_simulation_timeout_seconds": 1800,
+    "generation_core_test_timeout_seconds": 1800,
+    "monitor_check_interval_seconds": 30,
+    "release_readiness_test_timeout_seconds": 600,
+    "stage11_negative_audit_timeout_seconds": 600,
+    "termination_grace_seconds": 10
+  },
+  "environment_contract": {
+    "declared_non_standard_dependency_names": [],
+    "dependency_policy": "standard_library_only",
+    "deterministic_result_comparison": "byte_exact",
+    "required_fields": [
+      "python_version",
+      "python_implementation",
+      "python_cache_tag",
+      "python_executable",
+      "os_name",
+      "platform_system",
+      "platform_release",
+      "platform_version",
+      "machine",
+      "architecture",
+      "required_dependency_versions",
+      "dependency_policy"
+    ],
+    "schema": {
+      "path": "configs/finals/capd_proactive_stage10_execution_environment_schema.json",
+      "sha256": "e22b1f8895a198eed857ed78343b6f4dd9e44ada8ad4c8227aa5cfbea898cd11"
+    },
+    "wall_clock_time_role": "observational_only"
+  },
+  "schema_version": "capd_proactive_stage10_generation_freeze_receipt_v1_0",
+  "schemas": {
+    "metadata_schemas": {
+      "capd_proactive_stage10_execution_environment_schema": {
+        "path": "configs/finals/capd_proactive_stage10_execution_environment_schema.json",
+        "sha256": "e22b1f8895a198eed857ed78343b6f4dd9e44ada8ad4c8227aa5cfbea898cd11"
+      },
+      "capd_proactive_stage10_final_status_evidence_receipt_schema": {
+        "path": "configs/finals/capd_proactive_stage10_final_status_evidence_receipt_schema.json",
+        "sha256": "37a2bd1b0d068fbc4374af647643ea35d4a1debbf53abf1177e3e6a76ff84161"
+      },
+      "capd_proactive_stage10_generation_freeze_receipt_schema": {
+        "path": "configs/finals/capd_proactive_stage10_generation_freeze_receipt_schema.json",
+        "sha256": "442c76c591f3bfaa4a07c68952611c9fae90948f0d8c6a340773908ca577286e"
+      },
+      "capd_proactive_stage10_generation_source_manifest_schema": {
+        "path": "configs/finals/capd_proactive_stage10_generation_source_manifest_schema.json",
+        "sha256": "fb1c0fbe889dfac9e850733533349fddc2356a4eb89ae5bedba0523ed9e9547b"
+      },
+      "capd_proactive_stage10_generation_test_evidence_schema": {
+        "path": "configs/finals/capd_proactive_stage10_generation_test_evidence_schema.json",
+        "sha256": "9f1b64bcac29750552ff149d979507e171e56a38ac06ef46369a3c6265c7337f"
+      },
+      "capd_proactive_stage10_manifest_schema_v2_1": {
+        "path": "configs/finals/capd_proactive_stage10_manifest_schema_v2_1.json",
+        "sha256": "2449ed8b872604ad224b8af8535b1dcced20648a95c4862e81e4bc507819fe7a"
+      },
+      "capd_proactive_stage10_release_manifest_schema": {
+        "path": "configs/finals/capd_proactive_stage10_release_manifest_schema.json",
+        "sha256": "98403feb9d3fe0a04eff47b546176797f8ace7526208a80f883248ba958ccdfa"
+      },
+      "capd_proactive_stage10_release_readiness_receipt_schema": {
+        "path": "configs/finals/capd_proactive_stage10_release_readiness_receipt_schema.json",
+        "sha256": "696337cf09acf2137219a9d4cb4beb7042f6e1df01c5ea9afea1db62ed92852d"
+      },
+      "capd_proactive_stage10_release_test_evidence_schema": {
+        "path": "configs/finals/capd_proactive_stage10_release_test_evidence_schema.json",
+        "sha256": "86d72a18101d899831a091aba9256ccb4eaaa0ee04ea8154661c046922e042f2"
+      },
+      "capd_proactive_stage10_run_identity_schema_v2_1": {
+        "path": "configs/finals/capd_proactive_stage10_run_identity_schema_v2_1.json",
+        "sha256": "d56a410f9e978b2833d6fa979fda4e42cad7a6aa3745ff2e2116f8e82e5f7d67"
+      },
+      "capd_proactive_stage10_run_state_schema_v2_1": {
+        "path": "configs/finals/capd_proactive_stage10_run_state_schema_v2_1.json",
+        "sha256": "9f6ac718b73c0b0de582234e1c09f3849968c59aa88bce1825985a760d616029"
+      },
+      "capd_proactive_stage10_stage11_negative_audit_evidence_schema": {
+        "path": "configs/finals/capd_proactive_stage10_stage11_negative_audit_evidence_schema.json",
+        "sha256": "4f3e4943ab4e04ea6c0297d4f435ba568bfb956181a9ad11652f9783c05ee0c7"
+      },
+      "capd_proactive_stage10_v2_r2_config_schema": {
+        "path": "configs/finals/capd_proactive_stage10_v2_r2_config_schema.json",
+        "sha256": "fd1c343e38e5ef2affcc99c5e724865e111b5d2271e0ff5bb451d9e188b8efce"
+      },
+      "capd_proactive_stage10_verification_schema_v2_1": {
+        "path": "configs/finals/capd_proactive_stage10_verification_schema_v2_1.json",
+        "sha256": "ebc16913f7f87da4730404508797f6180fc605c8433d1b87972d32bf15e6f7e5"
+      }
+    },
+    "result_schema": {
+      "path": "configs/finals/capd_proactive_stage10_result_schema_v2.json",
+      "sha256": "82e5ab94a518d483b0e095666df038cdca8736a7caa0269118bd553b8c08cbb7"
+    }
+  },
+  "source_manifest": {
+    "entry_count": 11,
+    "fingerprint_sha256": "c857374350d45fec7ed90af99fdfe4bf1689973e2435b70f26133634cde92d25",
+    "path": "configs/finals/capd_proactive_stage10_v2_r2_source_manifest.json",
+    "schema_version": "capd_proactive_stage10_generation_source_manifest_v1_0",
+    "sha256": "5b7c2e78d9e0823235b398460ecdb72834ceb05329807051c6ec3b6513917858",
+    "source_set_id": "stage10-v2-r2-generation-core-v1"
+  },
+  "source_set_id": "stage10-v2-r2-generation-core-v1",
+  "stage9_binding": {
+    "authority": {
+      "checkpoint_sha256": "8ec44db66348aef3c65459ea48a3b87fc417d862102c85b4fe6bda958bf915d3",
+      "config_path": "configs/finals/capd_proactive_stage9.json",
+      "config_sha256": "642641d56fe52e3772bdaa0772d5c9fd250cc17976918ce99acd36d18a035922",
+      "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
+      "expected_instrumentation_rows": 30,
+      "expected_quality_rows": 90,
+      "latency_summary_sha256": "a4e28f6627b278258202d7ab71db72474f29f9e569ca432ebfc40e36baf12a09",
+      "output_root": "outputs/capd_proactive_stage9",
+      "rejected_run_ids": [
+        "stage9-overhead-r1",
+        "stage9-overhead-v2-r1",
+        "stage9-overhead-v2-r2"
+      ],
+      "required_artifact_count": 19,
+      "result_schema_path": "configs/finals/capd_proactive_stage9_result_schema.json",
+      "result_schema_sha256": "a07c1f4b192f76eff45d33fcbe6e37b325aec1a8648c5542538ead1b6ecda893",
+      "run_id": "stage9-overhead-v2-r3",
+      "run_identity_file_sha256": "3241d3df3b1ff701dcc0a571d05f0eacab8412becf1fc960e22df97ef433c2b2",
+      "run_identity_sha256": "cc662852fa7ee43209d721b5acaae062fb02d790f82e5245ec0511c443987454",
+      "run_state_sha256": "c862886d04981e63569258e5605994c6bf14afca880122e39777903d30a3e1c3",
+      "stage8_receipt_sha256": "fc91e2538e6f88a65fc777ea79fc5d99581f47034a194507c599d58c2b6ba27d",
+      "verification_sha256": "bc5dc7fc46247da5d2085dd302150361232ff0cd27cd9b911cb559072ef8635f"
+    },
+    "byte_recovery_audit": {
+      "path": "docs/superpowers/specs/2026-08-06-stage10-stage9-r3-byte-recovery.json",
+      "sha256": "94a68bfccfa6fec3a947b6ed35f83cca04a09bfe708b9390385d7476e0c5bc64",
+      "status": "byte_recovery_verified"
+    }
+  }
+}

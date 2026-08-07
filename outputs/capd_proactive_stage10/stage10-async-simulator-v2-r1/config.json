@@ -1,0 +1,159 @@
+{
+  "approved_design": {
+    "path": "docs/superpowers/specs/2026-08-06-stage10-formal-async-simulator-migration-design.md",
+    "sha256": "2cdd4a647de2d0441b2ae70e476f61ec6cd4488f2d5669337e6de8723b76aebd",
+    "status": "design_approved"
+  },
+  "arrival_profiles": [
+    {
+      "id": "uniform-0p5",
+      "kind": "uniform",
+      "load_ratio": "0.5"
+    },
+    {
+      "id": "uniform-0p8",
+      "kind": "uniform",
+      "load_ratio": "0.8"
+    },
+    {
+      "id": "uniform-1p0",
+      "kind": "uniform",
+      "load_ratio": "1.0"
+    },
+    {
+      "id": "uniform-1p2",
+      "kind": "uniform",
+      "load_ratio": "1.2"
+    },
+    {
+      "base_load_ratio": "0.5",
+      "bursts": [
+        {
+          "duration_ns": 1000000000,
+          "multiplier": "2.0",
+          "start_ns": 2000000000
+        },
+        {
+          "duration_ns": 1000000000,
+          "multiplier": "1.6",
+          "start_ns": 6000000000
+        }
+      ],
+      "id": "burst-reference",
+      "kind": "burst"
+    }
+  ],
+  "byte_recovery_audit": {
+    "path": "docs/superpowers/specs/2026-08-06-stage10-stage9-r3-byte-recovery.json",
+    "sha256": "94a68bfccfa6fec3a947b6ed35f83cca04a09bfe708b9390385d7476e0c5bc64",
+    "status": "byte_recovery_verified"
+  },
+  "comparison_channels": [
+    {
+      "arrival_rate_basis": "reference_profile_fixed",
+      "cross_profile_comparison_allowed": true,
+      "id": "fixed_arrival",
+      "scope": "timing_sensitivity_within_simulator"
+    },
+    {
+      "arrival_rate_basis": "per_profile_mu_demote",
+      "cross_profile_comparison_allowed": false,
+      "id": "capacity_normalized",
+      "scope": "relative_capacity_pressure_only"
+    }
+  ],
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "evidence_mode": "deterministic_async_simulation",
+  "failure_status": "stage10_async_simulation_not_verified",
+  "interpretation_boundary": {
+    "kernel_behavior_verified": false,
+    "real_concurrency_verified": false,
+    "real_foreground_end_to_end_latency_verified": false,
+    "real_nvm_measurement_verified": false,
+    "real_system_async_performance_verified": false
+  },
+  "migration_scenarios": [
+    {
+      "id": "migration-ratio-0p01",
+      "ratio": "0.01",
+      "role": "sensitivity_only",
+      "source": "predeclared_simulator_scenario_ratio_not_hardware_measurement"
+    },
+    {
+      "id": "migration-ratio-0p10",
+      "ratio": "0.10",
+      "role": "reference",
+      "source": "predeclared_simulator_scenario_ratio_not_hardware_measurement"
+    },
+    {
+      "id": "migration-ratio-1p00",
+      "ratio": "1.00",
+      "role": "sensitivity_only",
+      "source": "predeclared_simulator_scenario_ratio_not_hardware_measurement"
+    }
+  ],
+  "output_root": "outputs/capd_proactive_stage10",
+  "reference_timing_profile": "inference-mean__migration-ratio-0p10",
+  "result_schema": "configs/finals/capd_proactive_stage10_result_schema_v2.json",
+  "result_schema_sha256": "82e5ab94a518d483b0e095666df038cdca8736a7caa0269118bd553b8c08cbb7",
+  "run_id": "stage10-async-simulator-v2-r1",
+  "scenario_count": 60,
+  "schema_version": "capd_proactive_stage10_v2_0",
+  "simulator_parameters": {
+    "F_low": 16,
+    "F_target": 24,
+    "K": 8,
+    "b_max": 2,
+    "b_t_reference": 2,
+    "candidate_source": "lru_tail",
+    "dram_capacity_frames": 64,
+    "initial_free_frames": 16,
+    "seed": 3136859,
+    "simulation_horizon_ns": 10000000000
+  },
+  "stage9_binding": {
+    "checkpoint_sha256": "8ec44db66348aef3c65459ea48a3b87fc417d862102c85b4fe6bda958bf915d3",
+    "config_path": "configs/finals/capd_proactive_stage9.json",
+    "config_sha256": "642641d56fe52e3772bdaa0772d5c9fd250cc17976918ce99acd36d18a035922",
+    "contract_id": "CAPD-PROACTIVE-STAGE9-2.0",
+    "expected_instrumentation_rows": 30,
+    "expected_quality_rows": 90,
+    "latency_summary_sha256": "a4e28f6627b278258202d7ab71db72474f29f9e569ca432ebfc40e36baf12a09",
+    "output_root": "outputs/capd_proactive_stage9",
+    "rejected_run_ids": [
+      "stage9-overhead-r1",
+      "stage9-overhead-v2-r1",
+      "stage9-overhead-v2-r2"
+    ],
+    "required_artifact_count": 19,
+    "result_schema_path": "configs/finals/capd_proactive_stage9_result_schema.json",
+    "result_schema_sha256": "a07c1f4b192f76eff45d33fcbe6e37b325aec1a8648c5542538ead1b6ecda893",
+    "run_id": "stage9-overhead-v2-r3",
+    "run_identity_file_sha256": "3241d3df3b1ff701dcc0a571d05f0eacab8412becf1fc960e22df97ef433c2b2",
+    "run_identity_sha256": "cc662852fa7ee43209d721b5acaae062fb02d790f82e5245ec0511c443987454",
+    "run_state_sha256": "c862886d04981e63569258e5605994c6bf14afca880122e39777903d30a3e1c3",
+    "stage8_receipt_sha256": "fc91e2538e6f88a65fc777ea79fc5d99581f47034a194507c599d58c2b6ba27d",
+    "verification_sha256": "bc5dc7fc46247da5d2085dd302150361232ff0cd27cd9b911cb559072ef8635f"
+  },
+  "success_status": "stage10_async_simulation_verified",
+  "test_evidence": {
+    "expected_command": "python -m unittest tests.test_capd_proactive_stage10 tests.test_capd_proactive_stage10_v2 tests.test_capd_proactive_stage11 -v",
+    "minimum_test_count": 60,
+    "required_module": "tests.test_capd_proactive_stage10_v2",
+    "required_modules": [
+      "tests.test_capd_proactive_stage10",
+      "tests.test_capd_proactive_stage10_v2",
+      "tests.test_capd_proactive_stage11"
+    ]
+  },
+  "timing_conversion_rule": "Decimal ROUND_HALF_UP to integral nanoseconds",
+  "timing_source": {
+    "boundary": "user_space_linux_cpu_synchronous_capd_decision_round",
+    "field": "by_b_max[\"2\"].stages.total_round_latency_ns.mean",
+    "formal_b_max": 2,
+    "original_value": "2252304.4582606885",
+    "sample_count": 182394,
+    "source_artifact": "latency_summary.json",
+    "source_run_id": "stage9-overhead-v2-r3"
+  }
+}

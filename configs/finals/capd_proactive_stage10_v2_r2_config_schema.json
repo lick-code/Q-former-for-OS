@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "run_id",
+    "approved_design",
+    "approved_plan",
+    "generation_source_manifest",
+    "generation_freeze_receipt",
+    "metadata_schemas",
+    "controlled_execution",
+    "generation_tests",
+    "formal_simulation_worker",
+    "release_contract"
+  ],
+  "schema_version": "capd_proactive_stage10_v2_1",
+  "type": "object"
+}

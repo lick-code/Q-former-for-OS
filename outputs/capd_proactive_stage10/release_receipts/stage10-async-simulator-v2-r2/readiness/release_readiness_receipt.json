@@ -1,0 +1,46 @@
+{
+  "approved_freeze_receipt_sha256": "3f4ce4ff71006777e18ded8d6b2e453c679b4a3d3ba2723d5892d7e310ac61f2",
+  "completion_decision": "approved_for_status_finalization",
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "evidence_mode": "deterministic_async_simulation",
+  "generation_chain": {
+    "checksums_sha256": "dba5ce4a96ed092adaa5feefdac31defec935b14f883f4677219c9317231735a",
+    "dispatcher_verifier_status": "stage10_async_simulation_verified",
+    "manifest_sha256": "337e9866d80d5956b4479ac64f3a4e6cbc73c129e408cd32d7b7d28f21f5334f",
+    "native_verifier_status": "stage10_async_simulation_verified",
+    "run_identity_sha256": "3c7eb24390a4f05a9339e467776765ea47f5fc146c5d89d59648b9d04698b908",
+    "run_state_sha256": "c783c5d6a59383e07c6de80f6e40b4ebaeb0e996e365ec7fae8165402c6a29be",
+    "stage10a": {
+      "manifest_files": 12,
+      "result_count": 5,
+      "status": "verified"
+    },
+    "stage9_artifact_sha256_verified_count": 19,
+    "synthetic_test_only": false,
+    "verification_sha256": "fe903efc6b00d77df4b66bfaf3917a5302481deea3da98c24d01c9cacbaa56db"
+  },
+  "real_system_async_performance_verified": false,
+  "release_status": "stage10_release_readiness_verified",
+  "release_test_evidence_sha256": "cbf7c10b308b87e254492eebec4267cada09341466295e3db00e396a6a9ce843",
+  "run_id": "stage10-async-simulator-v2-r2",
+  "schema_version": "capd_proactive_stage10_release_readiness_receipt_v1_0",
+  "stage11_negative_audit": {
+    "evidence_sha256": "d27819561b42fb562a423795a02ea4a1c51929fa432c1dec1f564d34bb91f76e",
+    "result": {
+      "stage10_r2": {
+        "formal_authorized": false,
+        "reason_code": "invalid_stage10a_fixture",
+        "status": "NOT_VERIFIABLE"
+      },
+      "stage10a": {
+        "formal_authorized": false,
+        "reason_code": "stage10a_fixture_only",
+        "status": "BLOCKED"
+      }
+    },
+    "result_sha256": "663d313fa497cd3705b6d43a375b9b7d8b5840bf958a814293287ce0190b7704",
+    "source_snapshot_sha256": "5a70385c3d1b29a2c7e41725a93c773e6271b4e7c8ca756fb4a35e7f4889dea4"
+  },
+  "stage11_positive_migration_authorized": false,
+  "synthetic_test_only": false
+}

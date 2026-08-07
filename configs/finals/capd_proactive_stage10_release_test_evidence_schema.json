@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "contract_id": "CAPD-PROACTIVE-STAGE10-2.0",
+  "required": [
+    "schema_version",
+    "phase",
+    "argv",
+    "timeout_seconds",
+    "pre_source_snapshot",
+    "post_source_snapshot",
+    "log_sha256",
+    "test_count",
+    "final_status",
+    "exit_code",
+    "timed_out",
+    "environment"
+  ],
+  "schema_version": "capd_proactive_stage10_release_test_evidence_v1_0",
+  "type": "object"
+}

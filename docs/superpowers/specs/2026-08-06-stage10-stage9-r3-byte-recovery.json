@@ -1,0 +1,365 @@
+{
+    "schema_version":  "capd_stage10_stage9_r3_byte_recovery_v1_0",
+    "status":  "byte_recovery_verified",
+    "stage9_run_id":  "stage9-overhead-v2-r3",
+    "stage9_root":  "outputs/capd_proactive_stage9/stage9-overhead-v2-r3",
+    "reason":  "Restore checkout-only line-ending changes so every Stage9 verification.json artifact SHA can be verified byte-for-byte before the Stage10 formal input gate.",
+    "checkout_policy":  {
+                            "core_autocrlf":  "true",
+                            "gitattributes_csv":  "text eol=lf",
+                            "gitattributes_raw":  "unspecified",
+                            "observed_effect":  "capacity_overhead.csv checked out as LF while formal bytes are CRLF; perf/perf-stat.raw checked out as CRLF while formal bytes are LF",
+                            "recovery_override":  "Exact path rules use binary !eol for both recovered files so future Git checkouts do not rewrite verified bytes and text diff does not misclassify authoritative CRLF.",
+                            "effective_text_attribute_after_recovery":  "unset for both files; diff and merge also unset by the binary macro"
+                        },
+    "snapshot_before":  [
+                            {
+                                "path":  "__pycache__/perf_recovery_driver.cpython-313.pyc",
+                                "length":  16706,
+                                "sha256":  "c2c38f74841820f5af354916327eadc8305d5d078fdff9a085a2044c6651081a"
+                            },
+                            {
+                                "path":  "artifacts/report_cn.md",
+                                "length":  2818,
+                                "sha256":  "c7023475cf3abf751282fba671db94c65e37453fcf8e3555d43acbb93115b0c5"
+                            },
+                            {
+                                "path":  "capacity_overhead.csv",
+                                "length":  1031,
+                                "sha256":  "12d0e041d7810aef2c5b95aea872cce42e33310fffcb132c8e3df7270ef6e3a7"
+                            },
+                            {
+                                "path":  "environment.json",
+                                "length":  1400,
+                                "sha256":  "3388e180a09a9b6bd5bc8497fcb25c5d5c68cc6ddcf5c33848326d6326cb0642"
+                            },
+                            {
+                                "path":  "instrumentation_audit.json",
+                                "length":  21734,
+                                "sha256":  "d7cabf5735c418c99923b8087d55297c1220966407949ffefe960dacf2eca207"
+                            },
+                            {
+                                "path":  "latency_summary.json",
+                                "length":  7893,
+                                "sha256":  "a4e28f6627b278258202d7ab71db72474f29f9e569ca432ebfc40e36baf12a09"
+                            },
+                            {
+                                "path":  "logs/stage1_stage9_regression.log",
+                                "length":  94248,
+                                "sha256":  "0a74a93d33ccb909e30556ece81c1ee2bce40860ba6e2b9f8ea022ba73e8bb22"
+                            },
+                            {
+                                "path":  "measurement_checkpoint.json",
+                                "length":  14048,
+                                "sha256":  "8ec44db66348aef3c65459ea48a3b87fc417d862102c85b4fe6bda958bf915d3"
+                            },
+                            {
+                                "path":  "memory_breakdown.json",
+                                "length":  5537,
+                                "sha256":  "ee2267e0fdc31f6a9968c76dc18b0704212da2528a62a8a418963297caa075e3"
+                            },
+                            {
+                                "path":  "perf/failed-attempt-nul-ack/perf-stat.raw",
+                                "length":  281,
+                                "sha256":  "e225bd4728cf3ecbe11120669368c46724e9ff8373607ad4b5c2ef60e5a16854"
+                            },
+                            {
+                                "path":  "perf/failed-attempt-nul-ack/perf-stderr.log",
+                                "length":  605,
+                                "sha256":  "ccfb2344057caeeb5cae468282943ae9470e800c991cde86bd9e368c1ec078f0"
+                            },
+                            {
+                                "path":  "perf/perf_parsed.json",
+                                "length":  19785,
+                                "sha256":  "bc8ec7936d7fdaa4bf15e21505f5fa003d93e36f40d00cccc6bc6f204d86a52d"
+                            },
+                            {
+                                "path":  "perf/perf_scope_counts.json",
+                                "length":  17588,
+                                "sha256":  "9bfaeb23c66ab86f74aae625c60f80581a18d629cc7b125df60d1d15627fc45e"
+                            },
+                            {
+                                "path":  "perf/perf-stat.raw",
+                                "length":  299,
+                                "sha256":  "2396689f862a9d08aaeccb97cd4e02e1275ebe6caae0e985db8c049b74ba52df"
+                            },
+                            {
+                                "path":  "perf/perf-stderr.log",
+                                "length":  853,
+                                "sha256":  "df1cff30f60b2d7433af70cf31e3a354a043fcd9eab1f0b1a8c1563296735254"
+                            },
+                            {
+                                "path":  "perf_recovery_driver.py",
+                                "length":  9528,
+                                "sha256":  "abf6a4393bb52569325e00b8f2df9205973ce5d16b59d746951c891c5b32ba3c"
+                            },
+                            {
+                                "path":  "perf_recovery_receipt.json",
+                                "length":  1308,
+                                "sha256":  "b130cb820a552063c4cbe9fd02fc4adb01969db5b4f44790831e347c4d95b49b"
+                            },
+                            {
+                                "path":  "preflight.json",
+                                "length":  717,
+                                "sha256":  "3489eccbfcc9de90181615f0b12ab70e43d28e8aa10ff476cdb46ac14ee79888"
+                            },
+                            {
+                                "path":  "quality_summary.json",
+                                "length":  94230,
+                                "sha256":  "5b4c0c584580e142b77fa7df0c32a2f5f6f2b4ce93a9f3aebc7bbdff6be16b2a"
+                            },
+                            {
+                                "path":  "raw_latency_samples.csv",
+                                "length":  194210443,
+                                "sha256":  "1a8a144cfca9519ca4a8bb9ae46417aadd45b38d056100752c1b82d866465528"
+                            },
+                            {
+                                "path":  "recover_perf_only.sh",
+                                "length":  8870,
+                                "sha256":  "334a6be17cf4ebf8fc73fe236f61d20b9dca96821da836fffdca67ee2fafe69e"
+                            },
+                            {
+                                "path":  "recover_verify_only.sh",
+                                "length":  3976,
+                                "sha256":  "b778e23979fb88ae9e7a1d40b11bd24640597fe1062add71e812a19a2d682be6"
+                            },
+                            {
+                                "path":  "resolved_config.json",
+                                "length":  7478,
+                                "sha256":  "d54b271c2470a04bfbaa82dd4c696214adb5fb83235d32f3a82eda01213ab8a0"
+                            },
+                            {
+                                "path":  "run_identity.json",
+                                "length":  4202,
+                                "sha256":  "3241d3df3b1ff701dcc0a571d05f0eacab8412becf1fc960e22df97ef433c2b2"
+                            },
+                            {
+                                "path":  "run_state.json",
+                                "length":  420,
+                                "sha256":  "c862886d04981e63569258e5605994c6bf14afca880122e39777903d30a3e1c3"
+                            },
+                            {
+                                "path":  "run_state.perf_failure.original.json",
+                                "length":  1753,
+                                "sha256":  "c6ff94c0d105506f690e9caedb58e850b3533107a44b51a2cf982f7eb6b8ea79"
+                            },
+                            {
+                                "path":  "server_test_receipt.json",
+                                "length":  424,
+                                "sha256":  "63e3bfe89b5240b5c7492ee0100e90ba34731238fad7f73797f00a303b21e032"
+                            },
+                            {
+                                "path":  "stage8_compatibility_receipt.json",
+                                "length":  1578,
+                                "sha256":  "fc91e2538e6f88a65fc777ea79fc5d99581f47034a194507c599d58c2b6ba27d"
+                            },
+                            {
+                                "path":  "throughput_summary.json",
+                                "length":  2602,
+                                "sha256":  "1ef11eca08655d6166de75c7ccec9fed95c47396f5acd99b0edb67bc24655ce5"
+                            },
+                            {
+                                "path":  "verification.json",
+                                "length":  3054,
+                                "sha256":  "bc5dc7fc46247da5d2085dd302150361232ff0cd27cd9b911cb559072ef8635f"
+                            },
+                            {
+                                "path":  "verify_only_recovery_receipt.json",
+                                "length":  913,
+                                "sha256":  "7d6ad275d6c7b427286bef540f1638c3ff585a2dfcb43a1f34ead93ed5b0a539"
+                            }
+                        ],
+    "recovered_files":  [
+                            {
+                                "path":  "capacity_overhead.csv",
+                                "before_length":  1031,
+                                "before_sha256":  "12d0e041d7810aef2c5b95aea872cce42e33310fffcb132c8e3df7270ef6e3a7",
+                                "before_line_endings":  "LF",
+                                "after_length":  1038,
+                                "after_sha256":  "aebc319fe12f34a93eb1405c7a8590262543935b67da751aed62ddad678d902a",
+                                "after_line_endings":  "CRLF",
+                                "text_content_changed":  false
+                            },
+                            {
+                                "path":  "perf/perf-stat.raw",
+                                "before_length":  299,
+                                "before_sha256":  "2396689f862a9d08aaeccb97cd4e02e1275ebe6caae0e985db8c049b74ba52df",
+                                "before_line_endings":  "CRLF",
+                                "after_length":  291,
+                                "after_sha256":  "aa946e5bfa49c34ad717da6066dd5180e0bff835e723588814f0a2067b5b3fd0",
+                                "after_line_endings":  "LF",
+                                "text_content_changed":  false
+                            }
+                        ],
+    "snapshot_after":  [
+                           {
+                               "path":  "__pycache__/perf_recovery_driver.cpython-313.pyc",
+                               "length":  16706,
+                               "sha256":  "c2c38f74841820f5af354916327eadc8305d5d078fdff9a085a2044c6651081a"
+                           },
+                           {
+                               "path":  "artifacts/report_cn.md",
+                               "length":  2818,
+                               "sha256":  "c7023475cf3abf751282fba671db94c65e37453fcf8e3555d43acbb93115b0c5"
+                           },
+                           {
+                               "path":  "capacity_overhead.csv",
+                               "length":  1038,
+                               "sha256":  "aebc319fe12f34a93eb1405c7a8590262543935b67da751aed62ddad678d902a"
+                           },
+                           {
+                               "path":  "environment.json",
+                               "length":  1400,
+                               "sha256":  "3388e180a09a9b6bd5bc8497fcb25c5d5c68cc6ddcf5c33848326d6326cb0642"
+                           },
+                           {
+                               "path":  "instrumentation_audit.json",
+                               "length":  21734,
+                               "sha256":  "d7cabf5735c418c99923b8087d55297c1220966407949ffefe960dacf2eca207"
+                           },
+                           {
+                               "path":  "latency_summary.json",
+                               "length":  7893,
+                               "sha256":  "a4e28f6627b278258202d7ab71db72474f29f9e569ca432ebfc40e36baf12a09"
+                           },
+                           {
+                               "path":  "logs/stage1_stage9_regression.log",
+                               "length":  94248,
+                               "sha256":  "0a74a93d33ccb909e30556ece81c1ee2bce40860ba6e2b9f8ea022ba73e8bb22"
+                           },
+                           {
+                               "path":  "measurement_checkpoint.json",
+                               "length":  14048,
+                               "sha256":  "8ec44db66348aef3c65459ea48a3b87fc417d862102c85b4fe6bda958bf915d3"
+                           },
+                           {
+                               "path":  "memory_breakdown.json",
+                               "length":  5537,
+                               "sha256":  "ee2267e0fdc31f6a9968c76dc18b0704212da2528a62a8a418963297caa075e3"
+                           },
+                           {
+                               "path":  "perf/failed-attempt-nul-ack/perf-stat.raw",
+                               "length":  281,
+                               "sha256":  "e225bd4728cf3ecbe11120669368c46724e9ff8373607ad4b5c2ef60e5a16854"
+                           },
+                           {
+                               "path":  "perf/failed-attempt-nul-ack/perf-stderr.log",
+                               "length":  605,
+                               "sha256":  "ccfb2344057caeeb5cae468282943ae9470e800c991cde86bd9e368c1ec078f0"
+                           },
+                           {
+                               "path":  "perf/perf_parsed.json",
+                               "length":  19785,
+                               "sha256":  "bc8ec7936d7fdaa4bf15e21505f5fa003d93e36f40d00cccc6bc6f204d86a52d"
+                           },
+                           {
+                               "path":  "perf/perf_scope_counts.json",
+                               "length":  17588,
+                               "sha256":  "9bfaeb23c66ab86f74aae625c60f80581a18d629cc7b125df60d1d15627fc45e"
+                           },
+                           {
+                               "path":  "perf/perf-stat.raw",
+                               "length":  291,
+                               "sha256":  "aa946e5bfa49c34ad717da6066dd5180e0bff835e723588814f0a2067b5b3fd0"
+                           },
+                           {
+                               "path":  "perf/perf-stderr.log",
+                               "length":  853,
+                               "sha256":  "df1cff30f60b2d7433af70cf31e3a354a043fcd9eab1f0b1a8c1563296735254"
+                           },
+                           {
+                               "path":  "perf_recovery_driver.py",
+                               "length":  9528,
+                               "sha256":  "abf6a4393bb52569325e00b8f2df9205973ce5d16b59d746951c891c5b32ba3c"
+                           },
+                           {
+                               "path":  "perf_recovery_receipt.json",
+                               "length":  1308,
+                               "sha256":  "b130cb820a552063c4cbe9fd02fc4adb01969db5b4f44790831e347c4d95b49b"
+                           },
+                           {
+                               "path":  "preflight.json",
+                               "length":  717,
+                               "sha256":  "3489eccbfcc9de90181615f0b12ab70e43d28e8aa10ff476cdb46ac14ee79888"
+                           },
+                           {
+                               "path":  "quality_summary.json",
+                               "length":  94230,
+                               "sha256":  "5b4c0c584580e142b77fa7df0c32a2f5f6f2b4ce93a9f3aebc7bbdff6be16b2a"
+                           },
+                           {
+                               "path":  "raw_latency_samples.csv",
+                               "length":  194210443,
+                               "sha256":  "1a8a144cfca9519ca4a8bb9ae46417aadd45b38d056100752c1b82d866465528"
+                           },
+                           {
+                               "path":  "recover_perf_only.sh",
+                               "length":  8870,
+                               "sha256":  "334a6be17cf4ebf8fc73fe236f61d20b9dca96821da836fffdca67ee2fafe69e"
+                           },
+                           {
+                               "path":  "recover_verify_only.sh",
+                               "length":  3976,
+                               "sha256":  "b778e23979fb88ae9e7a1d40b11bd24640597fe1062add71e812a19a2d682be6"
+                           },
+                           {
+                               "path":  "resolved_config.json",
+                               "length":  7478,
+                               "sha256":  "d54b271c2470a04bfbaa82dd4c696214adb5fb83235d32f3a82eda01213ab8a0"
+                           },
+                           {
+                               "path":  "run_identity.json",
+                               "length":  4202,
+                               "sha256":  "3241d3df3b1ff701dcc0a571d05f0eacab8412becf1fc960e22df97ef433c2b2"
+                           },
+                           {
+                               "path":  "run_state.json",
+                               "length":  420,
+                               "sha256":  "c862886d04981e63569258e5605994c6bf14afca880122e39777903d30a3e1c3"
+                           },
+                           {
+                               "path":  "run_state.perf_failure.original.json",
+                               "length":  1753,
+                               "sha256":  "c6ff94c0d105506f690e9caedb58e850b3533107a44b51a2cf982f7eb6b8ea79"
+                           },
+                           {
+                               "path":  "server_test_receipt.json",
+                               "length":  424,
+                               "sha256":  "63e3bfe89b5240b5c7492ee0100e90ba34731238fad7f73797f00a303b21e032"
+                           },
+                           {
+                               "path":  "stage8_compatibility_receipt.json",
+                               "length":  1578,
+                               "sha256":  "fc91e2538e6f88a65fc777ea79fc5d99581f47034a194507c599d58c2b6ba27d"
+                           },
+                           {
+                               "path":  "throughput_summary.json",
+                               "length":  2602,
+                               "sha256":  "1ef11eca08655d6166de75c7ccec9fed95c47396f5acd99b0edb67bc24655ce5"
+                           },
+                           {
+                               "path":  "verification.json",
+                               "length":  3054,
+                               "sha256":  "bc5dc7fc46247da5d2085dd302150361232ff0cd27cd9b911cb559072ef8635f"
+                           },
+                           {
+                               "path":  "verify_only_recovery_receipt.json",
+                               "length":  913,
+                               "sha256":  "7d6ad275d6c7b427286bef540f1638c3ff585a2dfcb43a1f34ead93ed5b0a539"
+                           }
+                       ],
+    "changed_paths":  [
+                          "capacity_overhead.csv",
+                          "perf/perf-stat.raw"
+                      ],
+    "artifact_sha256_validation":  {
+                                       "verification_mapping_count":  19,
+                                       "verified_count":  19,
+                                       "mismatch_count":  0,
+                                       "mismatches":  [
+
+                                                      ],
+                                       "path_escape_count":  0,
+                                       "result":  "passed"
+                                   }
+}
