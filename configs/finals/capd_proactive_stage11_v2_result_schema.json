@@ -1,0 +1,22 @@
+{
+  "schema_version": "capd_proactive_stage11_v2_result_schema_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE11-2.0",
+  "required_row_fields": [
+    "row_id", "run_id", "source_job_id", "track", "workload", "policy",
+    "seed", "cost_profile", "cost_profile_weights", "dram_hits", "nvm_reads",
+    "nvm_writes", "total_demotions", "raw_access_count", "weighted_cost",
+    "weighted_cost_per_access", "evidence_mode", "evidence_status"
+  ],
+  "allowed_evidence_status": ["candidate-ready", "BLOCKED", "NOT_VERIFIABLE"],
+  "forbidden_generated_status": "formally_verified",
+  "null_numeric_representation": "null",
+  "report_missing_numeric_representation": "N/A",
+  "run_identity_required": [
+    "run_id", "contract_id", "approved_design_sha256", "approved_plan_sha256",
+    "config_sha256", "result_schema_sha256", "generation_source_manifest_sha256",
+    "generation_source_members_sha256", "verifier_source_manifest_sha256",
+    "verifier_source_members_sha256", "authorization_receipt_sha256",
+    "standard_source_manifest_sha256", "sorted_job_ids_sha256",
+    "frozen_grid_sha256", "code_version", "synthetic_test_only"
+  ]
+}

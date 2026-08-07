@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capd_proactive_stage11_v2_production_result_v1_0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "run_id", "lane", "rows", "blocked_lanes", "stage11_formally_verified", "test_used_for_parameter_selection"],
+  "properties": {
+    "schema_version": {"const": "capd_proactive_stage11_v2_production_result_v1_0"},
+    "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"},
+    "run_id": {"const": "stage11-standard-cost-profiles-v2-r3"},
+    "lane": {"const": "offline_cost_profiles"},
+    "rows": {"type": "array", "minItems": 192, "maxItems": 192, "items": {"$ref": "#/$defs/row"}},
+    "blocked_lanes": {"type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true},
+    "stage11_formally_verified": {"const": false},
+    "test_used_for_parameter_selection": {"const": false}
+  },
+  "$defs": {"row": {"type": "object", "additionalProperties": false, "required": ["row_id", "run_id", "source_job_id", "track", "workload", "policy", "seed", "cost_profile", "cost_profile_weights", "dram_hits", "nvm_reads", "nvm_writes", "total_demotions", "raw_access_count", "reactive_demotions", "proactive_demotions", "emergency_demotions", "weighted_cost", "weighted_cost_per_access", "evidence_mode", "evidence_status"], "properties": {"row_id": {"type": "string"}, "run_id": {"type": "string"}, "source_job_id": {"type": "string"}, "track": {"const": "standard"}, "workload": {"type": "string"}, "policy": {"type": "string"}, "seed": {"type": ["integer", "null"]}, "cost_profile": {"type": "string"}, "cost_profile_weights": {"type": "object"}, "dram_hits": {"type": "integer", "minimum": 0}, "nvm_reads": {"type": "integer", "minimum": 0}, "nvm_writes": {"type": "integer", "minimum": 0}, "total_demotions": {"type": "integer", "minimum": 0}, "raw_access_count": {"type": "integer", "minimum": 0}, "reactive_demotions": {"type": "integer", "minimum": 0}, "proactive_demotions": {"type": "integer", "minimum": 0}, "emergency_demotions": {"type": "integer", "minimum": 0}, "weighted_cost": {"type": "integer", "minimum": 0}, "weighted_cost_per_access": {"type": ["number", "null"]}, "evidence_mode": {"const": "offline_raw_counter_recompute"}, "evidence_status": {"const": "candidate-ready"}}}}
+}

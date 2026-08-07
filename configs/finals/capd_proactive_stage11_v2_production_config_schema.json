@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capd_proactive_stage11_v2_production_config_v1_0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "production_revision", "run_id", "approved_production_design", "approved_production_plan", "upstream", "stage10_external_anchors", "input_audit", "source_manifests", "standard_contract", "cost_profiles", "cost_semantics", "main_control", "authorized_scope", "expected_result_rows", "blocked_lanes", "output_root", "production_branch_available", "test_used_for_parameter_selection"],
+  "properties": {
+    "schema_version": {"const": "capd_proactive_stage11_v2_production_config_v1_0"},
+    "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"},
+    "production_revision": {"const": "stage11-v2-production-r3"},
+    "run_id": {"const": "stage11-standard-cost-profiles-v2-r3"},
+    "approved_production_design": {"$ref": "#/$defs/approval"},
+    "approved_production_plan": {"$ref": "#/$defs/approval"},
+    "upstream": {"type": "object", "additionalProperties": false, "required": ["stage8_root", "stage9_root", "stage10_root"], "properties": {"stage8_root": {"type": "string"}, "stage9_root": {"type": "string"}, "stage10_root": {"type": "string"}}},
+    "stage10_external_anchors": {"type": "object"},
+    "input_audit": {"type": "object"},
+    "source_manifests": {"type": "object"},
+    "standard_contract": {"type": "object"},
+    "cost_profiles": {"type": "object", "minProperties": 4, "maxProperties": 4},
+    "cost_semantics": {"type": "object"},
+    "main_control": {"type": "object", "additionalProperties": false, "required": ["b_max"], "properties": {"b_max": {"const": 2}}},
+    "authorized_scope": {"const": "offline_cost_profiles_only"},
+    "expected_result_rows": {"const": 192},
+    "blocked_lanes": {"type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true},
+    "output_root": {"const": "outputs/capd_proactive_stage11_v2"},
+    "production_branch_available": {"const": true},
+    "test_used_for_parameter_selection": {"const": false}
+  },
+  "$defs": {"approval": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "required_status"], "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "required_status": {"type": "string"}}}}
+}

@@ -1,0 +1,131 @@
+\subsection{\heiti 提前降级行为与适用边界}
+
+总体结果表明，CAPD 的成本收益集中在部分工作负载，而在其余工作负载上与规则式排序方法持平。本节不比较主动降级与被动降级机制的优劣，而是从降级页面的后续访问行为出发，分析 CAPD 在何种访问模式下能够通过页面排序降低成本，以及哪些场景没有足够的排序收益空间。
+
+\subsubsection{\heiti 短期重访与无后续复用}
+
+Early-Reuse@$\Delta$ 表示主动降级页面在随后 $\Delta$ 次访存内再次被访问的比例。该指标越高，说明越多页面在降级后很快重新进入访问路径。无后续复用率表示主动降级页面在剩余测试区间内不再被访问的比例；该字段在实验产物中对应 \texttt{wasted\_demotion\_rate}，本文按照其实际统计语义称为无后续复用率。表~\ref{tab:capd-early-reuse} 对 CAPD 和 TPP-inspired 的页面后续访问行为进行比较。CAPD 的主动降级次数为三个训练随机种子的均值，各比例先在同一工作负载的固定 Test 窗口内按事件数合并，再对三个随机种子取均值。
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \caption{CAPD 与 TPP-inspired 的短期重访和无后续复用行为}
+  \label{tab:capd-early-reuse}
+  \renewcommand{\arraystretch}{1.12}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llrrrrr}
+    \toprule
+    工作负载 & 方法 & 主动降级次数 & Early-Reuse@64 & Early-Reuse@256 & Early-Reuse@1024 & 无后续复用率 \\
+    \midrule
+    blackscholes  & CAPD         & 29,252 & 8.42\%  & 48.09\% & 92.81\% & 0.08\% \\
+    blackscholes  & TPP-inspired & 40,090 & 48.02\% & 78.04\% & 96.98\% & 0.04\% \\
+    canneal       & CAPD         & 2,409 & 0.00\% & 0.00\% & 0.00\% & 100.00\% \\
+    canneal       & TPP-inspired & 2,409 & 0.00\% & 0.00\% & 0.00\% & 100.00\% \\
+    dedup         & CAPD         & 345 & 0.00\% & 0.00\% & 0.00\% & 100.00\% \\
+    dedup         & TPP-inspired & 345 & 0.00\% & 0.00\% & 0.00\% & 100.00\% \\
+    fluidanimate  & CAPD         & 0 & N/A & N/A & N/A & N/A \\
+    fluidanimate  & TPP-inspired & 0 & N/A & N/A & N/A & N/A \\
+    streamcluster & CAPD         & 3 & 0.00\% & 0.00\% & 0.00\% & 100.00\% \\
+    streamcluster & TPP-inspired & 3 & 0.00\% & 0.00\% & 0.00\% & 100.00\% \\
+    swaptions     & CAPD         & 8,510 & 63.11\% & 81.45\% & 91.88\% & 0.26\% \\
+    swaptions     & TPP-inspired & 9,260 & 67.67\% & 82.85\% & 91.71\% & 0.25\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \fbox{\parbox[c][4.8cm][c]{0.94\linewidth}{
+    \centering
+    \textbf{占位图：blackscholes 与 swaptions 的 Early-Reuse 曲线}\\[0.5em]
+    两个子图分别对应 blackscholes 和 swaptions\\
+    横轴：重访窗口 $\Delta\in\{64,256,1024\}$；纵轴：Early-Reuse（\%）\\
+    两条折线：CAPD、TPP-inspired；在数据点上标注具体比例
+  }}
+  \caption{CAPD 与 TPP-inspired 在两个排序敏感工作负载上的短期重访行为。}
+  \label{fig:capd-early-reuse}
+\end{figure}
+
+blackscholes 上的差异最为明显。CAPD 的 Early-Reuse@64 为 8.42\%，比 TPP-inspired 的 48.02\% 低 39.60 个百分点；Early-Reuse@256 也降低 29.95 个百分点。同时，CAPD 的主动降级次数由 40,090 次减少到 29,252 次。结合上一节中 NVM 读取和页面降级事件的下降可以看出，CAPD 的主要作用不是寻找永远不会再访问的页面，而是减少会在极短时间内重新访问的提前降级，并降低不必要的页面迁移数量。
+
+swaptions 上 CAPD 与 TPP-inspired 的差异较小：Early-Reuse@64 和 Early-Reuse@256 分别降低 4.56 和 1.40 个百分点，而 Early-Reuse@1024 基本持平。该结果与其 1.36\% 的 Weighted Cost 降幅一致，说明 CAPD 在该工作负载上改善了部分近期页面选择，但仍有较多降级页面会在短时间内重新访问。canneal、dedup 和 streamcluster 中，两种方法选择的主动降级页面均没有后续复用，排序规则之间不存在可观测差异；fluidanimate 没有触发主动降级，因此 Early-Reuse 和无后续复用率均记为 N/A，而不是 0\%。
+
+\subsubsection{\heiti 首次复用距离与后续访问强度}
+
+Early-Reuse 只判断页面是否落入给定窗口，首次复用距离和未来访问次数能够进一步刻画降级页面后续访问的时间位置和访问强度。表~\ref{tab:capd-reuse-distance} 给出了 blackscholes 和 swaptions 上 CAPD 的统计范围。范围来自各固定 Test 窗口和三个训练随机种子的逐次结果；P50 和 P95 均为对应结果中的事件级分位数，不对分位数再次合并计算。
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \caption{CAPD 降级页面的首次复用距离与未来访问次数}
+  \label{tab:capd-reuse-distance}
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    工作负载 & 首次复用距离 P50 & 首次复用距离 P95 & 未来访问次数均值 & 未来访问次数 P50 & 未来访问次数 P95 \\
+    \midrule
+    blackscholes & 265--269 & 1,203--1,478 & 4,615.1--5,755.2 & 1,611--1,982 & 27,867--33,934 \\
+    swaptions    & 41--42   & 6,034.3--6,310 & 4,015.0--9,334.1 & 1,822.5--2,973 & 17,104.8--46,006.9 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+blackscholes 的首次复用距离中位数约为 265 次访问，但 95 分位数达到 1,203 至 1,478，说明其降级页面通常仍会再次使用，只是重访时间具有一定跨度。swaptions 的中位数仅为 41 至 42，表明短期重访更集中；与此同时，其 95 分位数超过 6,000，呈现更明显的长尾。两个工作负载中，发生后续复用的页面往往还会被访问数千次，进一步说明 CAPD 的收益不能解释为识别“永久冷页”。其有效性来自对重访时机的相对排序，即优先降级近期复用风险较低的候选页面。
+
+\subsubsection{\heiti OOV 泛化诊断}
+
+CAPD 在测试时保持训练词表冻结，未见页面和程序计数器均映射到统一的 UNK 标记。表~\ref{tab:capd-oov} 同时报告按访问次数统计的 OOV 比例和按不同标记统计的 unique OOV 比例。对于包含多个固定 Test 窗口的工作负载，表中给出各窗口和随机种子结果的取值范围。
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \caption{CAPD 在不同工作负载上的页面与程序计数器 OOV 比例}
+  \label{tab:capd-oov}
+  \renewcommand{\arraystretch}{1.12}
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    工作负载 & 页面 access OOV & 页面 unique OOV & PC access OOV & PC unique OOV \\
+    \midrule
+    blackscholes  & 0.2732--0.2734\%   & 9.0909\%          & 24.8216--24.8890\% & 40.0929\% \\
+    canneal       & 77.7778--77.7780\% & 99.9163--99.9303\% & 4.1666--4.1667\%   & 18.7500\% \\
+    dedup         & 18.1817--18.1820\% & 98.2379--98.5240\% & 12.4998--12.5002\% & 22.2222\% \\
+    fluidanimate  & 0.5023\%           & 33.3333\%          & 100.0000\%          & 100.0000\% \\
+    streamcluster & 2.9863\%           & 75.0000\%          & 43.0000\%           & 84.8101\% \\
+    swaptions     & 0.0000\%           & 0.0000\%           & 12.0247--12.4662\% & 36.6589\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+OOV 比例与 CAPD 的成本收益不存在简单的单调关系。canneal 和 dedup 的页面 unique OOV 比例接近 100\%，但 CAPD 与规则式方法持平；blackscholes 在存在 PC OOV 的情况下仍取得最大成本降幅；swaptions 的页面 OOV 为 0，但收益小于 blackscholes。fluidanimate 的 PC OOV 为 100\%，然而该工作负载没有主动降级决策，因而该比例不能用于评价排序质量。上述结果说明，OOV 反映的是冻结词表对测试标记的覆盖程度，不能单独作为模型有效或失效的判据，也不构成依据测试结果扩展词表或重新训练模型的理由。
+
+\subsubsection{\heiti 适用边界归纳}
+
+表~\ref{tab:capd-applicability} 将六个工作负载归纳为三类页面访问模式。该分类用于解释结果，不参与模型选择或参数调整。
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{CAPD 页面排序收益的适用场景与边界}
+  \label{tab:capd-applicability}
+  \renewcommand{\arraystretch}{1.18}
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{p{2.6cm}p{2.7cm}p{8.2cm}}
+    \toprule
+    访问模式 & 工作负载 & 行为特征与结果解释 \\
+    \midrule
+    排序敏感且页面会复用
+      & blackscholes、swaptions
+      & 不同方法会选择不同页面。CAPD 减少短期重访和主动降级次数，分别获得 10.05\% 和 1.36\% 的成本下降；收益大小取决于能否避开近期复用页面。 \\
+    候选页面均无后续复用
+      & canneal、dedup
+      & 两种方法的无后续复用率均为 100\%，候选页面之间缺少能够影响后续事件的有效排序差异，因此 CAPD 与基线持平。 \\
+    结构性零或稀疏事件
+      & fluidanimate、streamcluster
+      & fluidanimate 没有主动降级事件，streamcluster 仅有 3 次且均无后续复用。可供页面排序发挥作用的事件数量不足，结果只能说明两种方法持平，不能据此判断模型排序能力。 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+综合来看，CAPD 适用于存在持续主动降级需求、候选页面后续复用行为存在差异，并且近期访存上下文能够帮助区分重访时机的场景。当候选页面都不会再次访问，或工作负载几乎不触发主动降级时，复杂排序不会产生额外收益。该结论限定在当前单线程、单进程和固定候选集合的 Trace Replay 范围内，说明的是 CAPD 页面排序的适用条件，而不是主动降级机制相对被动机制的普遍优越性。

@@ -1,0 +1,14 @@
+{
+  "schema_version": "capd_proactive_stage11_v2_config_schema_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE11-2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "contract_id", "approved_design", "approved_plan",
+    "source_manifests", "upstream", "stage10_external_anchors",
+    "standard_contract", "cost_profiles", "cost_semantics", "main_control",
+    "analysis_grid", "model_component_ablation", "output_root",
+    "execution_authorization", "production_execution_enabled",
+    "test_used_for_parameter_selection"
+  ]
+}

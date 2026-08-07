@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "capd_proactive_stage11_v2_upstream_continuity_comparison_v1_0", "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "comparisons", "identical"],
+  "properties": {"schema_version": {"const": "capd_proactive_stage11_v2_upstream_continuity_comparison_v1_0"}, "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"}, "comparisons": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["comparison_id", "baseline_snapshot_sha256", "observed_snapshot_sha256", "per_root_comparison", "identical"], "properties": {"comparison_id": {"type": "string"}, "baseline_snapshot_sha256": {"type": "string"}, "observed_snapshot_sha256": {"type": "string"}, "per_root_comparison": {"type": "array"}, "identical": {"type": "boolean"}}}, "minItems": 1, "maxItems": 2}, "identical": {"type": "boolean"}}
+}

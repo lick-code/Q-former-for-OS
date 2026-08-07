@@ -1,0 +1,10 @@
+{
+  "schema_version": "capd_proactive_stage11_v2_release_manifest_schema_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE11-2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "phase", "files"],
+  "phases": ["generation", "verification", "final_approval", "final_status"],
+  "manifest_excludes": ["manifest.json", "SHA256SUMS"],
+  "checksums_excludes": ["SHA256SUMS"]
+}

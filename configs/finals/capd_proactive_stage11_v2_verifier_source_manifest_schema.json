@@ -1,0 +1,12 @@
+{
+  "schema_version": "capd_proactive_stage11_v2_source_manifest_schema_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE11-2.0",
+  "role": "verifier",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "contract_id", "role", "approved_design_sha256",
+    "approved_plan_sha256", "members", "member_count", "members_sha256",
+    "local_import_closure_complete", "exclusions"
+  ]
+}

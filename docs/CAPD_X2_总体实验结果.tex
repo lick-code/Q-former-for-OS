@@ -1,0 +1,118 @@
+\subsection{\heiti CAPD 总体实验结果}
+
+本节从加权访问成本、页面访问与迁移事件以及候选集合内参考上界三个层面评价 CAPD 的页面排序效果。对于包含多个固定 Test 窗口的工作负载，首先合并窗口内的事件计数并计算单位访问成本；随后对六个工作负载等权求宏平均，避免测试窗口数量和长度差异改变工作负载权重。CAPD 的结果均为三个训练随机种子的均值，其他方法为确定性运行结果。
+
+\subsubsection{\heiti Weighted Cost 对比}
+
+表~\ref{tab:capd-workload-cost} 给出了五种页面排序方法在六个工作负载上的单位访问 Weighted Cost。CAPD 在 blackscholes 和 swaptions 上取得了低于三种在线对比方法的成本，在其余四个工作负载上与 TPP-inspired 持平。六工作负载宏平均下，CAPD 的单位访问成本为 1.105942，相较 Proactive-LRU 和 TPP-inspired 降低 2.62\%，相较 Proactive-CLOCK 降低 3.06\%。
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \caption{六个工作负载上的单位访问 Weighted Cost}
+  \label{tab:capd-workload-cost}
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{2.8pt}
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    工作负载 & Proactive-LRU & Proactive-CLOCK & TPP-inspired & CAPD & Oracle & CAPD 相对 TPP \\
+    \midrule
+    blackscholes  & 1.617769 & 1.623131 & 1.617769 & \textbf{1.455201} & 1.440681 & $-10.05\%$ \\
+    canneal       & 1.038619 & 1.038619 & 1.038619 & \textbf{1.038619} & 1.038619 & $0.00\%$ \\
+    dedup         & 1.007307 & 1.007307 & 1.007307 & \textbf{1.007307} & 1.007307 & $0.00\%$ \\
+    fluidanimate  & 1.000025 & 1.000025 & 1.000025 & \textbf{1.000025} & 1.000025 & $0.00\%$ \\
+    streamcluster & 1.000297 & 1.000297 & 1.000297 & \textbf{1.000297} & 1.000297 & $0.00\%$ \\
+    swaptions     & 1.149888 & 1.175554 & 1.149888 & \textbf{1.134203} & 1.123524 & $-1.36\%$ \\
+    \midrule
+    宏平均         & 1.135651 & 1.140822 & 1.135651 & \textbf{1.105942} & 1.101742 & $-2.62\%$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \fbox{\parbox[c][5.0cm][c]{0.94\linewidth}{
+    \centering
+    \textbf{占位图 1：六个工作负载上的 Weighted Cost 对比}\\[0.5em]
+    横轴：blackscholes、canneal、dedup、fluidanimate、streamcluster、swaptions\\
+    纵轴：相对 TPP-inspired 归一化的单位访问 Weighted Cost，TPP-inspired$=1$\\
+    分组柱：Proactive-LRU、Proactive-CLOCK、TPP-inspired、CAPD；参考点：Oracle\\
+    CAPD 绘制三个训练随机种子的均值和标准差误差棒
+  }}
+  \caption{六个工作负载上的归一化 Weighted Cost。数值越低表示加权访问成本越小。}
+  \label{fig:capd-workload-cost}
+\end{figure}
+
+从逐工作负载结果看，CAPD 相较 TPP-inspired 在 blackscholes 上降低 10.05\%，在 swaptions 上降低 1.36\%。如图~\ref{fig:capd-workload-cost} 所示，这两类工作负载贡献了宏平均中的全部成本改善。canneal、dedup、fluidanimate 和 streamcluster 上各方法结果相同，因此不能将宏平均收益解释为 CAPD 在所有工作负载上的固定优势。更准确的结论是，CAPD 在当前测试范围内没有出现高于在线对比方法的工作负载，并在页面选择会改变后续访存行为的工作负载上取得了成本收益。
+
+\subsubsection{\heiti 页面访问与迁移事件分解}
+
+Weighted Cost 由 DRAM 命中、NVM 读取、NVM 写入和页面降级四类事件共同决定。表~\ref{tab:capd-workload-event-delta} 给出了 CAPD 相对 TPP-inspired 的逐工作负载事件差值，其中负数表示 CAPD 触发的对应事件更少。六个工作负载合计后，CAPD 增加 17,379 次 DRAM 命中，减少 16,565.7 次 NVM 读取、813.3 次 NVM 写入和 17,382 次页面降级，最终使加权成本减少 196,079。
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \caption{CAPD 相对 TPP-inspired 的页面访问与迁移事件差值}
+  \label{tab:capd-workload-event-delta}
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    工作负载 & $\Delta$DRAM 命中 & $\Delta$NVM 读取 & $\Delta$NVM 写入 & $\Delta$页面降级 & $\Delta$Weighted Cost \\
+    \midrule
+    blackscholes  & $+16,255$ & $-16,255$ & $0$      & $-16,257$ & $-178,825$ \\
+    canneal       & $0$       & $0$       & $0$      & $0$       & $0$ \\
+    dedup         & $0$       & $0$       & $0$      & $0$       & $0$ \\
+    fluidanimate  & $0$       & $0$       & $0$      & $0$       & $0$ \\
+    streamcluster & $0$       & $0$       & $0$      & $0$       & $0$ \\
+    swaptions     & $+1,124$  & $-310.7$  & $-813.3$ & $-1,125$ & $-17,254$ \\
+    \midrule
+    合计           & $+17,379$ & $-16,565.7$ & $-813.3$ & $-17,382$ & $-196,079$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \fbox{\parbox[c][4.5cm][c]{0.94\linewidth}{
+    \centering
+    \textbf{占位图 2：Weighted Cost 变化的事件贡献分解}\\[0.5em]
+    横轴：blackscholes、swaptions；纵轴：CAPD$-$TPP-inspired 的成本贡献\\
+    堆叠项：$\Delta N_{\mathrm{hit}}$、$2\Delta N_{\mathrm{NVM\_read}}$、\\
+    $8\Delta N_{\mathrm{NVM\_write}}$、$10\Delta N_{\mathrm{demotion}}$\\
+    在柱顶标注最终 $\Delta$Weighted Cost
+  }}
+  \caption{blackscholes 和 swaptions 上 Weighted Cost 变化的事件贡献。负值表示该事件项降低了 CAPD 的成本。}
+  \label{fig:capd-event-contribution}
+\end{figure}
+
+blackscholes 上的主要变化是 NVM 读取和页面降级分别减少 16,255 次和 16,257 次。由于两类事件在成本模型中的权重分别为 2 和 10，页面降级减少构成了该工作负载的主要收益来源。swaptions 上的变化规模较小，但同时减少了 NVM 读取、NVM 写入和页面降级，其中 NVM 写入与页面降级的高权重共同形成 17,254 的成本降幅。其余四个工作负载中，两种方法的四类事件计数完全相同，表明在当前候选集合和水位配置下，页面排序差异没有转化为可观测的访问或迁移差异，因此无需逐一作重复分析。
+
+\subsubsection{\heiti Oracle 上界分析}
+
+Oracle 在与其他方法相同的候选集合和批量大小约束下，使用未来信息对候选页面进行排序。它表示当前候选范围内的参考上界，而不是能够在线运行的基线，也不等同于整个回放过程的全局最优解。表~\ref{tab:capd-oracle-gap} 报告 CAPD 与 Oracle 的单位访问成本差距。
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{CAPD 与候选集合内 Oracle 的 Weighted Cost 差距}
+  \label{tab:capd-oracle-gap}
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{lrrr}
+    \toprule
+    工作负载 & CAPD & Oracle & CAPD 相对 Oracle 差距 \\
+    \midrule
+    blackscholes  & 1.455201 & 1.440681 & 1.01\% \\
+    canneal       & 1.038619 & 1.038619 & 0.00\% \\
+    dedup         & 1.007307 & 1.007307 & 0.00\% \\
+    fluidanimate  & 1.000025 & 1.000025 & 0.00\% \\
+    streamcluster & 1.000297 & 1.000297 & 0.00\% \\
+    swaptions     & 1.134203 & 1.123524 & 0.95\% \\
+    \midrule
+    宏平均         & 1.105942 & 1.101742 & 0.38\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+CAPD 在 canneal、dedup、fluidanimate 和 streamcluster 上与 Oracle 持平，说明在这些工作负载的当前候选集合内，未来信息没有带来额外排序收益。在 blackscholes 和 swaptions 上，CAPD 与 Oracle 分别仍有 1.01\% 和 0.95\% 的差距；六工作负载宏平均差距为 0.38\%。这表明 CAPD 已利用了当前候选集合内的大部分可见排序收益，但在真正产生策略差异的工作负载上仍保留少量改进空间。总体而言，CAPD 的优势表现为具有明确适用场景的页面排序收益，而不是跨工作负载无条件成立的普遍提升。

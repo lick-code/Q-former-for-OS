@@ -1,0 +1,17 @@
+{
+  "schema_version": "capd_proactive_stage11_v2_final_approval_receipt_schema_v1_0",
+  "contract_id": "CAPD-PROACTIVE-STAGE11-2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "contract_id", "run_id", "approved_plan_sha256",
+    "approval_decision", "approval_authority", "approval_reference",
+    "approval_timestamp", "execution_authorization_receipt_sha256",
+    "generation_artifact_sha256", "verification_receipt_sha256",
+    "verification_manifest_sha256", "verification_checksums_sha256",
+    "standard_source_manifest_sha256", "sorted_job_ids_sha256",
+    "standard_job_count", "standard_workload_count", "stage11_generation_verified",
+    "stage11_final_approval_granted", "test_used_for_parameter_selection",
+    "evidence_scope", "synthetic_test_only"
+  ]
+}

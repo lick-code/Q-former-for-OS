@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "capd_proactive_stage11_v2_production_source_manifest_v1_0", "type": "object", "additionalProperties": false,
+  "patternProperties": {".*_sha256$": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+  "required": ["schema_version", "contract_id", "role", "approved_production_design_sha256", "approved_production_plan_sha256", "members", "member_count", "members_sha256", "local_import_closure_complete", "exclusions"],
+  "properties": {"schema_version": {"const": "capd_proactive_stage11_v2_production_source_manifest_v1_0"}, "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"}, "role": {"const": "verifier"}, "member_count": {"const": 32}, "members": {"type": "array", "minItems": 32, "maxItems": 32}, "local_import_closure_complete": {"const": true}, "exclusions": {"type": "array"}}
+}

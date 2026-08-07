@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "capd_proactive_stage11_v2_production_package_manifest_v1_0", "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "phase", "members", "member_count", "members_sha256"],
+  "properties": {"schema_version": {"const": "capd_proactive_stage11_v2_production_package_manifest_v1_0"}, "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"}, "phase": {"enum": ["input_audit", "execution_authorization", "generation", "verification", "final_approval", "final_status"]}, "members": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "length", "sha256"], "properties": {"path": {"type": "string"}, "length": {"type": "integer", "minimum": 0}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}}, "member_count": {"type": "integer", "minimum": 1}, "members_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capd_proactive_stage11_v2_frozen_tree_snapshot_v1_0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "roots"],
+  "properties": {
+    "schema_version": {"const": "capd_proactive_stage11_v2_frozen_tree_snapshot_v1_0"},
+    "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"},
+    "roots": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["root_id", "repository_relative_root", "exists", "members"],
+        "properties": {
+          "root_id": {"type": "string"},
+          "repository_relative_root": {"type": "string"},
+          "exists": {"type": "boolean"},
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "length", "sha256"],
+              "properties": {
+                "path": {"type": "string"},
+                "length": {"type": "integer", "minimum": 0},
+                "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
