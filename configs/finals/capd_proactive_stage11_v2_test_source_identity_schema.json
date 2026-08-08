@@ -2,5 +2,5 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "capd_proactive_stage11_v2_test_source_identity_v1_0", "type": "object", "additionalProperties": false,
   "patternProperties": {".*_sha256$": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
   "required": ["schema_version", "contract_id", "audit_id", "approved_production_design_sha256", "approved_production_plan_sha256", "members", "members_sha256", "member_count", "test_source_pre_snapshot_sha256", "test_source_post_snapshot_sha256", "test_sources_unchanged"],
-  "properties": {"schema_version": {"const": "capd_proactive_stage11_v2_test_source_identity_v1_0"}, "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"}, "audit_id": {"const": "stage11-input-audit-v2-r4"}, "members": {"type": "array", "minItems": 29, "maxItems": 29, "uniqueItems": true}, "member_count": {"const": 29}, "test_sources_unchanged": {"const": true}}
+  "properties": {"schema_version": {"const": "capd_proactive_stage11_v2_test_source_identity_v1_0"}, "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"}, "audit_id": {"const": "stage11-input-audit-v2-r7"}, "members": {"type": "array", "minItems": 29, "maxItems": 29, "uniqueItems": true}, "member_count": {"const": 29}, "test_sources_unchanged": {"const": true}}
 }

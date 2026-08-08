@@ -440,9 +440,11 @@ class InputAuditPackageTest(unittest.TestCase):
 
     for field, wrong_value in (
         ("generation_source_manifest_sha256",
-         verifier.sha256_value(verifier.load_json_strict(generation_path))),
+         verifier.sha256_value({
+             "rehashed_tamper": verifier.load_json_strict(generation_path)})),
         ("verifier_source_manifest_sha256",
-         verifier.sha256_value(verifier.load_json_strict(verifier_path)))):
+         verifier.sha256_value({
+             "rehashed_tamper": verifier.load_json_strict(verifier_path)}))):
       tampered = copy.deepcopy(identity)
       tampered[field] = wrong_value
       payloads = self._payloads()

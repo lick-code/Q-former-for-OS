@@ -7,8 +7,8 @@
   "properties": {
     "schema_version": {"const": "capd_proactive_stage11_v2_production_config_v1_0"},
     "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"},
-    "production_revision": {"const": "stage11-v2-production-r3"},
-    "run_id": {"const": "stage11-standard-cost-profiles-v2-r3"},
+    "production_revision": {"const": "stage11-v2-production-r6"},
+    "run_id": {"const": "stage11-standard-cost-profiles-v2-r6"},
     "approved_production_design": {"$ref": "#/$defs/approval"},
     "approved_production_plan": {"$ref": "#/$defs/approval"},
     "upstream": {"type": "object", "additionalProperties": false, "required": ["stage8_root", "stage9_root", "stage10_root"], "properties": {"stage8_root": {"type": "string"}, "stage9_root": {"type": "string"}, "stage10_root": {"type": "string"}}},

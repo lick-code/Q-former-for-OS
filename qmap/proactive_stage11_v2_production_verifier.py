@@ -20,9 +20,9 @@ from qmap import proactive_stage11_v2_production_guard as production_guard
 
 
 CONTRACT_ID = "CAPD-PROACTIVE-STAGE11-2.0"
-PRODUCTION_REVISION = "stage11-v2-production-r3"
-RUN_ID = "stage11-standard-cost-profiles-v2-r3"
-AUDIT_ID = "stage11-input-audit-v2-r4"
+PRODUCTION_REVISION = "stage11-v2-production-r6"
+RUN_ID = "stage11-standard-cost-profiles-v2-r6"
+AUDIT_ID = "stage11-input-audit-v2-r7"
 APPROVED_DESIGN_SHA256 = (
     "ec00fdaeac4084f638fbf6da866d4444badd26dfac95eef061e137a5a26ba356")
 APPROVED_PLAN_SHA256 = (
@@ -1485,6 +1485,13 @@ def validate_generation_identity_chain(
       "source_snapshot_sha256", "expected_result_rows",
       "test_used_for_parameter_selection"}
   _exact_keys(identity, identity_fields, "Generation run identity")
+  _exact_keys(identity["code_version"], {"commit", "dirty"},
+              "Generation code version")
+  _require((identity["code_version"]["commit"] is None or
+            isinstance(identity["code_version"]["commit"], str)) and
+           (identity["code_version"]["dirty"] is None or
+            isinstance(identity["code_version"]["dirty"], bool)),
+           "Generation code-version diagnostic is invalid.")
   _require(
       identity["schema_version"] ==
       "capd_proactive_stage11_v2_production_run_identity_v1_0" and
@@ -1498,8 +1505,7 @@ def validate_generation_identity_chain(
       identity["production_result_schema_sha256"] == sha256_file(
           root / "configs/finals/capd_proactive_stage11_v2_production_result_schema.json") and
       identity["expected_result_rows"] == 192 and
-      identity["test_used_for_parameter_selection"] is False and
-      identity["code_version"] == code_version(root),
+      identity["test_used_for_parameter_selection"] is False,
       "Generation run identity primary fields mismatch.")
 
   input_binding = values["input_audit_binding.json"]

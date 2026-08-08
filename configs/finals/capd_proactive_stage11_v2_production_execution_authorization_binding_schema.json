@@ -1,5 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "capd_proactive_stage11_v2_production_execution_authorization_binding_v1_0", "type": "object", "additionalProperties": false,
   "required": ["schema_version", "contract_id", "run_id", "package_path", "receipt_sha256", "manifest_sha256", "checksums_sha256"],
-  "properties": {"schema_version": {"const": "capd_proactive_stage11_v2_production_execution_authorization_binding_v1_0"}, "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"}, "run_id": {"const": "stage11-standard-cost-profiles-v2-r3"}, "package_path": {"type": "string"}, "receipt_sha256": {"$ref": "#/$defs/sha"}, "manifest_sha256": {"$ref": "#/$defs/sha"}, "checksums_sha256": {"$ref": "#/$defs/sha"}}, "$defs": {"sha": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+  "properties": {"schema_version": {"const": "capd_proactive_stage11_v2_production_execution_authorization_binding_v1_0"}, "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"}, "run_id": {"const": "stage11-standard-cost-profiles-v2-r6"}, "package_path": {"type": "string"}, "receipt_sha256": {"$ref": "#/$defs/sha"}, "manifest_sha256": {"$ref": "#/$defs/sha"}, "checksums_sha256": {"$ref": "#/$defs/sha"}}, "$defs": {"sha": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
 }

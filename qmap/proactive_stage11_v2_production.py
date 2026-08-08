@@ -21,9 +21,9 @@ from qmap import proactive_stage11_v2_production_guard as production_guard
 
 
 CONTRACT_ID = "CAPD-PROACTIVE-STAGE11-2.0"
-PRODUCTION_REVISION = "stage11-v2-production-r3"
-RUN_ID = "stage11-standard-cost-profiles-v2-r3"
-AUDIT_ID = "stage11-input-audit-v2-r4"
+PRODUCTION_REVISION = "stage11-v2-production-r6"
+RUN_ID = "stage11-standard-cost-profiles-v2-r6"
+AUDIT_ID = "stage11-input-audit-v2-r7"
 APPROVED_DESIGN_SHA256 = (
     "ec00fdaeac4084f638fbf6da866d4444badd26dfac95eef061e137a5a26ba356")
 APPROVED_PLAN_SHA256 = (
@@ -1560,9 +1560,11 @@ def build_generation_package(
           authorization_binding["manifest_sha256"],
       "execution_authorization_checksums_sha256":
           authorization_binding["checksums_sha256"],
-      "generation_source_manifest_sha256": sha256_value(generation_source_manifest),
+      "generation_source_manifest_sha256": sha256_file(
+          root / config["source_manifests"]["generation"]),
       "generation_source_members_sha256": generation_source_manifest["members_sha256"],
-      "verifier_source_manifest_sha256": sha256_value(verifier_source_manifest),
+      "verifier_source_manifest_sha256": sha256_file(
+          root / config["source_manifests"]["verifier"]),
       "verifier_source_members_sha256": verifier_source_manifest["members_sha256"],
       "stage8_input_receipt_sha256": sha256_value(stage8_receipt),
       "stage9_input_receipt_sha256": sha256_value(stage9_receipt),

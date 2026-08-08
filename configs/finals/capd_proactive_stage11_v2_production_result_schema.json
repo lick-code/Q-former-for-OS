@@ -7,7 +7,7 @@
   "properties": {
     "schema_version": {"const": "capd_proactive_stage11_v2_production_result_v1_0"},
     "contract_id": {"const": "CAPD-PROACTIVE-STAGE11-2.0"},
-    "run_id": {"const": "stage11-standard-cost-profiles-v2-r3"},
+    "run_id": {"const": "stage11-standard-cost-profiles-v2-r6"},
     "lane": {"const": "offline_cost_profiles"},
     "rows": {"type": "array", "minItems": 192, "maxItems": 192, "items": {"$ref": "#/$defs/row"}},
     "blocked_lanes": {"type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true},
