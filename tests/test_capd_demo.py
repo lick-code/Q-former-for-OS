@@ -10,9 +10,15 @@ from pathlib import Path
 from unittest import mock
 
 from scripts import run_capd_demo as demo
+from scripts import show_capd_repository as repository_tour
 
 
 class CapdDemoTest(unittest.TestCase):
+
+  def test_repository_tour_finds_all_representative_paths(self):
+    self.assertEqual(
+        0, repository_tour.show_tour(
+            demo.ROOT, include_assets=False, pause=0.0))
 
   def test_synthetic_trace_is_deterministic_and_nontrivial(self):
     one = demo.build_demo_trace()
